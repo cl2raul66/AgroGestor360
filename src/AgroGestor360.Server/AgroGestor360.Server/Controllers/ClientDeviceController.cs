@@ -4,6 +4,7 @@ using AgroGestor360.Server.Tools.Enums;
 using AgroGestor360.Server.Tools.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using vCardLib.Models;
 
 namespace AgroGestor360.Server.Controllers;
 
@@ -33,14 +34,16 @@ public class ClientDeviceController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<string>> Insert(ClientDevice clientDevice)
+    public async Task<ActionResult<string>> Register(Object )
     {
         var id = clientdeviceForLitedbServ.Insert(clientDevice);
         if (string.IsNullOrEmpty(id))
         {
             return BadRequest();
         }
-        await hubCtx.Clients.All.SendAsync("ReceiveMessage", $"{OperationType.Create}:{nameof(ClientDevice)}:{id}");
+        await hubCtx.Groups.AddToGroupAsync(id, "anonymous");
+
+        //await hubCtx.Clients.All.SendAsync("ReceiveMessage", $"{OperationType.Create}:{nameof(ClientDevice)}:{id}");
         return Ok(id);
     }
 
@@ -50,9 +53,11 @@ public class ClientDeviceController : ControllerBase
         var result = clientdeviceForLitedbServ.Update(clientDevice);
         if (result)
         {
-            await hubCtx.Clients.All.SendAsync("ReceiveMessage", $"{OperationType.Update}:{nameof(ClientDevice)}:{clientDevice.Id}");
+            //await hubCtx.Clients.All.SendAsync("ReceiveMessage", $"{OperationType.Update}:{nameof(ClientDevice)}:{clientDevice.Id}");
+            await Task.CompletedTask;
             return Ok(result);
         }
+        await Task.CompletedTask;
         return BadRequest();
     }
 
@@ -62,9 +67,11 @@ public class ClientDeviceController : ControllerBase
         var result = clientdeviceForLitedbServ.Delete(id);
         if (result)
         {
-            await hubCtx.Clients.All.SendAsync("ReceiveMessage", $"{OperationType.Delete}:{nameof(ClientDevice)}:{id}");
+            //await hubCtx.Clients.All.SendAsync("ReceiveMessage", $"{OperationType.Delete}:{nameof(ClientDevice)}:{id}");
+            await Task.CompletedTask;
             return Ok(result);
         }
+        await Task.CompletedTask;
         return BadRequest();
     }
 }
