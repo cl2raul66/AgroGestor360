@@ -1,10 +1,14 @@
-﻿namespace AgroGestor360.App
+﻿using AgroGestor360.App.Views;
+
+namespace AgroGestor360.App;
+
+public partial class AppShell : Shell
 {
-    public partial class AppShell : Shell
+    public AppShell()
     {
-        public AppShell()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+
+        Routing.RegisterRoute(nameof(PgSignUp), typeof(PgSignUp));
+        Routing.RegisterRoute(nameof(PgHome), typeof(PgHome));
     }
 }
