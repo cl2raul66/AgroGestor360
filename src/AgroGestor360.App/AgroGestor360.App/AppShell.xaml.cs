@@ -8,7 +8,10 @@ public partial class AppShell : Shell
     {
         InitializeComponent();
 
-        Routing.RegisterRoute(nameof(PgSignUp), typeof(PgSignUp));
         Routing.RegisterRoute(nameof(PgHome), typeof(PgHome));
+        Routing.RegisterRoute(nameof(PgSettings), typeof(PgSettings));
+        Routing.RegisterRoute(nameof(PgExpense), typeof(PgExpense));
+        Routing.RegisterRoute(nameof(PgLoans), typeof(PgLoans));
+        Routing.RegisterRoute(nameof(PgSales), typeof(PgSales));
     }
 }

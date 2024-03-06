@@ -21,7 +21,11 @@ public static class MauiProgram
             });
 
         builder.Services.AddTransient<PgSignIn,PgSignInViewModel>();
-        builder.Services.AddTransient<PgSignUp,PgSignUpViewModel>();
+        builder.Services.AddTransient<PgHome,PgHomeViewModel>();
+        builder.Services.AddTransient<PgSettings,PgSettingsViewModel>();
+        builder.Services.AddTransient<PgExpense,PgExpenseViewModel>();
+        builder.Services.AddTransient<PgLoans,PgLoansViewModel>();
+        builder.Services.AddTransient<PgSales,PgSalesViewModel>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

@@ -3,11 +3,72 @@
     x:Class="AgroGestor360.App.Views.PgHome"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Home">
-    <VerticalStackLayout>
-        <Label
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
+    Title="Inicio"
+    x:DataType="vm:PgHomeViewModel"
+    Shell.NavBarIsVisible="False">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
+    <Grid
+        Padding="8"
+        RowDefinitions="auto,*,auto"
+        RowSpacing="16">
+        <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
+            <Label
+                Grid.Column="1"
+                FontSize="18"
+                Text="Inicio"
+                TextTransform="Uppercase"
+                VerticalOptions="Center" />
+            <HorizontalStackLayout Grid.Column="2" Spacing="8">
+                <Button
+                    Command="{Binding GoToLoansCommand}"
+                    Text="Prestamos"
+                    ToolTipProperties.Text="Ir a prestamos"
+                    WidthRequest="100" />
+                <Button
+                    Command="{Binding GoToExpenseCommand}"
+                    Text="Gastos"
+                    ToolTipProperties.Text="Ir a gastos"
+                    WidthRequest="100" />
+                <Button
+                    Command="{Binding GoToSalesCommand}"
+                    Text="Ventas"
+                    ToolTipProperties.Text="Ir a ventas"
+                    WidthRequest="100" />
+                <BoxView
+                    Margin="0,2"
+                    BackgroundColor="{StaticResource Tertiary}"
+                    CornerRadius="2"
+                    WidthRequest="2" />
+                <Button
+                    Command="{Binding GoToSettingsCommand}"
+                    FontFamily="icofont"
+                    Text="{StaticResource UiSettings}"
+                    ToolTipProperties.Text="Ajustes" />
+            </HorizontalStackLayout>
+        </Grid>
+        <Frame
+            Grid.Row="1"
             HorizontalOptions="Center"
-            Text="Welcome to Home!"
-            VerticalOptions="Center" />
-    </VerticalStackLayout>
+            VerticalOptions="Center">
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Accesos rápidos:" />
+                <HorizontalStackLayout Spacing="8">
+                    <Button
+                        Text="Aportes"
+                        ToolTipProperties.Text="Agregar aporte"
+                        WidthRequest="100" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Frame>
+        <Label
+            Grid.Row="2"
+            FontSize="11"
+            HorizontalOptions="Center"
+            Text="by RandA Media Lab, Group" />
+    </Grid>
+
 </ContentPage>

@@ -2,9 +2,9 @@ using AgroGestor360.App.ViewModels;
 
 namespace AgroGestor360.App.Views;
 
-public partial class PgHome : ContentPage
+public partial class PgSales : ContentPage
 {
-	public PgHome(PgHomeViewModel vm)
+	public PgSales(PgSalesViewModel vm)
 	{
 		InitializeComponent();
 
