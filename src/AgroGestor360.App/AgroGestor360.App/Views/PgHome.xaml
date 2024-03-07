@@ -26,18 +26,21 @@
                 <Button
                     Command="{Binding GoToLoansCommand}"
                     Text="Prestamos"
+                    TextTransform="Uppercase"
                     ToolTipProperties.Text="Ir a prestamos"
-                    WidthRequest="100" />
+                    WidthRequest="110" />
                 <Button
                     Command="{Binding GoToExpenseCommand}"
                     Text="Gastos"
+                    TextTransform="Uppercase"
                     ToolTipProperties.Text="Ir a gastos"
-                    WidthRequest="100" />
+                    WidthRequest="110" />
                 <Button
                     Command="{Binding GoToSalesCommand}"
                     Text="Ventas"
+                    TextTransform="Uppercase"
                     ToolTipProperties.Text="Ir a ventas"
-                    WidthRequest="100" />
+                    WidthRequest="110" />
                 <BoxView
                     Margin="0,2"
                     BackgroundColor="{StaticResource Tertiary}"
@@ -47,6 +50,7 @@
                     Command="{Binding GoToSettingsCommand}"
                     FontFamily="icofont"
                     Text="{StaticResource UiSettings}"
+                    TextTransform="Uppercase"
                     ToolTipProperties.Text="Ajustes" />
             </HorizontalStackLayout>
         </Grid>
@@ -58,9 +62,13 @@
                 <Label Text="Accesos rápidos:" />
                 <HorizontalStackLayout Spacing="8">
                     <Button
+                        Text="Realizar venta"
+                        ToolTipProperties.Text="Agregar nueva venta"
+                        WidthRequest="130" />
+                    <Button
                         Text="Aportes"
                         ToolTipProperties.Text="Agregar aporte"
-                        WidthRequest="100" />
+                        WidthRequest="130" />
                 </HorizontalStackLayout>
             </VerticalStackLayout>
         </Frame>

@@ -1,15 +1,28 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AgroGestor360.App.Services;
+using AgroGestor360.App.ViewModels.Settings;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AgroGestor360.App.ViewModels;
 
 public partial class PgSettingsViewModel : ObservableObject
 {
+    readonly INavigationService navigationServ;
+
+    public PgSettingsViewModel(INavigationService navigationService)
+    {
+        navigationServ = navigationService;
+    }
+
+    [ObservableProperty]
+    ContentView currentContent;
+
     [RelayCommand]
-    async Task GoToSettings() => await Shell.Current.GoToAsync("..", true);
+    async Task GoToBack() => await Shell.Current.GoToAsync("..", true);
+
+    [RelayCommand]
+    void ShowCvSeedCapital()
+    {
+        navigationServ.NavigateToView<CvSeedCapitalViewModel>(view => CurrentContent = view);
+    }
 }

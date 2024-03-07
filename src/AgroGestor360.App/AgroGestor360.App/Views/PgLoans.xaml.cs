@@ -6,7 +6,7 @@ public partial class PgLoans : ContentPage
 {
 	public PgLoans(PgLoansViewModel vm)
 	{
-		InitializeComponent();
+        InitializeComponent();
 
 		BindingContext = vm;
 	}

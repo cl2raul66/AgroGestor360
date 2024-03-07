@@ -9,5 +9,5 @@ public partial class PgSettings : ContentPage
 		InitializeComponent();
 
 		BindingContext = vm;
-	}
+    }
 }

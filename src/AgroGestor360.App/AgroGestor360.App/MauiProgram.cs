@@ -1,5 +1,8 @@
-﻿using AgroGestor360.App.ViewModels;
+﻿using AgroGestor360.App.Services;
+using AgroGestor360.App.ViewModels;
+using AgroGestor360.App.ViewModels.Settings;
 using AgroGestor360.App.Views;
+using AgroGestor360.App.Views.Settings;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 
@@ -20,15 +23,18 @@ public static class MauiProgram
                 fonts.AddFont("icofont.ttf", "icofont");
             });
 
-        builder.Services.AddTransient<PgSignIn,PgSignInViewModel>();
-        builder.Services.AddTransient<PgHome,PgHomeViewModel>();
-        builder.Services.AddTransient<PgSettings,PgSettingsViewModel>();
-        builder.Services.AddTransient<PgExpense,PgExpenseViewModel>();
-        builder.Services.AddTransient<PgLoans,PgLoansViewModel>();
-        builder.Services.AddTransient<PgSales,PgSalesViewModel>();
+        builder.Services.AddSingleton<INavigationService, NavigationService>();
+
+        builder.Services.AddTransient<PgSignIn, PgSignInViewModel>();
+        builder.Services.AddTransient<PgHome, PgHomeViewModel>();
+        builder.Services.AddTransient<PgSettings, PgSettingsViewModel>();
+        builder.Services.AddTransient<CvSeedCapital, CvSeedCapitalViewModel>();
+        builder.Services.AddTransient<PgExpense, PgExpenseViewModel>();
+        builder.Services.AddTransient<PgLoans, PgLoansViewModel>();
+        builder.Services.AddTransient<PgSales, PgSalesViewModel>();
 
 #if DEBUG
-		builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
 
         return builder.Build();
