@@ -1,9 +1,18 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace AgroGestor360.App.ViewModels.Settings;
 
 public partial class CvSeedCapitalViewModel : ObservableObject
 {
-    [ObservableProperty]
-    string texto = "Hola mundo";
+    [RelayCommand]
+    async Task Add()
+    {
+        string resul = await Shell.Current.DisplayPromptAsync("Agregar capital inicial", "", "Agregar", "Cancelar", "0.00");
+        if (string.IsNullOrEmpty(resul))
+        {
+            return;
+        }
+
+    }
 }

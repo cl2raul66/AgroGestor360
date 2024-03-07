@@ -1,11 +1,6 @@
 ﻿using AgroGestor360.App.ViewModels.Settings;
 using AgroGestor360.App.Views.Settings;
 using CommunityToolkit.Mvvm.ComponentModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AgroGestor360.App.Services;
 
@@ -33,6 +28,12 @@ public class NavigationService : INavigationService
             var view = new CvSeedCapital(vm!);
             updateViewAction(view);
         }
-        // Agrega aquí más condiciones para otros ViewModels
+        
+        if (viewModel is CvUsersViewModel)
+        {
+            var vm = viewModel as CvUsersViewModel;
+            var view = new CvUsers(vm!);
+            updateViewAction(view);
+        }
     }
 }

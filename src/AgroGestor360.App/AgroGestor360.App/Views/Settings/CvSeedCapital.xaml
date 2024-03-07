@@ -6,11 +6,24 @@
     xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels.Settings"
     x:DataType="vm:CvSeedCapitalViewModel">
 
-    <VerticalStackLayout>
-        <Label
-            HorizontalOptions="Center"
-            Text="{Binding Texto, Mode=OneWay}"
-            VerticalOptions="Center" />
-    </VerticalStackLayout>
+    <Grid RowDefinitions="auto,*" RowSpacing="8">
+        <Frame Padding="8">
+            <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
+                <Label
+                    Grid.Column="1"
+                    FontSize="18"
+                    Text="Capital inicial"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+                <HorizontalStackLayout Grid.Column="2" Spacing="8">
+                    <Button
+                        Command="{Binding AddCommand}"
+                        FontFamily="icofont"
+                        Text="{StaticResource Plus}"
+                        ToolTipProperties.Text="Agregar" />
+                </HorizontalStackLayout>
+            </Grid>
+        </Frame>
+    </Grid>
 
 </ContentView>

@@ -33,11 +33,12 @@
         </Grid>
         <Grid
             Grid.Row="1"
-            ColumnDefinitions="auto,*"
-            ColumnSpacing="4">
+            ColumnDefinitions="200,*"
+            ColumnSpacing="16">
             <ScrollView>
                 <VerticalStackLayout Spacing="8">
                     <Button
+                        Command="{Binding ShowCvSeedCapitalCommand}"
                         Text="Capital inicial"
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para capital inicial" />
@@ -62,6 +63,7 @@
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para clientes" />
                     <Button
+                        Command="{Binding ShowCvUsersCommand}"
                         Text="Usuarios"
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para usuarios" />
@@ -74,9 +76,10 @@
                     IsVisible="{Binding CurrentContent, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                     VerticalOptions="FillAndExpand" />
                 <Label
+                    FontSize="16"
                     HorizontalOptions="Center"
                     IsVisible="{Binding CurrentContent, Mode=OneWay, Converter={ctk:IsNullConverter}}"
-                    Text="Aqui se muestra la informacion de los botones."
+                    Text="¡Seleccione un ajuste de la izquierda para visualizar!"
                     VerticalOptions="Center" />
             </Grid>
         </Grid>

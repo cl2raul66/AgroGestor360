@@ -15,7 +15,7 @@ public partial class PgSettingsViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    ContentView currentContent;
+    ContentView? currentContent;
 
     [RelayCommand]
     async Task GoToBack() => await Shell.Current.GoToAsync("..", true);
@@ -24,5 +24,11 @@ public partial class PgSettingsViewModel : ObservableObject
     void ShowCvSeedCapital()
     {
         navigationServ.NavigateToView<CvSeedCapitalViewModel>(view => CurrentContent = view);
+    }
+
+    [RelayCommand]
+    void ShowCvUsers()
+    {
+        navigationServ.NavigateToView<CvUsersViewModel>(view => CurrentContent = view);
     }
 }
