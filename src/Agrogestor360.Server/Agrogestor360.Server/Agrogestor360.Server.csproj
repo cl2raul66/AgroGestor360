@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="LiteDB" Version="5.0.19" />
+    <PackageReference Include="UnitsNet" Version="5.48.0" />
     <PackageReference Include="vCardLib.dll" Version="5.0.0" />
   </ItemGroup>
 

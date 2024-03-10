@@ -34,7 +34,7 @@ public class ClientDeviceController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<string>> Register(Object )
+    public async Task<ActionResult<string>> Register(ClientDevice clientDevice)
     {
         var id = clientdeviceForLitedbServ.Insert(clientDevice);
         if (string.IsNullOrEmpty(id))
