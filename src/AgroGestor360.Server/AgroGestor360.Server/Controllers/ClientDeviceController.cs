@@ -2,6 +2,7 @@
 using AgroGestor360.Server.Sevices;
 using AgroGestor360.Server.Tools.Enums;
 using AgroGestor360.Server.Tools.Hubs;
+using LiteDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using vCardLib.Models;
@@ -30,7 +31,7 @@ public class ClientDeviceController : ControllerBase
     [HttpGet("{id}")]
     public ActionResult<IEnumerable<ClientDevice>> GetAllById(string id)
     {
-        return Ok(clientdeviceForLitedbServ.GetAllById(id));
+        return Ok(clientdeviceForLitedbServ.GetAllById(new ObjectId(id)));
     }
 
     [HttpPost]
@@ -64,7 +65,7 @@ public class ClientDeviceController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult<bool>> Delete(string id)
     {
-        var result = clientdeviceForLitedbServ.Delete(id);
+        var result = clientdeviceForLitedbServ.Delete(new ObjectId(id));
         if (result)
         {
             //await hubCtx.Clients.All.SendAsync("ReceiveMessage", $"{OperationType.Delete}:{nameof(ClientDevice)}:{id}");

@@ -55,6 +55,7 @@
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para tarjetas de bancos" />
                     <Button
+                        Command="{Binding ShowCvProductsCommand}"
                         Text="Productos"
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para productos" />

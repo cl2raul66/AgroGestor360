@@ -8,8 +8,8 @@ public interface IUserForLitedbService
 {
     bool Exist { get; }
 
-    bool Delete(string id);
-    IEnumerable<User> GetAllById(string id);
+    bool Delete(ObjectId id);
+    IEnumerable<User> GetAllById(ObjectId id);
     IEnumerable<User> GetAllByIsAuthorized();
     IEnumerable<User> GetAllByIsNotAuthorized();
     string Insert(User User);
@@ -37,7 +37,7 @@ public class UserForLitedbService : IUserForLitedbService
 
     public IEnumerable<User> GetAllByIsNotAuthorized() => collection.Find(x => !x.IsAuthorized).Reverse();
 
-    public IEnumerable<User> GetAllById(string id) => collection.Find(x => x.Id == id);
+    public IEnumerable<User> GetAllById(ObjectId id) => collection.Find(x => x.Id == id);
 
 
     public string Insert(User User)
@@ -55,5 +55,5 @@ public class UserForLitedbService : IUserForLitedbService
 
     public bool Update(User User) => collection.Update(User);
 
-    public bool Delete(string id) => collection.Delete(id);
+    public bool Delete(ObjectId id) => collection.Delete(id);
 }

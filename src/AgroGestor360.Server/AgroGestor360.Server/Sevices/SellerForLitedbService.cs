@@ -4,7 +4,7 @@ using vCardLib.Models;
 
 namespace AgroGestor360.Server.Sevices;
 
-public interface IClientForLitedbService
+public interface ISellerForLitedbService
 {
     bool Delete(string id);
     IEnumerable<vCard> GetallByNameSection(string name);
@@ -15,15 +15,15 @@ public interface IClientForLitedbService
     bool Update(vCard card);
 }
 
-public class ClientForLitedbService : IClientForLitedbService
+public class SellerForLitedbService : ISellerForLitedbService
 {
     readonly ILiteCollection<vCard> collection;
 
-    public ClientForLitedbService()
+    public SellerForLitedbService()
     {
         var cnx = new ConnectionString()
         {
-            Filename = FileHelper.GetFileDbPath("Client")
+            Filename = FileHelper.GetFileDbPath("Seller")
         };
 
         var mapper = new BsonMapper();

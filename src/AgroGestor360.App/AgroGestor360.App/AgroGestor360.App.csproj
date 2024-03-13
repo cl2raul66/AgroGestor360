@@ -90,6 +90,9 @@
 	  <MauiXaml Update="Views\PgSignIn.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\Settings\CvProducts.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\CvSeedCapital.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

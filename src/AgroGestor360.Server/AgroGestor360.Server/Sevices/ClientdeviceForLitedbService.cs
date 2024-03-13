@@ -8,8 +8,8 @@ public interface IClientdeviceForLitedbService
 {
     bool Exist { get; }
 
-    bool Delete(string id);
-    IEnumerable<ClientDevice> GetAllById(string id);
+    bool Delete(ObjectId id);
+    IEnumerable<ClientDevice> GetAllById(ObjectId id);
     string Insert(ClientDevice clientDevice);
     bool Update(ClientDevice clientDevice);
 }
@@ -31,7 +31,7 @@ public class ClientdeviceForLitedbService : IClientdeviceForLitedbService
 
     public bool Exist => collection.Count() > 0;
 
-    public IEnumerable<ClientDevice> GetAllById(string id) => collection.Find(x => x.Id == id);
+    public IEnumerable<ClientDevice> GetAllById(ObjectId id) => collection.Find(x => x.Id == id);
 
     public string Insert(ClientDevice clientDevice)
     {
@@ -48,5 +48,5 @@ public class ClientdeviceForLitedbService : IClientdeviceForLitedbService
 
     public bool Update(ClientDevice clientDevice) => collection.Update(clientDevice);
 
-    public bool Delete(string id) => collection.Delete(id);
+    public bool Delete(ObjectId id) => collection.Delete(id);
 }

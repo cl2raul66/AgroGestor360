@@ -45,24 +45,17 @@ public class Merchandise
     public string? Description { get; set; }
 }
 
-public class Inventory
-{
-    public ObjectId? Id { get; set; }
-    public ObjectId? MerchandiseId { get; set; }
-    public double Quantity { get; set; }
-}
-
 public class Presentation
 {
-    public string Measure { get; set; }
-    public string Unit { get; set; }
+    public string? Measure { get; set; }
+    public string? Unit { get; set; }
     public double Value { get; set; }
 }
 
 public class Article
 {
     public ObjectId? Id { get; set; }
-    public string? Name { get; set; }
+    public ObjectId? MerchandiseId { get; set; }
     public double Price { get; set; }
     public Presentation? Packaging { get; set; }
     public string? Category { get; set; }
@@ -71,7 +64,7 @@ public class Article
 public class Product
 {
     public ObjectId? Id { get; set; }
-    public Article? Article { get; set; }
+    public ObjectId? ArticlesId { get; set; }
     public double Quantity { get; set; }
 }
 
@@ -81,6 +74,15 @@ public class ProductOffering
     public ObjectId? ProductId { get; set; }
     public double Quantity { get; set; }
     public double BonusAmount { get; set; }
+}
+
+public class BankAccount
+{
+    public ObjectId? Id { get; set; }
+    public string? BankName { get; set; }
+    public string? Alias { get; set; }
+    public vCard? Beneficiary { get; set; } 
+    public string? AccountType { get; set; }
 }
 
 public class Token

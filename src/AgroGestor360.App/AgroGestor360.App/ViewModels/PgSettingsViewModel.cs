@@ -31,4 +31,10 @@ public partial class PgSettingsViewModel : ObservableObject
     {
         navigationServ.NavigateToView<CvUsersViewModel>(view => CurrentContent = view);
     }
+
+    [RelayCommand]
+    void ShowCvProducts()
+    {
+        navigationServ.NavigateToView<CvProductsViewModel>(view => CurrentContent = view);
+    }
 }
