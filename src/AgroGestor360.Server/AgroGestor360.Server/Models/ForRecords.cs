@@ -3,6 +3,7 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Models;
 
+
 public class InventoryDispatch
 {
     public ObjectId? Id { get; set; }
@@ -17,21 +18,14 @@ public class DispatchItem
     public double Quantity { get; set; }
 }
 
-public class Dispatch
-{
-    public ObjectId? Id { get; set; }
-    public ObjectId? SellerId { get; set;}
-    public bool WithFEL { get; set;}
-}
-
 #region Principales
 public class LedgerRecord
 {
     public DateTime Date { get; set; }
     public string? Description { get; set; }
     public TransactionType TransactionType { get; set; }
-    public double TransactionAmount { get; set; }
-    public ObjectId? BankAccountId { get; set; }
+    public List<BankTransaction>? BankTransactions { get; set; }
+    public ObjectId? DetailId { get; set; }
 }
 
 public class Inventory
