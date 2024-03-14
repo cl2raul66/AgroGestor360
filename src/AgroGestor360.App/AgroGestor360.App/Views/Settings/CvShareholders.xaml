@@ -17,14 +17,17 @@
                     VerticalOptions="Center" />
                 <HorizontalStackLayout Grid.Column="2" Spacing="8">
                     <Button
+                        Command="{Binding ShowAddShareholderCommand}"
                         FontFamily="icofont"
                         Text="{StaticResource Plus}"
                         ToolTipProperties.Text="Agregar" />
                     <Button
+                        Command="{Binding ShowEditShareholderCommand}"
                         FontFamily="icofont"
                         Text="{StaticResource Edit}"
                         ToolTipProperties.Text="Modificar" />
                     <Button
+                        Command="{Binding ShowDeleteShareholderCommand}"
                         FontFamily="icofont"
                         Text="{StaticResource UiDelete}"
                         ToolTipProperties.Text="Eliminar" />
