@@ -43,17 +43,15 @@
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para capital inicial" />
                     <Button
-                        Text="Accionistas"
-                        TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para accionistas" />
-                    <Button
-                        Text="Cuentas"
+                        Command="{Binding ShowCvBankAccountsCommand}"
+                        Text="Cuentas y tarjetas"
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para cuentas bancarias" />
                     <Button
-                        Text="Tarjetas"
+                        Command="{Binding ShowCvShareholdersCommand}"
+                        Text="Accionistas"
                         TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para tarjetas de bancos" />
+                        ToolTipProperties.Text="Ajustes para accionistas" />
                     <Button
                         Command="{Binding ShowCvProductsCommand}"
                         Text="Productos"
@@ -63,11 +61,11 @@
                         Text="Clientes"
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para clientes" />
-                    <Button
+                    <!--<Button
                         Command="{Binding ShowCvUsersCommand}"
                         Text="Usuarios"
                         TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para usuarios" />
+                        ToolTipProperties.Text="Ajustes para usuarios" />-->
                 </VerticalStackLayout>
             </ScrollView>
             <Grid Grid.Column="1">

@@ -69,6 +69,8 @@
 	<ItemGroup>
 	  <Folder Include="Models\" />
 	  <Folder Include="Tools\" />
+	  <Folder Include="Views\Settings\Products\" />
+	  <Folder Include="Views\Settings\Shareholders\" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -90,10 +92,19 @@
 	  <MauiXaml Update="Views\PgSignIn.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\Settings\BankAccounts\PgAddAccountOrCard.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Settings\CvBankAccounts.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\CvProducts.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\CvSeedCapital.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Settings\CvShareholders.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\CvUsers.xaml">

@@ -80,10 +80,17 @@ public class ProductOffering
 public class BankAccount
 {
     public ObjectId? Id { get; set; }
-    public string? BankName { get; set; }
+    public ObjectId? BankId { get; set; }
     public string? Alias { get; set; }
     public vCard? Beneficiary { get; set; }
     public FinancialInstrumentType InstrumentType { get; set; }
+    public bool Enable {get; set;}
+}
+
+public class Bank
+{
+    public ObjectId? Id { get; set; }
+    public string? Name { get; set; }
 }
 
 public class Sale

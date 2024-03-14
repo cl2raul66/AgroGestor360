@@ -1,8 +1,10 @@
 ﻿using AgroGestor360.App.Services;
 using AgroGestor360.App.ViewModels;
 using AgroGestor360.App.ViewModels.Settings;
+using AgroGestor360.App.ViewModels.Settings.BankAccounts;
 using AgroGestor360.App.Views;
 using AgroGestor360.App.Views.Settings;
+using AgroGestor360.App.Views.Settings.BankAccounts;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 
@@ -29,6 +31,9 @@ public static class MauiProgram
         builder.Services.AddTransient<PgHome, PgHomeViewModel>();
         builder.Services.AddTransient<PgSettings, PgSettingsViewModel>();
         builder.Services.AddTransient<CvSeedCapital, CvSeedCapitalViewModel>();
+        builder.Services.AddTransient<CvBankAccounts, CvBankAccountsViewModel>();
+        builder.Services.AddTransient<PgAddAccountOrCard, PgAddAccountOrCardViewModel>();
+        builder.Services.AddTransient<CvShareholders, CvShareholdersViewModel>();
         builder.Services.AddTransient<CvUsers, CvUsersViewModel>();
         builder.Services.AddTransient<CvProducts, CvProductsViewModel>();
         builder.Services.AddTransient<PgExpense, PgExpenseViewModel>();

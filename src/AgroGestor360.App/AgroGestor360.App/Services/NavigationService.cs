@@ -42,5 +42,19 @@ public class NavigationService : INavigationService
             var view = new CvProducts(vm!);
             updateViewAction(view);
         }
+
+        if (viewModel is CvShareholdersViewModel)
+        {
+            var vm = viewModel as CvShareholdersViewModel;
+            var view = new CvShareholders(vm!);
+            updateViewAction(view);
+        }
+
+        if (viewModel is CvBankAccountsViewModel)
+        {
+            var vm = viewModel as CvBankAccountsViewModel;
+            var view = new CvBankAccounts(vm!);
+            updateViewAction(view);
+        }
     }
 }
