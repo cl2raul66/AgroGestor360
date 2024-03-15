@@ -58,6 +58,7 @@
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para productos" />
                     <Button
+                        Command="{Binding ShowCvCustomersCommand}"
                         Text="Clientes"
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para clientes" />

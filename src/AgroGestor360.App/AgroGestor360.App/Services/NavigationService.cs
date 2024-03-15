@@ -1,4 +1,5 @@
-﻿using AgroGestor360.App.ViewModels.Settings;
+﻿using AgroGestor360.App.View.Settings;
+using AgroGestor360.App.ViewModels.Settings;
 using AgroGestor360.App.Views.Settings;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -54,6 +55,13 @@ public class NavigationService : INavigationService
         {
             var vm = viewModel as CvBankAccountsViewModel;
             var view = new CvBankAccounts(vm!);
+            updateViewAction(view);
+        }
+
+        if (viewModel is CvCustomersViewModel)
+        {
+            var vm = viewModel as CvCustomersViewModel;
+            var view = new CvCustomers(vm!);
             updateViewAction(view);
         }
     }

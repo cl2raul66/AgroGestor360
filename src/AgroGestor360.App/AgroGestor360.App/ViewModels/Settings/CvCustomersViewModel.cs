@@ -1,4 +1,4 @@
-﻿using AgroGestor360.App.Views.Settings.Shareholders;
+﻿using AgroGestor360.App.Views.Settings.Customers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -9,25 +9,25 @@ using System.Threading.Tasks;
 
 namespace AgroGestor360.App.ViewModels.Settings;
 
-public partial class CvShareholdersViewModel : ObservableObject
+public partial  class CvCustomersViewModel : ObservableObject
 {
     [RelayCommand]
-    async Task ShowAddShareholder()
+    async Task ShowAddCustomer()
     {
-        await Shell.Current.GoToAsync(nameof(PgAddEditShareholder), true, new Dictionary<string, object>() { { "title", "Agregar" } });
+        await Shell.Current.GoToAsync(nameof(PgAddEditCustomer), true, new Dictionary<string, object>() { { "title", "Agregar" } });
     }
 
     [RelayCommand]
-    async Task ShowEditShareholder()
+    async Task ShowEditCustomer()
     {
-        await Shell.Current.GoToAsync(nameof(PgAddEditShareholder), true, new Dictionary<string, object>() { { "title", "Editar" } });
+        await Shell.Current.GoToAsync(nameof(PgAddEditCustomer), true, new Dictionary<string, object>() { { "title", "Editar" } });
     }
 
     [RelayCommand]
-    async Task ShowDeleteShareholder()
+    async Task ShowDeleteCustomer()
     {
         StringBuilder sb = new();
-        sb.AppendLine("Usted esta seguro de eliminar al siguiente accionista:");
+        sb.AppendLine("Usted esta seguro de eliminar al siguiente cliente:");
         sb.AppendLine($"FECHA DE INGRESO: {0}");
         sb.AppendLine($"NOMBRE: {0}");
         sb.AppendLine($"NIT: {0}");
@@ -36,7 +36,7 @@ public partial class CvShareholdersViewModel : ObservableObject
         sb.AppendLine($"TELEFONO: {0}");
         sb.AppendLine($"CORREO ELECTRONICO: {0}");
 
-        bool resul = await Shell.Current.DisplayAlert("Eliminar accionista", sb.ToString(), "Eliminar", "Cancelar");
+        bool resul = await Shell.Current.DisplayAlert("Eliminar cliente", sb.ToString().TrimEnd(), "Eliminar", "Cancelar");
         if (resul)
         {
             return;
