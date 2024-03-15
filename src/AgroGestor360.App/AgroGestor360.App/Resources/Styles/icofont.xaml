@@ -2156,7 +2156,7 @@
     <x:String x:Key="DuotoneicofontCart">&#x13ade;</x:String>
     <x:String x:Key="Icon25">&#x13adf;</x:String>
     <x:String x:Key="DuotoneicofontCategory">&#x13ae0;</x:String>
-    <x:String x:Key="Icon26">&#x13ae1;</x:String>
+    <x:String x:Key="Category">&#x13ae1;</x:String>
     <x:String x:Key="DuotoneicofontChart">&#x13ae2;</x:String>
     <x:String x:Key="Icon27">&#x13ae3;</x:String>
     <x:String x:Key="DuotoneicofontCheckedout">&#x13ae4;</x:String>
