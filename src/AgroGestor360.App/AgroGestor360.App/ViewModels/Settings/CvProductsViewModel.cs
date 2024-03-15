@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AgroGestor360.App.Views.Settings.Products;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
@@ -33,5 +34,23 @@ public partial class CvProductsViewModel : ObservableObject
         {
             return;
         }
+    }
+
+    [RelayCommand]
+    async Task AddItem()
+    {
+        await Shell.Current.GoToAsync(nameof(PgAddItem), true);
+    }
+
+    [RelayCommand]
+    async Task AddProduct()
+    {
+        await Shell.Current.GoToAsync(nameof(PgAddProduct), true);
+    }
+
+    [RelayCommand]
+    async Task CreateOffer()
+    {
+        await Shell.Current.GoToAsync(nameof(PgCreateOffer), true);
     }
 }
