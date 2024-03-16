@@ -105,12 +105,13 @@ public class Loan
     public ObjectId? Id { get; set; }
     public DateTime Date { get; set; }
     public string? LoanNumber { get; set; }
-    public ObjectId? AccountId { get; set; }
+    public ObjectId? BankAccountId { get; set; }
     public double Amount { get; set; }
     public double Interest { get; set; }
     public string? Concept { get; set; }
     public LoanType Type { get; set; }
     public double Insurance { get; set; }
+    public string? MoreDetails { get; set; }
 }
 
 public class Expense

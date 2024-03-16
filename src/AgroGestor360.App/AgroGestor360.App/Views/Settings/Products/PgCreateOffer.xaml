@@ -19,7 +19,7 @@
         <Grid RowDefinitions="auto,*,auto" RowSpacing="12">
             <Label
                 FontSize="18"
-                Text="Agregar producto"
+                Text="Agregar oferta"
                 TextTransform="Uppercase"
                 VerticalOptions="Center" />
             <ScrollView Grid.Row="1">

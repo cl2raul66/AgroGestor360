@@ -42,8 +42,7 @@
                     ToolTipProperties.Text="Ir a ventas"
                     WidthRequest="110" />
                 <BoxView
-                    Margin="0,2"
-                    BackgroundColor="{StaticResource Tertiary}"
+                    BackgroundColor="{StaticResource Gray300}"
                     CornerRadius="2"
                     WidthRequest="2" />
                 <Button
