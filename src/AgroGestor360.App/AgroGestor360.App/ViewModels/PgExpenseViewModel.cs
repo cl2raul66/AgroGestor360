@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AgroGestor360.App.Views.Expense;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,4 +11,9 @@ namespace AgroGestor360.App.ViewModels;
 
 public partial class PgExpenseViewModel : ObservableObject
 {
+    [RelayCommand]
+    async Task GoToBack() => await Shell.Current.GoToAsync("..", true);
+
+    [RelayCommand]
+    async Task ShowAddExpense() => await Shell.Current.GoToAsync(nameof(PgAddExpense), true);
 }

@@ -5,13 +5,49 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     Title="Gastos"
-    x:DataType="vm:PgExpenseViewModel">
+    x:DataType="vm:PgExpenseViewModel"
+    Shell.NavBarIsVisible="False">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
 
-    <VerticalStackLayout>
+    <Grid
+        Padding="8"
+        RowDefinitions="auto,*,auto"
+        RowSpacing="16">
+        <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
+            <HorizontalStackLayout Spacing="8">
+                <Button
+                    Command="{Binding GoToBackCommand}"
+                    FontFamily="icofont"
+                    Text="{StaticResource ArrowLeft}"
+                    TextTransform="Uppercase"
+                    ToolTipProperties.Text="Atras" />
+                <Label
+                    Grid.Column="1"
+                    FontSize="18"
+                    Text="Gastos"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Grid.Column="2" Spacing="8">
+                <!--<BoxView
+                    BackgroundColor="{StaticResource Gray300}"
+                    CornerRadius="2"
+                    WidthRequest="2" />-->
+                <Button
+                    Command="{Binding ShowAddExpenseCommand}"
+                    FontFamily="icofont"
+                    Text="{StaticResource Plus}"
+                    TextTransform="Uppercase"
+                    ToolTipProperties.Text="Agregar" />
+            </HorizontalStackLayout>
+        </Grid>
         <Label
+            Grid.Row="2"
+            FontSize="11"
             HorizontalOptions="Center"
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" />
-    </VerticalStackLayout>
+            Text="by RandA Media Lab, Group" />
+    </Grid>
 
 </ContentPage>

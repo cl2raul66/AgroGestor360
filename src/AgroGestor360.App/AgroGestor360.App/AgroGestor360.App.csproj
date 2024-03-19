@@ -72,6 +72,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\Expense\PgAddExpense.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Loans\PgAddLoan.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
