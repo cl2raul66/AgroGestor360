@@ -22,7 +22,7 @@
                     FontFamily="icofont"
                     Text="{StaticResource ArrowLeft}"
                     TextTransform="Uppercase"
-                    ToolTipProperties.Text="Ajustes" />
+                    ToolTipProperties.Text="Atras" />
                 <Label
                     Grid.Column="1"
                     FontSize="18"

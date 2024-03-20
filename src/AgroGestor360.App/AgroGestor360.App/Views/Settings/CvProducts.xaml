@@ -14,7 +14,7 @@
                 <Label
                     Grid.Column="1"
                     FontSize="18"
-                    Text="Artículos y productos"
+                    Text="Catálogo de Productos"
                     TextTransform="Uppercase"
                     VerticalOptions="Center" />
                 <HorizontalStackLayout Grid.Column="2" Spacing="8">
