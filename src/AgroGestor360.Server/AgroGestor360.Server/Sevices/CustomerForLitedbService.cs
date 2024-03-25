@@ -62,6 +62,8 @@ public class CustomerForLitedbService : ICustomerForLitedbService
 
     public IEnumerable<vCard> GetallByPhoneSection(string number) => collection.Find(x => x.PhoneNumbers.Any(n => n.Number.Contains(number)));
 
+    public IEnumerable<vCard> GetByBirthdate(DateTime birthdate) => collection.Find(x => x.BirthDay == birthdate.Date);
+
     public vCard GetById(string id) => collection.FindById(id);
 
     public bool Insert(vCard card)

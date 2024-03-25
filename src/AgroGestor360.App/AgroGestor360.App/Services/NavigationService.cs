@@ -23,46 +23,31 @@ public class NavigationService : INavigationService
     {
         var viewModel = _serviceProvider.GetService<TViewModel>();
 
-        if (viewModel is CvSeedCapitalViewModel)
+        switch (viewModel)
         {
-            var vm = viewModel as CvSeedCapitalViewModel;
-            var view = new CvSeedCapital(vm!);
-            updateViewAction(view);
-        }
-        
-        if (viewModel is CvUsersViewModel)
-        {
-            var vm = viewModel as CvUsersViewModel;
-            var view = new CvUsers(vm!);
-            updateViewAction(view);
-        }
-
-        if (viewModel is CvProductsViewModel)
-        {
-            var vm = viewModel as CvProductsViewModel;
-            var view = new CvProducts(vm!);
-            updateViewAction(view);
-        }
-
-        if (viewModel is CvShareholdersViewModel)
-        {
-            var vm = viewModel as CvShareholdersViewModel;
-            var view = new CvShareholders(vm!);
-            updateViewAction(view);
-        }
-
-        if (viewModel is CvBankAccountsViewModel)
-        {
-            var vm = viewModel as CvBankAccountsViewModel;
-            var view = new CvBankAccounts(vm!);
-            updateViewAction(view);
-        }
-
-        if (viewModel is CvCustomersViewModel)
-        {
-            var vm = viewModel as CvCustomersViewModel;
-            var view = new CvCustomers(vm!);
-            updateViewAction(view);
+            case CvSeedCapitalViewModel vm:
+                updateViewAction(new CvSeedCapital(vm));
+                break;
+            case CvUsersViewModel vm:
+                updateViewAction(new CvUsers(vm));
+                break;
+            case CvProductsViewModel vm:
+                updateViewAction(new CvProducts(vm));
+                break;
+            case CvShareholdersViewModel vm:
+                updateViewAction(new CvShareholders(vm));
+                break;
+            case CvBankAccountsViewModel vm:
+                updateViewAction(new CvBankAccounts(vm));
+                break;
+            case CvCustomersViewModel vm:
+                updateViewAction(new CvCustomers(vm));
+                break;
+            case CvWarehouseViewModel vm:
+                updateViewAction(new CvWarehouse(vm));
+                break;
+            default:
+                break;
         }
     }
 }

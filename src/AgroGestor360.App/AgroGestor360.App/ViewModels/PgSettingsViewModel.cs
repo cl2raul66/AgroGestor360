@@ -21,6 +21,12 @@ public partial class PgSettingsViewModel : ObservableObject
     async Task GoToBack() => await Shell.Current.GoToAsync("..", true);
 
     [RelayCommand]
+    void ShowCvEntity()
+    {
+        
+    }
+
+    [RelayCommand]
     void ShowCvSeedCapital()
     {
         navigationServ.NavigateToView<CvSeedCapitalViewModel>(view => CurrentContent = view);
@@ -54,5 +60,11 @@ public partial class PgSettingsViewModel : ObservableObject
     void ShowCvCustomers()
     {
         navigationServ.NavigateToView<CvCustomersViewModel>(view => CurrentContent = view);
+    }
+
+    [RelayCommand]
+    void ShowCvInventory()
+    {
+        navigationServ.NavigateToView<CvWarehouseViewModel>(view => CurrentContent = view);
     }
 }

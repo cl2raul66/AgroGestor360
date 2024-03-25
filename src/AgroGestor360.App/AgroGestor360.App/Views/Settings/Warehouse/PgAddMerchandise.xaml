@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
-    x:Class="AgroGestor360.App.Views.Settings.Customers.PgAddEditCustomer"
+    x:Class="AgroGestor360.App.Views.Settings.Warehouse.PgAddMerchandise"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels.Settings.Customers"
-    Title="AddEditCustomer"
-    x:DataType="vm:PgAddEditCustomerViewModel"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels.Settings.Warehouse"
+    Title="AddMerchandise"
+    x:DataType="vm:PgAddMerchandiseViewModel"
     BackgroundColor="#99634833"
     Shell.NavBarIsVisible="False"
     Shell.PresentationMode="ModalAnimated">
@@ -19,89 +19,69 @@
         <Grid RowDefinitions="auto,*,auto" RowSpacing="8">
             <Label
                 FontSize="18"
-                Text="{Binding Title, Mode=OneWay, StringFormat='{0} cliente'}"
+                Text="Agregar mercancía"
                 TextTransform="Uppercase"
                 VerticalOptions="Center" />
             <ScrollView Grid.Row="1">
                 <VerticalStackLayout Spacing="8">
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                        <Label Text="Nombre: *" />
+                        <Entry
+                            Grid.Row="1"
+                            ClearButtonVisibility="WhileEditing"
+                            IsSpellCheckEnabled="True"
+                            IsTextPredictionEnabled="True"
+                            Placeholder="Escriba aquí" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,2*" ColumnSpacing="8">
                         <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                            <Label Text="Fecha:" />
-                            <DatePicker Grid.Row="1" />
+                            <Label Text="Cantidad unitaria: *" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                HorizontalTextAlignment="End"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Keyboard="Numeric"
+                                Placeholder="0.00" />
                         </Grid>
                         <Grid
                             Grid.Column="1"
                             RowDefinitions="auto,auto"
                             RowSpacing="4">
-                            <Label Text="Fecha de nacimiento:" />
-                            <DatePicker Grid.Row="1" />
+                            <Label Text="Categoría: *" />
+                            <Picker Grid.Row="1" />
                         </Grid>
                     </Grid>
+                    <Label
+                        FontSize="14"
+                        HorizontalOptions="Center"
+                        Text="Presentación"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
                     <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                        <Label Text="Nombre completo: *" />
-                        <Entry
-                            Grid.Row="1"
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Placeholder="Escriba aquí" />
+                        <Label Text="Magnitud: *" />
+                        <Picker Grid.Row="1" />
                     </Grid>
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                    <Grid ColumnDefinitions="2*,*" ColumnSpacing="8">
                         <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                            <Label Text="Nit: *" />
-                            <Entry
-                                Grid.Row="1"
-                                ClearButtonVisibility="WhileEditing"
-                                IsSpellCheckEnabled="True"
-                                IsTextPredictionEnabled="True"
-                                Keyboard="Numeric"
-                                Placeholder="Escriba aquí" />
+                            <Label Text="Medida base: *" />
+                            <Picker Grid.Row="1" />
                         </Grid>
                         <Grid
                             Grid.Column="1"
                             RowDefinitions="auto,auto"
                             RowSpacing="4">
-                            <Label Text="Dpi: *" />
+                            <Label Text="Valor: *" />
                             <Entry
                                 Grid.Row="1"
                                 ClearButtonVisibility="WhileEditing"
+                                HorizontalTextAlignment="End"
                                 IsSpellCheckEnabled="True"
                                 IsTextPredictionEnabled="True"
                                 Keyboard="Numeric"
-                                Placeholder="Escriba aquí" />
+                                Placeholder="0.00" />
                         </Grid>
-                    </Grid>
-                    <Grid
-                        Grid.Column="1"
-                        RowDefinitions="auto,auto"
-                        RowSpacing="4">
-                        <Label Text="Teléfono principal: *" />
-                        <Entry
-                            Grid.Row="1"
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Keyboard="Telephone"
-                            Placeholder="Escriba aquí" />
-                    </Grid>
-                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                        <Label Text="Correo electrónico principal:" />
-                        <Entry
-                            Grid.Row="1"
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Keyboard="Email"
-                            Placeholder="Escriba aquí" />
-                    </Grid>
-                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                        <Label Text="Dirección de residencia:" />
-                        <Editor
-                            Grid.Row="1"
-                            HeightRequest="64"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Placeholder="Escriba aquí" />
                     </Grid>
                 </VerticalStackLayout>
             </ScrollView>

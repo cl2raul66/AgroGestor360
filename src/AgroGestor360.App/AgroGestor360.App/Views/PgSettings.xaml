@@ -38,6 +38,10 @@
             <ScrollView>
                 <VerticalStackLayout Spacing="8">
                     <Button
+                        Text="Entidad"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Ajustes para entidad" />
+                    <Button
                         Command="{Binding ShowCvSeedCapitalCommand}"
                         Text="Capital inicial"
                         TextTransform="Uppercase"
@@ -53,15 +57,20 @@
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para accionistas" />
                     <Button
-                        Command="{Binding ShowCvProductsCommand}"
-                        Text="Productos"
+                        Command="{Binding ShowCvInventoryCommand}"
+                        Text="Almacén"
                         TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para productos" />
+                        ToolTipProperties.Text="Ajustes para almacén" />
                     <Button
                         Command="{Binding ShowCvCustomersCommand}"
                         Text="Clientes"
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para clientes" />
+                    <Button
+                        Command="{Binding ShowCvProductsCommand}"
+                        Text="Productos"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Ajustes para productos" />
                     <!--<Button
                         Command="{Binding ShowCvUsersCommand}"
                         Text="Usuarios"

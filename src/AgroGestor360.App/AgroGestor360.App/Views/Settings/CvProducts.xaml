@@ -114,7 +114,6 @@
                     <HorizontalStackLayout Grid.Column="1" Spacing="8">
                         <Button
                             FontFamily="icofont"
-                            IsEnabled="False"
                             Text="{StaticResource Inbox}"
                             ToolTipProperties.Text="Crear producto a partir de este artículo" />
                         <BoxView
