@@ -49,7 +49,6 @@ public static class MauiProgram
         builder.Services.AddTransient<CvShareholders, CvShareholdersViewModel>();
         builder.Services.AddTransient<PgAddEditShareholder, PgAddEditShareholderViewModel>();
         builder.Services.AddTransient<CvProducts, CvProductsViewModel>();
-        builder.Services.AddTransient<PgAddItem, PgAddItemViewModel>();
         builder.Services.AddTransient<PgAddProduct, PgAddProductViewModel>();
         builder.Services.AddTransient<PgCreateOffer, PgCreateOfferViewModel>();
         builder.Services.AddTransient<CvCustomers, CvCustomersViewModel>();

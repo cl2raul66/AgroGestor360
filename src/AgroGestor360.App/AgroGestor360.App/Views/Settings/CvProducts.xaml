@@ -22,7 +22,7 @@
                         BackgroundColor="{StaticResource Gray300}"
                         CornerRadius="2"
                         WidthRequest="2" />-->
-                    <Button
+                    <!--<Button
                         Command="{Binding ViewArticlesCommand}"
                         FontFamily="icofont"
                         Text="{StaticResource Dropbox}"
@@ -31,21 +31,19 @@
                         Command="{Binding ViewProductsCommand}"
                         FontFamily="icofont"
                         Text="{StaticResource Box}"
-                        ToolTipProperties.Text="Ver productos" />
+                        ToolTipProperties.Text="Ver productos" />-->
                 </HorizontalStackLayout>
             </Grid>
         </Frame>
         <!--#endregion-->
         <!--#region CONTENIDO-->
-        <!--#region VISTA DE ARTICULOS-->
         <Grid
             Grid.Row="1"
-            ColumnDefinitions="*,auto,280"
+            ColumnDefinitions="*,auto,*,auto,300"
             ColumnSpacing="8"
-            IsVisible="{Binding IsProductsVisible, Mode=OneWay, Converter={ctk:InvertedBoolConverter}}"
             RowDefinitions="auto,*,auto"
             RowSpacing="8">
-            <!--  PANEL IZQUIERDO  -->
+            <!--#region VISTA DE ARTICULOS-->
             <VerticalStackLayout Spacing="8">
                 <Label
                     Grid.Column="1"
@@ -99,11 +97,6 @@
                             <Label Text="Por categoría" VerticalOptions="Center" />
                         </RadioButton.Content>
                     </RadioButton>
-                    <RadioButton>
-                        <RadioButton.Content>
-                            <Label Text="Por cantidad unitaria" VerticalOptions="Center" />
-                        </RadioButton.Content>
-                    </RadioButton>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
             <ScrollView Grid.Row="1">
@@ -111,100 +104,43 @@
             </ScrollView>
             <Frame Grid.Row="2" Padding="8">
                 <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                    <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                    <HorizontalStackLayout Spacing="8">
                         <Button
                             FontFamily="icofont"
-                            Text="{StaticResource Inbox}"
-                            ToolTipProperties.Text="Crear producto a partir de este artículo" />
-                        <BoxView
-                            BackgroundColor="{StaticResource Gray300}"
-                            CornerRadius="2"
-                            WidthRequest="2" />
-                        <Button
-                            Command="{Binding AddItemCommand}"
-                            FontFamily="icofont"
-                            Text="{StaticResource Plus}"
-                            ToolTipProperties.Text="Agregar" />
+                            Text="{StaticResource DollarFlase}"
+                            ToolTipProperties.Text="Ver artículos sin precio de venta" />
                         <Button
                             FontFamily="icofont"
-                            IsEnabled="False"
-                            Text="{StaticResource UiDelete}"
-                            ToolTipProperties.Text="Eliminar" />
+                            Text="{StaticResource DollarTrue}"
+                            ToolTipProperties.Text="Ver artículos con precio venta" />
                     </HorizontalStackLayout>
-                </Grid>
-            </Frame>
-            <BoxView
-                Grid.RowSpan="3"
-                Grid.Column="1"
-                BackgroundColor="{StaticResource Gray300}"
-                CornerRadius="2"
-                WidthRequest="2" />
-            <!--  PANEL DERECHO  -->
-            <VerticalStackLayout Grid.Column="2" Spacing="8">
-                <Label
-                    Grid.Column="1"
-                    FontSize="18"
-                    Text="Categorías"
-                    TextTransform="Uppercase"
-                    VerticalOptions="Center" />
-                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                    <Entry
-                        ClearButtonVisibility="WhileEditing"
-                        IsSpellCheckEnabled="True"
-                        IsTextPredictionEnabled="True"
-                        Placeholder="Escriba aquí" />
-                    <Button
-                        Grid.Column="1"
-                        FontFamily="icofont"
-                        Text="{StaticResource Search}"
-                        ToolTipProperties.Text="Buscar" />
-                </Grid>
-                <HorizontalStackLayout Spacing="8">
-                    <RadioButton>
-                        <RadioButton.Content>
-                            <Label Text="Por nombre" VerticalOptions="Center" />
-                        </RadioButton.Content>
-                    </RadioButton>
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
-            <ScrollView Grid.Row="1" Grid.Column="2">
-                <CollectionView />
-            </ScrollView>
-            <Frame
-                Grid.Row="2"
-                Grid.Column="2"
-                Padding="8">
-                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                     <HorizontalStackLayout Grid.Column="1" Spacing="8">
                         <!--<BoxView
                             BackgroundColor="{StaticResource Gray300}"
                             CornerRadius="2"
                             WidthRequest="2" />-->
                         <Button
-                            Command="{Binding AddCategoryCommand}"
+                            Command="{Binding AddProductCommand}"
                             FontFamily="icofont"
-                            Text="{StaticResource Plus}"
-                            ToolTipProperties.Text="Agregar" />
+                            Text="{StaticResource Inbox}"
+                            ToolTipProperties.Text="Crear producto a partir de este artículo" />
                         <Button
+                            Command="{Binding ShowSetSellingPriceCommand}"
                             FontFamily="icofont"
-                            IsEnabled="False"
-                            Text="{StaticResource UiDelete}"
-                            ToolTipProperties.Text="Eliminar" />
+                            Text="{StaticResource Dollar}"
+                            ToolTipProperties.Text="Agregar o modificar precio de venta" />
                     </HorizontalStackLayout>
                 </Grid>
             </Frame>
-        </Grid>
-        <!--#endregion-->
-        <!--#region VISTA DE PRODUCTOS-->
-        <Grid
-            Grid.Row="1"
-            ColumnDefinitions="*,auto,300"
-            ColumnSpacing="8"
-            IsVisible="{Binding IsProductsVisible, Mode=OneWay}"
-            RowDefinitions="auto,*,auto"
-            RowSpacing="8">
-            <!--  PANEL IZQUIERDO  -->
-            <VerticalStackLayout Spacing="8">
+            <!--#endregion-->
+            <BoxView
+                Grid.RowSpan="3"
+                Grid.Column="1"
+                BackgroundColor="{StaticResource Gray300}"
+                CornerRadius="2"
+                WidthRequest="2" />
+            <!--#region VISTA DE PRODUCTOS-->
+            <VerticalStackLayout Grid.Column="2" Spacing="8">
                 <Label
                     Grid.Column="1"
                     FontSize="18"
@@ -264,10 +200,13 @@
                     </RadioButton>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
-            <ScrollView Grid.Row="1">
+            <ScrollView Grid.Row="1" Grid.Column="2">
                 <CollectionView />
             </ScrollView>
-            <Frame Grid.Row="2" Padding="8">
+            <Frame
+                Grid.Row="2"
+                Grid.Column="2"
+                Padding="8">
                 <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                     <HorizontalStackLayout Grid.Column="1" Spacing="8">
                         <Button
@@ -292,14 +231,15 @@
                     </HorizontalStackLayout>
                 </Grid>
             </Frame>
+            <!--#endregion-->
             <BoxView
                 Grid.RowSpan="3"
-                Grid.Column="1"
+                Grid.Column="3"
                 BackgroundColor="{StaticResource Gray300}"
                 CornerRadius="2"
                 WidthRequest="2" />
-            <!--  PANEL DERECHO  -->
-            <VerticalStackLayout Grid.Column="2" Spacing="8">
+            <!--#region VISTA DE OFERTAS-->
+            <VerticalStackLayout Grid.Column="4" Spacing="8">
                 <Label
                     Grid.Column="1"
                     FontSize="18"
@@ -331,12 +271,12 @@
                     </RadioButton>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
-            <ScrollView Grid.Row="1" Grid.Column="2">
+            <ScrollView Grid.Row="1" Grid.Column="4">
                 <CollectionView />
             </ScrollView>
             <Frame
                 Grid.Row="2"
-                Grid.Column="2"
+                Grid.Column="4"
                 Padding="8">
                 <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                     <HorizontalStackLayout Grid.Column="1" Spacing="8">
@@ -352,8 +292,8 @@
                     </HorizontalStackLayout>
                 </Grid>
             </Frame>
+            <!--#endregion-->
         </Grid>
-        <!--#endregion-->
         <!--#endregion-->
     </Grid>
 

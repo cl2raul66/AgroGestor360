@@ -132,9 +132,6 @@
 	  <MauiXaml Update="Views\Settings\CvUsers.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Settings\Products\PgAddItem.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\Products\PgAddProduct.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

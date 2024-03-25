@@ -11,35 +11,35 @@ namespace AgroGestor360.App.ViewModels.Settings;
 
 public partial class CvProductsViewModel : ObservableObject
 {
-    [ObservableProperty]
-    bool isProductsVisible;
+    //[ObservableProperty]
+    //bool isProductsVisible;
+
+    //[RelayCommand]
+    //void ViewArticles()
+    //{
+    //    IsProductsVisible = false;
+    //}
+
+    //[RelayCommand]
+    //void ViewProducts()
+    //{
+    //    IsProductsVisible = true;
+    //}
 
     [RelayCommand]
-    void ViewArticles()
+    async Task ShowSetSellingPrice()
     {
-        IsProductsVisible = false;
-    }
+        StringBuilder sb = new();
+        sb.AppendLine($"NOMBRE: {0}");
+        sb.AppendLine($"PRECIO ANTERIOR: {"0.00"}");
+        sb.AppendLine($"PRESENTACION: {0}");
+        sb.AppendLine($"CATEGORIA: {0}");
 
-    [RelayCommand]
-    void ViewProducts()
-    {
-        IsProductsVisible = true;
-    }
-
-    [RelayCommand]
-    async Task AddCategory()
-    {
-        string resul = await Shell.Current.DisplayPromptAsync("Agregar categoría", "Nombre:", "Agregar", "Cancelar", "Escriba aquí");
+        string resul = await Shell.Current.DisplayPromptAsync("Establecer precio de venta", sb.ToString().TrimEnd(), "Establecer", "Cancelar", "0.00");
         if (string.IsNullOrEmpty(resul))
         {
             return;
         }
-    }
-
-    [RelayCommand]
-    async Task AddItem()
-    {
-        await Shell.Current.GoToAsync(nameof(PgAddItem), true);
     }
 
     [RelayCommand]
