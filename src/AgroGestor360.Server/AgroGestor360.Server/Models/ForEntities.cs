@@ -4,6 +4,15 @@ using vCardLib.Models;
 
 namespace AgroGestor360.Server.Models;
 
+public class Organization
+{
+    public ObjectId? Id { get; set; }
+    public string? Name { get; set; }
+    public string? Address { get; set; }
+    public string? Phone { get; set; }
+    public string? Email { get; set; }
+}
+
 public class ClientDevice
 {
     public ObjectId? Id { get; set; }
@@ -37,6 +46,20 @@ public class UserGroup
 {
     public string? Id { get; set; }
     public string? Name { get; set; }
+}
+
+public class CustomerDiscount
+{
+    public DateTime Date { get; set; }
+    public ObjectId? CustomerId { get; set; }
+    public ObjectId? CustomerDiscountClass { get; set; }
+}
+
+public class CustomerDiscountClass
+{
+    public ObjectId? Id { get; set; }
+    public string? Name { get; set; }
+    public double Value { get; set; }
 }
 
 public class Merchandise
@@ -96,8 +119,37 @@ public class Bank
 public class Sale
 {
     public ObjectId? Id { get; set; }
+    public List<SaleProduct>? SaleProducts { get; set; }
     public ObjectId? SellerId { get; set; }
-    public bool WithFEL { get; set; }
+    public ObjectId? CustomerId { get; set; }
+    public bool IsWithFEL { get; set; }
+    public List<PaymentMethod>? Payments { get; set; }
+}
+
+public abstract class PaymentMethod
+{
+    public double Amount { get; set; }
+}
+
+public class ImmediatePayment : PaymentMethod
+{
+    public string? Reference { get; set; }
+    public ObjectId? BankAccountId { get; set; }
+    public ImmediatePaymentType Type { get; set; }
+}
+
+public class CreditPayment : PaymentMethod
+{
+    public CreditPaymentType Type { get; set; }
+    public int NumberOfInstallments { get; set; }
+}
+
+public class SaleProduct
+{
+    public ObjectId? ProductId { get; set; }
+    public double Quantity { get; set; }
+    public ObjectId? ProductOfferingId { get; set; }
+    public ObjectId? CustomerDiscountClassId { get; set; }
 }
 
 public class Loan

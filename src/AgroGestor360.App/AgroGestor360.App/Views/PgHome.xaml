@@ -24,6 +24,15 @@
                 VerticalOptions="Center" />
             <HorizontalStackLayout Grid.Column="2" Spacing="8">
                 <Button
+                    Text="Reportes"
+                    TextTransform="Uppercase"
+                    ToolTipProperties.Text="Ir a reportes"
+                    WidthRequest="110" />
+                <BoxView
+                    BackgroundColor="{StaticResource Gray300}"
+                    CornerRadius="2"
+                    WidthRequest="2" />
+                <Button
                     Command="{Binding GoToLoansCommand}"
                     Text="Prestamos"
                     TextTransform="Uppercase"

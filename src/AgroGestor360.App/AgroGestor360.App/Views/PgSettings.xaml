@@ -76,6 +76,11 @@
                         Text="Usuarios"
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ajustes para usuarios" />-->
+                    <Button
+                        Command="{Binding ShowCvSalesCommand}"
+                        Text="Ventas"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Ajustes para ventas" />
                 </VerticalStackLayout>
             </ScrollView>
             <Grid Grid.Column="1">

@@ -46,6 +46,9 @@ public class NavigationService : INavigationService
             case CvWarehouseViewModel vm:
                 updateViewAction(new CvWarehouse(vm));
                 break;
+            case CvSalesViewModel vm:
+                updateViewAction(new CvSales(vm));
+                break;
             default:
                 break;
         }
