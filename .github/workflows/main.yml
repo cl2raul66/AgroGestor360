@@ -1,0 +1,60 @@
+name: .NET Core Publish
+
+on:
+  push:
+    paths:
+      - 'Agrogestor360/src/Agrogestor360.Server/Agrogestor360.Server/**'
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 8.0
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+
+    - name: Create Tag
+      id: create_tag
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const { repo: { owner, repo } } = context;
+          let version = 'v1.0.0'; // default version
+          try {
+            // get the latest tag
+            const { data: { name } } = await github.rest.repos.getLatestRelease({ owner, repo });
+            const [major, minor, patch] = name.substring(1).split('.').map(Number);
+            // increment the version
+            version = `v${major}.${minor}.${patch + 1}`;
+          } catch (error) {
+            console.log('No previous release found');
+          }
+          // create the new tag
+          const ref = await github.rest.git.createRef({ owner, repo, ref: `refs/tags/${version}`, sha: context.sha });
+          return version;
+
+    - name: Publish
+      run: dotnet publish --configuration Release --runtime win-x64 --no-build --output ./publish
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Agrogestor360Server
+        path: ./publish/
