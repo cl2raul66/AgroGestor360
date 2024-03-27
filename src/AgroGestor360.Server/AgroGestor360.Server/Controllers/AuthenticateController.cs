@@ -6,15 +6,14 @@ namespace AgroGestor360.Server.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class AuthenticateController(IConfiguration configuration) : Controller
+public class AuthController(IConfiguration configuration) : Controller
 {
     private readonly IConfiguration _configuration = configuration;
 
     [HttpPost]
-    public IActionResult Authenticate(string tokenauth)
+    public IActionResult Authenticate([FromBody] string tokenauth)
     {
-        var hashes = tokenauth.Split(':')?.Select(x => x.Trim()).ToArray();
-        if (hashes is null && hashes!.Length != 2 && string.IsNullOrEmpty(hashes[0]) && string.IsNullOrEmpty(hashes[1]))
+        if (string.IsNullOrEmpty(tokenauth) && string.IsNullOrWhiteSpace(tokenauth))
         {
             return BadRequest();
         }
