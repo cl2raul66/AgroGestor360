@@ -171,12 +171,6 @@ public class Expense
     public ObjectId? Id { get; set; }
 }
 
-//public class ShareholderContribution
-//{
-//    public ObjectId? Id { get; set; }
-//    public vCard? Shareholder { get; set; }
-//}
-
 public class BankTransaction
 {
     public ObjectId? BankAccountId { get; set; }

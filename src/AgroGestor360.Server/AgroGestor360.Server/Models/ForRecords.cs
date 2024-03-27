@@ -3,12 +3,11 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Models;
 
-
 public class InventoryDispatch
 {
     public ObjectId? Id { get; set; }
-    public DispatchItem[]? DispatchItems { get; set; }
-    public string? Reason { get; set; } // Razón del despacho: Venta, Desperdicio, Caducidad
+    public List<DispatchItem>? DispatchItems { get; set; }
+    public string? Reason { get; set; }
     public DateTime DispatchDate { get; set; }
 }
 
@@ -28,7 +27,7 @@ public class LedgerRecord
     public ObjectId? DetailId { get; set; }
 }
 
-public class Inventory
+public class Warehouse
 {
     public ObjectId? Id { get; set; }
     public ObjectId? MerchandiseId { get; set; }
