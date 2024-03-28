@@ -7,7 +7,9 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddSingleton<IClientdeviceForLitedbService, ClientdeviceForLitedbService>();
+builder.Services.AddSingleton<IShareholderForLitedbService, ShareholderForLitedbService>();
+builder.Services.AddSingleton<ISellerForLitedbService, SellerForLitedbService>();
+builder.Services.AddSingleton<ICustomerForLitedbService, CustomerForLitedbService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
