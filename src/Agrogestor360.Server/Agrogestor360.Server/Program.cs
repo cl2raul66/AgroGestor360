@@ -1,5 +1,6 @@
 using AgroGestor360.Server.Sevices;
 using AgroGestor360.Server.Tools.Hubs;
+using AgroGestor360.Server.Tools.Middleware;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
@@ -16,6 +17,9 @@ builder.Services.AddHealthChecks();
 var app = builder.Build();
 
 app.UseRouting();
+
+// Add the middle-ware here
+app.UseMiddleware<DeviceTypeRestrictionMiddleware>();
 
 app.UseAuthorization();
 

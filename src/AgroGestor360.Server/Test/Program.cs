@@ -1,7 +1,6 @@
-﻿using System.Security.Cryptography;
+﻿using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
-
-HttpClient client = new();
 
 string GenerateHash(string input)
 {
@@ -15,6 +14,10 @@ string GenerateHash(string input)
 }
 
 string salt = "2EE6C66E-5016-4DDE-9B41-6E2C2A526438";
+
+HttpClient client = new();
+client.DefaultRequestHeaders.UserAgent.ParseAdd(RuntimeInformation.OSDescription);
+client.DefaultRequestHeaders.Add("OrganizationToken", GenerateHash("526A0E42-C856-4EED-94D1-2ABF8DDE1F48" + salt));
 Console.WriteLine("Hola root");
 
 var healthCheckResponse = await client.GetAsync("http://localhost:5010/healthchecks");
