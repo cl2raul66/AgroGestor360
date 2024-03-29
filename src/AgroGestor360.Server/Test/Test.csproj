@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\AgroGestor360.Client\AgroGestor360.Client\AgroGestor360.Client.csproj" />
+  </ItemGroup>
+
 </Project>

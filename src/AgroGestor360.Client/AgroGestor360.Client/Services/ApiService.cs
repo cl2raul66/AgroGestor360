@@ -8,7 +8,16 @@ using System.Text.Json;
 
 namespace AgroGestor360.Client.Services;
 
-public class ApiService
+public interface IApiService
+{
+    Task<bool> AuthRoot(string serverURL, string password);
+    Task<bool> CheckUrl(string serverURL);
+    Task<bool> ConnectToServerHub(string serverURL);
+    Task<Organization?> GetOrganization(string serverURL);
+    void SetClientAccessToken(string token);
+}
+
+public class ApiService : IApiService
 {
     bool isSetClientAccessToken;
     readonly JsonSerializerOptions jsonOptions = new()
@@ -29,8 +38,9 @@ public class ApiService
 
     HttpClient Httpclient { get; set; }
 
-    public void SetClientAccessToken(string token)
+    public void SetClientAccessToken(string clientaccesstoken)
     {
+        var token = HashHelper.GenerateHash(clientaccesstoken);
         Httpclient.DefaultRequestHeaders.Add("ClientAccessToken", token);
         isSetClientAccessToken = true;
     }
@@ -65,10 +75,16 @@ public class ApiService
                         options.Headers.Add("ClientAccessToken", Httpclient.DefaultRequestHeaders.GetValues("ClientAccessToken").First());
                         options.Headers.Add("UserAgent", RuntimeInformation.OSDescription);
                     })
+                    .WithAutomaticReconnect(new RetryPolicy())
                     .Build();
 
+                HubConnection.On<string>("ReceiveStatusMessage", (message) =>
+                {
+                    Console.WriteLine($"Server Status: {message}");
+                });
+
                 await HubConnection.StartAsync();
-                return HubConnection.State == HubConnectionState.Connected;
+                return HubConnection.State is HubConnectionState.Connected;
             }
             catch (Exception ex)
             {
@@ -79,26 +95,50 @@ public class ApiService
         return false;
     }
 
-    public async Task<Organization> GetOrganization(string serverURL)
+    public async Task<Organization?> GetOrganization(string serverURL)
     {
-        var response = await Httpclient.GetAsync($"{serverURL}/Organization");
-        if (response.IsSuccessStatusCode)
+        if (isSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<Organization>(content, jsonOptions)!;
+            var response = await Httpclient.GetAsync($"{serverURL}/Organization");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<Organization>(content, jsonOptions)!;
+            }
+            else
+            {
+                Console.WriteLine("No se pudo obtener la información de la organización.");
+            }
         }
-        else
-        {
-            Console.WriteLine("No se pudo obtener la información de la organización.");
-        }
-        return new Organization();
+        return null;
     }
-    
-    public async Task<bool> Auth(string serverURL, string password, string salt)
+
+    public async Task<bool> AuthRoot(string serverURL, string password)
     {
-        string token = HashHelper.GenerateHash("root" + password + salt);
-        var content = new StringContent($"\"{token}\"", Encoding.UTF8, "application/json");
-        var response = await Httpclient.PostAsync($"{serverURL}/Auth", content);
-        return response.IsSuccessStatusCode;
+        if (isSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await Httpclient.GetAsync($"{serverURL}/Organization/Id");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return false;
+            }
+
+            string salt = await response.Content.ReadAsStringAsync();
+            string token = HashHelper.GenerateHash("root" + password + salt);
+            var content = new StringContent($"\"{token}\"", Encoding.UTF8, "application/json");
+            response = await Httpclient.PostAsync($"{serverURL}/Auth", content);
+            return response.IsSuccessStatusCode;
+        }
+        return false;
+    }
+
+
+    class RetryPolicy : IRetryPolicy
+    {
+        public TimeSpan? NextRetryDelay(RetryContext retryContext)
+        {
+            return TimeSpan.FromSeconds(Math.Pow(2, retryContext.PreviousRetryCount));
+        }
     }
 }

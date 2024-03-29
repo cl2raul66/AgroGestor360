@@ -11,9 +11,9 @@ public class DeviceTypeRestrictionMiddleware(RequestDelegate next, IConfiguratio
     {
         var connection = context.Connection;
         var userAgent = context.Request.Headers.UserAgent.ToString();
-        var organizationId = context.Request.Headers["ClientAccessToken"].ToString();
+        var token = context.Request.Headers["ClientAccessToken"].ToString();
 
-        if (organizationId != clientAccessToken)
+        if (token != clientAccessToken)
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             await context.Response.WriteAsync("Token de acceso a clientes inválido.");

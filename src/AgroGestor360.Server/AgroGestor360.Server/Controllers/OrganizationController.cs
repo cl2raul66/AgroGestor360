@@ -15,4 +15,11 @@ public class OrganizationController(IConfiguration configuration) : ControllerBa
         var organization = _configuration.GetSection("Organization").Get<Organization>();
         return Ok(organization);
     }
+
+    [HttpGet("Id")]
+    public IActionResult GetOrganizationId()
+    {
+        var organization = _configuration["Organization:Id"];
+        return Ok(organization);
+    }
 }
