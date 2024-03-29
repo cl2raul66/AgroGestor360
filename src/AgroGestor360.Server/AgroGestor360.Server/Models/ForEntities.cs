@@ -6,7 +6,7 @@ namespace AgroGestor360.Server.Models;
 
 public class Organization
 {
-    public ObjectId? Id { get; set; }
+    public string? Id { get; set; }
     public string? Name { get; set; }
     public string? Address { get; set; }
     public string? Phone { get; set; }

@@ -5,18 +5,18 @@ namespace AgroGestor360.Server.Tools.Middleware;
 public class DeviceTypeRestrictionMiddleware(RequestDelegate next, IConfiguration configuration)
 {
     private readonly RequestDelegate _next = next;
-    private readonly string? _organizationToken = HashHelper.GenerateHash(configuration["Organization:Id"] + configuration["License:ClientId"]);
+    private readonly string clientAccessToken = HashHelper.GenerateHash(configuration["License:ClientAccessToken"]!);
 
     public async Task InvokeAsync(HttpContext context)
     {
         var connection = context.Connection;
         var userAgent = context.Request.Headers.UserAgent.ToString();
-        var organizationId = context.Request.Headers["OrganizationToken"].ToString();
+        var organizationId = context.Request.Headers["ClientAccessToken"].ToString();
 
-        if (organizationId != _organizationToken)
+        if (organizationId != clientAccessToken)
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            await context.Response.WriteAsync("Token de organización inválido.");
+            await context.Response.WriteAsync("Token de acceso a clientes inválido.");
             return;
         }
 

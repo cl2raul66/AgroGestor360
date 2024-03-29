@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace AgroGestor360.Server.Tools.Helpers;
+namespace AgroGestor360.Client.Tools.Helpers;
 
 public class HashHelper
 {

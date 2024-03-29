@@ -19,7 +19,7 @@ public class AuthController(IConfiguration configuration) : Controller
 
         string? username = _configuration["User:Username"];
         string? password = _configuration["User:Password"];
-        string? salt = _configuration["License:ClientId"];
+        string? salt = _configuration["Organization:Id"];
 
         string token = HashHelper.GenerateHash(username! + password! + salt!);
 

@@ -31,7 +31,7 @@ public class ShareholderForLitedbService : IShareholderForLitedbService
 
     public bool Exist => collection.Count() > 0;
 
-    public IEnumerable<vCard> GetAllById(ObjectId id) => collection.Find(x => x.Id == id);
+    public IEnumerable<vCard> GetAllById(ObjectId id) => collection.Find(x => x.Uid == id.ToString());
 
     public string Insert(vCard vCard)
     {

@@ -13,11 +13,11 @@ string GenerateHash(string input)
     return sb.ToString();
 }
 
-string salt = "2EE6C66E-5016-4DDE-9B41-6E2C2A526438";
+string salt = "2EE6C66E50164DDE9B416E2C2A526438";
 
 HttpClient client = new();
 client.DefaultRequestHeaders.UserAgent.ParseAdd(RuntimeInformation.OSDescription);
-client.DefaultRequestHeaders.Add("OrganizationToken", GenerateHash("526A0E42-C856-4EED-94D1-2ABF8DDE1F48" + salt));
+client.DefaultRequestHeaders.Add("ClientAccessToken", GenerateHash("38D941C88617485496B07AF837C5E64E"));
 Console.WriteLine("Hola root");
 
 var healthCheckResponse = await client.GetAsync("http://localhost:5010/healthchecks");
