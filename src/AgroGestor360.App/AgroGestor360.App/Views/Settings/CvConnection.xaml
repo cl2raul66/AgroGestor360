@@ -17,6 +17,7 @@
                     VerticalOptions="Center" />
                 <HorizontalStackLayout Grid.Column="2" Spacing="8">
                     <Button
+                        Command="{Binding ShowSetURLCommand}"
                         FontFamily="icofont"
                         Text="{StaticResource Plugin}"
                         ToolTipProperties.Text="Establecer conexión" />
@@ -27,7 +28,7 @@
             <Label
                 FontSize="16"
                 HorizontalOptions="Center"
-                Text="¡No hay URL establecida!"
+                Text="{Binding ServerURL, Mode=OneWay, StringFormat='Servidor en {0}.', TargetNullValue='¡No hay URL establecida!'}"
                 VerticalOptions="Center" />
         </Grid>
     </Grid>

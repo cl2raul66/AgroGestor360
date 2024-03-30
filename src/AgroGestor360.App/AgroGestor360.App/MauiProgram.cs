@@ -5,6 +5,7 @@ using AgroGestor360.App.ViewModels.Expense;
 using AgroGestor360.App.ViewModels.Loans;
 using AgroGestor360.App.ViewModels.Settings;
 using AgroGestor360.App.ViewModels.Settings.BankAccounts;
+using AgroGestor360.App.ViewModels.Settings.Connection;
 using AgroGestor360.App.ViewModels.Settings.Customers;
 using AgroGestor360.App.ViewModels.Settings.Products;
 using AgroGestor360.App.ViewModels.Settings.Sales;
@@ -15,6 +16,7 @@ using AgroGestor360.App.Views.Expense;
 using AgroGestor360.App.Views.Loans;
 using AgroGestor360.App.Views.Settings;
 using AgroGestor360.App.Views.Settings.BankAccounts;
+using AgroGestor360.App.Views.Settings.Connection;
 using AgroGestor360.App.Views.Settings.Customers;
 using AgroGestor360.App.Views.Settings.Products;
 using AgroGestor360.App.Views.Settings.Sales;
@@ -22,7 +24,9 @@ using AgroGestor360.App.Views.Settings.Shareholders;
 using AgroGestor360.App.Views.Settings.Warehouse;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Maui;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace AgroGestor360.App;
 
@@ -41,13 +45,21 @@ public static class MauiProgram
                 fonts.AddFont("icofont.ttf", "icofont");
             });
 
-        builder.Services.AddSingleton<IApiService, ApiService>();
-        builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.AddAppsettings();
 
+        builder.Services.AddSingleton<IApiService>(serviceProvider =>
+        {
+            var configuration = serviceProvider.GetService<IConfiguration>();
+            var apiService = new ApiService();
+            apiService.SetClientAccessToken(configuration!["License:ClientAccessToken"]!);
+            return apiService;
+        });
+        builder.Services.AddSingleton<INavigationService, NavigationService>();
         builder.Services.AddTransient<PgSignIn, PgSignInViewModel>();
         builder.Services.AddTransient<PgHome, PgHomeViewModel>();
         builder.Services.AddTransient<PgSettings, PgSettingsViewModel>();
         builder.Services.AddTransient<CvConnection, CvConnectionViewModel>();
+        builder.Services.AddTransient<PgSetURL, PgSetURLViewModel>();
         builder.Services.AddTransient<CvSeedCapital, CvSeedCapitalViewModel>();
         builder.Services.AddTransient<CvBankAccounts, CvBankAccountsViewModel>();
         builder.Services.AddTransient<PgAddAccountOrCard, PgAddAccountOrCardViewModel>();
@@ -75,5 +87,19 @@ public static class MauiProgram
 #endif
 
         return builder.Build();
+    }
+
+    private static void AddAppsettings(this MauiAppBuilder builder)
+    {
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        using Stream stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.appsettings.json")!;
+        if (stream is not null)
+        {
+            IConfiguration config = new ConfigurationBuilder()
+                .AddJsonStream(stream)
+                .Build();
+            builder.Configuration.AddConfiguration(config);
+        }
+
     }
 }

@@ -4,11 +4,20 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels.Settings.Customers"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels.Settings.Connection"
     Title="Establecer URL"
+    x:DataType="vm:PgSetURLViewModel"
     BackgroundColor="#99634833"
     Shell.NavBarIsVisible="False"
     Shell.PresentationMode="ModalAnimated">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ctk:MultiConverter x:Key="MyMultiConverter">
+                <ctk:IsNullConverter />
+                <ctk:InvertedBoolConverter />
+            </ctk:MultiConverter>
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <Frame
         Margin="16"
@@ -17,59 +26,68 @@
         VerticalOptions="Center">
         <VerticalStackLayout Spacing="8">
             <Label
-                FontSize="Subtitle"
-                Text="Servidor:"
-                TextColor="{StaticResource Primary}" />
-            <Entry ClearButtonVisibility="WhileEditing" Placeholder="http://localhost:8000" />
-            <Grid ColumnDefinitions="*, auto" ColumnSpacing="8">
-                <HorizontalStackLayout Spacing="8">
-                    <Label
-                        FontFamily="icofont"
-                        FontSize="Body"
-                        VerticalOptions="Center">
-                        <!--<Label.Triggers>
-                            <DataTrigger
-                                Binding="{Binding StatusApi, Mode=OneWay}"
-                                TargetType="Label"
-                                Value="true">
-                                <Setter Property="Text" Value="{StaticResource CheckCircled}" />
-                                <Setter Property="TextColor" Value="{StaticResource Tertiary}" />
-                            </DataTrigger>
-                            <DataTrigger
-                                Binding="{Binding StatusApi, Mode=OneWay}"
-                                TargetType="Label"
-                                Value="false">
-                                <Setter Property="Text" Value="{StaticResource NotAllowed}" />
-                                <Setter Property="TextColor" Value="Red" />
-                            </DataTrigger>
-                        </Label.Triggers>-->
-                    </Label>
-                    <Label FontSize="Body" VerticalOptions="Center">
-                        <!--<Label.Triggers>
-                            <DataTrigger
-                                Binding="{Binding StatusApi, Mode=OneWay}"
-                                TargetType="Label"
-                                Value="true">
-                                <Setter Property="Text" Value="Permitido" />
-                                <Setter Property="TextColor" Value="{StaticResource Tertiary}" />
-                            </DataTrigger>
-                            <DataTrigger
-                                Binding="{Binding StatusApi, Mode=OneWay}"
-                                TargetType="Label"
-                                Value="false">
-                                <Setter Property="Text" Value="Denegado" />
-                                <Setter Property="TextColor" Value="Red" />
-                            </DataTrigger>
-                        </Label.Triggers>-->
-                    </Label>
-                </HorizontalStackLayout>
+                FontSize="18"
+                Text="Establecer URL"
+                TextTransform="Uppercase"
+                VerticalOptions="Center" />
+            <Label Text="URL:" />
+            <Entry
+                ClearButtonVisibility="WhileEditing"
+                Placeholder="http://localhost:8000"
+                Text="{Binding ServerURL}" />
+            <HorizontalStackLayout Spacing="8">
+                <Label
+                    FontFamily="icofont"
+                    FontSize="Body"
+                    VerticalOptions="Center">
+                    <Label.Triggers>
+                        <DataTrigger
+                            Binding="{Binding ConnectedAPI, Mode=OneWay}"
+                            TargetType="Label"
+                            Value="true">
+                            <Setter Property="Text" Value="{StaticResource CheckCircled}" />
+                        </DataTrigger>
+                        <DataTrigger
+                            Binding="{Binding ConnectedAPI, Mode=OneWay}"
+                            TargetType="Label"
+                            Value="false">
+                            <Setter Property="Text" Value="{StaticResource NotAllowed}" />
+                            <Setter Property="TextColor" Value="Red" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+                <Label FontSize="Body" VerticalOptions="Center">
+                    <Label.Triggers>
+                        <DataTrigger
+                            Binding="{Binding ConnectedAPI, Mode=OneWay}"
+                            TargetType="Label"
+                            Value="true">
+                            <Setter Property="Text" Value="URL permitido" />
+                        </DataTrigger>
+                        <DataTrigger
+                            Binding="{Binding ConnectedAPI, Mode=OneWay}"
+                            TargetType="Label"
+                            Value="false">
+                            <Setter Property="Text" Value="URL denegado" />
+                            <Setter Property="TextColor" Value="Red" />
+                        </DataTrigger>
+                        <DataTrigger
+                            Binding="{Binding ConnectedAPI, Mode=OneWay, Converter={ctk:IsNullConverter}}"
+                            TargetType="Label"
+                            Value="true">
+                            <Setter Property="Text" Value="URL no comprobado" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </HorizontalStackLayout>
+            <Grid ColumnDefinitions="100, auto" ColumnSpacing="8">
                 <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                    <Button Command="{Binding TestCommand}" Text="Probar" />
+                    <Button Command="{Binding TestCommand}" Text="Comprobar" />
                     <Button
                         Command="{Binding SaveCommand}"
-                        IsEnabled="{Binding StatusApi, Mode=OneWay}"
+                        IsEnabled="{Binding ConnectedAPI, Mode=OneWay, Converter={StaticResource MyMultiConverter}}"
                         Text="Guardar" />
-                    <Button Text="Cancelar" />
+                    <Button Command="{Binding CancelCommand}" Text="Cancelar" />
                 </HorizontalStackLayout>
             </Grid>
         </VerticalStackLayout>
