@@ -11,6 +11,30 @@
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
                 <ResourceDictionary Source="Resources/Styles/icofont.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="BorderItem" TargetType="Border">
+                <Setter Property="StrokeShape" Value="RoundRectangle 4" />
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal">
+                                <VisualState.Setters>
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="Padding" Value="8,4" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Selected">
+                                <VisualState.Setters>
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="Padding" Value="8,4" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource Tertiary}" />
+                                    <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

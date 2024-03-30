@@ -2323,7 +2323,7 @@
     <x:String x:Key="Icon105">&#x13b85;</x:String>
     <x:String x:Key="DuotoneicofontPlayCircle">&#x13b86;</x:String>
     <x:String x:Key="DuotoneicofontPlugins">&#x13b88;</x:String>
-    <x:String x:Key="Icon106">&#x13b89;</x:String>
+    <x:String x:Key="Plugins">&#x13b89;</x:String>
     <x:String x:Key="DuotoneicofontPlusCircle">&#x13b8b;</x:String>
     <x:String x:Key="DuotoneicofontPrevious">&#x13b8c;</x:String>
     <x:String x:Key="Icon107">&#x13b8d;</x:String>

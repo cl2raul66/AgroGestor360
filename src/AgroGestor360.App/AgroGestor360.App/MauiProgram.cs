@@ -20,6 +20,7 @@ using AgroGestor360.App.Views.Settings.Products;
 using AgroGestor360.App.Views.Settings.Sales;
 using AgroGestor360.App.Views.Settings.Shareholders;
 using AgroGestor360.App.Views.Settings.Warehouse;
+using AgroGestor360.Client.Services;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 
@@ -40,11 +41,13 @@ public static class MauiProgram
                 fonts.AddFont("icofont.ttf", "icofont");
             });
 
+        builder.Services.AddSingleton<IApiService, ApiService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
 
         builder.Services.AddTransient<PgSignIn, PgSignInViewModel>();
         builder.Services.AddTransient<PgHome, PgHomeViewModel>();
         builder.Services.AddTransient<PgSettings, PgSettingsViewModel>();
+        builder.Services.AddTransient<CvConnection, CvConnectionViewModel>();
         builder.Services.AddTransient<CvSeedCapital, CvSeedCapitalViewModel>();
         builder.Services.AddTransient<CvBankAccounts, CvBankAccountsViewModel>();
         builder.Services.AddTransient<PgAddAccountOrCard, PgAddAccountOrCardViewModel>();

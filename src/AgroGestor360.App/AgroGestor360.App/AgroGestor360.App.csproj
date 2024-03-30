@@ -72,6 +72,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Reference Include="AgroGestor360.Client">
+	    <HintPath>..\..\AgroGestor360.Client\AgroGestor360.Client\bin\Debug\net8.0\AgroGestor360.Client.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Update="Views\Settings\CvWarehouse.xaml.cs">
 	    <DependentUpon>CvWarehouse.xaml</DependentUpon>
 	  </Compile>
@@ -87,7 +93,13 @@
 	  <MauiXaml Update="Views\Loans\PgAmortization.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\Settings\Connection\PgSetURL.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\Customers\PgAddEditCustomer.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Settings\CvConnection.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\CvCustomers.xaml">
@@ -115,6 +127,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\CvBankAccounts.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Settings\CvNullSelected.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\CvSales.xaml">

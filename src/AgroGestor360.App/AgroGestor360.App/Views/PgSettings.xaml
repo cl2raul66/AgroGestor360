@@ -36,65 +36,43 @@
             ColumnDefinitions="200,*"
             ColumnSpacing="16">
             <ScrollView>
-                <VerticalStackLayout Spacing="8">
-                    <Button
-                        Text="Entidad"
-                        TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para entidad" />
-                    <Button
-                        Command="{Binding ShowCvSeedCapitalCommand}"
-                        Text="Capital inicial"
-                        TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para capital inicial" />
-                    <Button
-                        Command="{Binding ShowCvBankAccountsCommand}"
-                        Text="Cuentas y tarjetas"
-                        TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para cuentas bancarias" />
-                    <Button
-                        Command="{Binding ShowCvShareholdersCommand}"
-                        Text="Accionistas"
-                        TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para accionistas" />
-                    <Button
-                        Command="{Binding ShowCvInventoryCommand}"
-                        Text="Almacén"
-                        TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para almacén" />
-                    <Button
-                        Command="{Binding ShowCvCustomersCommand}"
-                        Text="Clientes"
-                        TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para clientes" />
-                    <Button
-                        Command="{Binding ShowCvProductsCommand}"
-                        Text="Productos"
-                        TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para productos" />
-                    <!--<Button
-                        Command="{Binding ShowCvUsersCommand}"
-                        Text="Usuarios"
-                        TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para usuarios" />-->
-                    <Button
-                        Command="{Binding ShowCvSalesCommand}"
-                        Text="Ventas"
-                        TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ajustes para ventas" />
-                </VerticalStackLayout>
+                <CollectionView SelectedItem="{Binding SelectedMenu, Mode=OneWayToSource}" SelectionMode="Single">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemsSource>
+                        <x:Array Type="{x:Type x:String}">
+                            <x:String>Conexión</x:String>
+                            <x:String>Entidad</x:String>
+                            <x:String>Capital inicial</x:String>
+                            <x:String>Cuentas y tarjetas</x:String>
+                            <x:String>Accionistas</x:String>
+                            <x:String>Almacén</x:String>
+                            <x:String>Clientes</x:String>
+                            <x:String>Productos</x:String>
+                            <x:String>Vendedores</x:String>
+                            <x:String>Ventas</x:String>
+                        </x:Array>
+                    </CollectionView.ItemsSource>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource BorderItem}">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="Body"
+                                    HorizontalOptions="Center"
+                                    Text="{Binding .}"
+                                    TextColor="{StaticResource White}" />
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </ScrollView>
             <Grid Grid.Column="1">
                 <ContentView
                     Content="{Binding CurrentContent, Mode=OneWay}"
                     HorizontalOptions="FillAndExpand"
-                    IsVisible="{Binding CurrentContent, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                     VerticalOptions="FillAndExpand" />
-                <Label
-                    FontSize="16"
-                    HorizontalOptions="Center"
-                    IsVisible="{Binding CurrentContent, Mode=OneWay, Converter={ctk:IsNullConverter}}"
-                    Text="¡Seleccione un ajuste de la izquierda para visualizar!"
-                    VerticalOptions="Center" />
             </Grid>
         </Grid>
         <Label

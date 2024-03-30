@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AgroGestor360.App.Views.Settings.Connection.PgSetURL"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels.Settings.Customers"
+    Title="Establecer URL"
+    BackgroundColor="#99634833"
+    Shell.NavBarIsVisible="False"
+    Shell.PresentationMode="ModalAnimated">
+
+    <Frame
+        Margin="16"
+        HorizontalOptions="Center"
+        MaximumWidthRequest="480"
+        VerticalOptions="Center">
+        <VerticalStackLayout Spacing="8">
+            <Label
+                FontSize="Subtitle"
+                Text="Servidor:"
+                TextColor="{StaticResource Primary}" />
+            <Entry ClearButtonVisibility="WhileEditing" Placeholder="http://localhost:8000" />
+            <Grid ColumnDefinitions="*, auto" ColumnSpacing="8">
+                <HorizontalStackLayout Spacing="8">
+                    <Label
+                        FontFamily="icofont"
+                        FontSize="Body"
+                        VerticalOptions="Center">
+                        <!--<Label.Triggers>
+                            <DataTrigger
+                                Binding="{Binding StatusApi, Mode=OneWay}"
+                                TargetType="Label"
+                                Value="true">
+                                <Setter Property="Text" Value="{StaticResource CheckCircled}" />
+                                <Setter Property="TextColor" Value="{StaticResource Tertiary}" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding StatusApi, Mode=OneWay}"
+                                TargetType="Label"
+                                Value="false">
+                                <Setter Property="Text" Value="{StaticResource NotAllowed}" />
+                                <Setter Property="TextColor" Value="Red" />
+                            </DataTrigger>
+                        </Label.Triggers>-->
+                    </Label>
+                    <Label FontSize="Body" VerticalOptions="Center">
+                        <!--<Label.Triggers>
+                            <DataTrigger
+                                Binding="{Binding StatusApi, Mode=OneWay}"
+                                TargetType="Label"
+                                Value="true">
+                                <Setter Property="Text" Value="Permitido" />
+                                <Setter Property="TextColor" Value="{StaticResource Tertiary}" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding StatusApi, Mode=OneWay}"
+                                TargetType="Label"
+                                Value="false">
+                                <Setter Property="Text" Value="Denegado" />
+                                <Setter Property="TextColor" Value="Red" />
+                            </DataTrigger>
+                        </Label.Triggers>-->
+                    </Label>
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                    <Button Command="{Binding TestCommand}" Text="Probar" />
+                    <Button
+                        Command="{Binding SaveCommand}"
+                        IsEnabled="{Binding StatusApi, Mode=OneWay}"
+                        Text="Guardar" />
+                    <Button Text="Cancelar" />
+                </HorizontalStackLayout>
+            </Grid>
+        </VerticalStackLayout>
+    </Frame>
+
+</ContentPage>

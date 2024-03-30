@@ -7,6 +7,7 @@ namespace AgroGestor360.App.Services;
 
 public interface INavigationService
 {
+    void NavigateToNullView(Action<ContentView> updateViewAction);
     void NavigateToView<TViewModel>(Action<ContentView> updateViewAction) where TViewModel : ObservableObject;
 }
 
@@ -19,12 +20,20 @@ public class NavigationService : INavigationService
         _serviceProvider = serviceProvider;
     }
 
+    public void NavigateToNullView(Action<ContentView> updateViewAction)
+    {
+        updateViewAction(new CvNullSelected());
+    }
+
     public void NavigateToView<TViewModel>(Action<ContentView> updateViewAction) where TViewModel : ObservableObject
     {
         var viewModel = _serviceProvider.GetService<TViewModel>();
 
         switch (viewModel)
         {
+            case CvConnectionViewModel vm:
+                updateViewAction(new CvConnection(vm));
+                break;
             case CvSeedCapitalViewModel vm:
                 updateViewAction(new CvSeedCapital(vm));
                 break;
@@ -50,6 +59,7 @@ public class NavigationService : INavigationService
                 updateViewAction(new CvSales(vm));
                 break;
             default:
+                updateViewAction(new CvNullSelected());
                 break;
         }
     }
