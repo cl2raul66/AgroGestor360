@@ -36,7 +36,7 @@
             ColumnDefinitions="200,*"
             ColumnSpacing="16">
             <ScrollView>
-                <CollectionView SelectedItem="{Binding SelectedMenu, Mode=OneWayToSource}" SelectionMode="Single">
+                <CollectionView SelectedItem="{Binding SelectedMenu}" SelectionMode="Single">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
                     </CollectionView.ItemsLayout>

@@ -1,19 +1,24 @@
 ﻿using AgroGestor360.App.Services;
 using AgroGestor360.App.ViewModels.Settings;
-using AgroGestor360.App.Views.Settings;
+using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.ComponentModel;
+using System.Text;
 
 namespace AgroGestor360.App.ViewModels;
 
 public partial class PgSettingsViewModel : ObservableObject
 {
     readonly INavigationService navigationServ;
+    readonly IApiService apiServ;
+    readonly string serverURL;
 
-    public PgSettingsViewModel(INavigationService navigationService)
+    public PgSettingsViewModel(INavigationService navigationService, IApiService apiService)
     {
         navigationServ = navigationService;
+        apiServ = apiService;
+        serverURL = Preferences.Default.Get("serverurl", string.Empty);
         SelectedMenu = string.Empty;
     }
 
@@ -26,7 +31,7 @@ public partial class PgSettingsViewModel : ObservableObject
     [RelayCommand]
     async Task GoToBack() => await Shell.Current.GoToAsync("..", true);
 
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
         if (e.PropertyName == nameof(SelectedMenu))
@@ -37,6 +42,21 @@ public partial class PgSettingsViewModel : ObservableObject
                     navigationServ.NavigateToView<CvConnectionViewModel>(view => CurrentContent = view);
                     break;
                 case "Entidad":
+                    var org = await apiServ.GetOrganization(serverURL);
+                    StringBuilder sb = new();
+                    if (org is not null)
+                    {
+                        sb.AppendLine($"NOMBRE: {org.Name}");
+                        sb.AppendLine($"TELEFONO: {org.Phone}");
+                        sb.AppendLine($"CORREO ELECTRONICO: {org.Email}");
+                        sb.AppendLine($"DIRECCION: {org.Address}");
+                    }
+                    else
+                    {
+                        sb.AppendLine("No hay información de la entidad");
+                    }
+                    await Shell.Current.DisplayAlert("Información de la empresa", sb.ToString(), "Cerrar");
+                    SelectedMenu = null;
                     break;
                 case "Capital inicial":
                     navigationServ.NavigateToView<CvSeedCapitalViewModel>(view => CurrentContent = view);
@@ -56,7 +76,7 @@ public partial class PgSettingsViewModel : ObservableObject
                 case "Productos":
                     navigationServ.NavigateToView<CvProductsViewModel>(view => CurrentContent = view);
                     break;
-                case "Vendedores": 
+                case "Vendedores":
                     break;
                 case "Ventas":
                     navigationServ.NavigateToView<CvSalesViewModel>(view => CurrentContent = view);
