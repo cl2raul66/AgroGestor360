@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels.Settings.Customers"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     Title="AddEditCustomer"
     x:DataType="vm:PgAddEditCustomerViewModel"
     BackgroundColor="#99634833"

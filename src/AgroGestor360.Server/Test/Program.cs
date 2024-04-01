@@ -1,7 +1,11 @@
 ﻿using AgroGestor360.Client.Services;
 
 IApiService apiServ = new ApiService();
+apiServ.ConnectToHttpClient();
 apiServ.SetClientAccessToken("38D941C88617485496B07AF837C5E64E");
+
+IOrganizationService organizationServ = new OrganizationService();
+IAuthService authServ = new AuthService();
 
 string url = "http://localhost:5010";
 
@@ -15,7 +19,7 @@ if (!checkurl)
 }
 else
 {
-    var org = await apiServ.GetOrganization(url);
+    var org = await organizationServ.GetOrganization(url);
     if (org is not null)
     {
         Console.WriteLine("Información de la organización:");
@@ -36,7 +40,7 @@ string? password = Console.ReadLine();
 
 if (!string.IsNullOrEmpty(password))
 {
-    var resultAuth = await apiServ.AuthRoot(url, password);
+    var resultAuth = await authServ.AuthRoot(url, password);
 
     if (resultAuth)
     {

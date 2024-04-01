@@ -1,16 +1,6 @@
 ﻿using AgroGestor360.App.Services;
 using AgroGestor360.App.View.Settings;
 using AgroGestor360.App.ViewModels;
-using AgroGestor360.App.ViewModels.Expense;
-using AgroGestor360.App.ViewModels.Loans;
-using AgroGestor360.App.ViewModels.Settings;
-using AgroGestor360.App.ViewModels.Settings.BankAccounts;
-using AgroGestor360.App.ViewModels.Settings.Connection;
-using AgroGestor360.App.ViewModels.Settings.Customers;
-using AgroGestor360.App.ViewModels.Settings.Products;
-using AgroGestor360.App.ViewModels.Settings.Sales;
-using AgroGestor360.App.ViewModels.Settings.Shareholders;
-using AgroGestor360.App.ViewModels.Settings.Warehouse;
 using AgroGestor360.App.Views;
 using AgroGestor360.App.Views.Expense;
 using AgroGestor360.App.Views.Loans;
@@ -51,10 +41,15 @@ public static class MauiProgram
         {
             var configuration = serviceProvider.GetService<IConfiguration>();
             var apiService = new ApiService();
+            apiService.ConnectToHttpClient();
             apiService.SetClientAccessToken(configuration!["License:ClientAccessToken"]!);
             return apiService;
         });
+        builder.Services.AddSingleton<IAuthService, AuthService>();
+        builder.Services.AddSingleton<IOrganizationService, OrganizationService>();
+        builder.Services.AddSingleton<IBanksService, BanksService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
+
         builder.Services.AddTransient<PgSignIn, PgSignInViewModel>();
         builder.Services.AddTransient<PgHome, PgHomeViewModel>();
         builder.Services.AddTransient<PgSettings, PgSettingsViewModel>();

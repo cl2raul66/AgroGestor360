@@ -1,4 +1,4 @@
-using AgroGestor360.App.ViewModels.Loans;
+using AgroGestor360.App.ViewModels;
 
 namespace AgroGestor360.App.Views.Loans;
 

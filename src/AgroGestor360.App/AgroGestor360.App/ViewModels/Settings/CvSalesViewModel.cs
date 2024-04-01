@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgroGestor360.App.ViewModels.Settings;
+namespace AgroGestor360.App.ViewModels;
 
 public partial class CvSalesViewModel : ObservableObject
 {

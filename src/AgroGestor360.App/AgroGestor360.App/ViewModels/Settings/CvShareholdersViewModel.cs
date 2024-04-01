@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Text;
 
-namespace AgroGestor360.App.ViewModels.Settings;
+namespace AgroGestor360.App.ViewModels;
 
 public partial class CvShareholdersViewModel : ObservableObject
 {

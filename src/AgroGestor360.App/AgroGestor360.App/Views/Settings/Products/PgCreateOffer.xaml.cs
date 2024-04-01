@@ -1,4 +1,4 @@
-using AgroGestor360.App.ViewModels.Settings.Products;
+using AgroGestor360.App.ViewModels;
 
 namespace AgroGestor360.App.Views.Settings.Products;
 

@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-namespace AgroGestor360.App.ViewModels.Settings;
+namespace AgroGestor360.App.ViewModels;
 
 public partial class CvSeedCapitalViewModel : ObservableObject
 {

@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 
-namespace AgroGestor360.App.ViewModels.Settings;
+namespace AgroGestor360.App.ViewModels;
 
 public partial class CvConnectionViewModel : ObservableRecipient
 {

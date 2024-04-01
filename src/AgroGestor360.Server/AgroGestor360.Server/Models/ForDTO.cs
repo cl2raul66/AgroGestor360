@@ -1,24 +1,15 @@
-﻿using AgroGestor360.Client.Tools;
+﻿using AgroGestor360.Server.Tools.Enums;
 using vCardLib.Models;
 
-namespace AgroGestor360.Client.Models;
+namespace AgroGestor360.Server.Models;
 
-public class Organization
-{
-    public string? Id { get; set; }
-    public string? Name { get; set; }
-    public string? Address { get; set; }
-    public string? Phone { get; set; }
-    public string? Email { get; set; }
-}
-
-//public class ClientDevice
+//public class ClientDeviceDTO
 //{
 //    public string? Id { get; set; }
 //    public DeviceInfo? Device { get; set; }
 //}
 
-//public class DeviceInfo
+//public class DeviceInfoDTO
 //{
 //    public string? Brand { get; set; }
 //    public string? Model { get; set; }
@@ -26,7 +17,7 @@ public class Organization
 //    public string? SO { get; set; }
 //}
 
-//public class User
+//public class UserDTO
 //{
 //    public string? Id { get; set; }
 //    public vCard? Contact { get; set; }
@@ -34,34 +25,34 @@ public class Organization
 //    public List<string>? GroupsId { get; set; }
 //}
 
-//public class ClientClass
+//public class ClientClassDTO
 //{
 //    public string? Id { get; set; }
 //    public string? Title { get; set; }
 //    public double? PercentageValue { get; set; }
 //}
 
-//public class UserGroup
+//public class UserGroupDTO
 //{
 //    public string? Id { get; set; }
 //    public string? Name { get; set; }
 //}
 
-//public class CustomerDiscount
+//public class CustomerDiscountDTO
 //{
 //    public DateTime Date { get; set; }
 //    public string? CustomerId { get; set; }
 //    public string? CustomerDiscountClass { get; set; }
 //}
 
-//public class CustomerDiscountClass
+//public class CustomerDiscountClassDTO
 //{
 //    public string? Id { get; set; }
 //    public string? Name { get; set; }
 //    public double Value { get; set; }
 //}
 
-//public class Merchandise
+//public class MerchandiseDTO
 //{
 //    public string? Id { get; set; }
 //    public string? Name { get; set; }
@@ -70,28 +61,28 @@ public class Organization
 //    public string? Description { get; set; }
 //}
 
-//public class Presentation
+//public class PresentationDTO
 //{
 //    public string? Measure { get; set; }
 //    public string? Unit { get; set; }
 //    public double Value { get; set; }
 //}
 
-//public class Article
+//public class ArticleDTO
 //{
 //    public string? Id { get; set; }
 //    public string? MerchandiseId { get; set; }
 //    public double Price { get; set; }
 //}
 
-//public class Product
+//public class ProductDTO
 //{
 //    public string? Id { get; set; }
 //    public string? ArticlesId { get; set; }
 //    public double Quantity { get; set; }
 //}
 
-//public class ProductOffering
+//public class ProductOfferingDTO
 //{
 //    public string? Id { get; set; }
 //    public string? ProductId { get; set; }
@@ -99,7 +90,7 @@ public class Organization
 //    public double BonusAmount { get; set; }
 //}
 
-public class BankAccount
+public class BankAccountDTO
 {
     public string? Id { get; set; }
     public string? BankId { get; set; }
@@ -109,13 +100,13 @@ public class BankAccount
     public bool Enable { get; set; }
 }
 
-public class Bank
+public class BankDTO
 {
     public string? Id { get; set; }
     public string? Name { get; set; }
 }
 
-//public class Sale
+//public class SaleDTO
 //{
 //    public string? Id { get; set; }
 //    public List<SaleProduct>? SaleProducts { get; set; }
@@ -130,7 +121,7 @@ public class Bank
 //    public double Amount { get; set; }
 //}
 
-//public class ImmediatePayment : PaymentMethod
+//public class ImmediatePaymentDTO : PaymentMethod
 //{
 //    public string? Reference { get; set; }
 //    public string? BankAccountId { get; set; }
@@ -143,7 +134,7 @@ public class Bank
 //    public int NumberOfInstallments { get; set; }
 //}
 
-//public class SaleProduct
+//public class SaleProductDTO
 //{
 //    public string? ProductId { get; set; }
 //    public double Quantity { get; set; }
@@ -151,7 +142,7 @@ public class Bank
 //    public string? CustomerDiscountClassId { get; set; }
 //}
 
-//public class Loan
+//public class LoanDTO
 //{
 //    public string? Id { get; set; }
 //    public DateTime Date { get; set; }
@@ -165,18 +156,18 @@ public class Bank
 //    public string? MoreDetails { get; set; }
 //}
 
-//public class Expense
+//public class ExpenseDTO
 //{
 //    public string? Id { get; set; }
 //}
 
-//public class BankTransaction
+//public class BankTransactionDTO
 //{
 //    public string? BankAccountId { get; set; }
 //    public double TransactionAmount { get; set; }
 //}
 
-//public class Token
+//public class TokenDTO
 //{
 //    public string? Id { get; set; }
 //}

@@ -1,5 +1,5 @@
 ﻿using AgroGestor360.App.View.Settings;
-using AgroGestor360.App.ViewModels.Settings;
+using AgroGestor360.App.ViewModels;
 using AgroGestor360.App.Views.Settings;
 using CommunityToolkit.Mvvm.ComponentModel;
 

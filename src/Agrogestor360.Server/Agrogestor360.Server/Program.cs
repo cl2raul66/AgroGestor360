@@ -1,4 +1,5 @@
 using AgroGestor360.Server.Sevices;
+using AgroGestor360.Server.Tools.Configurations;
 using AgroGestor360.Server.Tools.Hubs;
 using AgroGestor360.Server.Tools.Middleware;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -7,6 +8,8 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddSingleton<BanksDbConfig>();
+builder.Services.AddSingleton<IBanksForLitedbService, BanksForLitedbService>();
 builder.Services.AddSingleton<IShareholderForLitedbService, ShareholderForLitedbService>();
 builder.Services.AddSingleton<ISellerForLitedbService, SellerForLitedbService>();
 builder.Services.AddSingleton<ICustomerForLitedbService, CustomerForLitedbService>();

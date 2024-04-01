@@ -1,5 +1,5 @@
 ﻿using AgroGestor360.App.Services;
-using AgroGestor360.App.ViewModels.Settings;
+using AgroGestor360.App.ViewModels;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,12 +12,14 @@ public partial class PgSettingsViewModel : ObservableObject
 {
     readonly INavigationService navigationServ;
     readonly IApiService apiServ;
+    readonly IOrganizationService organizationServ;
     readonly string serverURL;
 
-    public PgSettingsViewModel(INavigationService navigationService, IApiService apiService)
+    public PgSettingsViewModel(INavigationService navigationService, IApiService apiService, IOrganizationService organizationService)
     {
         navigationServ = navigationService;
         apiServ = apiService;
+        organizationServ = organizationService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         SelectedMenu = string.Empty;
     }
@@ -42,7 +44,8 @@ public partial class PgSettingsViewModel : ObservableObject
                     navigationServ.NavigateToView<CvConnectionViewModel>(view => CurrentContent = view);
                     break;
                 case "Entidad":
-                    var org = await apiServ.GetOrganization(serverURL);
+                    SelectedMenu = null;
+                    var org = await organizationServ.GetOrganization(serverURL);
                     StringBuilder sb = new();
                     if (org is not null)
                     {
@@ -55,8 +58,7 @@ public partial class PgSettingsViewModel : ObservableObject
                     {
                         sb.AppendLine("No hay información de la entidad");
                     }
-                    await Shell.Current.DisplayAlert("Información de la empresa", sb.ToString(), "Cerrar");
-                    SelectedMenu = null;
+                    await Shell.Current.DisplayAlert("Información de la empresa", sb.ToString(), "Cerrar");                    
                     break;
                 case "Capital inicial":
                     navigationServ.NavigateToView<CvSeedCapitalViewModel>(view => CurrentContent = view);

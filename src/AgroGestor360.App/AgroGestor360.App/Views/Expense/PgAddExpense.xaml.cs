@@ -1,4 +1,4 @@
-using AgroGestor360.App.ViewModels.Expense;
+using AgroGestor360.App.ViewModels;
 
 namespace AgroGestor360.App.Views.Expense;
 

@@ -3,10 +3,13 @@
     x:Class="AgroGestor360.App.Views.Settings.CvBankAccounts"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels.Settings"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:model="clr-namespace:AgroGestor360.Client.Models;assembly=AgroGestor360.Client"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     x:DataType="vm:CvBankAccountsViewModel">
 
     <Grid RowDefinitions="auto,*" RowSpacing="8">
+        <!--#region ENCABEZADO-->
         <Frame Padding="8">
             <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
                 <Label
@@ -15,66 +18,136 @@
                     Text="Cuentas bancarias"
                     TextTransform="Uppercase"
                     VerticalOptions="Center" />
-                <HorizontalStackLayout Grid.Column="2" Spacing="8">
-                    <Button
-                        Command="{Binding AddBankCommand}"
-                        FontFamily="icofont"
-                        Text="{StaticResource BankAlt}"
-                        ToolTipProperties.Text="Agregar banco" />
-                    <BoxView
-                        BackgroundColor="{StaticResource Gray300}"
-                        CornerRadius="2"
-                        WidthRequest="2" />
-                    <Button
-                        Command="{Binding ShowAddAccountOrCardCommand}"
-                        FontFamily="icofont"
-                        Text="{StaticResource Plus}"
-                        ToolTipProperties.Text="Agregar cuenta o tarjeta" />
-                    <Button
-                        FontFamily="icofont"
-                        Text="{StaticResource UiDelete}"
-                        ToolTipProperties.Text="Eliminar" />
-                </HorizontalStackLayout>
             </Grid>
         </Frame>
+        <!--#endregion-->
+        <!--#region CONTENIDO-->
         <Grid
             Grid.Row="1"
-            ColumnDefinitions="*,auto,auto"
-            ColumnSpacing="8">
-            <ScrollView>
-                <CollectionView>
+            Padding="8"
+            ColumnDefinitions="300,auto,*"
+            ColumnSpacing="8"
+            RowDefinitions="auto,*,auto"
+            RowSpacing="8">
+            <!--#region PANEL IZQUIERDO-->
+            <VerticalStackLayout Spacing="8">
+                <Label
+                    FontSize="18"
+                    Text="Bancos"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <Entry
+                        ClearButtonVisibility="WhileEditing"
+                        IsSpellCheckEnabled="True"
+                        IsTextPredictionEnabled="True"
+                        Placeholder="Escriba aquí" />
+                    <Button
+                        Grid.Column="1"
+                        FontFamily="icofont"
+                        Text="{StaticResource Search}"
+                        ToolTipProperties.Text="Buscar" />
+                </Grid>
+            </VerticalStackLayout>
+            <ScrollView Grid.Row="1">
+                <CollectionView
+                    ItemsSource="{Binding Banks, Mode=OneWay}"
+                    SelectedItem="{Binding SelectedBank}"
+                    SelectionMode="Single">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout ItemSpacing="4" Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Border>
-                                <Label Text="{Binding .}" />
+                        <DataTemplate x:DataType="model:Bank">
+                            <Border Style="{StaticResource BorderItem}">
+                                <Label
+                                    FontSize="Caption"
+                                    Text="{Binding Name}"
+                                    TextColor="{StaticResource White}"
+                                    TextTransform="Uppercase" />
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </ScrollView>
+            <Frame Grid.Row="2" Padding="8">
+                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                        <Button
+                            Command="{Binding ShowAddAccountOrCardCommand}"
+                            FontFamily="icofont"
+                            IsEnabled="{Binding SelectedBank, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                            Text="{StaticResource ArrowRight}"
+                            ToolTipProperties.Text="Agregar metodo de pago a partir del banco seleccionada" />
+                        <BoxView
+                            BackgroundColor="{StaticResource Gray300}"
+                            CornerRadius="2"
+                            WidthRequest="2" />
+                        <Button
+                            Command="{Binding AddBankCommand}"
+                            FontFamily="icofont"
+                            Text="{StaticResource Plus}"
+                            ToolTipProperties.Text="Agregar" />
+                        <Button
+                            FontFamily="icofont"
+                            IsEnabled="{Binding SelectedBank, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                            Text="{StaticResource UiDelete}"
+                            ToolTipProperties.Text="Eliminar" />
+                    </HorizontalStackLayout>
+                </Grid>
+            </Frame>
             <BoxView
+                Grid.RowSpan="3"
                 Grid.Column="1"
                 BackgroundColor="{StaticResource Gray300}"
                 CornerRadius="2"
                 WidthRequest="2" />
-            <ScrollView Grid.Column="2">
-                <CollectionView>
-                    <CollectionView.ItemsLayout>
-                        <LinearItemsLayout ItemSpacing="4" Orientation="Vertical" />
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Border>
-                                <Label Text="{Binding .}" />
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+            <!--#endregion-->
+            <!--#region PANEL DERECHA-->
+            <VerticalStackLayout Grid.Column="2" Spacing="8">
+                <Label
+                    FontSize="18"
+                    Text="Cuentas y tarjetas"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <Entry
+                        ClearButtonVisibility="WhileEditing"
+                        IsSpellCheckEnabled="True"
+                        IsTextPredictionEnabled="True"
+                        Placeholder="Escriba aquí" />
+                    <Button
+                        Grid.Column="1"
+                        FontFamily="icofont"
+                        Text="{StaticResource Search}"
+                        ToolTipProperties.Text="Buscar" />
+                </Grid>
+                <HorizontalStackLayout Spacing="8">
+                    <RadioButton Content="Por alias" />
+                    <RadioButton Content="Por número" />
+                    <RadioButton Content="Por beneficiario" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+            <ScrollView Grid.Row="1" Grid.Column="2">
+                <CollectionView />
             </ScrollView>
+            <Frame
+                Grid.Row="2"
+                Grid.Column="2"
+                Padding="8">
+                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                        <Button
+                            FontFamily="icofont"
+                            IsEnabled="False"
+                            Text="{StaticResource UiDelete}"
+                            ToolTipProperties.Text="Eliminar" />
+                    </HorizontalStackLayout>
+                </Grid>
+            </Frame>
+            <!--#endregion-->
         </Grid>
+        <!--#endregion-->
     </Grid>
 
 </ContentView>

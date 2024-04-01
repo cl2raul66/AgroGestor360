@@ -1,4 +1,4 @@
-using AgroGestor360.App.ViewModels.Settings.Shareholders;
+using AgroGestor360.App.ViewModels;
 
 namespace AgroGestor360.App.Views.Settings.Shareholders;
 

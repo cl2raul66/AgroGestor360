@@ -3,7 +3,7 @@
     x:Class="AgroGestor360.App.Views.Settings.CvSeedCapital"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels.Settings"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     x:DataType="vm:CvSeedCapitalViewModel">
 
     <Grid RowDefinitions="auto,*" RowSpacing="8">

@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.ComponentModel.DataAnnotations;
 
-namespace AgroGestor360.App.ViewModels.Settings.Connection;
+namespace AgroGestor360.App.ViewModels;
 
 public partial class PgSetURLViewModel : ObservableValidator
 {
