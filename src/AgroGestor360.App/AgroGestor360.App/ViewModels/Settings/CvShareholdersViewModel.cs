@@ -32,8 +32,8 @@ public partial class CvShareholdersViewModel : ObservableObject
         sb.AppendLine($"TELEFONO: {0}");
         sb.AppendLine($"CORREO ELECTRONICO: {0}");
 
-        bool resul = await Shell.Current.DisplayAlert("Eliminar accionista", sb.ToString(), "Eliminar", "Cancelar");
-        if (resul)
+        bool result = await Shell.Current.DisplayAlert("Eliminar accionista", sb.ToString(), "Eliminar", "Cancelar");
+        if (result)
         {
             return;
         }

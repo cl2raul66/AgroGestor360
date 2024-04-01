@@ -8,6 +8,7 @@ public partial class CvBankAccounts : ContentView
 	{
 		InitializeComponent();
 
+		vm.Initialize();
 		BindingContext = vm;
 	}
 }

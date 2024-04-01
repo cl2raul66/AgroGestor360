@@ -21,7 +21,7 @@ public class BanksService : IBanksService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/exist");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/banks/exist");
 
             if (response.IsSuccessStatusCode)
             {
@@ -65,11 +65,13 @@ public class BanksService : IBanksService
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var bankJson = JsonSerializer.Serialize(bank);
-            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/banks", new StringContent(bankJson, Encoding.UTF8, "application/json"));
+            var data = new StringContent(bankJson, Encoding.UTF8, "application/json");
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/banks", data);
 
-            response.EnsureSuccessStatusCode();
-
-            return await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
         }
         return string.Empty;
     }
@@ -81,7 +83,7 @@ public class BanksService : IBanksService
             var bankJson = JsonSerializer.Serialize(bank);
             var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/banks", new StringContent(bankJson, Encoding.UTF8, "application/json"));
 
-            response.EnsureSuccessStatusCode();
+            return response.IsSuccessStatusCode;
         }
         return false;
     }
@@ -92,7 +94,7 @@ public class BanksService : IBanksService
         {
             var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/banks/{id}");
 
-            response.EnsureSuccessStatusCode();
+            return response.IsSuccessStatusCode;
         }
         return false;
     }

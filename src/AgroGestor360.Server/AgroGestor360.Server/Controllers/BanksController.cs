@@ -26,24 +26,25 @@ namespace AgroGestor360.Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Bank>> Get()
+        public ActionResult<IEnumerable<BankDTO>> Get()
         {
-            var banks = banksServ.GetAll();
+            var banks = banksServ.GetAll()?.Select(x => x.ToBankDTO()) ?? Array.Empty<BankDTO>();
 
             return !banks?.Any() ?? true ? NotFound() : Ok(banks);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Bank> Get(string id)
+        public ActionResult<BankDTO> Get(string id)
         {
             var bank = banksServ.GetById(new ObjectId(id));
 
-            return bank is null ? NotFound() : Ok(bank);
+            return bank is null ? NotFound() : Ok(bank!.ToBankDTO());
         }
 
         [HttpPost]
         public ActionResult<string> Post([FromBody] BankDTO bank)
         {
+            bank.Id = ObjectId.NewObjectId().ToString();
             return banksServ.Insert(bank.ToBank());
         }
 
@@ -56,9 +57,9 @@ namespace AgroGestor360.Server.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(ObjectId id)
+        public IActionResult Delete(string id)
         {
-            var deleted = banksServ.Delete(id);
+            var deleted = banksServ.Delete(new ObjectId(id));
 
             return Ok(deleted);
         }

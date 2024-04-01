@@ -24,13 +24,21 @@ public class BanksForLitedbService : IBanksForLitedbService
         collection = dbConfig.Bd.GetCollection<Bank>();
     }
 
-    public bool Exist => collection.Count() > 0;
+    //public bool Exist => collection.Count() > 0;
+    public bool Exist
+    {
+        get
+        {
+            var r = collection.Count() > 0;
+            return r;
+        }
+    }
 
     public IEnumerable<Bank> GetAll() => collection.FindAll();
 
     public Bank GetById(ObjectId id) => collection.FindById(id);
 
-    public string Insert(Bank bank) => collection.Insert(bank).AsString;
+    public string Insert(Bank bank) => collection.Insert(bank).ToString();
 
     public bool Update(Bank bank) => collection.Update(bank);
 
