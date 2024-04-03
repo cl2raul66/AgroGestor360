@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddSingleton<BanksDbConfig>();
 builder.Services.AddSingleton<IBanksForLitedbService, BanksForLitedbService>();
+builder.Services.AddSingleton<IBankAccountsForLitedbService, BankAccountsForLitedbService>();
 builder.Services.AddSingleton<IShareholderForLitedbService, ShareholderForLitedbService>();
 builder.Services.AddSingleton<ISellerForLitedbService, SellerForLitedbService>();
 builder.Services.AddSingleton<ICustomerForLitedbService, CustomerForLitedbService>();

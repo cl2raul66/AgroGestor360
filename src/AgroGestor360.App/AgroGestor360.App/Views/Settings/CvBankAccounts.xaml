@@ -132,9 +132,42 @@
                         <RadioButton Content="Por beneficiario" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
-
                 <ScrollView Grid.Row="1">
-                    <CollectionView />
+                    <CollectionView
+                        ItemsSource="{Binding BankAccounts, Mode=OneWay}"
+                        SelectedItem="{Binding SelectedBankAccount}"
+                        SelectionMode="Single">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout
+                                HorizontalItemSpacing="2"
+                                Orientation="Vertical"
+                                Span="2"
+                                VerticalItemSpacing="2" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:BankAccount">
+                                <Border Style="{StaticResource BorderItem}">
+                                    <Grid ColumnDefinitions="auto,*" ColumnSpacing="8">
+                                        <Label
+                                            FontFamily="icofont"
+                                            FontSize="64"
+                                            HorizontalOptions="Center"
+                                            Text="{StaticResource Bank}"
+                                            TextColor="{StaticResource White}"
+                                            VerticalOptions="Center" />
+                                        <VerticalStackLayout
+                                            Grid.Column="1"
+                                            Spacing="8"
+                                            VerticalOptions="Center">
+                                            <Label Text="{Binding BankId, Mode=OneWay, StringFormat='Banco: {0}'}" TextColor="{StaticResource White}" />
+                                            <Label Text="{Binding Number, Mode=OneWay, StringFormat='No. Cuenta: {0}'}" TextColor="{StaticResource White}" />
+                                            <Label Text="{Binding Beneficiary.FormattedName, Mode=OneWay, StringFormat='No. Propietario: {0}'}" TextColor="{StaticResource White}" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </ScrollView>
                 <Frame Grid.Row="2" Padding="8">
                     <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">

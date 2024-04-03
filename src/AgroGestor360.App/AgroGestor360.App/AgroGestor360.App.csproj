@@ -69,12 +69,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="7.0.1" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="8.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.7" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.7" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.14" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.14" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+		<PackageReference Include="vCardLib.dll" Version="5.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -171,5 +172,21 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="C:\Users\elrau\.nuget\packages\microsoft.windowsappsdk\1.4.240211001\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />
+	</ItemGroup>
+
+	<!--<ItemGroup>
+	  <Compile Remove="C:\Users\elrau\.nuget\packages\microsoft.windowsappsdk\1.4.240211001\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="C:\Users\elrau\.nuget\packages\microsoft.windowsappsdk\1.4.240211001\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="C:\Users\elrau\.nuget\packages\microsoft.windowsappsdk\1.4.240211001\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />
+	</ItemGroup>-->
 
 </Project>

@@ -4,7 +4,20 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Sevices;
 
-public class BankAccountsForLitedbService
+public interface IBankAccountsForLitedbService
+{
+    bool Exist { get; }
+    bool ThatBankAccountNumberExists(string number);
+
+    bool Delete(ObjectId id);
+    IEnumerable<BankAccount> GetAll();
+    BankAccount GetById(string id);
+    BankAccount? GetByNumber(string number);
+    string Insert(BankAccount account);
+    bool Update(BankAccount account);
+}
+
+public class BankAccountsForLitedbService : IBankAccountsForLitedbService
 {
     readonly ILiteCollection<BankAccount> collection;
 
@@ -13,11 +26,17 @@ public class BankAccountsForLitedbService
         collection = dbConfig.Bd.GetCollection<BankAccount>();
     }
 
-    public bool Exists => collection.Count() > 0;
+    public bool Exist => collection.Count() > 0;
 
-    public BankAccount GetAllById(ObjectId id) => collection.FindById(id);
+    public bool ThatBankAccountNumberExists(string number) => collection.Find(x => x.Number == number)?.Any() ?? false;
 
-    public string Insert(BankAccount account) => collection.Insert(account).AsString;
+    public IEnumerable<BankAccount> GetAll() => collection.FindAll();
+
+    public BankAccount GetById(string id) => collection.FindById(id);
+
+    public BankAccount? GetByNumber(string number) => collection.Find(x => x.Number == number).FirstOrDefault();
+
+    public string Insert(BankAccount account) => collection.Insert(account).ToString();
 
     public bool Update(BankAccount account) => collection.Update(account);
 

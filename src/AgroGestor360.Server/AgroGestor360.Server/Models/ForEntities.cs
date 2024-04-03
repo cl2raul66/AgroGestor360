@@ -105,9 +105,10 @@ public class BankAccount
     public ObjectId? Id { get; set; }
     public ObjectId? BankId { get; set; }
     public string? Alias { get; set; }
+    public string? Number { get; set; }
     public vCard? Beneficiary { get; set; }
     public FinancialInstrumentType InstrumentType { get; set; }
-    public bool Enable {get; set;}
+    public bool Disabled { get; set; }
 }
 
 public class Bank

@@ -1,4 +1,5 @@
 ﻿using AgroGestor360.Server.Tools.Enums;
+using LiteDB;
 using vCardLib.Models;
 
 namespace AgroGestor360.Server.Models;
@@ -92,12 +93,12 @@ namespace AgroGestor360.Server.Models;
 
 public class BankAccountDTO
 {
-    public string? Id { get; set; }
+    public string? Number { get; set; }
     public string? BankId { get; set; }
     public string? Alias { get; set; }
     public vCard? Beneficiary { get; set; }
     public FinancialInstrumentType InstrumentType { get; set; }
-    public bool Enable { get; set; }
+    public bool Disabled { get; set; }
 }
 
 public class BankDTO

@@ -3,6 +3,7 @@ using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System.Text;
 
@@ -13,12 +14,14 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
     readonly string serverURL;
     readonly IBanksService banksServ;
     readonly IAuthService authServ;
+    readonly IBankAccountsService bankAccountsServ;
 
-    public CvBankAccountsViewModel(IBanksService banksService, IAuthService authService)
-    {        
+    public CvBankAccountsViewModel(IBanksService banksService, IAuthService authService, IBankAccountsService bankAccountsService)
+    {
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         banksServ = banksService;
         authServ = authService;
+        bankAccountsServ = bankAccountsService;
         IsActive = true;
     }
 
@@ -28,8 +31,18 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
     [ObservableProperty]
     Bank? selectedBank;
 
+    [ObservableProperty]
+    ObservableCollection<BankAccount>? bankAccounts;
+
+    [ObservableProperty]
+    BankAccount? selectedBankAccount;
+
     [RelayCommand]
-    async Task ShowAddAccountOrCard() => await Shell.Current.GoToAsync(nameof(PgAddAccountOrCard), true);
+    async Task ShowAddAccountOrCard()
+    {
+        Dictionary<string, object> sendData = new() { { "CurrentBank", SelectedBank! } };
+        await Shell.Current.GoToAsync(nameof(PgAddAccountOrCard), true, sendData);
+    }
 
     [RelayCommand]
     async Task AddBank()
@@ -86,12 +99,21 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
     protected override void OnActivated()
     {
         base.OnActivated();
+        WeakReferenceMessenger.Default.Register<CvBankAccountsViewModel, BankAccount, string>(this, "addBankAccount", async (r, m) =>
+        {
+            bool result = await bankAccountsServ.InsertBankAsync(serverURL, m);
+            if (result)
+            {
+                BankAccounts ??= [];
+                BankAccounts.Insert(0, m);
+            }
+        });
     }
 
     #region EXTRA
     public async void Initialize()
     {
-        await GetBanks();
+        await Task.WhenAll(GetBanks(), GetBankAccounts());
     }
 
     private async Task GetBanks()
@@ -101,6 +123,16 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
         {
             var getbanks = await banksServ.GetBanksAsync(serverURL);
             Banks = new(getbanks!);
+        }
+    }
+
+    private async Task GetBankAccounts()
+    {
+        bool exist = await bankAccountsServ.CheckExistence(serverURL);
+        if (exist)
+        {
+            var getbanks = await bankAccountsServ.GetBanksAsync(serverURL);
+            BankAccounts = new(getbanks!);
         }
     }
     #endregion
