@@ -174,7 +174,7 @@
                         <HorizontalStackLayout Grid.Column="1" Spacing="8">
                             <Button
                                 FontFamily="icofont"
-                                IsEnabled="False"
+                                IsEnabled="{Binding SelectedBankAccount, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource UiDelete}"
                                 ToolTipProperties.Text="Eliminar" />
                         </HorizontalStackLayout>

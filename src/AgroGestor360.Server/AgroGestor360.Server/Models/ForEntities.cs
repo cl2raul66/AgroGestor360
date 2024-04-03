@@ -115,6 +115,7 @@ public class Bank
 {
     public ObjectId? Id { get; set; }
     public string? Name { get; set; }
+    public bool Disabled { get; set; }
 }
 
 public class Sale

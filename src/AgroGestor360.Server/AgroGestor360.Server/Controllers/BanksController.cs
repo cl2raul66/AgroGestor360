@@ -28,7 +28,7 @@ public class BanksController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<BankDTO>> Get()
     {
-        var banks = banksServ.GetAll()?.Select(x => x.ToBankDTO()) ?? [];
+        var banks = banksServ.GetAllEnabled()?.Select(x => x.ToBankDTO()) ?? [];
 
         return !banks?.Any() ?? true ? NotFound() : Ok(banks);
     }

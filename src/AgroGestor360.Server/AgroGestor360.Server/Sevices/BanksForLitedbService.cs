@@ -9,8 +9,10 @@ public interface IBanksForLitedbService
     bool Exist { get; }
 
     bool Delete(ObjectId id);
-    IEnumerable<Bank> GetAll();
+    IEnumerable<Bank> GetAllDisabled();
+    IEnumerable<Bank> GetAllEnabled();
     Bank GetById(ObjectId id);
+    ObjectId? GetIdByName(string name);
     string Insert(Bank bank);
     bool Update(Bank bank);
 }
@@ -26,9 +28,13 @@ public class BanksForLitedbService : IBanksForLitedbService
 
     public bool Exist => collection.Count() > 0;
 
-    public IEnumerable<Bank> GetAll() => collection.FindAll();
+    public IEnumerable<Bank> GetAllEnabled() => collection.Find(x => !x.Disabled);
+
+    public IEnumerable<Bank> GetAllDisabled() => collection.Find(x => x.Disabled);
 
     public Bank GetById(ObjectId id) => collection.FindById(id);
+
+    public ObjectId? GetIdByName(string name) => collection.FindOne(x => x.Name == name)?.Id;
 
     public string Insert(Bank bank) => collection.Insert(bank).ToString();
 

@@ -28,11 +28,9 @@ public static class BanksDTOExtension
         return new BankAccountDTO
         {
             Number = account.Number,
-            BankId = account.BankId!.ToString(),
             Alias = account.Alias,
             Beneficiary = account.Beneficiary,
-            InstrumentType = account.InstrumentType,
-            Disabled = account.Disabled
+            InstrumentType = account.InstrumentType
         };
     }
 
@@ -41,11 +39,9 @@ public static class BanksDTOExtension
         return new BankAccount
         {
             Number = dto.Number,
-            BankId = new ObjectId(dto.BankId),
             Alias = dto.Alias,
             Beneficiary = dto.Beneficiary,
-            InstrumentType = dto.InstrumentType,
-            Disabled = dto.Disabled
+            InstrumentType = dto.InstrumentType
         };
     }
 }
