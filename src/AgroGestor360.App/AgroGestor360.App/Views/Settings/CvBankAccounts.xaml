@@ -159,7 +159,7 @@
                                             Grid.Column="1"
                                             Spacing="8"
                                             VerticalOptions="Center">
-                                            <Label Text="{Binding BankId, Mode=OneWay, StringFormat='Banco: {0}'}" TextColor="{StaticResource White}" />
+                                            <Label Text="{Binding BankName, Mode=OneWay, StringFormat='Banco: {0}'}" TextColor="{StaticResource White}" />
                                             <Label Text="{Binding Number, Mode=OneWay, StringFormat='No. Cuenta: {0}'}" TextColor="{StaticResource White}" />
                                             <Label Text="{Binding Beneficiary.FormattedName, Mode=OneWay, StringFormat='No. Propietario: {0}'}" TextColor="{StaticResource White}" />
                                         </VerticalStackLayout>

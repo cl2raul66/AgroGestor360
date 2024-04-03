@@ -49,6 +49,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IOrganizationService, OrganizationService>();
         builder.Services.AddSingleton<IBanksService, BanksService>();
         builder.Services.AddSingleton<IBankAccountsService, BankAccountsService>();
+        builder.Services.AddSingleton<IFinancialInstrumentTypeService, FinancialInstrumentTypeService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
 
         builder.Services.AddTransient<PgSignIn, PgSignInViewModel>();

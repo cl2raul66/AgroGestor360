@@ -16,4 +16,4 @@ public enum CreditPaymentType { Check, CreditCard, CustomerAccount }
 
 public enum ExpenseType { Tax, NotTax, Payroll }
 
-public enum FinancialInstrumentType { Current, Savings, Investment, Loan, Payroll, CreditCard, DebitCard }
+public enum FinancialInstrumentType { Current, Savings, Investment, Payroll, CreditCard, DebitCard }

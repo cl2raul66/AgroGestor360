@@ -1,5 +1,5 @@
 ﻿using AgroGestor360.Client.Models;
-using AgroGestor360.Client.Tools;
+using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -10,26 +10,22 @@ using vCardLib.Models;
 namespace AgroGestor360.App.ViewModels;
 
 [QueryProperty(nameof(CurrentBank), nameof(CurrentBank))]
+[QueryProperty(nameof(BankAccountNumbers), nameof(BankAccountNumbers))]
 public partial class PgAddAccountOrCardViewModel : ObservableValidator
 {
-    readonly Dictionary<int, string> FinancialInstrument = new()
-    {
-        {(int)FinancialInstrumentType.Current, "Cuenta corriente"},
-        {(int)FinancialInstrumentType.Savings, "Cuenta de ahorros"},
-        {(int)FinancialInstrumentType.Investment, "Cuenta de inversión"},
-        {(int)FinancialInstrumentType.Loan, "Cuenta de préstamo"},
-        {(int)FinancialInstrumentType.Payroll, "Cuenta de nómina"},
-        {(int)FinancialInstrumentType.CreditCard, "Tarjeta de Crédito"},
-        {(int)FinancialInstrumentType.DebitCard, "Tarjeta de Débito"}
-    };
+    readonly IFinancialInstrumentTypeService financialInstrumentTypeServ;
 
-    public PgAddAccountOrCardViewModel()
+    public PgAddAccountOrCardViewModel(IFinancialInstrumentTypeService financialInstrumentTypeService)
     {
-        FinancialType = [.. FinancialInstrument.Values];
+        financialInstrumentTypeServ = financialInstrumentTypeService;
+        FinancialType = [.. financialInstrumentTypeServ.GetAll()];
     }
 
     [ObservableProperty]
     Bank? currentBank;
+
+    [ObservableProperty]
+    List<string>? bankAccountNumbers;
 
     [ObservableProperty]
     string? alias;
@@ -75,7 +71,7 @@ public partial class PgAddAccountOrCardViewModel : ObservableValidator
     {
         ValidateAllProperties();
 
-        if (HasErrors || string.IsNullOrEmpty(SelectedFinancialType))
+        if (HasErrors || string.IsNullOrEmpty(SelectedFinancialType) || BankAccountNumbers!.Contains(Number!))
         {
             IsVisibleInfo = true;
             await Task.Delay(3000);
@@ -83,20 +79,17 @@ public partial class PgAddAccountOrCardViewModel : ObservableValidator
             return;
         }
 
-        int idx = FinancialInstrument.FirstOrDefault(x => x.Value == SelectedFinancialType).Key;
-
         BankAccount newBankAccount = new() {
             Alias = Alias!.Trim().ToUpper(),
             Number = Number!.Trim(),
-            BankId = CurrentBank!.Id, 
-            InstrumentType = (FinancialInstrumentType)idx, 
+            BankName = CurrentBank!.Name, 
+            InstrumentType = financialInstrumentTypeServ.GetByName(SelectedFinancialType) ?? 0, 
             Beneficiary = new vCard(vCardLib.Enums.vCardVersion.v4) { 
                 FormattedName = BeneficiaryFullName!.Trim().ToUpper(), 
                 Language = new Language(CultureInfo.CurrentCulture.TwoLetterISOLanguageName), 
                 EmailAddresses = string.IsNullOrEmpty(BeneficiaryEMail) ? new() : [new EmailAddress(BeneficiaryEMail!.Trim().ToLower(),vCardLib.Enums.EmailAddressType.None)], 
                 PhoneNumbers = [new TelephoneNumber(BeneficiaryPhone!.Trim(), vCardLib.Enums.TelephoneNumberType.None)]
-            }, 
-            Disabled = false };
+            }};
 
         WeakReferenceMessenger.Default.Send(newBankAccount, "addBankAccount");
 

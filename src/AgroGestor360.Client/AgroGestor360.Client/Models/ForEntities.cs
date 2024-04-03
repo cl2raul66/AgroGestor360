@@ -102,11 +102,10 @@ public class Organization
 public class BankAccount
 {
     public string? Number { get; set; }
-    public string? BankId { get; set; }
+    public string? BankName { get; set; }
     public string? Alias { get; set; }
     public vCard? Beneficiary { get; set; }
     public FinancialInstrumentType InstrumentType { get; set; }
-    public bool Disabled { get; set; }
 }
 
 public class Bank

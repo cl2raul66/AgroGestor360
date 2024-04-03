@@ -40,7 +40,11 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
     [RelayCommand]
     async Task ShowAddAccountOrCard()
     {
-        Dictionary<string, object> sendData = new() { { "CurrentBank", SelectedBank! } };
+        var numbers = await bankAccountsServ.GetAllNumbersAsync(serverURL);
+        Dictionary<string, object> sendData = new() {
+            { "CurrentBank", SelectedBank! },
+            { "BankAccountNumbers",  numbers.ToList() }
+        };
         await Shell.Current.GoToAsync(nameof(PgAddAccountOrCard), true, sendData);
     }
 

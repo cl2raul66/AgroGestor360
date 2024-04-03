@@ -62,6 +62,18 @@ public class BankAccountsController : ControllerBase
         return Ok(allDTO);
     }
 
+    [HttpGet("numbers")]
+    public ActionResult<IEnumerable<string>> GetAllNumbers()
+    {
+        var all = bankAccountsServ.GetAllNumber();
+        if (!all?.Any() ?? true)
+        {
+            return NotFound();
+        }
+
+        return Ok(all);
+    }
+
     [HttpPost]
     public ActionResult<bool> Post([FromBody] BankAccountDTO dTO)
     {
