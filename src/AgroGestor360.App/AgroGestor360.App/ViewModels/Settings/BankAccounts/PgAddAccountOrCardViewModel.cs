@@ -79,17 +79,21 @@ public partial class PgAddAccountOrCardViewModel : ObservableValidator
             return;
         }
 
-        BankAccount newBankAccount = new() {
+        BankAccount newBankAccount = new()
+        {
             Alias = Alias!.Trim().ToUpper(),
             Number = Number!.Trim(),
-            BankName = CurrentBank!.Name, 
-            InstrumentType = financialInstrumentTypeServ.GetByName(SelectedFinancialType) ?? 0, 
-            Beneficiary = new vCard(vCardLib.Enums.vCardVersion.v4) { 
-                FormattedName = BeneficiaryFullName!.Trim().ToUpper(), 
-                Language = new Language(CultureInfo.CurrentCulture.TwoLetterISOLanguageName), 
-                EmailAddresses = string.IsNullOrEmpty(BeneficiaryEMail) ? new() : [new EmailAddress(BeneficiaryEMail!.Trim().ToLower(),vCardLib.Enums.EmailAddressType.None)], 
-                PhoneNumbers = [new TelephoneNumber(BeneficiaryPhone!.Trim(), vCardLib.Enums.TelephoneNumberType.None)]
-            }};
+            BankName = CurrentBank!.Name,
+            InstrumentType = financialInstrumentTypeServ.GetByName(SelectedFinancialType) ?? 0,
+            Beneficiary = new vCard(vCardLib.Enums.vCardVersion.v4)
+            {
+                Language = new Language(CultureInfo.CurrentCulture.TwoLetterISOLanguageName),
+                FormattedName = BeneficiaryFullName!.Trim().ToUpper(),
+                PhoneNumbers = [new TelephoneNumber(BeneficiaryPhone!.Trim(), vCardLib.Enums.TelephoneNumberType.None)],
+                CustomFields = [new KeyValuePair<string, string>("NIT", BeneficiaryNIT!)],
+                EmailAddresses = string.IsNullOrEmpty(BeneficiaryEMail) ? new() : [new EmailAddress(BeneficiaryEMail!.Trim().ToLower(), vCardLib.Enums.EmailAddressType.None)]
+            }
+        };
 
         WeakReferenceMessenger.Default.Send(newBankAccount, "addBankAccount");
 

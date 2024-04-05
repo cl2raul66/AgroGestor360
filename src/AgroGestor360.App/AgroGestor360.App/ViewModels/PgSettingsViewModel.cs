@@ -79,6 +79,7 @@ public partial class PgSettingsViewModel : ObservableObject
                     navigationServ.NavigateToView<CvProductsViewModel>(view => CurrentContent = view);
                     break;
                 case "Vendedores":
+                    navigationServ.NavigateToView<CvSellersViewModel>(view => CurrentContent = view);
                     break;
                 case "Ventas":
                     navigationServ.NavigateToView<CvSalesViewModel>(view => CurrentContent = view);

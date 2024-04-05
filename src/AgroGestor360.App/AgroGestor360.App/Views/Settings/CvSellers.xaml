@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="AgroGestor360.App.Views.CvSellers"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:model="clr-namespace:vCardLib.Models;assembly=vCardLib"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
+    x:DataType="vm:CvSellersViewModel">
+
+    <Grid RowDefinitions="auto,*" RowSpacing="8">
+        <!--#region ENCABEZADO-->
+        <Frame Padding="8">
+            <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
+                <Label
+                    Grid.Column="1"
+                    FontSize="18"
+                    Text="Vendedores"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+                <HorizontalStackLayout Grid.Column="2" Spacing="8">
+                    <!--<BoxView
+                    BackgroundColor="{StaticResource Gray300}"
+                    CornerRadius="2"
+                    WidthRequest="2" />-->
+                    <Button
+                        Command="{Binding ShowAddSellerCommand}"
+                        FontFamily="icofont"
+                        Text="{StaticResource Plus}"
+                        ToolTipProperties.Text="Agregar" />
+                    <Button
+                        Command="{Binding ShowEditSellerCommand}"
+                        FontFamily="icofont"
+                        IsEnabled="{Binding SelectedSeller, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Text="{StaticResource Edit}"
+                        ToolTipProperties.Text="Modificar" />
+                    <Button
+                        Command="{Binding ShowDeleteSellerCommand}"
+                        FontFamily="icofont"
+                        IsEnabled="{Binding SelectedSeller, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Text="{StaticResource UiDelete}"
+                        ToolTipProperties.Text="Eliminar" />
+                </HorizontalStackLayout>
+            </Grid>
+        </Frame>
+        <!--#endregion-->
+        <ScrollView Grid.Row="1">
+            <CollectionView
+                ItemsSource="{Binding Sellers, Mode=OneWay}"
+                SelectedItem="{Binding SelectedSeller}"
+                SelectionMode="Single">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout
+                        HorizontalItemSpacing="4"
+                        Orientation="Vertical"
+                        Span="6"
+                        VerticalItemSpacing="4" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:vCard">
+                        <Border Style="{StaticResource BorderItem}">
+                            <VerticalStackLayout Spacing="4" VerticalOptions="CenterAndExpand">
+                                <Label
+                                    FontFamily="icofont"
+                                    FontSize="48"
+                                    HorizontalOptions="Center"
+                                    Text="{StaticResource UiUser}"
+                                    TextColor="{StaticResource White}"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    HorizontalOptions="Center"
+                                    Text="{Binding FormattedName}"
+                                    TextColor="{StaticResource White}"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    HorizontalOptions="Center"
+                                    Text="{Binding BirthDay, Mode=OneWay, StringFormat='{0:dd-MM-yyyy}'}"
+                                    TextColor="{StaticResource White}"
+                                    VerticalOptions="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ScrollView>
+    </Grid>
+
+</ContentView>

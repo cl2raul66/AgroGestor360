@@ -103,7 +103,7 @@ public class BankAccountsController : ControllerBase
     }
 
     [HttpDelete("{number}")]
-    public IActionResult Delete(string number)
+    public ActionResult<bool> Delete(string number)
     {
         var find = bankAccountsServ.GetByNumber(number);
         var deleted = bankAccountsServ.Delete(find!.Id!);

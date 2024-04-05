@@ -1,5 +1,6 @@
 ﻿using AgroGestor360.App.View.Settings;
 using AgroGestor360.App.ViewModels;
+using AgroGestor360.App.Views;
 using AgroGestor360.App.Views.Settings;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -57,6 +58,9 @@ public class NavigationService : INavigationService
                 break;
             case CvSalesViewModel vm:
                 updateViewAction(new CvSales(vm));
+                break;
+            case CvSellersViewModel vm:
+                updateViewAction(new CvSellers(vm));
                 break;
             default:
                 updateViewAction(new CvNullSelected());

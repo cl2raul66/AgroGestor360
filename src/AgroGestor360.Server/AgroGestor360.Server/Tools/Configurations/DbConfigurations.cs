@@ -1,5 +1,6 @@
 ﻿using AgroGestor360.Server.Tools.Helpers;
 using LiteDB;
+using vCardLib.Models;
 
 namespace AgroGestor360.Server.Tools.Configurations;
 
@@ -15,5 +16,23 @@ public class BanksDbConfig
         };
 
         Bd = new LiteDatabase(cnx);
+    }
+}
+
+public class ContactsDbConfig
+{
+    public ILiteDatabase Bd { get; }
+
+    public ContactsDbConfig()
+    {
+        var cnx = new ConnectionString()
+        {
+            Filename = FileHelper.GetFileDbPath("Contacts")
+        };
+
+        var mapper = new BsonMapper();
+        mapper.Entity<vCard>().Id(vcard => vcard.Uid);
+
+        Bd = new LiteDatabase(cnx, mapper);
     }
 }
