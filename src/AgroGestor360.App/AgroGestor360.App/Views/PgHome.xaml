@@ -28,7 +28,7 @@
                     TextTransform="Uppercase"
                     ToolTipProperties.Text="Ir a reportes"
                     WidthRequest="110" />
-                <BoxView
+                <!--<BoxView
                     BackgroundColor="{StaticResource Gray300}"
                     CornerRadius="2"
                     WidthRequest="2" />
@@ -43,7 +43,7 @@
                     Text="Gastos"
                     TextTransform="Uppercase"
                     ToolTipProperties.Text="Ir a gastos"
-                    WidthRequest="110" />
+                    WidthRequest="110" />-->
                 <Button
                     Command="{Binding GoToSalesCommand}"
                     Text="Ventas"
@@ -73,10 +73,10 @@
                         Text="Realizar venta"
                         ToolTipProperties.Text="Agregar nueva venta"
                         WidthRequest="130" />
-                    <Button
+                    <!--<Button
                         Text="Aportes"
                         ToolTipProperties.Text="Agregar aporte"
-                        WidthRequest="130" />
+                        WidthRequest="130" />-->
                 </HorizontalStackLayout>
             </VerticalStackLayout>
         </Frame>

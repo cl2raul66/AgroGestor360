@@ -1,6 +1,7 @@
 ﻿using AgroGestor360.App.Views.Settings.BankAccounts;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
+using AgroGestor360.Client.Tools;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -62,7 +63,7 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
             return;
         }
         var newBank = new Bank() { Name = name };
-        result = await banksServ.InsertBankAsync(serverURL, newBank);
+        result = await banksServ.InsertBankAsync(serverURL, newBank); 
         if (!string.IsNullOrEmpty(result))
         {
             Banks ??= [];

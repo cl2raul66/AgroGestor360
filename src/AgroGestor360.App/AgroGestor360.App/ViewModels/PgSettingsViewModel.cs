@@ -63,7 +63,7 @@ public partial class PgSettingsViewModel : ObservableObject
                 case "Capital inicial":
                     navigationServ.NavigateToView<CvSeedCapitalViewModel>(view => CurrentContent = view);
                     break;
-                case "Cuentas y tarjetas":
+                case "Bancos":
                     navigationServ.NavigateToView<CvBankAccountsViewModel>(view => CurrentContent = view);
                     break;
                 case "Accionistas":

@@ -44,9 +44,9 @@
                         <x:Array Type="{x:Type x:String}">
                             <x:String>Conexión</x:String>
                             <x:String>Entidad</x:String>
-                            <x:String>Capital inicial</x:String>
-                            <x:String>Cuentas y tarjetas</x:String>
-                            <x:String>Accionistas</x:String>
+                            <!--<x:String>Capital inicial</x:String>-->
+                            <x:String>Bancos</x:String>
+                            <!--<x:String>Accionistas</x:String>-->
                             <x:String>Almacén</x:String>
                             <x:String>Clientes</x:String>
                             <x:String>Productos</x:String>

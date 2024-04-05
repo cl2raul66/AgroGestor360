@@ -141,27 +141,71 @@
                             <GridItemsLayout
                                 HorizontalItemSpacing="2"
                                 Orientation="Vertical"
-                                Span="2"
+                                Span="3"
                                 VerticalItemSpacing="2" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="model:BankAccount">
                                 <Border Style="{StaticResource BorderItem}">
-                                    <Grid ColumnDefinitions="auto,*" ColumnSpacing="8">
+                                    <Grid
+                                        ColumnDefinitions="auto,*"
+                                        ColumnSpacing="8"
+                                        VerticalOptions="CenterAndExpand">
                                         <Label
                                             FontFamily="icofont"
-                                            FontSize="64"
+                                            FontSize="52"
                                             HorizontalOptions="Center"
-                                            Text="{StaticResource Bank}"
                                             TextColor="{StaticResource White}"
-                                            VerticalOptions="Center" />
+                                            VerticalOptions="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger
+                                                    Binding="{Binding InstrumentType, Mode=OneWay}"
+                                                    TargetType="Label"
+                                                    Value="Current">
+                                                    <Setter Property="Text" Value="{StaticResource Bank}" />
+                                                </DataTrigger>
+                                                <DataTrigger
+                                                    Binding="{Binding InstrumentType, Mode=OneWay}"
+                                                    TargetType="Label"
+                                                    Value="Savings">
+                                                    <Setter Property="Text" Value="{StaticResource Bank}" />
+                                                </DataTrigger>
+                                                <DataTrigger
+                                                    Binding="{Binding InstrumentType, Mode=OneWay}"
+                                                    TargetType="Label"
+                                                    Value="Investment">
+                                                    <Setter Property="Text" Value="{StaticResource Bank}" />
+                                                </DataTrigger>
+                                                <DataTrigger
+                                                    Binding="{Binding InstrumentType, Mode=OneWay}"
+                                                    TargetType="Label"
+                                                    Value="Payroll">
+                                                    <Setter Property="Text" Value="{StaticResource Bank}" />
+                                                </DataTrigger>
+                                                <DataTrigger
+                                                    Binding="{Binding InstrumentType, Mode=OneWay}"
+                                                    TargetType="Label"
+                                                    Value="CreditCard">
+                                                    <Setter Property="Text" Value="{StaticResource CreditCard}" />
+                                                </DataTrigger>
+                                                <DataTrigger
+                                                    Binding="{Binding InstrumentType, Mode=OneWay}"
+                                                    TargetType="Label"
+                                                    Value="DebitCard">
+                                                    <Setter Property="Text" Value="{StaticResource CreditCard}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
                                         <VerticalStackLayout
                                             Grid.Column="1"
-                                            Spacing="8"
+                                            Spacing="4"
                                             VerticalOptions="Center">
-                                            <Label Text="{Binding BankName, Mode=OneWay, StringFormat='Banco: {0}'}" TextColor="{StaticResource White}" />
-                                            <Label Text="{Binding Number, Mode=OneWay, StringFormat='No. Cuenta: {0}'}" TextColor="{StaticResource White}" />
-                                            <Label Text="{Binding Beneficiary.FormattedName, Mode=OneWay, StringFormat='No. Propietario: {0}'}" TextColor="{StaticResource White}" />
+                                            <Label
+                                                LineBreakMode="MiddleTruncation"
+                                                Text="{Binding BankName, Mode=OneWay}"
+                                                TextColor="{StaticResource White}" />
+                                            <Label Text="{Binding Number, Mode=OneWay, StringFormat='No. {0}'}" TextColor="{StaticResource White}" />
+                                            <Label Text="{Binding Beneficiary.FormattedName, Mode=OneWay}" TextColor="{StaticResource White}" />
                                         </VerticalStackLayout>
                                     </Grid>
                                 </Border>
