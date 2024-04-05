@@ -1,5 +1,4 @@
 ﻿using AgroGestor360.App.Views.Settings;
-using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,12 +11,14 @@ namespace AgroGestor360.App.ViewModels;
 
 public partial class CvSellersViewModel : ObservableRecipient
 {
-    readonly ISellerService sellerServ;
+    readonly ISellersService sellersServ;
+    readonly IAuthService authServ;
     readonly string serverURL;
 
-    public CvSellersViewModel(ISellerService sellerService)
+    public CvSellersViewModel(ISellersService sellersService, IAuthService authService)
     {
-        sellerServ = sellerService;
+        sellersServ = sellersService;
+        authServ = authService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         IsActive = true;
     }
@@ -44,19 +45,28 @@ public partial class CvSellersViewModel : ObservableRecipient
     async Task ShowDeleteSeller()
     {
         StringBuilder sb = new();
-        sb.AppendLine("Usted esta seguro de eliminar al siguiente vendedor:");
-        sb.AppendLine($"FECHA DE INGRESO: {0}");
-        sb.AppendLine($"NOMBRE: {0}");
-        sb.AppendLine($"NIT: {0}");
-        sb.AppendLine($"DPI: {0}");
-        sb.AppendLine($"DIRECCION: {0}");
-        sb.AppendLine($"TELEFONO: {0}");
-        sb.AppendLine($"CORREO ELECTRONICO: {0}");
-
-        bool resul = await Shell.Current.DisplayAlert("Eliminar cliente", sb.ToString().TrimEnd(), "Eliminar", "Cancelar");
-        if (resul)
+        sb.AppendLine($"¿Seguro que quiere eliminar el vendedor: {SelectedSeller!.FormattedName}?");
+        sb.AppendLine("Inserte la contraseña:");
+        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar vendedor", sb.ToString(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
         {
+            SelectedSeller = null;
             return;
+        }
+
+        var approved = await authServ.AuthRoot(serverURL, pwd);
+        if (!approved)
+        {
+            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+            SelectedSeller = null;
+            return;
+        }
+
+        var result = await sellersServ.DeleteAsync(serverURL, SelectedSeller!.Uid!);
+        if (result)
+        {
+            Sellers!.Remove(SelectedSeller);
+            SelectedSeller = null;
         }
     }
 
@@ -65,7 +75,7 @@ public partial class CvSellersViewModel : ObservableRecipient
         base.OnActivated();
         WeakReferenceMessenger.Default.Register<CvSellersViewModel, vCard, string>(this, "newSeller", async (r, m) =>
         {
-            bool result = await sellerServ.InsertAsync(serverURL, m);
+            bool result = await sellersServ.InsertAsync(serverURL, m);
             if (result)
             {
                 r.Sellers ??= [];
@@ -77,7 +87,7 @@ public partial class CvSellersViewModel : ObservableRecipient
 
         WeakReferenceMessenger.Default.Register<CvSellersViewModel, vCard, string>(this, "editSeller", async (r, m) =>
         {
-            bool result = await sellerServ.UpdateAsync(serverURL, m);
+            bool result = await sellersServ.UpdateAsync(serverURL, m);
             if (result)
             {
                 int idx = r.Sellers!.IndexOf(SelectedSeller!);
@@ -96,10 +106,10 @@ public partial class CvSellersViewModel : ObservableRecipient
 
     private async Task GetSellers()
     {
-        bool exist = await sellerServ.ExistAsync(serverURL);
+        bool exist = await sellersServ.ExistAsync(serverURL);
         if (exist)
         {
-            var getsellers = await sellerServ.GetAllAsync(serverURL);
+            var getsellers = await sellersServ.GetAllAsync(serverURL);
             Sellers = new(getsellers!);
         }
     }

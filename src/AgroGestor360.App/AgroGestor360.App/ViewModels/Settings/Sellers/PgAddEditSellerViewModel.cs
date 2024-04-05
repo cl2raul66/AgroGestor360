@@ -18,10 +18,7 @@ public partial class PgAddEditSellerViewModel : ObservableValidator
     }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Title))]
     vCard? currentSeller;
-
-    public string Title => CurrentSeller is null ? "Agregar" : "Editar";
 
     [ObservableProperty]
     DateTime date;
@@ -82,6 +79,7 @@ public partial class PgAddEditSellerViewModel : ObservableValidator
 
         vCard theSeller = new(vCardLib.Enums.vCardVersion.v4)
         {
+            Uid = CurrentSeller?.Uid,
             Language = new Language(CultureInfo.CurrentCulture.TwoLetterISOLanguageName),
             FormattedName = Name!.Trim().ToUpper(),
             BirthDay = Birthday.Date >= Date.Date ? null : Birthday.Date,
@@ -107,8 +105,9 @@ public partial class PgAddEditSellerViewModel : ObservableValidator
             DPI = CurrentSeller.CustomFields.First(x => x.Key == nameof(DPI)).Value;
             Phone = CurrentSeller.PhoneNumbers.First().Number;
             Birthday = CurrentSeller!.BirthDay ?? DateTime.Now;
-            Email = CurrentSeller.EmailAddresses.First().Value;
+            Email = CurrentSeller.EmailAddresses.FirstOrDefault().Value;
             Address = CurrentSeller.CustomFields.FirstOrDefault(x => x.Key == "ADDRESS").Value;
+            Date = DateTime.Parse(CurrentSeller.CustomFields.FirstOrDefault(x => x.Key == "REGISTRATIONDATE").Value);
         }
     }
 }

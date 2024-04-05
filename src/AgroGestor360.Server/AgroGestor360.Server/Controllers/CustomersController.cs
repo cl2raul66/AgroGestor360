@@ -7,22 +7,22 @@ namespace AgroGestor360.Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class SellerController : ControllerBase
+public class CustomersController : ControllerBase
 {
-    private readonly ISellerForLitedbService sellerServ;
+    private readonly ICustomersForLitedbService customersServ;
 
-    public SellerController(ISellerForLitedbService sellerService)
+    public CustomersController(ICustomersForLitedbService customersService)
     {
-        sellerServ = sellerService;
+        customersServ = customersService;
     }
 
     [HttpGet("exist")]
-    public ActionResult<bool> Exist() => Ok(sellerServ.Exist);
+    public ActionResult<bool> Exist() => Ok(customersServ.Exist);
 
     [HttpGet]
     public ActionResult<IEnumerable<vCard>> GetAll()
     {
-        var all = sellerServ.GetAll();
+        var all = customersServ.GetAll();
         if (!all?.Any() ?? true)
         {
             return NotFound();
@@ -30,18 +30,17 @@ public class SellerController : ControllerBase
 
         return Ok(all);
     }
-    //public IActionResult GetAll() => Ok(sellerServ.GetAll());
 
     [HttpGet("byname/{name}")]
     public IActionResult GetAllByName(string name)
     {
-        return Ok(sellerServ.GetAllByName(name));
+        return Ok(customersServ.GetAllByName(name));
     }
 
     [HttpGet("{id}")]
     public IActionResult GetById(string id)
     {
-        var card = sellerServ.GetById(id);
+        var card = customersServ.GetById(id);
         return card is null ? NotFound() : Ok(card);
     }
 
@@ -49,21 +48,21 @@ public class SellerController : ControllerBase
     public ActionResult<bool> Post([FromBody] vCard card)
     {
         card.Uid = ObjectId.NewObjectId().ToString();
-        var id = sellerServ.Insert(card);
+        var id = customersServ.Insert(card);
         return Ok(!string.IsNullOrEmpty(id));
     }
 
     [HttpPut]
     public ActionResult<bool> Put([FromBody] vCard card)
     {
-        var result = sellerServ.Update(card);
+        var result = customersServ.Update(card);
         return Ok(result);
     }
 
     [HttpDelete("{id}")]
     public ActionResult<bool> Delete(string id)
     {
-        var result = sellerServ.Delete(id);
+        var result = customersServ.Delete(id);
         return Ok(result);
     }
 }

@@ -19,13 +19,30 @@
         <Grid RowDefinitions="auto,*,auto" RowSpacing="8">
             <Label
                 FontSize="18"
-                Text="{Binding Title, Mode=OneWay, StringFormat='{0} vendedor'}"
                 TextTransform="Uppercase"
-                VerticalOptions="Center" />
+                VerticalOptions="Center">
+                <Label.Triggers>
+                    <DataTrigger
+                        Binding="{Binding CurrentSeller, Mode=OneWay, Converter={ctk:IsNullConverter}}"
+                        TargetType="Label"
+                        Value="true">
+                        <Setter Property="Text" Value="Agregar vendedor" />
+                    </DataTrigger>
+                    <DataTrigger
+                        Binding="{Binding CurrentSeller, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        TargetType="Label"
+                        Value="true">
+                        <Setter Property="Text" Value="Editar vendedor" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
             <ScrollView Grid.Row="1">
                 <VerticalStackLayout Spacing="8">
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                        <Grid
+                            IsVisible="{Binding CurrentSeller, Mode=OneWay, Converter={ctk:IsNullConverter}}"
+                            RowDefinitions="auto,auto"
+                            RowSpacing="4">
                             <Label Text="Fecha:" />
                             <DatePicker Grid.Row="1" Date="{Binding Date}" />
                         </Grid>
@@ -133,7 +150,22 @@
                     <Button
                         Command="{Binding AddCommand}"
                         Text="Agregar"
-                        TextTransform="Uppercase" />
+                        TextTransform="Uppercase">
+                        <Button.Triggers>
+                            <DataTrigger
+                                Binding="{Binding CurrentSeller, Mode=OneWay, Converter={ctk:IsNullConverter}}"
+                                TargetType="Button"
+                                Value="true">
+                                <Setter Property="Text" Value="Agregar" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding CurrentSeller, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                                TargetType="Button"
+                                Value="true">
+                                <Setter Property="Text" Value="Editar" />
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
                     <Button
                         Command="{Binding CancelCommand}"
                         Text="Cancelar"

@@ -13,8 +13,8 @@ builder.Services.AddSingleton<ContactsDbConfig>();
 builder.Services.AddSingleton<IBanksForLitedbService, BanksForLitedbService>();
 builder.Services.AddSingleton<IBankAccountsForLitedbService, BankAccountsForLitedbService>();
 builder.Services.AddSingleton<IShareholderForLitedbService, ShareholderForLitedbService>();
-builder.Services.AddSingleton<ISellerForLitedbService, SellerForLitedbService>();
-builder.Services.AddSingleton<ICustomerForLitedbService, CustomerForLitedbService>();
+builder.Services.AddSingleton<ISellersForLitedbService, SellersForLitedbService>();
+builder.Services.AddSingleton<ICustomersForLitedbService, CustomersForLitedbService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();

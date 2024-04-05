@@ -44,6 +44,7 @@
             </Grid>
         </Frame>
         <!--#endregion-->
+        <!--#region CONTENIDO-->
         <ScrollView Grid.Row="1">
             <CollectionView
                 ItemsSource="{Binding Sellers, Mode=OneWay}"
@@ -64,7 +65,7 @@
                                     FontFamily="icofont"
                                     FontSize="48"
                                     HorizontalOptions="Center"
-                                    Text="{StaticResource UiUser}"
+                                    Text="{StaticResource Businessman}"
                                     TextColor="{StaticResource White}"
                                     VerticalOptions="Center" />
                                 <Label
@@ -85,6 +86,7 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </ScrollView>
+        <!--#endregion-->
     </Grid>
 
 </ContentView>

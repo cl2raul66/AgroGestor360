@@ -5,7 +5,7 @@ using vCardLib.Models;
 
 namespace AgroGestor360.Client.Services;
 
-public interface ISellerService
+public interface ICustomersService
 {
     Task<bool> DeleteAsync(string serverURL, string id);
     Task<bool> ExistAsync(string serverURL);
@@ -16,13 +16,13 @@ public interface ISellerService
     Task<bool> UpdateAsync(string serverURL, vCard card);
 }
 
-public class SellerService : ISellerService
+public class CustomersService : ICustomersService
 {
     public async Task<bool> ExistAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/seller/exist");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers/exist");
             if (response.IsSuccessStatusCode)
             {
                 return bool.Parse(await response.Content.ReadAsStringAsync());
@@ -35,7 +35,7 @@ public class SellerService : ISellerService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/seller");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers");
             if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
             {
                 return [];
@@ -53,7 +53,7 @@ public class SellerService : ISellerService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/seller/byname/{name}");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers/byname/{name}");
             if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
             {
                 return [];
@@ -71,7 +71,7 @@ public class SellerService : ISellerService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/seller/{id}");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers/{id}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
@@ -86,7 +86,7 @@ public class SellerService : ISellerService
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var content = new StringContent(JsonSerializer.Serialize(card), Encoding.UTF8, "application/json");
-            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/seller", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/customers", content);
             if (response.IsSuccessStatusCode)
             {
                 return bool.Parse(await response.Content.ReadAsStringAsync());
@@ -100,7 +100,7 @@ public class SellerService : ISellerService
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var content = new StringContent(JsonSerializer.Serialize(card), Encoding.UTF8, "application/json");
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/seller", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/customers", content);
             if (response.IsSuccessStatusCode)
             {
                 return bool.Parse(await response.Content.ReadAsStringAsync());
@@ -113,7 +113,7 @@ public class SellerService : ISellerService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/seller/{id}");
+            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/customers/{id}");
             if (response.IsSuccessStatusCode)
             {
                 return bool.Parse(await response.Content.ReadAsStringAsync());

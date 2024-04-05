@@ -4,7 +4,7 @@ using vCardLib.Models;
 
 namespace AgroGestor360.Server.Sevices;
 
-public interface ISellerForLitedbService
+public interface ICustomersForLitedbService
 {
     bool Exist { get; }
 
@@ -12,35 +12,30 @@ public interface ISellerForLitedbService
     IEnumerable<vCard> GetAll();
     IEnumerable<vCard> GetAllByName(string name);
     vCard GetById(string id);
-    string Insert(vCard card);
-    bool Update(vCard card);
+    string Insert(vCard entity);
+    bool Update(vCard entity);
 }
 
-public class SellerForLitedbService : ISellerForLitedbService
+public class CustomersForLitedbService : ICustomersForLitedbService
 {
     readonly ILiteCollection<vCard> collection;
 
-    public SellerForLitedbService(ContactsDbConfig dbConfig)
+    public CustomersForLitedbService(ContactsDbConfig dbConfig)
     {
-        collection = dbConfig.Bd.GetCollection<vCard>("Seller");
+        collection = dbConfig.Bd.GetCollection<vCard>("Customer");
     }
 
     public bool Exist => collection.Count() > 0;
 
-    //public IEnumerable<vCard> GetAll() => collection.FindAll();
-    public IEnumerable<vCard> GetAll()
-    {
-        var result = collection.FindAll();
-        return result;
-    }
+    public IEnumerable<vCard> GetAll() => collection.FindAll();
 
     public IEnumerable<vCard> GetAllByName(string name) => collection.Find(x => x.FormattedName!.Contains(name));
 
     public vCard GetById(string id) => collection.FindById(id);
 
-    public string Insert(vCard card) => collection.Insert(card).ToString();
+    public string Insert(vCard entity) => collection.Insert(entity).ToString();
 
-    public bool Update(vCard card) => collection.Update(card);
+    public bool Update(vCard entity) => collection.Update(entity);
 
     public bool Delete(string id) => collection.Delete(id);
 }
