@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace AgroGestor360.Server.Controllers;
+namespace AgroGestor360.Client.Services;
 
 public static class ApiServiceBase
 {

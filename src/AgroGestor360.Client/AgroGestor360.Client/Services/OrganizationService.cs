@@ -1,5 +1,4 @@
 ﻿using AgroGestor360.Client.Models;
-using AgroGestor360.Server.Controllers;
 using System.Text.Json;
 
 namespace AgroGestor360.Client.Services;

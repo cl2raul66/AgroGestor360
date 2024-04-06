@@ -61,21 +61,27 @@ public class Organization
 //    public double Value { get; set; }
 //}
 
-//public class Merchandise
-//{
-//    public string? Id { get; set; }
-//    public string? Name { get; set; }
-//    public Presentation? Packaging { get; set; }
-//    public string? Category { get; set; }
-//    public string? Description { get; set; }
-//}
+public class Merchandise
+{
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+    public Presentation? Packaging { get; set; }
+    public string? MerchandiseCategory { get; set; }
+    public string? Description { get; set; }
+}
 
-//public class Presentation
-//{
-//    public string? Measure { get; set; }
-//    public string? Unit { get; set; }
-//    public double Value { get; set; }
-//}
+public class MerchandiseCategory
+{
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+}
+
+public class Presentation
+{
+    public string? Measure { get; set; }
+    public string? Unit { get; set; }
+    public double Value { get; set; }
+}
 
 //public class Article
 //{

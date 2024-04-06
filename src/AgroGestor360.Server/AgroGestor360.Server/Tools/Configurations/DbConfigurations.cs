@@ -36,3 +36,18 @@ public class ContactsDbConfig
         Bd = new LiteDatabase(cnx, mapper);
     }
 }
+
+public class MerchandiseDbConfig
+{
+    public ILiteDatabase Bd { get; }
+
+    public MerchandiseDbConfig()
+    {
+        var cnx = new ConnectionString()
+        {
+            Filename = FileHelper.GetFileDbPath("Merchandise")
+        };
+
+        Bd = new LiteDatabase(cnx);
+    }
+}

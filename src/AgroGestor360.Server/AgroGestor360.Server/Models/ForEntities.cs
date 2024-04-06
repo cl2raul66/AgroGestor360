@@ -35,17 +35,17 @@ public class User
     public List<string>? GroupsId { get; set; }
 }
 
+public class UserGroup
+{
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+}
+
 public class ClientClass
 {
     public ObjectId? Id { get; set; }
     public string? Title { get; set; }
     public double? PercentageValue { get; set; }
-}
-
-public class UserGroup
-{
-    public string? Id { get; set; }
-    public string? Name { get; set; }
 }
 
 public class CustomerDiscount
@@ -67,8 +67,16 @@ public class Merchandise
     public ObjectId? Id { get; set; }
     public string? Name { get; set; }
     public Presentation? Packaging { get; set; }
-    public string? Category { get; set; }
+    public ObjectId? MerchandiseCategoryId { get; set; }
     public string? Description { get; set; }
+    public bool Disabled { get; set; }
+}
+
+public class MerchandiseCategory
+{
+    public ObjectId? Id { get; set; }
+    public string? Name { get; set; }
+    public bool Disabled { get; set; }
 }
 
 public class Presentation

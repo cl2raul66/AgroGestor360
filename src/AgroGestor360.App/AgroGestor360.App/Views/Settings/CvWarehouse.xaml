@@ -3,6 +3,8 @@
     x:Class="AgroGestor360.App.Views.Settings.CvWarehouse"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:model="clr-namespace:AgroGestor360.Client.Models;assembly=AgroGestor360.Client"
     xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     x:DataType="vm:CvWarehouseViewModel">
 
@@ -33,125 +35,146 @@
         <!--#region CONTENIDO-->
         <Grid
             Grid.Row="1"
+            Padding="8"
             ColumnDefinitions="280,auto,*"
-            ColumnSpacing="8"
-            RowDefinitions="auto,*,auto"
-            RowSpacing="8">
-            <!--  PANEL IZQUIERDO  -->
-            <VerticalStackLayout Spacing="8">
-                <Label
-                    FontSize="18"
-                    Text="Categorías"
-                    TextTransform="Uppercase"
-                    VerticalOptions="Center" />
-                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                    <Entry
-                        ClearButtonVisibility="WhileEditing"
-                        IsSpellCheckEnabled="True"
-                        IsTextPredictionEnabled="True"
-                        Placeholder="Escriba aquí" />
-                    <Button
-                        Grid.Column="1"
-                        FontFamily="icofont"
-                        Text="{StaticResource Search}"
-                        ToolTipProperties.Text="Buscar" />
-                </Grid>
-                <HorizontalStackLayout Spacing="8">
-                    <RadioButton>
-                        <RadioButton.Content>
-                            <Label Text="Por nombre" VerticalOptions="Center" />
-                        </RadioButton.Content>
-                    </RadioButton>
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
-            <ScrollView Grid.Row="1">
-                <CollectionView />
-            </ScrollView>
-            <Frame Grid.Row="2" Padding="8">
-                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                    <HorizontalStackLayout Grid.Column="1" Spacing="8">
+            ColumnSpacing="8">
+            <!--#region PANEL IZQUIERDO-->
+            <Grid RowDefinitions="auto,*,auto" RowSpacing="8">
+                <VerticalStackLayout Spacing="8">
+                    <Label
+                        FontSize="18"
+                        Text="Categorías"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <Entry
+                            ClearButtonVisibility="WhileEditing"
+                            IsSpellCheckEnabled="True"
+                            IsTextPredictionEnabled="True"
+                            Placeholder="Escriba aquí" />
                         <Button
                             Grid.Column="1"
                             FontFamily="icofont"
                             Text="{StaticResource Search}"
-                            ToolTipProperties.Text="Buscar por la categoría seleccionada" />
-                        <BoxView
-                            BackgroundColor="{StaticResource Gray300}"
-                            CornerRadius="2"
-                            WidthRequest="2" />
-                        <Button
-                            Command="{Binding AddCategoryCommand}"
-                            FontFamily="icofont"
-                            Text="{StaticResource Plus}"
-                            ToolTipProperties.Text="Agregar" />
-                        <Button
-                            FontFamily="icofont"
-                            IsEnabled="False"
-                            Text="{StaticResource UiDelete}"
-                            ToolTipProperties.Text="Eliminar" />
-                    </HorizontalStackLayout>
-                </Grid>
-            </Frame>
+                            ToolTipProperties.Text="Buscar" />
+                    </Grid>
+                </VerticalStackLayout>
+                <ScrollView Grid.Row="1">
+                    <CollectionView
+                        ItemsSource="{Binding Categories, Mode=OneWay}"
+                        SelectedItem="{Binding SelectedCategory}"
+                        SelectionMode="Single">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="4" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:MerchandiseCategory">
+                                <Border Style="{StaticResource BorderItem}">
+                                    <Label
+                                        FontSize="Caption"
+                                        LineBreakMode="MiddleTruncation"
+                                        Text="{Binding Name}"
+                                        TextColor="{StaticResource White}" />
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </ScrollView>
+                <Frame Grid.Row="2" Padding="8">
+                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                            <Button
+                                Grid.Column="1"
+                                FontFamily="icofont"
+                                IsEnabled="{Binding SelectedCategory, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                                Text="{StaticResource ArrowRight}"
+                                ToolTipProperties.Text="Crear mercancia con la categoria seleccionada" />
+                            <BoxView
+                                BackgroundColor="{StaticResource Gray300}"
+                                CornerRadius="2"
+                                WidthRequest="2" />
+                            <Button
+                                Command="{Binding AddCategoryCommand}"
+                                FontFamily="icofont"
+                                Text="{StaticResource Plus}"
+                                ToolTipProperties.Text="Agregar" />
+                            <Button
+                                Command="{Binding RemoveCategoryCommand}"
+                                FontFamily="icofont"
+                                IsEnabled="{Binding SelectedCategory, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                                Text="{StaticResource UiDelete}"
+                                ToolTipProperties.Text="Eliminar" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Frame>
+            </Grid>
+            <!--#endregion-->
             <BoxView
                 Grid.RowSpan="3"
                 Grid.Column="1"
                 BackgroundColor="{StaticResource Gray300}"
                 CornerRadius="2"
                 WidthRequest="2" />
-            <!--  PANEL DERECHO  -->
-            <VerticalStackLayout Grid.Column="2" Spacing="8">
-                <Label
-                    FontSize="18"
-                    Text="Mercancías"
-                    TextTransform="Uppercase"
-                    VerticalOptions="Center" />
-                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                    <Entry
-                        ClearButtonVisibility="WhileEditing"
-                        IsSpellCheckEnabled="True"
-                        IsTextPredictionEnabled="True"
-                        Placeholder="Escriba aquí" />
-                    <Button
-                        Grid.Column="1"
-                        FontFamily="icofont"
-                        Text="{StaticResource Search}"
-                        ToolTipProperties.Text="Buscar" />
-                </Grid>
-                <HorizontalStackLayout Spacing="8">
-                    <RadioButton>
-                        <RadioButton.Content>
-                            <Label Text="Por nombre" VerticalOptions="Center" />
-                        </RadioButton.Content>
-                    </RadioButton>
-                    <RadioButton>
-                        <RadioButton.Content>
-                            <Label Text="Por categoría" VerticalOptions="Center" />
-                        </RadioButton.Content>
-                    </RadioButton>
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
-            <ScrollView Grid.Row="1" Grid.Column="2">
-                <CollectionView />
-            </ScrollView>
-            <Frame
-                Grid.Row="2"
+            <!--#region PANEL DERECHO-->
+            <Grid
                 Grid.Column="2"
-                Padding="8">
-                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                    <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                RowDefinitions="auto,*,auto"
+                RowSpacing="8">
+                <VerticalStackLayout Grid.Column="2" Spacing="8">
+                    <Label
+                        FontSize="18"
+                        Text="Mercancías"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <Entry
+                            ClearButtonVisibility="WhileEditing"
+                            IsSpellCheckEnabled="True"
+                            IsTextPredictionEnabled="True"
+                            Placeholder="Escriba aquí" />
                         <Button
-                            Command="{Binding AddMerchandiseCommand}"
+                            Grid.Column="1"
                             FontFamily="icofont"
-                            Text="{StaticResource Plus}"
-                            ToolTipProperties.Text="Agregar" />
-                        <Button
-                            FontFamily="icofont"
-                            IsEnabled="False"
-                            Text="{StaticResource UiDelete}"
-                            ToolTipProperties.Text="Eliminar" />
+                            Text="{StaticResource Search}"
+                            ToolTipProperties.Text="Buscar" />
+                    </Grid>
+                    <HorizontalStackLayout Spacing="8">
+                        <RadioButton>
+                            <RadioButton.Content>
+                                <Label Text="Por nombre" VerticalOptions="Center" />
+                            </RadioButton.Content>
+                        </RadioButton>
+                        <RadioButton>
+                            <RadioButton.Content>
+                                <Label Text="Por categoría" VerticalOptions="Center" />
+                            </RadioButton.Content>
+                        </RadioButton>
                     </HorizontalStackLayout>
-                </Grid>
-            </Frame>
+                </VerticalStackLayout>
+                <ScrollView Grid.Row="1" Grid.Column="2">
+                    <CollectionView />
+                </ScrollView>
+                <Frame
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    Padding="8">
+                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                            <Button
+                                Command="{Binding AddMerchandiseCommand}"
+                                FontFamily="icofont"
+                                Text="{StaticResource Plus}"
+                                ToolTipProperties.Text="Agregar" />
+                            <Button
+                                FontFamily="icofont"
+                                IsEnabled="False"
+                                Text="{StaticResource UiDelete}"
+                                ToolTipProperties.Text="Eliminar" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Frame>
+            </Grid>
+            <!--#endregion-->
         </Grid>
     </Grid>
 

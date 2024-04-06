@@ -97,13 +97,13 @@
                     </Grid>
                 </Frame>
             </Grid>
+            <!--#endregion-->
             <BoxView
                 Grid.Column="1"
                 BackgroundColor="{StaticResource Gray300}"
                 CornerRadius="2"
                 WidthRequest="2" />
-            <!--#endregion-->
-            <!--#region PANEL DERECHA-->
+            <!--#region PANEL DERECHO-->
             <Grid
                 Grid.Column="2"
                 RowDefinitions="auto,*,auto"

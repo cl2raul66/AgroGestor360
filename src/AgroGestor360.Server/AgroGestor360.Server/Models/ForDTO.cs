@@ -1,4 +1,5 @@
 ﻿using AgroGestor360.Server.Tools.Enums;
+using LiteDB;
 using vCardLib.Models;
 
 namespace AgroGestor360.Server.Models;
@@ -52,21 +53,20 @@ namespace AgroGestor360.Server.Models;
 //    public double Value { get; set; }
 //}
 
-//public class MerchandiseDTO
-//{
-//    public string? Id { get; set; }
-//    public string? Name { get; set; }
-//    public Presentation? Packaging { get; set; }
-//    public string? Category { get; set; }
-//    public string? Description { get; set; }
-//}
+public class MerchandiseDTO
+{
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+    public Presentation? Packaging { get; set; }
+    public string? MerchandiseCategory { get; set; }
+    public string? Description { get; set; }
+}
 
-//public class PresentationDTO
-//{
-//    public string? Measure { get; set; }
-//    public string? Unit { get; set; }
-//    public double Value { get; set; }
-//}
+public class MerchandiseCategoryDTO
+{
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+}
 
 //public class ArticleDTO
 //{

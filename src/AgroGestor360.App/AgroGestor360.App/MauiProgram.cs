@@ -51,6 +51,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IBankAccountsService, BankAccountsService>();
         builder.Services.AddSingleton<ISellersService, SellersService>();
         builder.Services.AddSingleton<ICustomersService, CustomersService>();
+        builder.Services.AddSingleton<IMerchandiseCategoryService, MerchandiseCategoryService>();
         builder.Services.AddSingleton<IFinancialInstrumentTypeService, FinancialInstrumentTypeService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
 
