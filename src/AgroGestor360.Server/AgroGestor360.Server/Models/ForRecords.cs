@@ -27,7 +27,7 @@ public class LedgerRecord
     public ObjectId? DetailId { get; set; }
 }
 
-public class Warehouse
+public class WarehouseItem
 {
     public ObjectId? Id { get; set; }
     public ObjectId? MerchandiseId { get; set; }

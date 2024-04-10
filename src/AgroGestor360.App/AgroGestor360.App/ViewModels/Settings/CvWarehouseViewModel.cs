@@ -3,6 +3,7 @@ using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System.Text;
 
@@ -11,12 +12,16 @@ namespace AgroGestor360.App.ViewModels;
 public partial class CvWarehouseViewModel : ObservableRecipient
 {
     readonly IMerchandiseCategoryService merchandiseCategoryServ;
+    readonly IMerchandiseService merchandiseServ;
+    readonly IWarehouseService warehouseServ;
     readonly IAuthService authServ;
     readonly string serverURL;
 
-    public CvWarehouseViewModel(IMerchandiseCategoryService merchandiseCategoryService, IAuthService authService)
+    public CvWarehouseViewModel(IMerchandiseCategoryService merchandiseCategoryService, IWarehouseService warehouseService, IAuthService authService, IMerchandiseService merchandiseService)
     {
         merchandiseCategoryServ = merchandiseCategoryService;
+        merchandiseServ = merchandiseService;
+        warehouseServ = warehouseService;
         authServ = authService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         IsActive = true;
@@ -27,12 +32,12 @@ public partial class CvWarehouseViewModel : ObservableRecipient
 
     [ObservableProperty]
     MerchandiseCategory? selectedCategory;
+    
+    [ObservableProperty]
+    ObservableCollection<WarehouseItemGet>? warehouses;
 
-    [RelayCommand]
-    async Task AddMerchandise()
-    {
-        await Shell.Current.GoToAsync(nameof(PgAddMerchandise), true);
-    }
+    [ObservableProperty]
+    WarehouseItemGet? selectedWarehouse;
 
     [RelayCommand]
     async Task AddCategory()
@@ -84,19 +89,59 @@ public partial class CvWarehouseViewModel : ObservableRecipient
         }
     }
 
+    [RelayCommand]
+    async Task AddWarehouse()
+    {
+        Dictionary<string, object> sendData = new() { { "CurrentCategory", SelectedCategory!.Name! } };
+        await Shell.Current.GoToAsync(nameof(PgAddWarehouse), true, sendData);
+    }
+
+    protected override void OnActivated()
+    {
+        base.OnActivated();
+        WeakReferenceMessenger.Default.Register<CvWarehouseViewModel, WarehouseItemGet, string>(this, "AddWarehouse", async (r, m) =>
+        {
+            Merchandise merchandise = new() { Name = m.Name, MerchandiseCategory = SelectedCategory!.Id, Packaging = m.Packaging, Description = m.Description };
+
+            var merchandiseId = await merchandiseServ.InsertAsync(serverURL, merchandise);
+
+            if (!string.IsNullOrEmpty(merchandiseId))
+            {
+                var result = await warehouseServ.InsertAsync(serverURL, new() { MerchandiseId = merchandiseId, Quantity = m.Quantity });
+
+                if (!string.IsNullOrEmpty(result))
+                {
+                    r.Warehouses ??= [];
+                    r.Warehouses.Insert(0, m);
+                }
+            }
+            SelectedCategory = null;
+        });
+    }
+
     #region EXTRA
     public async void Initialize()
     {
-        await GetCategories();
+        await Task.WhenAll(GetCategories(), GetWarehouse());
     }
 
-    private async Task GetCategories()
+    async Task GetCategories()
     {
         bool exist = await merchandiseCategoryServ.CheckExistence(serverURL);
         if (exist)
         {
             var getcategories = await merchandiseCategoryServ.GetAllAsync(serverURL);
             Categories = new(getcategories!);
+        }
+    }
+
+    async Task GetWarehouse()
+    {
+        bool exist = await warehouseServ.CheckExistence(serverURL);
+        if (exist)
+        {
+            var getAll = await warehouseServ.GetAllAsync(serverURL);
+            Warehouses = new(getAll!);
         }
     }
     #endregion

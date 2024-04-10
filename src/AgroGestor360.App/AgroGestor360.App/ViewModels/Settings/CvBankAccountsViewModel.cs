@@ -120,7 +120,7 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
         await Task.WhenAll(GetBanks(), GetBankAccounts());
     }
 
-    private async Task GetBanks()
+    async Task GetBanks()
     {
         bool exist = await banksServ.CheckExistence(serverURL);
         if (exist)
@@ -130,7 +130,7 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
         }
     }
 
-    private async Task GetBankAccounts()
+    async Task GetBankAccounts()
     {
         bool exist = await bankAccountsServ.CheckExistence(serverURL);
         if (exist)

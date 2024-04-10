@@ -39,7 +39,7 @@ public class BankAccountsForLitedbService : IBankAccountsForLitedbService
 
     public BankAccount? GetByNumber(string number) => collection.Find(x => x.Number == number).FirstOrDefault();
 
-    public string Insert(BankAccount account) => collection.Insert(account).ToString();
+    public string Insert(BankAccount account) => collection.Insert(account).AsObjectId.ToString();
 
     public bool Update(BankAccount account) => collection.Update(account);
 

@@ -69,12 +69,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="8.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="8.0.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.14" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.14" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+		<PackageReference Include="UnitsNet" Version="5.50.0" />
 		<PackageReference Include="vCardLib.dll" Version="5.0.0" />
 	</ItemGroup>
 
@@ -174,7 +175,7 @@
 	  <MauiXaml Update="Views\Settings\Shareholders\PgAddEditShareholder.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Settings\Warehouse\PgAddMerchandise.xaml">
+	  <MauiXaml Update="Views\Settings\Warehouse\PgAddWarehouse.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
@@ -186,6 +187,9 @@
 	<ItemGroup>
 	  <Compile Update="Views\Settings\Sellers\PgAddEditSeller.xaml.cs">
 	    <DependentUpon>PgAddEditSeller.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Settings\Warehouse\PgAddWarehouse.xaml.cs">
+	    <DependentUpon>PgAddWarehouse.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 

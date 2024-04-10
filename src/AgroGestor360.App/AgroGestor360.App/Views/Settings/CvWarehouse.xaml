@@ -85,6 +85,7 @@
                         <HorizontalStackLayout Grid.Column="1" Spacing="8">
                             <Button
                                 Grid.Column="1"
+                                Command="{Binding AddWarehouseCommand}"
                                 FontFamily="icofont"
                                 IsEnabled="{Binding SelectedCategory, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource ArrowRight}"
@@ -123,7 +124,7 @@
                 <VerticalStackLayout Grid.Column="2" Spacing="8">
                     <Label
                         FontSize="18"
-                        Text="Mercancías"
+                        Text="Mercancías en almacén"
                         TextTransform="Uppercase"
                         VerticalOptions="Center" />
                     <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
@@ -152,7 +153,36 @@
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1" Grid.Column="2">
-                    <CollectionView />
+                    <CollectionView
+                        ItemsSource="{Binding Warehouses, Mode=OneWay}"
+                        SelectedItem="{Binding SelectedWarehouse}"
+                        SelectionMode="Single">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout
+                                HorizontalItemSpacing="4"
+                                Orientation="Vertical"
+                                Span="7"
+                                VerticalItemSpacing="4" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:WarehouseItemGet">
+                                <Border Style="{StaticResource BorderItem}">
+                                    <VerticalStackLayout Spacing="4">
+                                        <Label
+                                            FontSize="Title"
+                                            HorizontalOptions="Center"
+                                            Text="{Binding Quantity, Mode=OneWay}"
+                                            TextColor="{StaticResource White}" />
+                                        <Label
+                                            HorizontalOptions="Center"
+                                            LineBreakMode="MiddleTruncation"
+                                            Text="{Binding Name, Mode=OneWay}"
+                                            TextColor="{StaticResource White}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </ScrollView>
                 <Frame
                     Grid.Row="2"
@@ -160,14 +190,14 @@
                     Padding="8">
                     <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                         <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                            <Button
+                            <!--<Button
                                 Command="{Binding AddMerchandiseCommand}"
                                 FontFamily="icofont"
                                 Text="{StaticResource Plus}"
-                                ToolTipProperties.Text="Agregar" />
+                                ToolTipProperties.Text="Agregar" />-->
                             <Button
                                 FontFamily="icofont"
-                                IsEnabled="False"
+                                IsEnabled="{Binding SelectedWarehouse, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource UiDelete}"
                                 ToolTipProperties.Text="Eliminar" />
                         </HorizontalStackLayout>

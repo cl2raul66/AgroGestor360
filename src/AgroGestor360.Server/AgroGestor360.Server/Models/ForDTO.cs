@@ -68,6 +68,23 @@ public class MerchandiseCategoryDTO
     public string? Name { get; set; }
 }
 
+public class WarehouseItemGetDTO
+{
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+    public Presentation? Packaging { get; set; }
+    public string? MerchandiseCategory { get; set; }
+    public string? Description { get; set; }
+    public double Quantity { get; set; }
+}
+
+public class WarehouseItemSendDTO
+{
+    public string? Id { get; set; }
+    public string? MerchandiseId { get; set; }
+    public double Quantity { get; set; }
+}
+
 //public class ArticleDTO
 //{
 //    public string? Id { get; set; }

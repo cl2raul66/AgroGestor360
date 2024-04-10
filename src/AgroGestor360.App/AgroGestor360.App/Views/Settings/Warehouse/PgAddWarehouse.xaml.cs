@@ -2,9 +2,9 @@ using AgroGestor360.App.ViewModels;
 
 namespace AgroGestor360.App.Views.Settings.Warehouse;
 
-public partial class PgAddMerchandise : ContentPage
+public partial class PgAddWarehouse : ContentPage
 {
-	public PgAddMerchandise(PgAddMerchandiseViewModel vm)
+	public PgAddWarehouse(PgAddWarehouseViewModel vm)
 	{
 		InitializeComponent();
 

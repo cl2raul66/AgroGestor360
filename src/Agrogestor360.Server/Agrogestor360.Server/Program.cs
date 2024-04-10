@@ -17,6 +17,8 @@ builder.Services.AddSingleton<IShareholderForLitedbService, ShareholderForLitedb
 builder.Services.AddSingleton<ISellersForLitedbService, SellersForLitedbService>();
 builder.Services.AddSingleton<ICustomersForLitedbService, CustomersForLitedbService>();
 builder.Services.AddSingleton<IMerchandiseCategoryForLitedbService, MerchandiseCategoryForLitedbService>();
+builder.Services.AddSingleton<IMerchandiseForLitedbService, MerchandiseForLitedbService>();
+builder.Services.AddSingleton<IWarehouseForLitedbService, WarehouseForLitedbService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();

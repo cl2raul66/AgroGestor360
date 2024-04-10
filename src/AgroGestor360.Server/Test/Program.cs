@@ -35,19 +35,55 @@ else
     }
 }
 
-Console.Write("Ingrese su contraseña: ");
-string? password = Console.ReadLine();
+//Console.Write("Ingrese su contraseña: ");
+//string? password = Console.ReadLine();
 
-if (!string.IsNullOrEmpty(password))
-{
-    var resultAuth = await authServ.AuthRoot(url, password);
+//if (!string.IsNullOrEmpty(password))
+//{
+//    var resultAuth = await authServ.AuthRoot(url, password);
 
-    if (resultAuth)
-    {
-        Console.WriteLine("Autenticación exitosa.");
-    }
-    else
-    {
-        Console.WriteLine("Autenticación fallida.");
-    }
-}
+//    if (resultAuth)
+//    {
+//        Console.WriteLine("Autenticación exitosa.");
+//    }
+//    else
+//    {
+//        Console.WriteLine("Autenticación fallida.");
+//    }
+//}
+
+//var service = new MeasurementService();
+//while (true)
+//{
+//    Console.WriteLine("Seleccione una medida:");
+//    var measurements = service.GetMeasurementNames().ToList();
+//    for (int i = 0; i < measurements.Count; i++)
+//    {
+//        Console.WriteLine($"{i + 1}. {measurements[i]}");
+//    }
+
+//    if (int.TryParse(Console.ReadLine(), out int selectedMeasurement) && selectedMeasurement > 0 && selectedMeasurement <= measurements.Count)
+//    {
+//        var units = service.GetNamesAndUnitsMeasurement(measurements[selectedMeasurement - 1]);
+//        Console.WriteLine($"Unidades para {measurements[selectedMeasurement - 1]}:");
+//        //for (int i = 0; i < units.Count; i++)
+//        //{
+//        //    Console.WriteLine($"{i + 1}. {units[i]}");
+//        //}
+//        foreach (var item in units)
+//        {
+//            Console.WriteLine(item);
+//        }
+//    }
+//    else
+//    {
+//        Console.WriteLine("Entrada inválida. Por favor, intente de nuevo.");
+//    }
+
+//    Console.WriteLine("¿Desea continuar? (s/n)");
+//    var r = Console.ReadLine();
+//    if (r?.ToLower() != "s")
+//    {
+//        break;
+//    }
+//}

@@ -33,7 +33,7 @@ public class MerchandiseCategoryForLitedbService : IMerchandiseCategoryForLitedb
 
     public MerchandiseCategory GetById(ObjectId id) => collection.FindById(id);
 
-    public string Insert(MerchandiseCategory entity) => collection.Insert(entity).ToString();
+    public string Insert(MerchandiseCategory entity) => collection.Insert(entity).AsObjectId.ToString();
 
     public bool Update(MerchandiseCategory entity) => collection.Update(entity);
 

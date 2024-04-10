@@ -83,6 +83,23 @@ public class Presentation
     public double Value { get; set; }
 }
 
+public class WarehouseItemGet
+{
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+    public Presentation? Packaging { get; set; }
+    public string? MerchandiseCategory { get; set; }
+    public string? Description { get; set; }
+    public double Quantity { get; set; }
+}
+
+public class WarehouseItemSend
+{
+    public string? Id { get; set; }
+    public string? MerchandiseId { get; set; }
+    public double Quantity { get; set; }
+}
+
 //public class Article
 //{
 //    public string? Id { get; set; }

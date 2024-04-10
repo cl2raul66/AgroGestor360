@@ -33,7 +33,7 @@ public class CustomersForLitedbService : ICustomersForLitedbService
 
     public vCard GetById(string id) => collection.FindById(id);
 
-    public string Insert(vCard entity) => collection.Insert(entity).ToString();
+    public string Insert(vCard entity) => collection.Insert(entity).AsString;
 
     public bool Update(vCard entity) => collection.Update(entity);
 

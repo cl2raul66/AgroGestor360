@@ -36,7 +36,7 @@ public class BanksForLitedbService : IBanksForLitedbService
 
     public ObjectId? GetIdByName(string name) => collection.FindOne(x => x.Name == name)?.Id;
 
-    public string Insert(Bank bank) => collection.Insert(bank).ToString();
+    public string Insert(Bank bank) => collection.Insert(bank).AsObjectId.ToString();
 
     public bool Update(Bank bank) => collection.Update(bank);
 
