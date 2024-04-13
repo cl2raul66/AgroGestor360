@@ -3,6 +3,7 @@
     x:Class="AgroGestor360.App.App"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:cnv="clr-namespace:AgroGestor360.App.Tools.Converters"
     xmlns:local="clr-namespace:AgroGestor360.App">
     <Application.Resources>
         <ResourceDictionary>
@@ -11,6 +12,8 @@
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
                 <ResourceDictionary Source="Resources/Styles/icofont.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <cnv:UnitToAbbreviationConverter x:Key="UnitToAbbreviation" />
+            <cnv:MerchandiseCategoryToHumanIdConverter x:Key="MerchandiseCategoryToHumanId" />
             <Style x:Key="BorderItem" TargetType="Border">
                 <Setter Property="StrokeShape" Value="RoundRectangle 4" />
                 <Setter Property="VisualStateManager.VisualStateGroups">

@@ -9,39 +9,33 @@ public interface IMerchandiseForLitedbService
     bool Exist { get; }
 
     bool Delete(ObjectId id);
-    IEnumerable<Merchandise> GetAllByName(string name);
-    IEnumerable<ObjectId> GetAllCategories();
-    IEnumerable<Merchandise> GetAllDisabled();
-    IEnumerable<Merchandise> GetAllEnabled();
-    Merchandise GetById(ObjectId id);
-    string Insert(Merchandise entity);
-    bool Update(Merchandise entity);
+    IEnumerable<MerchandiseItem> GetAll();
+    IEnumerable<MerchandiseCategory> GetAllCategories();
+    MerchandiseItem GetById(ObjectId id);
+    string Insert(MerchandiseItem entity);
+    bool Update(MerchandiseItem entity);
 }
 
 public class MerchandiseForLitedbService : IMerchandiseForLitedbService
 {
-    readonly ILiteCollection<Merchandise> collection;
+    readonly ILiteCollection<MerchandiseItem> collection;
 
     public MerchandiseForLitedbService(MerchandiseDbConfig dbConfig)
     {
-        collection = dbConfig.Bd.GetCollection<Merchandise>();
+        collection = dbConfig.Bd.GetCollection<MerchandiseItem>();
     }
 
     public bool Exist => collection.Count() > 0;
 
-    public IEnumerable<Merchandise> GetAllEnabled() => collection.Find(x => !x.Disabled);
+    public IEnumerable<MerchandiseItem> GetAll() => collection.FindAll() ?? [];
 
-    public IEnumerable<Merchandise> GetAllDisabled() => collection.Find(x => x.Disabled);
+    public IEnumerable<MerchandiseCategory> GetAllCategories() => collection.Find(Query.All()).Select(x => x.Category ?? new())?.Distinct() ?? [];
 
-    public IEnumerable<ObjectId> GetAllCategories() => collection.FindAll().Select(x => x.MerchandiseCategoryId!).Distinct();
+    public MerchandiseItem GetById(ObjectId id) => collection.FindById(id);
 
-    public Merchandise GetById(ObjectId id) => collection.FindById(id);
+    public string Insert(MerchandiseItem entity) => collection.Insert(entity).AsObjectId.ToString();
 
-    public IEnumerable<Merchandise> GetAllByName(string name) => collection.Find(x => x.Name!.Contains(name));
-
-    public string Insert(Merchandise entity) => collection.Insert(entity).AsObjectId.ToString();
-
-    public bool Update(Merchandise entity) => collection.Update(entity);
+    public bool Update(MerchandiseItem entity) => collection.Update(entity);
 
     public bool Delete(ObjectId id) => collection.Delete(id);
 }

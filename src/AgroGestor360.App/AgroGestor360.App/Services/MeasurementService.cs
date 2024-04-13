@@ -7,20 +7,22 @@ public interface IMeasurementService
 {
     IEnumerable<string> GetMeasurementNames();
     IEnumerable<string> GetNamesUnits(string measurement);
+    IEnumerable<string> GetAbbreviationUnits(string measurement);
     IEnumerable<string> GetNamesAndUnitsMeasurement(string measurement);
 }
 
 public class MeasurementService : IMeasurementService
 {
-
-    readonly Dictionary<string, string> measurementAll = new() {
+    readonly IReadOnlyDictionary<string, string> measurementAll = new Dictionary<string, string>() 
+    {
+        {"Unit", "Unidad"},
         {nameof(Area), "Area"},
         {nameof(Mass), "Masa"},
         {nameof(Length), "Longitud"},
-        {nameof(Volume), "Volumen"},
+        {nameof(Volume), "Volumen"}
     };
 
-    readonly Dictionary<string, string> areaUnit = new()
+    readonly IReadOnlyDictionary<string, string> areaUnit = new Dictionary<string, string>()
     {
         {nameof(AreaUnit.Acre),"Acre"},
         {nameof(AreaUnit.Hectare),"Hectárea"},
@@ -32,7 +34,7 @@ public class MeasurementService : IMeasurementService
         {nameof(AreaUnit.SquareYard),"Yarda cuadrada"}
     };
 
-    readonly Dictionary<string, string> massUnit = new()
+    readonly IReadOnlyDictionary<string, string> massUnit = new Dictionary<string, string>()
     {
         {nameof(MassUnit.Gram),"Gramo"},
         {nameof(MassUnit.Milligram),"Miligramo"},
@@ -41,7 +43,7 @@ public class MeasurementService : IMeasurementService
         {nameof(MassUnit.Ounce),"Onza"}
     };
 
-    readonly Dictionary<string, string> lengthUnit = new()
+    readonly IReadOnlyDictionary<string, string> lengthUnit = new Dictionary<string, string>()
     {
         {nameof(LengthUnit.Centimeter),"Centímetro"},
         {nameof(LengthUnit.Meter),"Metro"},
@@ -51,7 +53,7 @@ public class MeasurementService : IMeasurementService
         {nameof(LengthUnit.Yard),"Yarda"}
     };
 
-    readonly Dictionary<string, string> volumeUnit = new()
+    readonly IReadOnlyDictionary<string, string> volumeUnit = new Dictionary<string, string>()
     {
         {nameof(VolumeUnit.Milliliter),"Mililitro"},
         {nameof(VolumeUnit.Liter),"Litro"},
@@ -67,11 +69,20 @@ public class MeasurementService : IMeasurementService
 
     public IEnumerable<string> GetNamesUnits(string measurement) => measurement switch
     {
-        "Area" => areaUnit.Values,
-        "Masa" => massUnit.Values,
-        "Longitud" => lengthUnit.Values,
-        "Volumen" => volumeUnit.Values,
-        _ => Array.Empty<string>(),
+        "Area" => [.. areaUnit.Values],
+        "Masa" => [.. massUnit.Values],
+        "Longitud" => [.. lengthUnit.Values],
+        "Volumen" => [.. volumeUnit.Values],
+        _ => [],
+    };
+
+    public IEnumerable<string> GetAbbreviationUnits(string measurement) => measurement switch
+    {
+        "Area" => areaUnit.Select(x => Area.GetAbbreviation(Enum.Parse<AreaUnit>(x.Key))),
+        "Masa" => massUnit.Select(x => Mass.GetAbbreviation(Enum.Parse<MassUnit>(x.Key))),
+        "Longitud" => lengthUnit.Select(x => Length.GetAbbreviation(Enum.Parse<LengthUnit>(x.Key))),
+        "Volumen" => volumeUnit.Select(x => Volume.GetAbbreviation(Enum.Parse<VolumeUnit>(x.Key))),
+        _ => [],
     };
 
     public IEnumerable<string> GetNamesAndUnitsMeasurement(string measurement)

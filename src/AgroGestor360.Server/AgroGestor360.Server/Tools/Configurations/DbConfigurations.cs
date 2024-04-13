@@ -51,3 +51,18 @@ public class MerchandiseDbConfig
         Bd = new LiteDatabase(cnx);
     }
 }
+
+public class ProductsDbConfig
+{
+    public ILiteDatabase Bd { get; }
+
+    public ProductsDbConfig()
+    {
+        var cnx = new ConnectionString()
+        {
+            Filename = FileHelper.GetFileDbPath("Products")
+        };
+
+        Bd = new LiteDatabase(cnx);
+    }
+}

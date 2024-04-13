@@ -27,13 +27,6 @@ public class LedgerRecord
     public ObjectId? DetailId { get; set; }
 }
 
-public class WarehouseItem
-{
-    public ObjectId? Id { get; set; }
-    public ObjectId? MerchandiseId { get; set; }
-    public double Quantity { get; set; }
-}
-
 public class AccountsPayable
 {
     public ObjectId? Id { get; set; }

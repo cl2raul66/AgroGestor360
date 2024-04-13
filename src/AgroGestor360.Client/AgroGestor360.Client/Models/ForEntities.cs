@@ -1,4 +1,6 @@
-﻿using AgroGestor360.Client.Tools;
+﻿// Ignore Spelling: DTO
+
+using AgroGestor360.Client.Tools;
 using vCardLib.Models;
 
 namespace AgroGestor360.Client.Models;
@@ -61,18 +63,27 @@ public class Organization
 //    public double Value { get; set; }
 //}
 
-public class Merchandise
+#region Merchandise
+/// <summary>
+/// Object: MerchandiseItem
+/// <para>
+/// string [Id, Name, Description]
+/// Presentation [Packaging]
+/// MerchandiseCategory [Category]
+/// </para>
+/// </summary>
+public class DTO1
 {
     public string? Id { get; set; }
     public string? Name { get; set; }
     public Presentation? Packaging { get; set; }
-    public string? MerchandiseCategory { get; set; }
+    public MerchandiseCategory? Category { get; set; }
     public string? Description { get; set; }
 }
 
 public class MerchandiseCategory
 {
-    public string? Id { get; set; }
+    public int Id { get; set; }
     public string? Name { get; set; }
 }
 
@@ -82,45 +93,63 @@ public class Presentation
     public string? Unit { get; set; }
     public double Value { get; set; }
 }
+#endregion
 
-public class WarehouseItemGet
+#region Warehouse
+/// <summary>
+/// Object: WarehouseItem
+/// <para>
+/// string [Id] 
+/// DTO1 [Merchandise]
+/// double [Quantity]
+/// </para>
+/// </summary>
+public class DTO2
+{
+    public string? Id { get; set; }
+    public DTO1? Merchandise { get; set; }
+    public double Quantity { get; set; }
+}
+
+/// <summary>
+/// WarehouseItem 
+/// string [Id, Name, Unit,  Category] 
+/// double [Value, Quantity]
+/// </summary>
+public class DTO2_1
 {
     public string? Id { get; set; }
     public string? Name { get; set; }
-    public Presentation? Packaging { get; set; }
-    public string? MerchandiseCategory { get; set; }
-    public string? Description { get; set; }
+    public string? Unit { get; set; }
+    public double Value { get; set; }
+    public string? Category { get; set; }
     public double Quantity { get; set; }
 }
+#endregion
 
-public class WarehouseItemSend
+public class Article
 {
     public string? Id { get; set; }
-    public string? MerchandiseId { get; set; }
-    public double Quantity { get; set; }
+    public string? Merchandise { get; set; }
+    public double Price { get; set; }
 }
 
-//public class Article
-//{
-//    public string? Id { get; set; }
-//    public string? MerchandiseId { get; set; }
-//    public double Price { get; set; }
-//}
+public class Product
+{
+    public string? Id { get; set; }
+    public string? Article { get; set; }
+    public double Quantity { get; set; }
+    public double Price { get; set; }
+}
 
-//public class Product
-//{
-//    public string? Id { get; set; }
-//    public string? ArticlesId { get; set; }
-//    public double Quantity { get; set; }
-//}
-
-//public class ProductOffering
-//{
-//    public string? Id { get; set; }
-//    public string? ProductId { get; set; }
-//    public double Quantity { get; set; }
-//    public double BonusAmount { get; set; }
-//}
+public class ProductOffering
+{
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+    public double Quantity { get; set; }
+    public double BonusAmount { get; set; }
+    public double Price { get; set; }
+}
 
 public class BankAccount
 {

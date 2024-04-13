@@ -11,90 +11,66 @@ namespace AgroGestor360.Server.Controllers;
 public class MerchandiseController : ControllerBase
 {
     readonly IMerchandiseForLitedbService merchandiseServ;
-    readonly IMerchandiseCategoryForLitedbService merchandiseCategoryServ;
 
-    public MerchandiseController(IMerchandiseForLitedbService merchandiseService, IMerchandiseCategoryForLitedbService merchandiseCategoryService)
+    public MerchandiseController(IMerchandiseForLitedbService merchandiseService)
     {
         merchandiseServ = merchandiseService;
-        merchandiseCategoryServ = merchandiseCategoryService;
     }
 
     [HttpGet("exist")]
     public IActionResult CheckExistence()
     {
         bool exist = merchandiseServ.Exist;
-
         return Ok(exist);
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<MerchandiseDTO>> GetAllEnabled()
+    public ActionResult<IEnumerable<DTO1>> GetAll()
     {
-        var all = merchandiseServ.GetAllEnabled()?.Select(x => {
-            var dto = x.ToMerchandiseDTO();
-            dto.MerchandiseCategory = merchandiseServ.GetById(x.MerchandiseCategoryId!).Name;
-            return dto;
-        }) ?? [];
-
-        return !all?.Any() ?? true ? NotFound() : Ok(all);
-    }
-
-    [HttpGet("byname/{name}")]
-    public ActionResult<IEnumerable<MerchandiseDTO>> GetAllByName(string name)
-    {
-        var all = merchandiseServ.GetAllByName(name)?.Select(x => {
-            var dto = x.ToMerchandiseDTO();
-            dto.MerchandiseCategory = merchandiseServ.GetById(x.MerchandiseCategoryId!).Name;
-            return dto;
-        }) ?? [];
-
+        var all = merchandiseServ.GetAll()?.Select(x => x.ToDTO1()) ?? [];
         return !all?.Any() ?? true ? NotFound() : Ok(all);
     }
 
     [HttpGet("allcategories")]
-    public ActionResult<IEnumerable<string>> GetAllCategories()
+    public ActionResult<IEnumerable<MerchandiseCategory>> GetAllCategories()
     {
-        var all = merchandiseServ.GetAllCategories()?.Select(x => x.ToString()) ?? [];
-
+        var all = merchandiseServ.GetAllCategories();
         return !all?.Any() ?? true ? NotFound() : Ok(all);
     }
 
     [HttpGet("{id}")]
-    public ActionResult<MerchandiseDTO> GetById(string id)
+    public ActionResult<DTO1> GetById(string id)
     {
         var find = merchandiseServ.GetById(new ObjectId(id));
         if (find is null)
         {
             return NotFound();
         }
-
-        var dto = find.ToMerchandiseDTO();
-        dto.MerchandiseCategory = merchandiseServ.GetById(find.MerchandiseCategoryId!).Name;
+        var dto = find.ToDTO1();
         return Ok(dto);
     }
 
     [HttpPost]
-    public ActionResult<string> Post([FromBody] MerchandiseDTO dTO)
+    public ActionResult<string> Post([FromBody] DTO1 dTO)
     {
-        var entity = dTO.ToMerchandise();
+        var entity = dTO.FromDTO1();
         entity.Id = ObjectId.NewObjectId();
         var result = merchandiseServ.Insert(entity);
         return Ok(result);
     }
 
     [HttpPut]
-    public IActionResult Put([FromBody] MerchandiseDTO dTO)
+    public IActionResult Put([FromBody] DTO1 dTO)
     {
-        var updated = merchandiseServ.Update(dTO.ToMerchandise());
-
-        return Ok(updated);
+        var entity = dTO.FromDTO1();
+        var result = merchandiseServ.Update(entity);
+        return Ok(result);
     }
 
     [HttpDelete("{id}")]
     public IActionResult Delete(string id)
     {
         var deleted = merchandiseServ.Delete(new ObjectId(id));
-
         return Ok(deleted);
     }
 }

@@ -1,4 +1,6 @@
-﻿using AgroGestor360.Server.Tools.Enums;
+﻿// Ignore Spelling: DTO
+
+using AgroGestor360.Server.Tools.Enums;
 using LiteDB;
 using vCardLib.Models;
 
@@ -53,59 +55,79 @@ namespace AgroGestor360.Server.Models;
 //    public double Value { get; set; }
 //}
 
-public class MerchandiseDTO
+#region Merchandise
+/// <summary>
+/// Object: MerchandiseItem
+/// <para>
+/// string [Id, Name, Description]
+/// Presentation [Packaging]
+/// MerchandiseCategory [Category]
+/// </para>
+/// </summary>
+public class DTO1
 {
     public string? Id { get; set; }
     public string? Name { get; set; }
     public Presentation? Packaging { get; set; }
-    public string? MerchandiseCategory { get; set; }
+    public MerchandiseCategory? Category { get; set; }
     public string? Description { get; set; }
 }
-
-public class MerchandiseCategoryDTO
+#endregion
+#region Warehouse
+/// <summary>
+/// Object: WarehouseItem
+/// <para>
+/// string [Id] 
+/// DTO1 [Merchandise]
+/// double [Quantity]
+/// </para>
+/// </summary>
+public class DTO2
 {
     public string? Id { get; set; }
-    public string? Name { get; set; }
-}
-
-public class WarehouseItemGetDTO
-{
-    public string? Id { get; set; }
-    public string? Name { get; set; }
-    public Presentation? Packaging { get; set; }
-    public string? MerchandiseCategory { get; set; }
-    public string? Description { get; set; }
+    public DTO1? Merchandise { get; set; }
     public double Quantity { get; set; }
 }
 
-public class WarehouseItemSendDTO
+/// <summary>
+/// WarehouseItem 
+/// string [Id, Name, Unit,  Category] 
+/// double [Value, Quantity]
+/// </summary>
+public class DTO2_1
 {
     public string? Id { get; set; }
-    public string? MerchandiseId { get; set; }
+    public string? Name { get; set; }
+    public string? Unit { get; set; }
+    public double Value { get; set; }
+    public string? Category { get; set; }
     public double Quantity { get; set; }
 }
+#endregion
 
-//public class ArticleDTO
-//{
-//    public string? Id { get; set; }
-//    public string? MerchandiseId { get; set; }
-//    public double Price { get; set; }
-//}
+public class ArticleDTO
+{
+    public string? Id { get; set; }
+    public string? Merchandise { get; set; }
+    public double Price { get; set; }
+}
 
-//public class ProductDTO
-//{
-//    public string? Id { get; set; }
-//    public string? ArticlesId { get; set; }
-//    public double Quantity { get; set; }
-//}
+public class ProductDTO
+{
+    public string? Id { get; set; }
+    public string? Article { get; set; }
+    public double Quantity { get; set; }
+    public double Price { get; set; }
+}
 
-//public class ProductOfferingDTO
-//{
-//    public string? Id { get; set; }
-//    public string? ProductId { get; set; }
-//    public double Quantity { get; set; }
-//    public double BonusAmount { get; set; }
-//}
+public class ProductOfferingDTO
+{
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+    public double Quantity { get; set; }
+    public double BonusAmount { get; set; }
+    public double Price { get; set; }
+}
 
 public class BankAccountDTO
 {

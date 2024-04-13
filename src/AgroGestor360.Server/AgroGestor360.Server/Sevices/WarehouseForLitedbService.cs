@@ -10,8 +10,9 @@ public interface IWarehouseForLitedbService
 
     bool Delete(ObjectId id);
     IEnumerable<WarehouseItem> GetAll();
+    IEnumerable<MerchandiseCategory> GetAllCategories();
+    IEnumerable<MerchandiseItem> GetAllMerchandise();
     WarehouseItem GetById(ObjectId id);
-    WarehouseItem GetByMerchandiseId(ObjectId merchandiseId);
     string Insert(WarehouseItem entity);
     bool Update(WarehouseItem entity);
 }
@@ -35,9 +36,11 @@ public class WarehouseForLitedbService : IWarehouseForLitedbService
 
     public IEnumerable<WarehouseItem> GetAll() => collection.FindAll();
 
-    public WarehouseItem GetById(ObjectId id) => collection.FindById(id);
+    public IEnumerable<MerchandiseItem> GetAllMerchandise() => collection.Find(Query.All())?.Select(x => x.Merchandise ?? new()) ?? [];
 
-    public WarehouseItem GetByMerchandiseId(ObjectId merchandiseId) => collection.FindOne(x => x.MerchandiseId!.ToString() == merchandiseId.ToString());
+    public IEnumerable<MerchandiseCategory> GetAllCategories() => collection.Find(Query.All())?.Select(x => x.Merchandise?.Category ?? new()) ?? [];
+
+    public WarehouseItem GetById(ObjectId id) => collection.FindById(id);
 
     public string Insert(WarehouseItem entity) => collection.Insert(entity).AsObjectId.ToString();
 

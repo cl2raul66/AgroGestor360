@@ -1,4 +1,5 @@
 ﻿using AgroGestor360.Client.Models;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 
@@ -8,12 +9,11 @@ public interface IMerchandiseService
 {
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string id);
-    Task<IEnumerable<Merchandise>?> GetAllByNameAsync(string serverURL, string name);
-    Task<IEnumerable<string>?> GetAllCategoriesAsync(string serverURL);
-    Task<IEnumerable<Merchandise>?> GetAllEnabledAsync(string serverURL);
-    Task<Merchandise?> GetByIdAsync(string serverURL, string id);
-    Task<string> InsertAsync(string serverURL, Merchandise entity);
-    Task<bool> UpdateAsync(string serverURL, Merchandise entity);
+    Task<IEnumerable<DTO1>> GetAllAsync(string serverURL);
+    Task<IEnumerable<MerchandiseCategory>> GetAllCategoriesAsync(string serverURL);
+    Task<DTO1?> GetByIdAsync(string serverURL, string id);
+    Task<string> InsertAsync(string serverURL, DTO1 entity);
+    Task<bool> UpdateAsync(string serverURL, DTO1 entity);
 }
 
 public class MerchandiseService : IMerchandiseService
@@ -33,49 +33,50 @@ public class MerchandiseService : IMerchandiseService
         return false;
     }
 
-    public async Task<IEnumerable<Merchandise>?> GetAllEnabledAsync(string serverURL)
+    public async Task<IEnumerable<DTO1>> GetAllAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/merchandise");
 
-            response.EnsureSuccessStatusCode();
+            if (response.StatusCode is HttpStatusCode.NotFound)
+            {
+                return [];
+            }
+            else
+            {
+                response.EnsureSuccessStatusCode();
+            }
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<Merchandise>>(content, ApiServiceBase.ProviderJSONOptions);
+            return JsonSerializer.Deserialize<IEnumerable<DTO1>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
         }
-        return null;
+        return [];
     }
 
-    public async Task<IEnumerable<Merchandise>?> GetAllByNameAsync(string serverURL, string name)
-    {
-        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
-        {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/merchandise/byname/{name}");
-
-            response.EnsureSuccessStatusCode();
-
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<Merchandise>>(content, ApiServiceBase.ProviderJSONOptions);
-        }
-        return null;
-    }
-
-    public async Task<IEnumerable<string>?> GetAllCategoriesAsync(string serverURL)
+    public async Task<IEnumerable<MerchandiseCategory>> GetAllCategoriesAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/merchandise/allcategories");
 
-            response.EnsureSuccessStatusCode();
+            if (response.StatusCode is HttpStatusCode.NotFound)
+            {
+                return [];
+            }
+            else
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<string>>(content, ApiServiceBase.ProviderJSONOptions);
+            return JsonSerializer.Deserialize<IEnumerable<MerchandiseCategory>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
         }
-        return null;
+        return [];
     }
 
-    public async Task<Merchandise?> GetByIdAsync(string serverURL, string id)
+    public async Task<DTO1?> GetByIdAsync(string serverURL, string id)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
@@ -84,12 +85,12 @@ public class MerchandiseService : IMerchandiseService
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<Merchandise>(content, ApiServiceBase.ProviderJSONOptions);
+            return JsonSerializer.Deserialize<DTO1>(content, ApiServiceBase.ProviderJSONOptions);
         }
         return null;
     }
 
-    public async Task<string> InsertAsync(string serverURL, Merchandise entity)
+    public async Task<string> InsertAsync(string serverURL, DTO1 entity)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
@@ -105,7 +106,7 @@ public class MerchandiseService : IMerchandiseService
         return string.Empty;
     }
 
-    public async Task<bool> UpdateAsync(string serverURL, Merchandise entity)
+    public async Task<bool> UpdateAsync(string serverURL, DTO1 entity)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {

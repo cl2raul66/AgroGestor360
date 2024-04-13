@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AgroGestor360.App.ViewModels;
 
-[QueryProperty(nameof(CurrentCategory), nameof(CurrentCategory))]
+[QueryProperty(nameof(Categories), nameof(Categories))]
 public partial class PgAddWarehouseViewModel : ObservableValidator
 {
     readonly IMeasurementService measurementServ;
@@ -22,7 +22,13 @@ public partial class PgAddWarehouseViewModel : ObservableValidator
     }
 
     [ObservableProperty]
-    string? currentCategory;
+    List<MerchandiseCategory>? categories;
+
+    [ObservableProperty]
+    MerchandiseCategory? selectedCategory;
+
+    [ObservableProperty]
+    string? newCategory;
 
     [ObservableProperty]
     [Required]
@@ -77,13 +83,15 @@ public partial class PgAddWarehouseViewModel : ObservableValidator
             return;
         }
 
-        WeakReferenceMessenger.Default.Send(new WarehouseItemGet()
+        DTO1 merchandise = new()
         {
             Name = Name!.Trim().ToUpper(),
-            Packaging = IsUnit ? null : new() { Measure = SelectedMagnitude!.ToUpper(), Unit = SelectedUnit!.ToUpper(), Value = theValue },
-            Quantity = theQuantity,
-            Description = Description?.Trim().ToUpper()
-        }, "AddWarehouse");
+            Category = string.IsNullOrEmpty(NewCategory) ? SelectedCategory : new() { Name = NewCategory.Trim().ToUpper()},
+            Description = Description?.Trim().ToUpper(),
+            Packaging = IsUnit ? null : new() { Measure = SelectedMagnitude, Unit = SelectedUnit, Value = theValue }
+        };
+
+        WeakReferenceMessenger.Default.Send(new DTO2() { Merchandise = merchandise, Quantity = theQuantity }, "AddWarehouse");
 
         await Cancel();
     }
@@ -97,8 +105,10 @@ public partial class PgAddWarehouseViewModel : ObservableValidator
             {
                 return;
             }
-            Units = new(measurementServ.GetNamesAndUnitsMeasurement(SelectedMagnitude!));
-            SelectedUnit = Units.First();
+            var getUnits = measurementServ.GetNamesAndUnitsMeasurement(SelectedMagnitude);
+            Units = !getUnits?.Any() ?? true ? null : new(getUnits!);
+            SelectedUnit = Units?.First();
+            IsUnit = SelectedUnit is null;
         }
     }
 }

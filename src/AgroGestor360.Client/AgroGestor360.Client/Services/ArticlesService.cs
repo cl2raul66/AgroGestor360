@@ -4,23 +4,23 @@ using System.Text.Json;
 
 namespace AgroGestor360.Client.Services;
 
-public interface IMerchandiseCategoryService
+public interface IArticlesService
 {
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string id);
-    Task<IEnumerable<MerchandiseCategory>?> GetAllAsync(string serverURL);
-    Task<MerchandiseCategory?> GetByIdAsync(string serverURL, string id);
-    Task<string> InsertAsync(string serverURL, MerchandiseCategory entity);
-    Task<bool> UpdateAsync(string serverURL, MerchandiseCategory entity);
+    Task<IEnumerable<Article>?> GetAllEnabledAsync(string serverURL);
+    Task<Article?> GetByIdAsync(string serverURL, string id);
+    Task<string> InsertAsync(string serverURL, Article entity);
+    Task<bool> UpdateAsync(string serverURL, Article entity);
 }
 
-public class MerchandiseCategoryService : IMerchandiseCategoryService
+public class ArticlesService : IArticlesService
 {
     public async Task<bool> CheckExistence(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/merchandisecategory/exist");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/articles/exist");
 
             if (response.IsSuccessStatusCode)
             {
@@ -31,41 +31,41 @@ public class MerchandiseCategoryService : IMerchandiseCategoryService
         return false;
     }
 
-    public async Task<IEnumerable<MerchandiseCategory>?> GetAllAsync(string serverURL)
+    public async Task<IEnumerable<Article>?> GetAllEnabledAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/merchandisecategory");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/articles");
 
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<MerchandiseCategory>>(content, ApiServiceBase.ProviderJSONOptions);
+            return JsonSerializer.Deserialize<IEnumerable<Article>>(content, ApiServiceBase.ProviderJSONOptions);
         }
         return null;
     }
 
-    public async Task<MerchandiseCategory?> GetByIdAsync(string serverURL, string id)
+    public async Task<Article?> GetByIdAsync(string serverURL, string id)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/merchandisecategory/{id}");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/articles/{id}");
 
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<MerchandiseCategory>(content, ApiServiceBase.ProviderJSONOptions);
+            return JsonSerializer.Deserialize<Article>(content, ApiServiceBase.ProviderJSONOptions);
         }
         return null;
     }
 
-    public async Task<string> InsertAsync(string serverURL, MerchandiseCategory entity)
+    public async Task<string> InsertAsync(string serverURL, Article entity)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var entityJson = JsonSerializer.Serialize(entity);
             var data = new StringContent(entityJson, Encoding.UTF8, "application/json");
-            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/merchandisecategory", data);
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/articles", data);
 
             if (response.IsSuccessStatusCode)
             {
@@ -75,12 +75,12 @@ public class MerchandiseCategoryService : IMerchandiseCategoryService
         return string.Empty;
     }
 
-    public async Task<bool> UpdateAsync(string serverURL, MerchandiseCategory entity)
+    public async Task<bool> UpdateAsync(string serverURL, Article entity)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var entityJson = JsonSerializer.Serialize(entity);
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/merchandisecategory", new StringContent(entityJson, Encoding.UTF8, "application/json"));
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/articles", new StringContent(entityJson, Encoding.UTF8, "application/json"));
 
             return response.IsSuccessStatusCode;
         }
@@ -91,7 +91,7 @@ public class MerchandiseCategoryService : IMerchandiseCategoryService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/merchandisecategory/{id}");
+            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/articles/{id}");
 
             return response.IsSuccessStatusCode;
         }

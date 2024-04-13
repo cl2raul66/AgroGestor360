@@ -16,7 +16,7 @@
         HorizontalOptions="Center"
         MaximumWidthRequest="480"
         VerticalOptions="Center">
-        <Grid RowDefinitions="auto,*,auto" RowSpacing="8">
+        <Grid RowDefinitions="auto,*,auto" RowSpacing="16">
             <Label
                 FontSize="18"
                 Text="Agregar mercancía"
@@ -24,16 +24,6 @@
                 VerticalOptions="Center" />
             <ScrollView Grid.Row="1">
                 <VerticalStackLayout Spacing="8">
-                    <Grid
-                        Grid.Column="1"
-                        RowDefinitions="auto,auto"
-                        RowSpacing="4">
-                        <Label Text="Categoría:" />
-                        <Label
-                            Grid.Row="1"
-                            HorizontalOptions="Center"
-                            Text="{Binding CurrentCategory, Mode=OneWay}" />
-                    </Grid>
                     <Grid RowDefinitions="auto,auto" RowSpacing="4">
                         <Label Text="Nombre: *" />
                         <Entry
@@ -45,11 +35,46 @@
                             Placeholder="Escriba aquí"
                             Text="{Binding Name}" />
                     </Grid>
+                    <Grid
+                        Grid.Column="1"
+                        RowDefinitions="auto,auto"
+                        RowSpacing="4">
+                        <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                            <Label Text="Categoría:" />
+                            <Button
+                                Grid.Column="1"
+                                FontFamily="icofont"
+                                IsVisible="{Binding Categories, Mode=OneWay, Converter={ctk:IsListNotNullOrEmptyConverter}}"
+                                Text="{StaticResource Plus}" />
+                        </Grid>
+                        <VerticalStackLayout Grid.Row="1" Spacing="8">
+                            <Picker
+                                IsVisible="{Binding Categories, Mode=OneWay, Converter={ctk:IsListNotNullOrEmptyConverter}}"
+                                ItemDisplayBinding="{Binding Name}"
+                                ItemsSource="{Binding Categories, Mode=OneWay}"
+                                SelectedItem="{Binding SelectedCategory}" />
+                            <Entry
+                                ClearButtonVisibility="WhileEditing"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Keyboard="Plain"
+                                Placeholder="Escriba aquí"
+                                Text="{Binding NewCategory}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                        <Label Text="Descripción: *" />
+                        <Editor
+                            Grid.Row="1"
+                            HeightRequest="64"
+                            IsSpellCheckEnabled="True"
+                            IsTextPredictionEnabled="True"
+                            Keyboard="Plain"
+                            Placeholder="Escriba aquí"
+                            Text="{Binding Description}" />
+                    </Grid>
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                        <Grid
-                            HorizontalOptions="Start"
-                            RowDefinitions="auto,auto"
-                            RowSpacing="4">
+                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
                             <Label Text="Cantidad unitaria: *" />
                             <Entry
                                 Grid.Row="1"
@@ -63,14 +88,13 @@
                         </Grid>
                         <Grid
                             Grid.Column="1"
-                            ColumnDefinitions="auto,auto"
-                            ColumnSpacing="4"
-                            VerticalOptions="End">
-                            <CheckBox IsChecked="{Binding IsUnit, Mode=TwoWay}" />
-                            <Label
-                                Grid.Column="1"
-                                Text="Es por unidades"
-                                VerticalOptions="Center" />
+                            RowDefinitions="auto,auto"
+                            RowSpacing="4">
+                            <Label Text="Magnitud:" />
+                            <Picker
+                                Grid.Row="1"
+                                ItemsSource="{Binding Magnitudes, Mode=OneWay}"
+                                SelectedItem="{Binding SelectedMagnitude}" />
                         </Grid>
                     </Grid>
                     <Label
@@ -81,54 +105,31 @@
                         TextTransform="Uppercase"
                         VerticalOptions="Center" />
                     <Grid
-                        ColumnDefinitions="*,2*"
+                        ColumnDefinitions="*,*"
                         ColumnSpacing="8"
                         IsVisible="{Binding IsUnit, Mode=OneWay, Converter={ctk:InvertedBoolConverter}}">
                         <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                            <Label Text="Magnitud:" />
-                            <Picker
-                                Grid.Row="1"
-                                ItemsSource="{Binding Magnitudes, Mode=OneWay}"
-                                SelectedItem="{Binding SelectedMagnitude}" />
-                        </Grid>
-                        <Grid
-                            Grid.Column="1"
-                            RowDefinitions="auto,auto"
-                            RowSpacing="4">
                             <Label Text="Medida base:" />
                             <Picker
                                 Grid.Row="1"
                                 ItemsSource="{Binding Units, Mode=OneWay}"
                                 SelectedItem="{Binding SelectedUnit}" />
                         </Grid>
-                    </Grid>
-                    <Grid
-                        HorizontalOptions="Start"
-                        IsVisible="{Binding IsUnit, Mode=OneWay, Converter={ctk:InvertedBoolConverter}}"
-                        RowDefinitions="auto,auto"
-                        RowSpacing="4"
-                        WidthRequest="100">
-                        <Label Text="Valor: *" />
-                        <Entry
-                            Grid.Row="1"
-                            ClearButtonVisibility="WhileEditing"
-                            HorizontalTextAlignment="End"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Keyboard="Numeric"
-                            Placeholder="0.00"
-                            Text="{Binding Value}" />
-                    </Grid>
-                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                        <Label Text="Descripción: *" />
-                        <Editor
-                            Grid.Row="1"
-                            HeightRequest="64"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Keyboard="Plain"
-                            Placeholder="Escriba aquí"
-                            Text="{Binding Description}" />
+                        <Grid
+                            Grid.Column="1"
+                            RowDefinitions="auto,auto"
+                            RowSpacing="4">
+                            <Label Text="Valor: *" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                HorizontalTextAlignment="End"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Keyboard="Numeric"
+                                Placeholder="0.00"
+                                Text="{Binding Value}" />
+                        </Grid>
                     </Grid>
                 </VerticalStackLayout>
             </ScrollView>

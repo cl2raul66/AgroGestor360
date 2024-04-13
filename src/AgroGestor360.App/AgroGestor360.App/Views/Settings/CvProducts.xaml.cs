@@ -8,6 +8,7 @@ public partial class CvProducts : ContentView
 	{
 		InitializeComponent();
 
+		vm.Initialize();
 		BindingContext = vm;
 	}
 }

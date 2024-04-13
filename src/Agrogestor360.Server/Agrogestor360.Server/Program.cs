@@ -11,14 +11,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<BanksDbConfig>();
 builder.Services.AddSingleton<ContactsDbConfig>();
 builder.Services.AddSingleton<MerchandiseDbConfig>();
+builder.Services.AddSingleton<ProductsDbConfig>();
 builder.Services.AddSingleton<IBanksForLitedbService, BanksForLitedbService>();
 builder.Services.AddSingleton<IBankAccountsForLitedbService, BankAccountsForLitedbService>();
 builder.Services.AddSingleton<IShareholderForLitedbService, ShareholderForLitedbService>();
 builder.Services.AddSingleton<ISellersForLitedbService, SellersForLitedbService>();
 builder.Services.AddSingleton<ICustomersForLitedbService, CustomersForLitedbService>();
-builder.Services.AddSingleton<IMerchandiseCategoryForLitedbService, MerchandiseCategoryForLitedbService>();
 builder.Services.AddSingleton<IMerchandiseForLitedbService, MerchandiseForLitedbService>();
 builder.Services.AddSingleton<IWarehouseForLitedbService, WarehouseForLitedbService>();
+builder.Services.AddSingleton<IArticlesForLitedbService, ArticlesForLitedbService>();
+builder.Services.AddSingleton<IProductsForLitedbService, ProductsForLitedbService>();
+builder.Services.AddSingleton<IProductsOfferingsForLitedbService, ProductsOfferingsForLitedbService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();

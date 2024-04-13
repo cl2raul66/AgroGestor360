@@ -18,194 +18,75 @@
                     Text="Almacén"
                     TextTransform="Uppercase"
                     VerticalOptions="Center" />
-                <!--<HorizontalStackLayout Grid.Column="2" Spacing="8">
+                <HorizontalStackLayout Grid.Column="2" Spacing="8">
                     <Button
-                        Command="{Binding AddMerchandiseCommand}"
+                        Command="{Binding AddWarehouseCommand}"
                         FontFamily="icofont"
                         Text="{StaticResource Plus}"
                         ToolTipProperties.Text="Agregar" />
                     <Button
                         FontFamily="icofont"
+                        IsEnabled="{Binding SelectedWarehouse, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                         Text="{StaticResource UiDelete}"
                         ToolTipProperties.Text="Eliminar" />
-                </HorizontalStackLayout>-->
+                </HorizontalStackLayout>
             </Grid>
         </Frame>
         <!--#endregion-->
         <!--#region CONTENIDO-->
-        <Grid
-            Grid.Row="1"
-            Padding="8"
-            ColumnDefinitions="280,auto,*"
-            ColumnSpacing="8">
-            <!--#region PANEL IZQUIERDO-->
-            <Grid RowDefinitions="auto,*,auto" RowSpacing="8">
-                <VerticalStackLayout Spacing="8">
-                    <Label
-                        FontSize="18"
-                        Text="Categorías"
-                        TextTransform="Uppercase"
-                        VerticalOptions="Center" />
-                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                        <Entry
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Placeholder="Escriba aquí" />
-                        <Button
-                            Grid.Column="1"
-                            FontFamily="icofont"
-                            Text="{StaticResource Search}"
-                            ToolTipProperties.Text="Buscar" />
-                    </Grid>
-                </VerticalStackLayout>
-                <ScrollView Grid.Row="1">
-                    <CollectionView
-                        ItemsSource="{Binding Categories, Mode=OneWay}"
-                        SelectedItem="{Binding SelectedCategory}"
-                        SelectionMode="Single">
-                        <CollectionView.ItemsLayout>
-                            <LinearItemsLayout ItemSpacing="4" Orientation="Vertical" />
-                        </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="model:MerchandiseCategory">
-                                <Border Style="{StaticResource BorderItem}">
+        <ScrollView Grid.Row="1">
+            <CollectionView
+                ItemsSource="{Binding Warehouses, Mode=OneWay}"
+                SelectedItem="{Binding SelectedWarehouse}"
+                SelectionMode="Single">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout
+                        HorizontalItemSpacing="4"
+                        Orientation="Vertical"
+                        Span="7"
+                        VerticalItemSpacing="4" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:DTO2_1">
+                        <Border Style="{StaticResource BorderItem}">
+                            <VerticalStackLayout Spacing="4">
+                                <Label
+                                    FontSize="Title"
+                                    HorizontalOptions="Center"
+                                    Text="{Binding Quantity, Mode=OneWay}"
+                                    TextColor="{StaticResource White}" />
+                                <Label
+                                    HorizontalOptions="Center"
+                                    LineBreakMode="TailTruncation"
+                                    Text="{Binding Name, Mode=OneWay}"
+                                    TextColor="{StaticResource White}" />
+                                <Grid ColumnDefinitions="*,auto" ColumnSpacing="2">
                                     <Label
-                                        FontSize="Caption"
-                                        LineBreakMode="MiddleTruncation"
-                                        Text="{Binding Name}"
-                                        TextColor="{StaticResource White}" />
-                                </Border>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </ScrollView>
-                <Frame Grid.Row="2" Padding="8">
-                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                            <Button
-                                Grid.Column="1"
-                                Command="{Binding AddWarehouseCommand}"
-                                FontFamily="icofont"
-                                IsEnabled="{Binding SelectedCategory, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
-                                Text="{StaticResource ArrowRight}"
-                                ToolTipProperties.Text="Crear mercancia con la categoria seleccionada" />
-                            <BoxView
-                                BackgroundColor="{StaticResource Gray300}"
-                                CornerRadius="2"
-                                WidthRequest="2" />
-                            <Button
-                                Command="{Binding AddCategoryCommand}"
-                                FontFamily="icofont"
-                                Text="{StaticResource Plus}"
-                                ToolTipProperties.Text="Agregar" />
-                            <Button
-                                Command="{Binding RemoveCategoryCommand}"
-                                FontFamily="icofont"
-                                IsEnabled="{Binding SelectedCategory, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
-                                Text="{StaticResource UiDelete}"
-                                ToolTipProperties.Text="Eliminar" />
-                        </HorizontalStackLayout>
-                    </Grid>
-                </Frame>
-            </Grid>
-            <!--#endregion-->
-            <BoxView
-                Grid.RowSpan="3"
-                Grid.Column="1"
-                BackgroundColor="{StaticResource Gray300}"
-                CornerRadius="2"
-                WidthRequest="2" />
-            <!--#region PANEL DERECHO-->
-            <Grid
-                Grid.Column="2"
-                RowDefinitions="auto,*,auto"
-                RowSpacing="8">
-                <VerticalStackLayout Grid.Column="2" Spacing="8">
-                    <Label
-                        FontSize="18"
-                        Text="Mercancías en almacén"
-                        TextTransform="Uppercase"
-                        VerticalOptions="Center" />
-                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                        <Entry
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Placeholder="Escriba aquí" />
-                        <Button
-                            Grid.Column="1"
-                            FontFamily="icofont"
-                            Text="{StaticResource Search}"
-                            ToolTipProperties.Text="Buscar" />
-                    </Grid>
-                    <HorizontalStackLayout Spacing="8">
-                        <RadioButton>
-                            <RadioButton.Content>
-                                <Label Text="Por nombre" VerticalOptions="Center" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                        <RadioButton>
-                            <RadioButton.Content>
-                                <Label Text="Por categoría" VerticalOptions="Center" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                    </HorizontalStackLayout>
-                </VerticalStackLayout>
-                <ScrollView Grid.Row="1" Grid.Column="2">
-                    <CollectionView
-                        ItemsSource="{Binding Warehouses, Mode=OneWay}"
-                        SelectedItem="{Binding SelectedWarehouse}"
-                        SelectionMode="Single">
-                        <CollectionView.ItemsLayout>
-                            <GridItemsLayout
-                                HorizontalItemSpacing="4"
-                                Orientation="Vertical"
-                                Span="7"
-                                VerticalItemSpacing="4" />
-                        </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="model:WarehouseItemGet">
-                                <Border Style="{StaticResource BorderItem}">
-                                    <VerticalStackLayout Spacing="4">
-                                        <Label
-                                            FontSize="Title"
-                                            HorizontalOptions="Center"
-                                            Text="{Binding Quantity, Mode=OneWay}"
-                                            TextColor="{StaticResource White}" />
-                                        <Label
-                                            HorizontalOptions="Center"
-                                            LineBreakMode="MiddleTruncation"
-                                            Text="{Binding Name, Mode=OneWay}"
-                                            TextColor="{StaticResource White}" />
-                                    </VerticalStackLayout>
-                                </Border>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </ScrollView>
-                <Frame
-                    Grid.Row="2"
-                    Grid.Column="2"
-                    Padding="8">
-                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                            <!--<Button
-                                Command="{Binding AddMerchandiseCommand}"
-                                FontFamily="icofont"
-                                Text="{StaticResource Plus}"
-                                ToolTipProperties.Text="Agregar" />-->
-                            <Button
-                                FontFamily="icofont"
-                                IsEnabled="{Binding SelectedWarehouse, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
-                                Text="{StaticResource UiDelete}"
-                                ToolTipProperties.Text="Eliminar" />
-                        </HorizontalStackLayout>
-                    </Grid>
-                </Frame>
-            </Grid>
-            <!--#endregion-->
-        </Grid>
+                                        FontSize="10"
+                                        LineBreakMode="TailTruncation"
+                                        Text="{Binding Category, Mode=OneWay, Converter={StaticResource MerchandiseCategoryToHumanId}}"
+                                        TextColor="{StaticResource White}"
+                                        ToolTipProperties.Text="{Binding Category}" />
+                                    <Label
+                                        Grid.Column="1"
+                                        FontSize="10"
+                                        ToolTipProperties.Text="{Binding Unit}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding Value, Mode=OneWay, StringFormat='{0:F2}'}" TextColor="{StaticResource White}" />
+                                                <Span Text=" " />
+                                                <Span Text="{Binding Unit, Mode=OneWay, Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ScrollView>
+        <!--#endregion-->
     </Grid>
 
 </ContentView>

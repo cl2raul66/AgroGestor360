@@ -62,21 +62,18 @@ public class CustomerDiscountClass
     public double Value { get; set; }
 }
 
-public class Merchandise
+public class MerchandiseItem
 {
     public ObjectId? Id { get; set; }
     public string? Name { get; set; }
     public Presentation? Packaging { get; set; }
-    public ObjectId? MerchandiseCategoryId { get; set; }
+    public MerchandiseCategory? Category { get; set; }
     public string? Description { get; set; }
-    public bool Disabled { get; set; }
 }
 
 public class MerchandiseCategory
 {
-    public ObjectId? Id { get; set; }
     public string? Name { get; set; }
-    public bool Disabled { get; set; }
 }
 
 public class Presentation
@@ -86,11 +83,19 @@ public class Presentation
     public double Value { get; set; }
 }
 
+public class WarehouseItem
+{
+    public ObjectId? Id { get; set; }
+    public MerchandiseItem? Merchandise { get; set; }
+    public double Quantity { get; set; }
+}
+
 public class Article
 {
     public ObjectId? Id { get; set; }
     public ObjectId? MerchandiseId { get; set; }
     public double Price { get; set; }
+    public bool Disabled { get; set; }
 }
 
 public class Product
@@ -98,12 +103,14 @@ public class Product
     public ObjectId? Id { get; set; }
     public ObjectId? ArticlesId { get; set; }
     public double Quantity { get; set; }
+    public bool Disabled { get; set; }
 }
 
 public class ProductOffering
 {
     public ObjectId? Id { get; set; }
     public ObjectId? ProductId { get; set; }
+    public int? Version { get; set; }
     public double Quantity { get; set; }
     public double BonusAmount { get; set; }
 }
