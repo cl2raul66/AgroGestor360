@@ -10,9 +10,9 @@ namespace AgroGestor360.Server.Controllers;
 [Route("[controller]")]
 public class MerchandiseController : ControllerBase
 {
-    readonly IMerchandiseForLitedbService merchandiseServ;
+    readonly IMerchandiseInLiteDbService merchandiseServ;
 
-    public MerchandiseController(IMerchandiseForLitedbService merchandiseService)
+    public MerchandiseController(IMerchandiseInLiteDbService merchandiseService)
     {
         merchandiseServ = merchandiseService;
     }

@@ -43,13 +43,25 @@
                             <Label Text="Categoría:" />
                             <Button
                                 Grid.Column="1"
+                                Command="{Binding SetNewCategoryCommand}"
                                 FontFamily="icofont"
                                 IsVisible="{Binding Categories, Mode=OneWay, Converter={ctk:IsListNotNullOrEmptyConverter}}"
-                                Text="{StaticResource Plus}" />
+                                Text="{StaticResource Plus}">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Button" Binding="{Binding IsSetNewCategory}" Value="true">
+                                                <Setter Property="BackgroundColor" Value="{StaticResource Gray200}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
                         </Grid>
                         <VerticalStackLayout Grid.Row="1" Spacing="8">
                             <Picker
-                                IsVisible="{Binding Categories, Mode=OneWay, Converter={ctk:IsListNotNullOrEmptyConverter}}"
+                                IsVisible="{Binding IsSetNewCategory, Mode=OneWay, Converter={ctk:InvertedBoolConverter}}"
                                 ItemDisplayBinding="{Binding Name}"
                                 ItemsSource="{Binding Categories, Mode=OneWay}"
                                 SelectedItem="{Binding SelectedCategory}" />
@@ -57,6 +69,7 @@
                                 ClearButtonVisibility="WhileEditing"
                                 IsSpellCheckEnabled="True"
                                 IsTextPredictionEnabled="True"
+                                IsVisible="{Binding IsSetNewCategory, Mode=OneWay}"
                                 Keyboard="Plain"
                                 Placeholder="Escriba aquí"
                                 Text="{Binding NewCategory}" />

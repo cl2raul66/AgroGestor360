@@ -83,34 +83,31 @@ public class Presentation
     public double Value { get; set; }
 }
 
-public class WarehouseItem
+public class ArticleItemForWarehouse
 {
     public ObjectId? Id { get; set; }
     public MerchandiseItem? Merchandise { get; set; }
     public double Quantity { get; set; }
 }
 
-public class Article
+public class ArticleItemForSale
 {
     public ObjectId? Id { get; set; }
-    public ObjectId? MerchandiseId { get; set; }
+    public MerchandiseItem? Merchandise { get; set; }
     public double Price { get; set; }
-    public bool Disabled { get; set; }
 }
 
-public class Product
+public class ProductItemForSale
 {
     public ObjectId? Id { get; set; }
-    public ObjectId? ArticlesId { get; set; }
+    public ArticleItemForSale? Article { get; set; }
     public double Quantity { get; set; }
-    public bool Disabled { get; set; }
+    public List<ProductOffering>? Offering { get; set; }
 }
 
 public class ProductOffering
 {
-    public ObjectId? Id { get; set; }
-    public ObjectId? ProductId { get; set; }
-    public int? Version { get; set; }
+    public int? Id { get; set; }
     public double Quantity { get; set; }
     public double BonusAmount { get; set; }
 }

@@ -10,25 +10,37 @@
     x:DataType="vm:CvProductsViewModel">
     <ContentView.Resources>
         <ResourceDictionary>
-            <DataTemplate x:Key="PriceZeroTemplate" x:DataType="model:Article">
+            <DataTemplate x:Key="PriceZeroTemplate" x:DataType="model:DTO3_1">
                 <Border Style="{StaticResource BorderItem}">
-                    <Label
-                        LineBreakMode="TailTruncation"
-                        Text="{Binding Merchandise}"
-                        TextColor="{StaticResource White}" />
+                    <Label LineBreakMode="TailTruncation">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{Binding Name, Mode=OneWay, StringFormat='{0}'}" TextColor="{StaticResource White}" />
+                                <Span Text=" " />
+                                <Span Text="{Binding Value, Mode=OneWay, StringFormat='[{0:F2}'}" TextColor="{StaticResource White}" />
+                                <Span Text=" " />
+                                <Span Text="{Binding Unit, Mode=OneWay, StringFormat='{0}]', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
                 </Border>
             </DataTemplate>
-            <DataTemplate x:Key="PriceNonZeroTemplate" x:DataType="model:Article">
+            <DataTemplate x:Key="PriceNonZeroTemplate" x:DataType="model:DTO3_1">
                 <Border Style="{StaticResource BorderItem}">
                     <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                        <Label
-                            LineBreakMode="TailTruncation"
-                            Text="{Binding Price}"
-                            TextColor="{StaticResource White}" />
+                        <Label LineBreakMode="MiddleTruncation">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding Name, Mode=OneWay, StringFormat='{0} '}" TextColor="{StaticResource White}" />
+                                    <Span Text="{Binding Value, Mode=OneWay, StringFormat='{0:F2} '}" TextColor="{StaticResource White}" />
+                                    <Span Text="{Binding Unit, Mode=OneWay, Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
                         <Label
                             Grid.Column="1"
                             LineBreakMode="TailTruncation"
-                            Text="{Binding Merchandise}"
+                            Text="{Binding Price, StringFormat='Precio: {0:F2}'}"
                             TextColor="{StaticResource White}" />
                     </Grid>
                 </Border>
@@ -83,7 +95,7 @@
                         Text="Artículos"
                         TextTransform="Uppercase"
                         VerticalOptions="Center" />
-                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <!--<Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                         <Entry
                             ClearButtonVisibility="WhileEditing"
                             IsSpellCheckEnabled="True"
@@ -129,7 +141,7 @@
                                 <Label Text="Por categoría" VerticalOptions="Center" />
                             </RadioButton.Content>
                         </RadioButton>
-                    </HorizontalStackLayout>
+                    </HorizontalStackLayout>-->
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1">
                     <CollectionView
@@ -199,7 +211,7 @@
                         Text="Productos"
                         TextTransform="Uppercase"
                         VerticalOptions="Center" />
-                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <!--<Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                         <Entry
                             ClearButtonVisibility="WhileEditing"
                             IsSpellCheckEnabled="True"
@@ -250,7 +262,7 @@
                                 <Label Text="Por cantidad unitaria" VerticalOptions="Center" />
                             </RadioButton.Content>
                         </RadioButton>
-                    </HorizontalStackLayout>
+                    </HorizontalStackLayout>-->
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1">
                     <CollectionView />
@@ -300,7 +312,7 @@
                         Text="Ofertas del producto"
                         TextTransform="Uppercase"
                         VerticalOptions="Center" />
-                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <!--<Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                         <Entry
                             ClearButtonVisibility="WhileEditing"
                             IsSpellCheckEnabled="True"
@@ -323,7 +335,7 @@
                                 <Label Text="Por bonificación" VerticalOptions="Center" />
                             </RadioButton.Content>
                         </RadioButton>
-                    </HorizontalStackLayout>
+                    </HorizontalStackLayout>-->
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1">
                     <CollectionView />

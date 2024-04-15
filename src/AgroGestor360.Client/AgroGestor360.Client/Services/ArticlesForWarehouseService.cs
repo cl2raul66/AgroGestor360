@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace AgroGestor360.Client.Services;
 
-public interface IWarehouseService
+public interface IArticlesForWarehouseService
 {
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string id);
@@ -18,13 +18,13 @@ public interface IWarehouseService
     Task<bool> UpdateAsync(string serverURL, DTO2 entity);
 }
 
-public class WarehouseService : IWarehouseService
+public class ArticlesForWarehouseService : IArticlesForWarehouseService
 {
     public async Task<bool> CheckExistence(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/warehouse/exist");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/articlesforwarehouse/exist");
 
             if (response.IsSuccessStatusCode)
             {
@@ -39,7 +39,7 @@ public class WarehouseService : IWarehouseService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/warehouse");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/articlesforwarehouse");
 
             if (response.StatusCode is HttpStatusCode.NotFound)
             {
@@ -60,7 +60,7 @@ public class WarehouseService : IWarehouseService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/warehouse/all1");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/articlesforwarehouse/all1");
 
             if (response.StatusCode is HttpStatusCode.NotFound)
             {
@@ -81,7 +81,7 @@ public class WarehouseService : IWarehouseService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/warehouse/allmerchandise");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/articlesforwarehouse/allmerchandise");
 
             if (response.StatusCode is HttpStatusCode.NotFound)
             {
@@ -102,7 +102,7 @@ public class WarehouseService : IWarehouseService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/warehouse/allcategories");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/articlesforwarehouse/allcategories");
 
             if (response.StatusCode is HttpStatusCode.NotFound)
             {
@@ -123,7 +123,7 @@ public class WarehouseService : IWarehouseService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/warehouse/{id}");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/articlesforwarehouse/{id}");
 
             if (response.StatusCode is HttpStatusCode.NotFound)
             {
@@ -146,7 +146,7 @@ public class WarehouseService : IWarehouseService
         {
             var entityJson = JsonSerializer.Serialize(entity);
             var data = new StringContent(entityJson, Encoding.UTF8, "application/json");
-            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/warehouse", data);
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/articlesforwarehouse", data);
 
             if (response.IsSuccessStatusCode)
             {
@@ -161,7 +161,7 @@ public class WarehouseService : IWarehouseService
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var entityJson = JsonSerializer.Serialize(entity);
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/warehouse", new StringContent(entityJson, Encoding.UTF8, "application/json"));
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/articlesforwarehouse", new StringContent(entityJson, Encoding.UTF8, "application/json"));
 
             return response.IsSuccessStatusCode;
         }
@@ -172,7 +172,7 @@ public class WarehouseService : IWarehouseService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/warehouse/{id}");
+            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/articlesforwarehouse/{id}");
 
             return response.IsSuccessStatusCode;
         }

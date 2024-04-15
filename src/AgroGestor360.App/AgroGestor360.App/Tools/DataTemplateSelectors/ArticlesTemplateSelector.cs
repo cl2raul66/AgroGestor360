@@ -15,6 +15,6 @@ public class ArticlesTemplateSelector : DataTemplateSelector
 
     protected override DataTemplate OnSelectTemplate(object item, BindableObject container)
     {
-        return ((Article)item).Price == 0 ? ArticlePriceZeroTemplate : ArticlePriceNonZeroTemplate;
+        return ((DTO3_1)item).Price == 0 ? ArticlePriceZeroTemplate : ArticlePriceNonZeroTemplate;
     }
 }

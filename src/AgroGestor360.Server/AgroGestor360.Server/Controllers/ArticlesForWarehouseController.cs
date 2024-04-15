@@ -8,19 +8,19 @@ namespace AgroGestor360.Server.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class WarehouseController : Controller
+public class ArticlesForWarehouseController : Controller
 {
-    readonly IWarehouseForLitedbService warehouseServ;
+    readonly IArticlesForWarehouseInLiteDbService articlesForWarehouseServ;
 
-    public WarehouseController(IWarehouseForLitedbService warehouseService)
+    public ArticlesForWarehouseController(IArticlesForWarehouseInLiteDbService articlesForWarehouseService)
     {
-        warehouseServ = warehouseService;
+        articlesForWarehouseServ = articlesForWarehouseService;
     }
 
     [HttpGet("exist")]
     public IActionResult CheckExistence()
     {
-        bool exist = warehouseServ.Exist;
+        bool exist = articlesForWarehouseServ.Exist;
 
         return Ok(exist);
     }
@@ -28,7 +28,7 @@ public class WarehouseController : Controller
     [HttpGet]
     public ActionResult<IEnumerable<DTO2>> GetAll()
     {
-        var all = warehouseServ.GetAll()?.Select(x => x.ToDTO2()) ?? [];
+        var all = articlesForWarehouseServ.GetAll()?.Select(x => x.ToDTO2()) ?? [];
 
         return !all?.Any() ?? true ? NotFound() : Ok(all);
     }
@@ -36,7 +36,7 @@ public class WarehouseController : Controller
     [HttpGet("all1")]
     public ActionResult<IEnumerable<DTO2_1>> GetAll1()
     {
-        var all = warehouseServ.GetAll()?.Select(x => x.ToDTO2_1()) ?? [];
+        var all = articlesForWarehouseServ.GetAll()?.Select(x => x.ToDTO2_1()) ?? [];
 
         return !all?.Any() ?? true ? NotFound() : Ok(all);
     }
@@ -44,7 +44,7 @@ public class WarehouseController : Controller
     [HttpGet("allmerchandise")]
     public ActionResult<IEnumerable<DTO1>> GetAllMerchandise()
     {
-        var all = warehouseServ.GetAllMerchandise()?.Select(x => x.ToDTO1()) ?? [];
+        var all = articlesForWarehouseServ.GetAllMerchandise()?.Select(x => x.ToDTO1()) ?? [];
 
         return !all?.Any() ?? true ? NotFound() : Ok(all);
     }
@@ -52,7 +52,7 @@ public class WarehouseController : Controller
     [HttpGet("allcategories")]
     public ActionResult<IEnumerable<MerchandiseCategory>> GetAllCategories()
     {
-        var all = warehouseServ.GetAllCategories() ?? [];
+        var all = articlesForWarehouseServ.GetAllCategories() ?? [];
 
         return !all?.Any() ?? true ? NotFound() : Ok(all);
     }
@@ -60,7 +60,7 @@ public class WarehouseController : Controller
     [HttpGet("{id}")]
     public ActionResult<DTO2> GetById(string id)
     {
-        var find = warehouseServ.GetById(new ObjectId(id));
+        var find = articlesForWarehouseServ.GetById(new ObjectId(id));
         if (find is null)
         {
             return NotFound();
@@ -75,13 +75,13 @@ public class WarehouseController : Controller
         var entity = dTO.FromDTO2();
         entity.Id = ObjectId.NewObjectId();
 
-        return warehouseServ.Insert(entity);
+        return articlesForWarehouseServ.Insert(entity);
     }
 
     [HttpPut]
     public IActionResult Put([FromBody] DTO2 dTO)
     {
-        var result = warehouseServ.Update(dTO.FromDTO2());
+        var result = articlesForWarehouseServ.Update(dTO.FromDTO2());
 
         return Ok(result);
     }
@@ -89,7 +89,7 @@ public class WarehouseController : Controller
     [HttpDelete("{id}")]
     public IActionResult Delete(string id)
     {
-        var deleted = warehouseServ.Delete(new ObjectId(id));
+        var deleted = articlesForWarehouseServ.Delete(new ObjectId(id));
 
         return Ok(deleted);
     }

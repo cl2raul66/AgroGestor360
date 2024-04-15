@@ -31,6 +31,9 @@ public partial class PgAddWarehouseViewModel : ObservableValidator
     string? newCategory;
 
     [ObservableProperty]
+    bool isSetNewCategory = true;
+
+    [ObservableProperty]
     [Required]
     [MinLength(3)]
     string? name;
@@ -62,6 +65,20 @@ public partial class PgAddWarehouseViewModel : ObservableValidator
 
     [ObservableProperty]
     bool isVisisbleInfo;
+
+    [RelayCommand]
+    void SetNewCategory()
+    {
+        IsSetNewCategory = !IsSetNewCategory;
+        if (IsSetNewCategory)
+        {
+            SelectedCategory = null;
+        }
+        if (!IsSetNewCategory)
+        {
+            NewCategory = null;
+        }
+    }
 
     [RelayCommand]
     async Task Cancel() => await Shell.Current.GoToAsync("..", true);
@@ -99,6 +116,14 @@ public partial class PgAddWarehouseViewModel : ObservableValidator
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
+        if (e.PropertyName == nameof(Categories))
+        {
+            if (Categories?.Any() ?? false)
+            {
+                IsSetNewCategory = false; 
+            }
+        }
+
         if (e.PropertyName == nameof(SelectedMagnitude))
         {
             if (string.IsNullOrEmpty(SelectedMagnitude))

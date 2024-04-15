@@ -3,33 +3,30 @@ using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
+using Microsoft.UI.Xaml.Input;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AgroGestor360.App.ViewModels;
 
 public partial class CvProductsViewModel : ObservableRecipient
 {
-    readonly IArticlesService articlesServ;
+    readonly IArticlesForSalesService articlesForSalesServ;
     readonly string serverURL;
 
-    public CvProductsViewModel(IArticlesService articlesService)
+    public CvProductsViewModel(IArticlesForSalesService articlesForSalesService)
     {
-        articlesServ = articlesService;
+        articlesForSalesServ = articlesForSalesService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         IsActive = true;
     }
 
     #region ARTICLE
     [ObservableProperty]
-    ObservableCollection<Article>? articles;
+    ObservableCollection<DTO3_1>? articles;
 
     [ObservableProperty]
-    Article? selectedArticle;
+    DTO3_1? selectedArticle;
 
     [ObservableProperty]
     bool isZeroPrice;
@@ -37,7 +34,7 @@ public partial class CvProductsViewModel : ObservableRecipient
     [RelayCommand]
     async Task GetArticlesZeroPrice()
     {
-        var getArticles = await articlesServ.GetAllEnabledAsync(serverURL);
+        var getArticles = await articlesForSalesServ.GetAll1Async(serverURL);
         if (getArticles is null)
         {
             return;
@@ -53,7 +50,7 @@ public partial class CvProductsViewModel : ObservableRecipient
     [RelayCommand]
     async Task GetArticlesNonZeroPrice()
     {
-        var getArticles = await articlesServ.GetAllEnabledAsync(serverURL);
+        var getArticles = await articlesForSalesServ.GetAll1Async(serverURL);
         if (getArticles is null)
         {
             return;
@@ -63,7 +60,7 @@ public partial class CvProductsViewModel : ObservableRecipient
         {
             Articles = new(articleszeroprice);
             IsZeroPrice = false;
-        }        
+        }
     }
     #endregion
 
@@ -85,16 +82,45 @@ public partial class CvProductsViewModel : ObservableRecipient
     [RelayCommand]
     async Task ShowSetSellingPrice()
     {
-        StringBuilder sb = new();
-        sb.AppendLine($"NOMBRE: {0}");
-        sb.AppendLine($"PRECIO ANTERIOR: {"0.00"}");
-        sb.AppendLine($"PRESENTACION: {0}");
-        sb.AppendLine($"CATEGORIA: {0}");
+        var theSelection = SelectedArticle;
+        SelectedArticle = null;
 
-        string resul = await Shell.Current.DisplayPromptAsync("Establecer precio de venta", sb.ToString().TrimEnd(), "Establecer", "Cancelar", "0.00");
-        if (string.IsNullOrEmpty(resul))
+        StringBuilder sb = new();
+        sb.AppendLine($"NOMBRE: {theSelection!.Name}");
+        if (theSelection.Price > 0)
+        {
+            sb.AppendLine($"PRECIO ANTERIOR: {theSelection.Price.ToString("0.00")}");
+        }
+        sb.AppendLine($"PRESENTACION: {theSelection.Value.ToString("0.00")} {theSelection.Unit}");
+        if (!string.IsNullOrEmpty(theSelection.Category))
+        {
+            sb.AppendLine($"CATEGORIA: {theSelection.Category}");
+        }
+
+        string price = await Shell.Current.DisplayPromptAsync("Establecer precio de venta", sb.ToString(), "Establecer", "Cancelar", "0.00");
+        double changePrice = 0;
+        if (string.IsNullOrEmpty(price) || !double.TryParse(price, out changePrice))
         {
             return;
+        }
+        var entity = new DTO3() { Id = theSelection!.Id, Price = changePrice };
+        var result = await articlesForSalesServ.ChangePriceAsync(serverURL, entity);
+        if (result)
+        {
+            if (IsZeroPrice)
+            {
+                Articles!.Remove(theSelection);
+                if (!Articles.Any())
+                {
+                    await GetArticlesNonZeroPrice();
+                }
+            }
+            else
+            {
+                int idx = Articles!.IndexOf(theSelection);
+                theSelection.Price = changePrice;
+                Articles[idx] = theSelection;
+            }
         }
     }
 
@@ -119,10 +145,14 @@ public partial class CvProductsViewModel : ObservableRecipient
 
     async Task GetArticles()
     {
-        bool exist = await articlesServ.CheckExistence(serverURL);
+        bool exist = await articlesForSalesServ.CheckExistence(serverURL);
         if (exist)
         {
             await GetArticlesZeroPrice();
+            if (Articles is null)
+            {
+                await GetArticlesNonZeroPrice();
+            }
         }
     }
     #endregion

@@ -4,7 +4,7 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Sevices;
 
-public interface IMerchandiseForLitedbService
+public interface IMerchandiseInLiteDbService
 {
     bool Exist { get; }
 
@@ -16,11 +16,11 @@ public interface IMerchandiseForLitedbService
     bool Update(MerchandiseItem entity);
 }
 
-public class MerchandiseForLitedbService : IMerchandiseForLitedbService
+public class MerchandiseInLiteDbService : IMerchandiseInLiteDbService
 {
     readonly ILiteCollection<MerchandiseItem> collection;
 
-    public MerchandiseForLitedbService(MerchandiseDbConfig dbConfig)
+    public MerchandiseInLiteDbService(MerchandiseDbConfig dbConfig)
     {
         collection = dbConfig.Bd.GetCollection<MerchandiseItem>();
     }
@@ -29,7 +29,7 @@ public class MerchandiseForLitedbService : IMerchandiseForLitedbService
 
     public IEnumerable<MerchandiseItem> GetAll() => collection.FindAll() ?? [];
 
-    public IEnumerable<MerchandiseCategory> GetAllCategories() => collection.Find(Query.All()).Select(x => x.Category ?? new())?.Distinct() ?? [];
+    public IEnumerable<MerchandiseCategory> GetAllCategories() => collection.Find(Query.All())?.Select(x => x.Category ?? new()).DistinctBy(c => c?.Name).Where(c => c != null) ?? [];
 
     public MerchandiseItem GetById(ObjectId id) => collection.FindById(id);
 

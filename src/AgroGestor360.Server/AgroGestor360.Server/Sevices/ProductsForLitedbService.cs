@@ -9,30 +9,30 @@ public interface IProductsForLitedbService
     bool Exist { get; }
 
     bool Delete(ObjectId id);
-    IEnumerable<Product> GetAll();
-    Product GetById(ObjectId id);
-    string Insert(Product entity);
-    bool Update(Product entity);
+    IEnumerable<ProductItemForSale> GetAll();
+    ProductItemForSale GetById(ObjectId id);
+    string Insert(ProductItemForSale entity);
+    bool Update(ProductItemForSale entity);
 }
 
 public class ProductsForLitedbService : IProductsForLitedbService
 {
-    readonly ILiteCollection<Product> collection;
+    readonly ILiteCollection<ProductItemForSale> collection;
 
     public ProductsForLitedbService(ProductsDbConfig dbConfig)
     {
-        collection = dbConfig.Bd.GetCollection<Product>();
+        collection = dbConfig.Bd.GetCollection<ProductItemForSale>();
     }
 
     public bool Exist => collection.Count() > 0;
 
-    public IEnumerable<Product> GetAll() => collection.FindAll();
+    public IEnumerable<ProductItemForSale> GetAll() => collection.FindAll();
 
-    public Product GetById(ObjectId id) => collection.FindById(id);
+    public ProductItemForSale GetById(ObjectId id) => collection.FindById(id);
 
-    public string Insert(Product entity) => collection.Insert(entity).AsObjectId.ToString();
+    public string Insert(ProductItemForSale entity) => collection.Insert(entity).AsObjectId.ToString();
 
-    public bool Update(Product entity) => collection.Update(entity);
+    public bool Update(ProductItemForSale entity) => collection.Update(entity);
 
     public bool Delete(ObjectId id) => collection.Delete(id);
 }

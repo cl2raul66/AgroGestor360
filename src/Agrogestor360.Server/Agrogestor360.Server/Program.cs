@@ -17,11 +17,10 @@ builder.Services.AddSingleton<IBankAccountsForLitedbService, BankAccountsForLite
 builder.Services.AddSingleton<IShareholderForLitedbService, ShareholderForLitedbService>();
 builder.Services.AddSingleton<ISellersForLitedbService, SellersForLitedbService>();
 builder.Services.AddSingleton<ICustomersForLitedbService, CustomersForLitedbService>();
-builder.Services.AddSingleton<IMerchandiseForLitedbService, MerchandiseForLitedbService>();
-builder.Services.AddSingleton<IWarehouseForLitedbService, WarehouseForLitedbService>();
-builder.Services.AddSingleton<IArticlesForLitedbService, ArticlesForLitedbService>();
+builder.Services.AddSingleton<IMerchandiseInLiteDbService, MerchandiseInLiteDbService>();
+builder.Services.AddSingleton<IArticlesForWarehouseInLiteDbService, ArticlesForWarehouseInLiteDbService>();
+builder.Services.AddSingleton<IArticlesForSalesInLiteDbService, ArticlesForSalesInLiteDbService>();
 builder.Services.AddSingleton<IProductsForLitedbService, ProductsForLitedbService>();
-builder.Services.AddSingleton<IProductsOfferingsForLitedbService, ProductsOfferingsForLitedbService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();

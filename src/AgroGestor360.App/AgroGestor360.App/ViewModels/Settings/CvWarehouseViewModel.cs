@@ -11,16 +11,16 @@ namespace AgroGestor360.App.ViewModels;
 public partial class CvWarehouseViewModel : ObservableRecipient
 {
     readonly IMerchandiseService merchandiseServ;
-    readonly IWarehouseService warehouseServ;
+    readonly IArticlesForWarehouseService articlesForWarehouseServ;
+    readonly IArticlesForSalesService articlesForSalesServ;
     readonly IAuthService authServ;
-    readonly IArticlesService articlesServ;
     readonly string serverURL;
 
-    public CvWarehouseViewModel(IWarehouseService warehouseService, IAuthService authService, IMerchandiseService merchandiseService, IArticlesService articlesService)
+    public CvWarehouseViewModel(IArticlesForWarehouseService articlesForWarehouseService, IMerchandiseService merchandiseService, IArticlesForSalesService articlesForSalesService, IAuthService authService)
     {
         merchandiseServ = merchandiseService;
-        warehouseServ = warehouseService;
-        articlesServ = articlesService;
+        articlesForWarehouseServ = articlesForWarehouseService;
+        articlesForSalesServ = articlesForSalesService;
         authServ = authService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         IsActive = true;
@@ -41,7 +41,7 @@ public partial class CvWarehouseViewModel : ObservableRecipient
     [RelayCommand]
     async Task AddWarehouse()
     {
-        var categories = await warehouseServ.GetAllCategoriesAsync(serverURL);
+        var categories = await articlesForWarehouseServ.GetAllCategoriesAsync(serverURL);
         if (categories.Any())
         {
             Dictionary<string, object> sendData = new() { { "Categories", categories.ToList() } };
@@ -63,27 +63,25 @@ public partial class CvWarehouseViewModel : ObservableRecipient
             if (!string.IsNullOrEmpty(merchandiseId))
             {
                 m.Merchandise!.Id = merchandiseId;
-                var warehouseId = await warehouseServ.InsertAsync(serverURL, m);
+                var warehouseId = await articlesForWarehouseServ.InsertAsync(serverURL, m);
 
                 if (!string.IsNullOrEmpty(warehouseId))
                 {
-                    //var articleId = await articlesServ.InsertAsync(serverURL, new() { Merchandise = merchandiseId, Price = 0 });
-                    //if (!string.IsNullOrEmpty(articleId))
-                    //{
-                    //    r.Warehouses ??= [];
-                    //    r.Warehouses.Insert(0, m);
-                    //}
-                    r.Warehouses ??= [];
-                    DTO2_1 itemInsert = new()
+                    var articleId = await articlesForSalesServ.InsertAsync(serverURL, new() { Merchandise = m.Merchandise, Price = 0 });
+                    if (!string.IsNullOrEmpty(articleId))
                     {
-                        Id = warehouseId,
-                        Name = m.Merchandise!.Name,
-                        Category = m.Merchandise!.Category?.Name,
-                        Quantity = m.Quantity,
-                        Unit = m.Merchandise.Packaging?.Unit,
-                        Value = m.Merchandise.Packaging?.Value ?? 0
-                    };
-                    r.Warehouses.Insert(0, itemInsert);
+                        r.Warehouses ??= [];
+                        DTO2_1 itemInsert = new()
+                        {
+                            Id = warehouseId,
+                            Name = m.Merchandise!.Name,
+                            Category = m.Merchandise!.Category?.Name,
+                            Quantity = m.Quantity,
+                            Unit = m.Merchandise.Packaging?.Unit,
+                            Value = m.Merchandise.Packaging?.Value ?? 0
+                        };
+                        r.Warehouses.Insert(0, itemInsert);
+                    }
                 }
             }
             SelectedCategory = null;
@@ -98,10 +96,10 @@ public partial class CvWarehouseViewModel : ObservableRecipient
 
     async Task GetWarehouse()
     {
-        bool exist = await warehouseServ.CheckExistence(serverURL);
+        bool exist = await articlesForWarehouseServ.CheckExistence(serverURL);
         if (exist)
         {
-            var getAll = await warehouseServ.GetAll1Async(serverURL);
+            var getAll = await articlesForWarehouseServ.GetAll1Async(serverURL);
             Warehouses = new(getAll!);
         }
     }

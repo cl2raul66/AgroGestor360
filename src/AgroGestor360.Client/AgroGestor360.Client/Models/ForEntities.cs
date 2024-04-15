@@ -63,13 +63,30 @@ public class Organization
 //    public double Value { get; set; }
 //}
 
+public class MerchandiseCategory
+{
+    public string? Name { get; set; }
+}
+
+public class Presentation
+{
+    public string? Measure { get; set; }
+    public string? Unit { get; set; }
+    public double Value { get; set; }
+}
+
+public class ProductOffering
+{
+    public int? Id { get; set; }
+    public double Quantity { get; set; }
+    public double BonusAmount { get; set; }
+}
+
 #region Merchandise
 /// <summary>
 /// Object: MerchandiseItem
 /// <para>
-/// string [Id, Name, Description]
-/// Presentation [Packaging]
-/// MerchandiseCategory [Category]
+/// string [Id, Name, Description], Presentation [Packaging], MerchandiseCategory [Category]
 /// </para>
 /// </summary>
 public class DTO1
@@ -80,28 +97,12 @@ public class DTO1
     public MerchandiseCategory? Category { get; set; }
     public string? Description { get; set; }
 }
-
-public class MerchandiseCategory
-{
-    public int Id { get; set; }
-    public string? Name { get; set; }
-}
-
-public class Presentation
-{
-    public string? Measure { get; set; }
-    public string? Unit { get; set; }
-    public double Value { get; set; }
-}
 #endregion
-
 #region Warehouse
 /// <summary>
-/// Object: WarehouseItem
+/// Object: ArticleItemForWarehouse
 /// <para>
-/// string [Id] 
-/// DTO1 [Merchandise]
-/// double [Quantity]
+/// string [Id], DTO1 [Merchandise], double [Quantity]
 /// </para>
 /// </summary>
 public class DTO2
@@ -112,9 +113,10 @@ public class DTO2
 }
 
 /// <summary>
-/// WarehouseItem 
-/// string [Id, Name, Unit,  Category] 
-/// double [Value, Quantity]
+/// Object: ArticleItemForWarehouse 
+/// <para>
+/// string [Id, Name, Unit,  Category], double [Value, Quantity]
+/// </para>
 /// </summary>
 public class DTO2_1
 {
@@ -126,31 +128,50 @@ public class DTO2_1
     public double Quantity { get; set; }
 }
 #endregion
-
-public class Article
+#region Sales
+/// <summary>
+/// Object: ArticleItemForSale 
+/// <para>
+/// string [Id], DTO1 [Merchandise], double [Price] 
+/// </para>
+/// </summary>
+public class DTO3
 {
     public string? Id { get; set; }
-    public string? Merchandise { get; set; }
+    public DTO1? Merchandise { get; set; }
     public double Price { get; set; }
 }
 
-public class Product
-{
-    public string? Id { get; set; }
-    public string? Article { get; set; }
-    public double Quantity { get; set; }
-    public double Price { get; set; }
-}
-
-public class ProductOffering
+/// <summary>
+/// Object: ArticleItemForSale 
+/// <para>
+/// string [Id, Name, Unit, Category], double [Value, Price] 
+/// </para>
+/// </summary>
+public class DTO3_1
 {
     public string? Id { get; set; }
     public string? Name { get; set; }
-    public double Quantity { get; set; }
-    public double BonusAmount { get; set; }
+    public string? Unit { get; set; }
+    public double Value { get; set; }
+    public string? Category { get; set; }
     public double Price { get; set; }
 }
 
+/// <summary>
+/// Object: ProductItemForSale 
+/// <para>
+/// string [Id], DTO3 [Article], double [Quantity], List ProductOffering [Offering]
+/// </para>
+/// </summary>
+public class DTO4
+{
+    public string? Id { get; set; }
+    public DTO3? Article { get; set; }
+    public double Quantity { get; set; }
+    public List<ProductOffering>? Offering { get; set; }
+}
+#endregion
 public class BankAccount
 {
     public string? Number { get; set; }
