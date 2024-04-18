@@ -1,10 +1,12 @@
-﻿using AgroGestor360.App.Views.Settings.Products;
+﻿using AgroGestor360.App.Models;
+using AgroGestor360.App.Views.Settings.Products;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.UI.Xaml.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Text;
 
 namespace AgroGestor360.App.ViewModels;
@@ -12,11 +14,13 @@ namespace AgroGestor360.App.ViewModels;
 public partial class CvProductsViewModel : ObservableRecipient
 {
     readonly IArticlesForSalesService articlesForSalesServ;
+    readonly IProductsForSalesService productsForSalesServ;
     readonly string serverURL;
 
-    public CvProductsViewModel(IArticlesForSalesService articlesForSalesService)
+    public CvProductsViewModel(IArticlesForSalesService articlesForSalesService, IProductsForSalesService productsForSalesService)
     {
         articlesForSalesServ = articlesForSalesService;
+        productsForSalesServ = productsForSalesService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         IsActive = true;
     }
@@ -62,22 +66,6 @@ public partial class CvProductsViewModel : ObservableRecipient
             IsZeroPrice = false;
         }
     }
-    #endregion
-
-    //[ObservableProperty]
-    //bool isProductsVisible;
-
-    //[RelayCommand]
-    //void ViewArticles()
-    //{
-    //    IsProductsVisible = false;
-    //}
-
-    //[RelayCommand]
-    //void ViewProducts()
-    //{
-    //    IsProductsVisible = true;
-    //}
 
     [RelayCommand]
     async Task ShowSetSellingPrice()
@@ -98,8 +86,7 @@ public partial class CvProductsViewModel : ObservableRecipient
         }
 
         string price = await Shell.Current.DisplayPromptAsync("Establecer precio de venta", sb.ToString(), "Establecer", "Cancelar", "0.00");
-        double changePrice = 0;
-        if (string.IsNullOrEmpty(price) || !double.TryParse(price, out changePrice))
+        if (string.IsNullOrEmpty(price) || !double.TryParse(price, out double changePrice))
         {
             return;
         }
@@ -123,24 +110,112 @@ public partial class CvProductsViewModel : ObservableRecipient
             }
         }
     }
+    #endregion
+
+    #region PRODUCT
+    [ObservableProperty]
+    ObservableCollection<DTO4_1>? products;
+
+    [ObservableProperty]
+    DTO4_1? selectedProduct;
 
     [RelayCommand]
     async Task AddProduct()
     {
-        await Shell.Current.GoToAsync(nameof(PgAddProduct), true);
+        Dictionary<string, object> sendObject = new() { { "CurrentArticle", SelectedArticle! } };
+        await Shell.Current.GoToAsync(nameof(PgAddProduct), true, sendObject);
     }
+
+    [RelayCommand]
+    async Task DeleteProduct()
+    {
+        var result = await productsForSalesServ.DeleteAsync(serverURL, SelectedProduct!.Id!);
+        if (result)
+        {
+            Products!.Remove(SelectedProduct!);
+        }
+    }
+    #endregion
+
+    #region OFFER
+    [ObservableProperty]
+    ObservableCollection<ProductOffering>? offers;
+
+    [ObservableProperty]
+    ProductOffering? selectedOffert;
 
     [RelayCommand]
     async Task CreateOffer()
     {
-        await Shell.Current.GoToAsync(nameof(PgCreateOffer), true);
+        Dictionary<string, object> sendObject = new() {
+            { "CurrentProduct", SelectedProduct! },
+            { "OfferId", (Offers?.Max(x => x.Id) ?? 0) + 1 }
+        };
+        await Shell.Current.GoToAsync(nameof(PgCreateOffer), true, sendObject);
+    }
+    #endregion
+
+    protected override void OnActivated()
+    {
+        base.OnActivated();
+        WeakReferenceMessenger.Default.Register<CvProductsViewModel, PgAddProductMessage, string>(this, nameof(PgAddProductMessage), async (r, m) =>
+        {
+            var article = await articlesForSalesServ.GetByIdAsync(serverURL, m.ArticleId);
+            DTO4 newProduct = new() { Name = m.Name, Article = article, Quantity = m.Quantity };
+            var result = await productsForSalesServ.InsertAsync(serverURL, newProduct);
+            if (!string.IsNullOrEmpty(result))
+            {
+                r.Products ??= [];
+                r.Products.Insert(0, new DTO4_1()
+                {
+                    Quantity = m.Quantity,
+                    Category = article!.Merchandise!.Category!.Name,
+                    Name = m.Name,
+                    Value = article!.Merchandise!.Packaging!.Value,
+                    Unit = article!.Merchandise!.Packaging!.Unit,
+                    SalePrice = m.Quantity * article!.Price
+                });
+            }
+        });
+
+        WeakReferenceMessenger.Default.Register<CvProductsViewModel, ProductOffering, string>(this, "NewProductOffering", async (r, m) =>
+        {
+            bool result = await productsForSalesServ.ChangeOfferingAsync(serverURL, new() { Id = SelectedProduct!.Id, Offering = [m] });
+            if (result)
+            {
+                r.Offers ??= [];
+                r.Offers.Insert(0, m);
+            }
+
+        });
+    }
+
+    protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.PropertyName == nameof(SelectedProduct))
+        {
+            if (SelectedProduct is not null)
+            {
+                Offers ??= [];
+
+                var getOffers = await productsForSalesServ.GetProductOfferingAsync(serverURL, SelectedProduct!.Id!);
+                if (getOffers?.Offering?.Any() ?? false)
+                {
+                    Offers = new(getOffers!.Offering);
+                }
+                else
+                {
+                    Offers = null;
+                }
+            }
+        }
     }
 
     #region EXTRA
     public async void Initialize()
     {
-        //await Task.WhenAll(GetCategories(), GetWarehouse());
-        await GetArticles();
+        await Task.WhenAll(GetArticles(), GetProducts());
     }
 
     async Task GetArticles()
@@ -153,6 +228,20 @@ public partial class CvProductsViewModel : ObservableRecipient
             {
                 await GetArticlesNonZeroPrice();
             }
+        }
+    }
+
+    async Task GetProducts()
+    {
+        bool exist = await productsForSalesServ.CheckExistence(serverURL);
+        if (exist)
+        {
+            var getProducts = await productsForSalesServ.GetAll1Async(serverURL);
+            if (getProducts is null)
+            {
+                return;
+            }
+            Products = new(getProducts);
         }
     }
     #endregion

@@ -101,6 +101,7 @@ public class ProductItemForSale
 {
     public ObjectId? Id { get; set; }
     public ArticleItemForSale? Article { get; set; }
+    public string? Name { get; set; }
     public double Quantity { get; set; }
     public List<ProductOffering>? Offering { get; set; }
 }

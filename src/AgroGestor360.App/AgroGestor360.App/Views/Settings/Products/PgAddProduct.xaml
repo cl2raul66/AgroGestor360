@@ -24,13 +24,6 @@
                 VerticalOptions="Center" />
             <ScrollView Grid.Row="1">
                 <VerticalStackLayout Spacing="8">
-                    <Grid
-                        Grid.Column="1"
-                        RowDefinitions="auto,auto"
-                        RowSpacing="4">
-                        <Label Text="Artículo: *" />
-                        <Picker Grid.Row="1" />
-                    </Grid>
                     <Label
                         FontSize="14"
                         HorizontalOptions="Center"
@@ -45,7 +38,9 @@
                             ClearButtonVisibility="WhileEditing"
                             IsSpellCheckEnabled="True"
                             IsTextPredictionEnabled="True"
-                            Placeholder="Escriba aquí" />
+                            Keyboard="Plain"
+                            Placeholder="Escriba aquí"
+                            Text="{Binding Name}" />
                     </Grid>
                     <Grid RowDefinitions="auto,auto" RowSpacing="4">
                         <Label Text="Cantidad unitaria: *" />
@@ -56,7 +51,8 @@
                             IsSpellCheckEnabled="True"
                             IsTextPredictionEnabled="True"
                             Keyboard="Numeric"
-                            Placeholder="0.00" />
+                            Placeholder="0.00"
+                            Text="{Binding Quantity}" />
                     </Grid>
                     <Label
                         FontAttributes="Bold"
@@ -71,7 +67,10 @@
                 Grid.Row="2"
                 ColumnDefinitions="*,auto"
                 ColumnSpacing="8">
-                <Label FontSize="14" VerticalOptions="Center">
+                <Label
+                    FontSize="14"
+                    IsVisible="{Binding IsVisibleInfo, Mode=OneWay}"
+                    VerticalOptions="Center">
                     <Label.FormattedText>
                         <FormattedString>
                             <Span

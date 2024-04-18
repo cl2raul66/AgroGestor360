@@ -80,10 +80,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Models\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Reference Include="AgroGestor360.Client">
 	    <HintPath>..\..\AgroGestor360.Client\AgroGestor360.Client\bin\Debug\net8.0\AgroGestor360.Client.dll</HintPath>
 	  </Reference>

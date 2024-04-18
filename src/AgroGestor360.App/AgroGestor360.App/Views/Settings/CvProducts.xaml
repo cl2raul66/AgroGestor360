@@ -31,9 +31,11 @@
                         <Label LineBreakMode="MiddleTruncation">
                             <Label.FormattedText>
                                 <FormattedString>
-                                    <Span Text="{Binding Name, Mode=OneWay, StringFormat='{0} '}" TextColor="{StaticResource White}" />
-                                    <Span Text="{Binding Value, Mode=OneWay, StringFormat='{0:F2} '}" TextColor="{StaticResource White}" />
-                                    <Span Text="{Binding Unit, Mode=OneWay, Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
+                                    <Span Text="{Binding Name, Mode=OneWay, StringFormat='{0}'}" TextColor="{StaticResource White}" />
+                                    <Span Text=" " />
+                                    <Span Text="{Binding Value, Mode=OneWay, StringFormat='[{0:F2}'}" TextColor="{StaticResource White}" />
+                                    <Span Text=" " />
+                                    <Span Text="{Binding Unit, Mode=OneWay, StringFormat='{0}]', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
                                 </FormattedString>
                             </Label.FormattedText>
                         </Label>
@@ -185,13 +187,12 @@
                                 Command="{Binding AddProductCommand}"
                                 FontFamily="icofont"
                                 IsEnabled="{Binding SelectedArticle, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
-                                Text="{StaticResource Inbox}"
+                                Text="{StaticResource ArrowRight}"
                                 ToolTipProperties.Text="Crear producto a partir de este artículo" />
                         </HorizontalStackLayout>
                     </Grid>
                 </Frame>
             </Grid>
-
             <!--#endregion-->
             <BoxView
                 Grid.RowSpan="3"
@@ -265,7 +266,38 @@
                     </HorizontalStackLayout>-->
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1">
-                    <CollectionView />
+                    <CollectionView
+                        ItemsSource="{Binding Products, Mode=OneWay}"
+                        SelectedItem="{Binding SelectedProduct}"
+                        SelectionMode="Single">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:DTO4_1">
+                                <Border Style="{StaticResource BorderItem}">
+                                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                                        <Label LineBreakMode="MiddleTruncation">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding Name, Mode=OneWay, StringFormat='{0}'}" TextColor="{StaticResource White}" />
+                                                    <Span Text=" " />
+                                                    <Span Text="{Binding Value, Mode=OneWay, StringFormat='[{0:F2}'}" TextColor="{StaticResource White}" />
+                                                    <Span Text=" " />
+                                                    <Span Text="{Binding Unit, Mode=OneWay, StringFormat='{0}]', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Label
+                                            Grid.Column="1"
+                                            LineBreakMode="TailTruncation"
+                                            Text="{Binding SalePrice, StringFormat='Precio: {0:F2}'}"
+                                            TextColor="{StaticResource White}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </ScrollView>
                 <Frame Grid.Row="2" Padding="8">
                     <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
@@ -273,20 +305,22 @@
                             <Button
                                 Command="{Binding CreateOfferCommand}"
                                 FontFamily="icofont"
+                                IsEnabled="{Binding SelectedProduct, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource Gift}"
                                 ToolTipProperties.Text="Crear oferta" />
-                            <BoxView
+                            <!--<BoxView
                                 BackgroundColor="{StaticResource Gray300}"
                                 CornerRadius="2"
-                                WidthRequest="2" />
-                            <Button
+                                WidthRequest="2" />-->
+                            <!--<Button
                                 Command="{Binding AddProductCommand}"
                                 FontFamily="icofont"
                                 Text="{StaticResource Plus}"
-                                ToolTipProperties.Text="Agregar" />
+                                ToolTipProperties.Text="Agregar" />-->
                             <Button
+                                Command="{Binding DeleteProductCommand}"
                                 FontFamily="icofont"
-                                IsEnabled="False"
+                                IsEnabled="{Binding SelectedProduct, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource UiDelete}"
                                 ToolTipProperties.Text="Eliminar" />
                         </HorizontalStackLayout>
@@ -338,7 +372,33 @@
                     </HorizontalStackLayout>-->
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1">
-                    <CollectionView />
+                    <CollectionView
+                        ItemsSource="{Binding Offers, Mode=OneWay}"
+                        SelectedItem="{Binding SelectedOffert}"
+                        SelectionMode="Single">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:ProductOffering">
+                                <Border Style="{StaticResource BorderItem}">
+                                    <Grid ColumnDefinitions="auto,*,*" ColumnSpacing="8">
+                                        <Label Text="{Binding Id, Mode=OneWay, StringFormat='No. {0}'}" TextColor="{StaticResource White}" />
+                                        <Label
+                                            Grid.Column="1"
+                                            HorizontalOptions="Center"
+                                            Text="{Binding Quantity, Mode=OneWay, StringFormat='Cantidad {0}'}"
+                                            TextColor="{StaticResource White}" />
+                                        <Label
+                                            Grid.Column="2"
+                                            HorizontalOptions="Center"
+                                            Text="{Binding BonusAmount, Mode=OneWay, StringFormat='Cantidad extra {0}'}"
+                                            TextColor="{StaticResource White}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </ScrollView>
                 <Frame Grid.Row="2" Padding="8">
                     <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">

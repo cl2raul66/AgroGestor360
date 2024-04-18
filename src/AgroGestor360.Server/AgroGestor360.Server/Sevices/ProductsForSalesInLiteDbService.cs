@@ -1,10 +1,10 @@
 ﻿using AgroGestor360.Server.Models;
-using AgroGestor360.Server.Tools.Configurations;
+using AgroGestor360.Server.Tools.Helpers;
 using LiteDB;
 
 namespace AgroGestor360.Server.Sevices;
 
-public interface IProductsForLitedbService
+public interface IProductsForSalesInLiteDbService
 {
     bool Exist { get; }
 
@@ -15,13 +15,19 @@ public interface IProductsForLitedbService
     bool Update(ProductItemForSale entity);
 }
 
-public class ProductsForLitedbService : IProductsForLitedbService
+public class ProductsForSalesInLiteDbService : IProductsForSalesInLiteDbService
 {
     readonly ILiteCollection<ProductItemForSale> collection;
 
-    public ProductsForLitedbService(ProductsDbConfig dbConfig)
+    public ProductsForSalesInLiteDbService()
     {
-        collection = dbConfig.Bd.GetCollection<ProductItemForSale>();
+        var cnx = new ConnectionString()
+        {
+            Filename = FileHelper.GetFileDbPath("Products_Sales")
+        };
+
+        LiteDatabase db = new(cnx);
+        collection = db.GetCollection<ProductItemForSale>();
     }
 
     public bool Exist => collection.Count() > 0;

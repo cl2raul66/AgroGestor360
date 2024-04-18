@@ -2,7 +2,6 @@
 using AgroGestor360.Server.Sevices;
 using AgroGestor360.Server.Tools.Extensions;
 using LiteDB;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AgroGestor360.Server.Controllers;

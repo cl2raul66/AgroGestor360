@@ -20,7 +20,7 @@ builder.Services.AddSingleton<ICustomersForLitedbService, CustomersForLitedbServ
 builder.Services.AddSingleton<IMerchandiseInLiteDbService, MerchandiseInLiteDbService>();
 builder.Services.AddSingleton<IArticlesForWarehouseInLiteDbService, ArticlesForWarehouseInLiteDbService>();
 builder.Services.AddSingleton<IArticlesForSalesInLiteDbService, ArticlesForSalesInLiteDbService>();
-builder.Services.AddSingleton<IProductsForLitedbService, ProductsForLitedbService>();
+builder.Services.AddSingleton<IProductsForSalesInLiteDbService, ProductsForSalesInLiteDbService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();

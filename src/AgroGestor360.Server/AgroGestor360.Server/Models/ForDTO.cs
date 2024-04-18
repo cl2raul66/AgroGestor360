@@ -141,7 +141,49 @@ public class DTO4
 {
     public string? Id { get; set; }
     public DTO3? Article { get; set; }
+    public string? Name { get; set; }
     public double Quantity { get; set; }
+    public List<ProductOffering>? Offering { get; set; }
+}
+
+/// <summary>
+/// Object: ProductItemForSale 
+/// <para>
+/// string [Id, Name], double [Quantity, SalePrice]
+/// </para>
+/// </summary>
+public class DTO4_1
+{
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+    public double Quantity { get; set; }
+    public double SalePrice { get; set; }
+    public string? Unit { get; set; }
+    public double Value { get; set; }
+    public string? Category { get; set; }
+}
+
+/// <summary>
+/// Object: ProductItemForSale 
+/// <para>
+/// string [Id], double [Quantity]
+/// </para>
+/// </summary>
+public class DTO4_2
+{
+    public string? Id { get; set; }
+    public double Quantity { get; set; }
+}
+
+/// <summary>
+/// Object: ProductItemForSale 
+/// <para>
+/// string [Id], List ProductOffering [Offering]
+/// </para>
+/// </summary>
+public class DTO4_3
+{
+    public string? Id { get; set; }
     public List<ProductOffering>? Offering { get; set; }
 }
 #endregion
