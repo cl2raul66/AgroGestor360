@@ -1,4 +1,5 @@
 ﻿using AgroGestor360.App.Models;
+using AgroGestor360.App.Views;
 using AgroGestor360.App.Views.Settings.Products;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
@@ -15,12 +16,14 @@ public partial class CvProductsViewModel : ObservableRecipient
 {
     readonly IArticlesForSalesService articlesForSalesServ;
     readonly IProductsForSalesService productsForSalesServ;
+    readonly IAuthService authServ;
     readonly string serverURL;
 
-    public CvProductsViewModel(IArticlesForSalesService articlesForSalesService, IProductsForSalesService productsForSalesService)
+    public CvProductsViewModel(IArticlesForSalesService articlesForSalesService, IProductsForSalesService productsForSalesService, IAuthService authService)
     {
         articlesForSalesServ = articlesForSalesService;
         productsForSalesServ = productsForSalesService;
+        authServ = authService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         IsActive = true;
     }
@@ -129,6 +132,29 @@ public partial class CvProductsViewModel : ObservableRecipient
     [RelayCommand]
     async Task DeleteProduct()
     {
+        StringBuilder sb = new();
+        sb.AppendLine($"Seguro que quiere eliminar el siguiente producto:");
+        sb.AppendLine($"Nombre: {SelectedProduct!.Name}");
+        sb.AppendLine($"Categoría: {SelectedProduct!.Category}");
+        sb.AppendLine($"Presentación: {SelectedProduct!.Value} {SelectedProduct!.Unit}");
+        sb.AppendLine($"Precio: {SelectedProduct!.SalePrice.ToString("0.00")}");
+        sb.AppendLine("");
+        sb.AppendLine("Inserte la contraseña:");
+        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar producto", sb.ToString().Trim(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
+        {
+            SelectedProduct = null;
+            return;
+        }
+
+        var approved = await authServ.AuthRoot(serverURL, pwd);
+        if (!approved)
+        {
+            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+            SelectedProduct = null;
+            return;
+        }
+
         var result = await productsForSalesServ.DeleteAsync(serverURL, SelectedProduct!.Id!);
         if (result)
         {
