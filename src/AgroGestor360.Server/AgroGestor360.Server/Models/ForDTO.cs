@@ -41,19 +41,12 @@ namespace AgroGestor360.Server.Models;
 //    public string? Name { get; set; }
 //}
 
-//public class CustomerDiscountDTO
-//{
-//    public DateTime Date { get; set; }
-//    public string? CustomerId { get; set; }
-//    public string? CustomerDiscountClass { get; set; }
-//}
-
-//public class CustomerDiscountClassDTO
-//{
-//    public string? Id { get; set; }
-//    public string? Name { get; set; }
-//    public double Value { get; set; }
-//}
+public class CustomerDiscountItemDTO
+{
+    public DateTime Date { get; set; }
+    public string? CustomerName { get; set; }
+    public int? CustomerDiscountClass { get; set; }
+}
 
 #region Merchandise
 /// <summary>

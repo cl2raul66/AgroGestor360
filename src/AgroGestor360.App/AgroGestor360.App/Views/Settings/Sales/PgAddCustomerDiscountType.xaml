@@ -19,7 +19,7 @@
         <Grid RowDefinitions="auto,*,auto" RowSpacing="12">
             <Label
                 FontSize="18"
-                Text="Agregar tipo de descuento a cliente"
+                Text="Agregar descuento"
                 TextTransform="Uppercase"
                 VerticalOptions="Center" />
             <ScrollView Grid.Row="1">
@@ -31,7 +31,8 @@
                             ClearButtonVisibility="WhileEditing"
                             IsSpellCheckEnabled="True"
                             IsTextPredictionEnabled="True"
-                            Placeholder="Escriba aquí, por ejemplo: Bronce, Plata, Oro, Diamante, etc" />
+                            Placeholder="Escriba aquí, por ejemplo: Bronce, Plata, Oro, Diamante, etc"
+                            Text="{Binding ClassName}" />
                     </Grid>
                     <Grid
                         HorizontalOptions="Start"
@@ -46,7 +47,8 @@
                             IsSpellCheckEnabled="True"
                             IsTextPredictionEnabled="True"
                             Keyboard="Numeric"
-                            Placeholder="0" />
+                            Placeholder="0"
+                            Text="{Binding Value}" />
                     </Grid>
                 </VerticalStackLayout>
             </ScrollView>
@@ -54,7 +56,10 @@
                 Grid.Row="2"
                 ColumnDefinitions="*,auto"
                 ColumnSpacing="8">
-                <Label FontSize="14" VerticalOptions="Center">
+                <Label
+                    FontSize="14"
+                    IsVisible="{Binding IsVisibleInfo, Mode=OneWay}"
+                    VerticalOptions="Center">
                     <Label.FormattedText>
                         <FormattedString>
                             <Span

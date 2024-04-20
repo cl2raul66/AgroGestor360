@@ -3,6 +3,8 @@
     x:Class="AgroGestor360.App.Views.Settings.CvSales"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:model="clr-namespace:AgroGestor360.Client.Models;assembly=AgroGestor360.Client"
     xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     x:DataType="vm:CvSalesViewModel">
 
@@ -16,7 +18,7 @@
                     Text="Ventas"
                     TextTransform="Uppercase"
                     VerticalOptions="Center" />
-                <HorizontalStackLayout Grid.Column="2" Spacing="8">
+                <!--<HorizontalStackLayout Grid.Column="2" Spacing="8">
                     <Button
                         FontFamily="icofont"
                         Text="{StaticResource Check}"
@@ -33,7 +35,7 @@
                         FontFamily="icofont"
                         Text="{StaticResource CreditCard}"
                         ToolTipProperties.Text="Creditos" />
-                </HorizontalStackLayout>
+                </HorizontalStackLayout>-->
             </Grid>
         </Frame>
         <!--#endregion-->
@@ -41,126 +43,174 @@
         <Grid
             Grid.Row="1"
             ColumnDefinitions="280,auto,*"
-            ColumnSpacing="8"
-            RowDefinitions="auto,*,auto"
-            RowSpacing="8">
-            <!--  PANEL IZQUIERDO  -->
-            <VerticalStackLayout Grid.Column="2" Spacing="8">
-                <Label
-                    Grid.Column="1"
-                    FontSize="18"
-                    Text="Descuentos a clientes"
-                    TextTransform="Uppercase"
-                    VerticalOptions="Center" />
-                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                    <Entry
-                        ClearButtonVisibility="WhileEditing"
-                        IsSpellCheckEnabled="True"
-                        IsTextPredictionEnabled="True"
-                        Placeholder="Escriba aquí" />
-                    <Button
+            ColumnSpacing="8">
+            <!--#region PANEL IZQUIERDO-->
+            <Grid RowDefinitions="auto,*,auto" RowSpacing="8">
+                <VerticalStackLayout Spacing="8">
+                    <Label
                         Grid.Column="1"
-                        FontFamily="icofont"
-                        Text="{StaticResource Search}"
-                        ToolTipProperties.Text="Buscar" />
-                </Grid>
-                <HorizontalStackLayout Spacing="8">
-                    <RadioButton>
-                        <RadioButton.Content>
-                            <Label Text="Por nombre" VerticalOptions="Center" />
-                        </RadioButton.Content>
-                    </RadioButton>
-                    <RadioButton>
-                        <RadioButton.Content>
-                            <Label Text="Por categoría" VerticalOptions="Center" />
-                        </RadioButton.Content>
-                    </RadioButton>
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
-            <ScrollView Grid.Row="1" Grid.Column="2">
-                <CollectionView />
-            </ScrollView>
-            <Frame
-                Grid.Row="2"
-                Grid.Column="2"
-                Padding="8">
-                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        FontSize="18"
+                        Text="Tipos de descuentos"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                    <!--<Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <Entry
+                            ClearButtonVisibility="WhileEditing"
+                            IsSpellCheckEnabled="True"
+                            IsTextPredictionEnabled="True"
+                            Placeholder="Escriba aquí" />
+                        <Button
+                            Grid.Column="1"
+                            FontFamily="icofont"
+                            Text="{StaticResource Search}"
+                            ToolTipProperties.Text="Buscar" />
+                    </Grid>
                     <HorizontalStackLayout Spacing="8">
-                        <Button
-                            FontFamily="icofont"
-                            Text="{StaticResource Close}"
-                            ToolTipProperties.Text="Ver por clientes sin descuentos" />
-                        <Button
-                            FontFamily="icofont"
-                            Text="{StaticResource Check}"
-                            ToolTipProperties.Text="Ver por clientes con descuentos" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                        <Button
-                            FontFamily="icofont"
-                            IsEnabled="False"
-                            Text="{StaticResource UiDelete}"
-                            ToolTipProperties.Text="Eliminar" />
-                    </HorizontalStackLayout>
-                </Grid>
-            </Frame>
+                        <RadioButton>
+                            <RadioButton.Content>
+                                <Label Text="Por nombre" VerticalOptions="Center" />
+                            </RadioButton.Content>
+                        </RadioButton>
+                    </HorizontalStackLayout>-->
+                </VerticalStackLayout>
+                <ScrollView Grid.Row="1">
+                    <CollectionView
+                        ItemsSource="{Binding Discount, Mode=OneWay}"
+                        SelectedItem="{Binding SelectedDiscount}"
+                        SelectionMode="Single">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:CustomerDiscountClass">
+                                <Border Style="{StaticResource BorderItem}">
+                                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                                        <Label Text="{Binding Name, Mode=OneWay}" TextColor="{StaticResource White}" />
+                                        <Label
+                                            Grid.Column="1"
+                                            Text="{Binding Value, Mode=OneWay, StringFormat='{0} %'}"
+                                            TextColor="{StaticResource White}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </ScrollView>
+                <Frame Grid.Row="2" Padding="8">
+                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <HorizontalStackLayout Spacing="8">
+                            <Button
+                                Command="{Binding SetEnableDiscountDefaultCommand}"
+                                FontFamily="icofont"
+                                Text="{StaticResource SaleDiscount}"
+                                ToolTipProperties.Text="Activar/Desactivar descuentos predeterminados">
+                                <Button.Triggers>
+                                    <DataTrigger
+                                        Binding="{Binding EnableDiscountDefault, Mode=OneWay}"
+                                        TargetType="Button"
+                                        Value="true">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource Tertiary}" />
+                                    </DataTrigger>
+                                    <DataTrigger
+                                        Binding="{Binding EnableDiscountDefault, Mode=OneWay}"
+                                        TargetType="Button"
+                                        Value="false">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                            <!--<BoxView
+    BackgroundColor="{StaticResource Gray300}"
+    CornerRadius="2"
+    WidthRequest="2" />-->
+                            <Button
+                                Command="{Binding ShowAddDiscountCommand}"
+                                FontFamily="icofont"
+                                IsEnabled="{Binding EnableDiscountDefault, Mode=OneWay, Converter={ctk:InvertedBoolConverter}}"
+                                Text="{StaticResource Plus}"
+                                ToolTipProperties.Text="Agregar clase y % de descuento" />
+                            <Button
+                                Command="{Binding DeleteDiscountCommand}"
+                                FontFamily="icofont"
+                                IsEnabled="{Binding SelectedDiscount, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                                Text="{StaticResource UiDelete}"
+                                ToolTipProperties.Text="Eliminar clase de descuento" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Frame>
+            </Grid>
+            <!--#endregion-->
             <BoxView
                 Grid.RowSpan="3"
                 Grid.Column="1"
                 BackgroundColor="{StaticResource Gray300}"
                 CornerRadius="2"
                 WidthRequest="2" />
-            <!--  PANEL DERECHO  -->
-            <VerticalStackLayout Spacing="8">
-                <Label
-                    Grid.Column="1"
-                    FontSize="18"
-                    Text="Tipos de descuentos"
-                    TextTransform="Uppercase"
-                    VerticalOptions="Center" />
-                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                    <Entry
-                        ClearButtonVisibility="WhileEditing"
-                        IsSpellCheckEnabled="True"
-                        IsTextPredictionEnabled="True"
-                        Placeholder="Escriba aquí" />
-                    <Button
+            <!--#region PANEL DERECHO-->
+            <Grid
+                Grid.Column="2"
+                RowDefinitions="auto,*,auto"
+                RowSpacing="8">
+                <VerticalStackLayout Spacing="8">
+                    <Label
                         Grid.Column="1"
-                        FontFamily="icofont"
-                        Text="{StaticResource Search}"
-                        ToolTipProperties.Text="Buscar" />
-                </Grid>
-                <HorizontalStackLayout Spacing="8">
-                    <RadioButton>
-                        <RadioButton.Content>
-                            <Label Text="Por nombre" VerticalOptions="Center" />
-                        </RadioButton.Content>
-                    </RadioButton>
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
-            <ScrollView Grid.Row="1">
-                <CollectionView />
-            </ScrollView>
-            <Frame Grid.Row="2" Padding="8">
-                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                    <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                        <!--<BoxView
-                BackgroundColor="{StaticResource Gray300}"
-                CornerRadius="2"
-                WidthRequest="2" />-->
+                        FontSize="18"
+                        Text="Descuentos a clientes"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                    <!--<Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <Entry
+                            ClearButtonVisibility="WhileEditing"
+                            IsSpellCheckEnabled="True"
+                            IsTextPredictionEnabled="True"
+                            Placeholder="Escriba aquí" />
                         <Button
-                            Command="{Binding ShowAddAccountOrCardCommand}"
+                            Grid.Column="1"
                             FontFamily="icofont"
-                            Text="{StaticResource Plus}"
-                            ToolTipProperties.Text="Agregar" />
-                        <Button
-                            FontFamily="icofont"
-                            IsEnabled="False"
-                            Text="{StaticResource UiDelete}"
-                            ToolTipProperties.Text="Eliminar" />
-                    </HorizontalStackLayout>
-                </Grid>
-            </Frame>
+                            Text="{StaticResource Search}"
+                            ToolTipProperties.Text="Buscar" />
+                    </Grid>
+                    <HorizontalStackLayout Spacing="8">
+                        <RadioButton>
+                            <RadioButton.Content>
+                                <Label Text="Por nombre" VerticalOptions="Center" />
+                            </RadioButton.Content>
+                        </RadioButton>
+                        <RadioButton>
+                            <RadioButton.Content>
+                                <Label Text="Por categoría" VerticalOptions="Center" />
+                            </RadioButton.Content>
+                        </RadioButton>
+                    </HorizontalStackLayout>-->
+                </VerticalStackLayout>
+                <ScrollView Grid.Row="1">
+                    <CollectionView />
+                </ScrollView>
+                <Frame Grid.Row="2" Padding="8">
+                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <HorizontalStackLayout Spacing="8">
+                            <Button
+                                FontFamily="icofont"
+                                Text="{StaticResource Close}"
+                                ToolTipProperties.Text="Ver por clientes sin descuentos" />
+                            <Button
+                                FontFamily="icofont"
+                                Text="{StaticResource Check}"
+                                ToolTipProperties.Text="Ver por clientes con descuentos" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                            <Button
+                                FontFamily="icofont"
+                                IsEnabled="False"
+                                Text="{StaticResource UiDelete}"
+                                ToolTipProperties.Text="Eliminar descuento al cliente seleccionado" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Frame>
+            </Grid>
+            <!--#endregion-->
         </Grid>
         <!--#endregion-->
     </Grid>

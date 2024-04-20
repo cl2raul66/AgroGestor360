@@ -48,16 +48,16 @@ public class ClientClass
     public double? PercentageValue { get; set; }
 }
 
-public class CustomerDiscount
+public class CustomerDiscountItem
 {
     public DateTime Date { get; set; }
     public ObjectId? CustomerId { get; set; }
-    public ObjectId? CustomerDiscountClass { get; set; }
+    public int? CustomerDiscountClass { get; set; }
 }
 
 public class CustomerDiscountClass
 {
-    public ObjectId? Id { get; set; }
+    public int Id { get; set; }
     public string? Name { get; set; }
     public double Value { get; set; }
 }

@@ -1,11 +1,9 @@
 ﻿using AgroGestor360.Server.Models;
 using AgroGestor360.Server.Sevices;
-using AgroGestor360.Server.Tools.Enums;
 using AgroGestor360.Server.Tools.Hubs;
 using LiteDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using vCardLib.Models;
 
 namespace AgroGestor360.Server.Controllers;
 

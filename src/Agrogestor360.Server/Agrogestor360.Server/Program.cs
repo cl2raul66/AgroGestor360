@@ -21,6 +21,7 @@ builder.Services.AddSingleton<IMerchandiseInLiteDbService, MerchandiseInLiteDbSe
 builder.Services.AddSingleton<IArticlesForWarehouseInLiteDbService, ArticlesForWarehouseInLiteDbService>();
 builder.Services.AddSingleton<IArticlesForSalesInLiteDbService, ArticlesForSalesInLiteDbService>();
 builder.Services.AddSingleton<IProductsForSalesInLiteDbService, ProductsForSalesInLiteDbService>();
+builder.Services.AddSingleton<ITypesDiscountsCustomersService, TypesDiscountsCustomersService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
