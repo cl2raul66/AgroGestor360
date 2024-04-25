@@ -24,7 +24,7 @@
                 VerticalOptions="Center" />
             <ScrollView Grid.Row="1">
                 <VerticalStackLayout Spacing="8">
-                    <Label Text="{Binding CurrentBank.Name, Mode=OneWay, StringFormat='Banco: {0}'}" />
+                    <Label Text="{Binding CurrentBank, Mode=OneWay, StringFormat='Banco: {0}'}" />
                     <Grid RowDefinitions="auto,auto" RowSpacing="4">
                         <Label Text="Alias:" />
                         <Entry
@@ -32,6 +32,7 @@
                             ClearButtonVisibility="WhileEditing"
                             IsSpellCheckEnabled="True"
                             IsTextPredictionEnabled="True"
+                            Keyboard="Plain"
                             Placeholder="Escriba aquí"
                             Text="{Binding Alias}" />
                     </Grid>
@@ -43,6 +44,7 @@
                                 ClearButtonVisibility="WhileEditing"
                                 IsSpellCheckEnabled="True"
                                 IsTextPredictionEnabled="True"
+                                Keyboard="Numeric"
                                 Placeholder="Escriba aquí"
                                 Text="{Binding Number}" />
                         </Grid>
@@ -56,60 +58,6 @@
                                 ItemsSource="{Binding FinancialType}"
                                 SelectedItem="{Binding SelectedFinancialType}" />
                         </Grid>
-                    </Grid>
-                    <Label
-                        FontSize="14"
-                        HorizontalOptions="Center"
-                        Text="Datos del beneficiario"
-                        TextTransform="Uppercase"
-                        VerticalOptions="Center" />
-                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                        <Label Text="Nombre completo: *" />
-                        <Entry
-                            Grid.Row="1"
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Placeholder="Escriba aquí"
-                            Text="{Binding BeneficiaryFullName}" />
-                    </Grid>
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                            <Label Text="Nit: *" />
-                            <Entry
-                                Grid.Row="1"
-                                ClearButtonVisibility="WhileEditing"
-                                IsSpellCheckEnabled="True"
-                                IsTextPredictionEnabled="True"
-                                Keyboard="Numeric"
-                                Placeholder="Escriba aquí"
-                                Text="{Binding BeneficiaryNIT}" />
-                        </Grid>
-                        <Grid
-                            Grid.Column="1"
-                            RowDefinitions="auto,auto"
-                            RowSpacing="4">
-                            <Label Text="Teléfono principal: *" />
-                            <Entry
-                                Grid.Row="1"
-                                ClearButtonVisibility="WhileEditing"
-                                IsSpellCheckEnabled="True"
-                                IsTextPredictionEnabled="True"
-                                Keyboard="Telephone"
-                                Placeholder="Escriba aquí"
-                                Text="{Binding BeneficiaryPhone}" />
-                        </Grid>
-                    </Grid>
-                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                        <Label Text="Correo electrónico principal:" />
-                        <Entry
-                            Grid.Row="1"
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Keyboard="Email"
-                            Placeholder="Escriba aquí"
-                            Text="{Binding BeneficiaryEMail}" />
                     </Grid>
                 </VerticalStackLayout>
             </ScrollView>

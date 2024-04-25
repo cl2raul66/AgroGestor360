@@ -2,7 +2,7 @@
 using LiteDB;
 using vCardLib.Models;
 
-namespace AgroGestor360.Server.Sevices;
+namespace AgroGestor360.Server.Services;
 
 public interface IShareholderForLitedbService
 {

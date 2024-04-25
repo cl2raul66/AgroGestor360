@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:model="clr-namespace:vCardLib.Models;assembly=vCardLib"
+    xmlns:model="clr-namespace:AgroGestor360.Client.Models;assembly=AgroGestor360.Client"
     xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     x:DataType="vm:CvSellersViewModel">
 
@@ -47,6 +47,7 @@
         <!--#region CONTENIDO-->
         <ScrollView Grid.Row="1">
             <CollectionView
+                x:Name="CvDTO6"
                 ItemsSource="{Binding Sellers, Mode=OneWay}"
                 SelectedItem="{Binding SelectedSeller}"
                 SelectionMode="Single">
@@ -54,33 +55,28 @@
                     <GridItemsLayout
                         HorizontalItemSpacing="4"
                         Orientation="Vertical"
-                        Span="6"
+                        Span="5"
                         VerticalItemSpacing="4" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:vCard">
+                    <DataTemplate x:DataType="model:DTO6">
                         <Border Style="{StaticResource BorderItem}">
-                            <VerticalStackLayout Spacing="4" VerticalOptions="CenterAndExpand">
+                            <Grid ColumnDefinitions="auto,*" ColumnSpacing="8">
                                 <Label
                                     FontFamily="icofont"
-                                    FontSize="48"
-                                    HorizontalOptions="Center"
+                                    FontSize="36"
                                     Text="{StaticResource Businessman}"
                                     TextColor="{StaticResource White}"
                                     VerticalOptions="Center" />
                                 <Label
+                                    Grid.Column="1"
                                     FontAttributes="Bold"
-                                    HorizontalOptions="Center"
-                                    Text="{Binding FormattedName}"
+                                    FontSize="12"
+                                    LineBreakMode="WordWrap"
+                                    Text="{Binding FullName}"
                                     TextColor="{StaticResource White}"
                                     VerticalOptions="Center" />
-                                <Label
-                                    FontAttributes="Bold"
-                                    HorizontalOptions="Center"
-                                    Text="{Binding BirthDay, Mode=OneWay, StringFormat='{0:dd-MM-yyyy}'}"
-                                    TextColor="{StaticResource White}"
-                                    VerticalOptions="Center" />
-                            </VerticalStackLayout>
+                            </Grid>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

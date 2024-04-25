@@ -36,7 +36,10 @@
             ColumnDefinitions="200,*"
             ColumnSpacing="16">
             <ScrollView>
-                <CollectionView SelectedItem="{Binding SelectedMenu}" SelectionMode="Single">
+                <CollectionView
+                    x:Name="CvOptions"
+                    SelectedItem="{Binding SelectedMenu}"
+                    SelectionMode="Single">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
@@ -44,9 +47,7 @@
                         <x:Array Type="{x:Type x:String}">
                             <x:String>Conexión</x:String>
                             <x:String>Entidad</x:String>
-                            <!--<x:String>Capital inicial</x:String>-->
                             <x:String>Bancos</x:String>
-                            <!--<x:String>Accionistas</x:String>-->
                             <x:String>Almacén</x:String>
                             <x:String>Clientes</x:String>
                             <x:String>Productos</x:String>
@@ -66,6 +67,14 @@
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
+                    <!--<CollectionView.GroupHeaderTemplate>
+                        <DataTemplate>
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="Subtitle"
+                                Text="{Binding Key}" />
+                        </DataTemplate>
+                    </CollectionView.GroupHeaderTemplate>-->
                 </CollectionView>
             </ScrollView>
             <Grid Grid.Column="1">

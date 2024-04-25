@@ -1,7 +1,8 @@
-﻿using AgroGestor360.Server.Sevices;
+﻿using AgroGestor360.Server.Models;
+using AgroGestor360.Server.Services;
+using AgroGestor360.Server.Tools.Extensions;
 using LiteDB;
 using Microsoft.AspNetCore.Mvc;
-using vCardLib.Models;
 
 namespace AgroGestor360.Server.Controllers;
 
@@ -9,60 +10,96 @@ namespace AgroGestor360.Server.Controllers;
 [Route("[controller]")]
 public class CustomersController : ControllerBase
 {
-    private readonly ICustomersForLitedbService customersServ;
+    readonly ICustomersInLiteDbService customersServ;
+    readonly IEnumerable<CustomerDiscountClass> AllDiscount;
 
-    public CustomersController(ICustomersForLitedbService customersService)
+    public CustomersController(ICustomersInLiteDbService customersService, IConfiguration configuration)
     {
         customersServ = customersService;
+        AllDiscount = configuration.GetSection("DefaultClientClasses")?.GetSection("Types").Get<IEnumerable<CustomerDiscountClass>>() ?? [];
     }
 
     [HttpGet("exist")]
-    public ActionResult<bool> Exist() => Ok(customersServ.Exist);
-
-    [HttpGet]
-    public ActionResult<IEnumerable<vCard>> GetAll()
+    public IActionResult CheckExistence()
     {
-        var all = customersServ.GetAll();
-        if (!all?.Any() ?? true)
-        {
-            return NotFound();
-        }
+        bool exist = customersServ.Exist;
 
-        return Ok(all);
+        return Ok(exist);
     }
 
-    [HttpGet("byname/{name}")]
-    public IActionResult GetAllByName(string name)
+    [HttpGet("getalldiscount")]
+    public ActionResult<IEnumerable<CustomerDiscountClass>> GetAllDiscount() => !AllDiscount?.Any() ?? true ? NotFound() : Ok(AllDiscount);
+
+    [HttpGet("getallwithdiscount")]
+    public ActionResult<IEnumerable<DTO5_1>> GetAllWithDiscount()
     {
-        return Ok(customersServ.GetAllByName(name));
+        var customers = customersServ.GetAllWithDiscount()?.Select(x => x.ToDTO5_1()) ?? [];
+
+        return !customers?.Any() ?? true ? NotFound() : Ok(customers);
+    }
+
+    [HttpGet("getallwithoutdiscount")]
+    public ActionResult<IEnumerable<DTO5_1>> GetAllWithoutDiscount()
+    {
+        var customers = customersServ.GetAllWithoutDiscount()?.Select(x => x.ToDTO5_1()) ?? [];
+
+        return !customers?.Any() ?? true ? NotFound() : Ok(customers);
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetById(string id)
+    public ActionResult<DTO5_3?> GetById(string id)
     {
-        var card = customersServ.GetById(id);
-        return card is null ? NotFound() : Ok(card);
+        var find = customersServ.GetById(new ObjectId(id));
+
+        return find is null ? NotFound() : Ok(find!.ToDTO5_3());
     }
 
     [HttpPost]
-    public ActionResult<bool> Post([FromBody] vCard card)
+    public ActionResult<string> Post([FromBody] DTO5_2 dTO)
     {
-        card.Uid = ObjectId.NewObjectId().ToString();
-        var id = customersServ.Insert(card);
-        return Ok(!string.IsNullOrEmpty(id));
+        var entity = dTO.FromDTO5_2();
+        entity.Id = ObjectId.NewObjectId();
+
+        var result = customersServ.Insert(entity);
+
+        return string.IsNullOrEmpty(result) ? NotFound(): Ok(result);
     }
 
     [HttpPut]
-    public ActionResult<bool> Put([FromBody] vCard card)
+    public ActionResult<bool> Update([FromBody] DTO5_3 dTO)
     {
-        var result = customersServ.Update(card);
+        var entity = dTO.FromDTO5_3();
+        if (entity is null)
+        {
+            return NoContent();
+        }
+        var result = customersServ.Update(entity);
+
         return Ok(result);
     }
 
-    [HttpDelete("{id}")]
-    public ActionResult<bool> Delete(string id)
+    [HttpPut("updatediscount")]
+    public ActionResult<bool> UpdateDiscount([FromBody] DTO5_4 dTO)
     {
-        var result = customersServ.Delete(id);
+        var entity = customersServ.GetById(new ObjectId(dTO.CustomerId));
+        if (entity is null)
+        {
+            return NoContent();
+        }
+        if (dTO.DiscountId > 0)
+        {
+            entity.Discount = AllDiscount.FirstOrDefault(x => x.Id == dTO.DiscountId);
+            if (entity.Discount is null)
+            {
+                return NotFound();
+            }
+        }
+        else
+        {
+            entity.Discount = null;
+        }
+        var result = customersServ.Update(entity);
+
         return Ok(result);
     }
 }

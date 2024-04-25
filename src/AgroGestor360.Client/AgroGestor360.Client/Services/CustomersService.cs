@@ -1,18 +1,19 @@
-﻿using System.Text;
+﻿using AgroGestor360.Client.Models;
+using System.Text;
 using System.Text.Json;
-using vCardLib.Models;
 
 namespace AgroGestor360.Client.Services;
 
 public interface ICustomersService
 {
-    Task<bool> DeleteAsync(string serverURL, string id);
     Task<bool> ExistAsync(string serverURL);
-    Task<IEnumerable<vCard>> GetAllAsync(string serverURL);
-    Task<IEnumerable<vCard>> GetAllByNameAsync(string serverURL, string name);
-    Task<vCard?> GetByIdAsync(string serverURL, string id);
-    Task<bool> InsertAsync(string serverURL, vCard card);
-    Task<bool> UpdateAsync(string serverURL, vCard card);
+    Task<IEnumerable<CustomerDiscountClass>> GetAllDiscountAsync(string serverURL);
+    Task<IEnumerable<DTO5_1>> GetAllWithDiscountAsync(string serverURL);
+    Task<IEnumerable<DTO5_1>> GetAllWithoutDiscountAsync(string serverURL);
+    Task<DTO5_3?> GetByIdAsync(string serverURL, string id);
+    Task<string> InsertAsync(string serverURL, DTO5_2 dTO);
+    Task<bool> UpdateAsync(string serverURL, DTO5_3 dTO);
+    Task<bool> UpdateDiscountAsync(string serverURL, DTO5_4 dTO);
 }
 
 public class CustomersService : ICustomersService
@@ -30,11 +31,11 @@ public class CustomersService : ICustomersService
         return false;
     }
 
-    public async Task<IEnumerable<vCard>> GetAllAsync(string serverURL)
+    public async Task<IEnumerable<CustomerDiscountClass>> GetAllDiscountAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers/getalldiscount");
             if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
             {
                 return [];
@@ -43,16 +44,16 @@ public class CustomersService : ICustomersService
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<vCard>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+            return JsonSerializer.Deserialize<IEnumerable<CustomerDiscountClass>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
         }
         return [];
     }
 
-    public async Task<IEnumerable<vCard>> GetAllByNameAsync(string serverURL, string name)
+    public async Task<IEnumerable<DTO5_1>> GetAllWithDiscountAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers/byname/{name}");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers/getallwithdiscount");
             if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
             {
                 return [];
@@ -61,12 +62,30 @@ public class CustomersService : ICustomersService
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<vCard>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+            return JsonSerializer.Deserialize<IEnumerable<DTO5_1>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
         }
         return [];
     }
 
-    public async Task<vCard?> GetByIdAsync(string serverURL, string id)
+    public async Task<IEnumerable<DTO5_1>> GetAllWithoutDiscountAsync(string serverURL)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers/getallwithoutdiscount");
+            if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
+            {
+                return [];
+            }
+
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<DTO5_1>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+        }
+        return [];
+    }
+
+    public async Task<DTO5_3?> GetByIdAsync(string serverURL, string id)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
@@ -74,31 +93,31 @@ public class CustomersService : ICustomersService
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<vCard>(content, ApiServiceBase.ProviderJSONOptions);
+                return JsonSerializer.Deserialize<DTO5_3>(content, ApiServiceBase.ProviderJSONOptions);
             }
         }
         return null;
     }
 
-    public async Task<bool> InsertAsync(string serverURL, vCard card)
+    public async Task<string> InsertAsync(string serverURL, DTO5_2 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var content = new StringContent(JsonSerializer.Serialize(card), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonSerializer.Serialize(dTO), Encoding.UTF8, "application/json");
             var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/customers", content);
             if (response.IsSuccessStatusCode)
             {
-                return bool.Parse(await response.Content.ReadAsStringAsync());
+                return await response.Content.ReadAsStringAsync();
             }
         }
-        return false;
+        return string.Empty;
     }
 
-    public async Task<bool> UpdateAsync(string serverURL, vCard card)
+    public async Task<bool> UpdateAsync(string serverURL, DTO5_3 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var content = new StringContent(JsonSerializer.Serialize(card), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonSerializer.Serialize(dTO), Encoding.UTF8, "application/json");
             var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/customers", content);
             if (response.IsSuccessStatusCode)
             {
@@ -108,11 +127,12 @@ public class CustomersService : ICustomersService
         return false;
     }
 
-    public async Task<bool> DeleteAsync(string serverURL, string id)
+    public async Task<bool> UpdateDiscountAsync(string serverURL, DTO5_4 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/customers/{id}");
+            var content = new StringContent(JsonSerializer.Serialize(dTO), Encoding.UTF8, "application/json");
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/customers/updatediscount", content);
             if (response.IsSuccessStatusCode)
             {
                 return bool.Parse(await response.Content.ReadAsStringAsync());

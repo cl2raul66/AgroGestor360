@@ -35,7 +35,7 @@
                         Text="Bancos"
                         TextTransform="Uppercase"
                         VerticalOptions="Center" />
-                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <!--<Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                         <Entry
                             ClearButtonVisibility="WhileEditing"
                             IsSpellCheckEnabled="True"
@@ -46,7 +46,7 @@
                             FontFamily="icofont"
                             Text="{StaticResource Search}"
                             ToolTipProperties.Text="Buscar" />
-                    </Grid>
+                    </Grid>-->
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1">
                     <CollectionView
@@ -57,11 +57,11 @@
                             <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="model:Bank">
+                            <DataTemplate>
                                 <Border Style="{StaticResource BorderItem}">
                                     <Label
                                         FontSize="Caption"
-                                        Text="{Binding Name}"
+                                        Text="{Binding .}"
                                         TextColor="{StaticResource White}"
                                         TextTransform="Uppercase" />
                                 </Border>
@@ -114,7 +114,7 @@
                         Text="Cuentas y tarjetas"
                         TextTransform="Uppercase"
                         VerticalOptions="Center" />
-                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <!--<Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                         <Entry
                             ClearButtonVisibility="WhileEditing"
                             IsSpellCheckEnabled="True"
@@ -130,12 +130,12 @@
                         <RadioButton Content="Por alias" />
                         <RadioButton Content="Por número" />
                         <RadioButton Content="Por beneficiario" />
-                    </HorizontalStackLayout>
+                    </HorizontalStackLayout>-->
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1">
                     <CollectionView
                         ItemsSource="{Binding BankAccounts, Mode=OneWay}"
-                        SelectedItem="{Binding SelectedBankAccount}"
+                        SelectedItem="{Binding SelectedBank}"
                         SelectionMode="Single">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout
@@ -202,10 +202,17 @@
                                             VerticalOptions="Center">
                                             <Label
                                                 LineBreakMode="MiddleTruncation"
-                                                Text="{Binding BankName, Mode=OneWay}"
+                                                Text="{Binding Alias, Mode=OneWay}"
                                                 TextColor="{StaticResource White}" />
-                                            <Label Text="{Binding Number, Mode=OneWay, StringFormat='No. {0}'}" TextColor="{StaticResource White}" />
-                                            <Label Text="{Binding Beneficiary.FormattedName, Mode=OneWay}" TextColor="{StaticResource White}" />
+                                            <Label>
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="{Binding BankName}" TextColor="{StaticResource White}" />
+                                                        <Span Text=": " TextColor="{StaticResource White}" />
+                                                        <Span Text="{Binding Number}" TextColor="{StaticResource White}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
                                         </VerticalStackLayout>
                                     </Grid>
                                 </Border>

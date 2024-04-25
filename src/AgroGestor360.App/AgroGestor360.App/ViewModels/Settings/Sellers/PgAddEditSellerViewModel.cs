@@ -1,10 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AgroGestor360.Client.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using vCardLib.Models;
 
 namespace AgroGestor360.App.ViewModels;
 
@@ -18,7 +17,7 @@ public partial class PgAddEditSellerViewModel : ObservableValidator
     }
 
     [ObservableProperty]
-    vCard? currentSeller;
+    DTO6_2? currentSeller;
 
     [ObservableProperty]
     DateTime date;
@@ -73,24 +72,36 @@ public partial class PgAddEditSellerViewModel : ObservableValidator
             return;
         }
 
-        Dictionary<string, string> customFields = string.IsNullOrEmpty(Address)
-            ? new() { { nameof(NIT), NIT! }, { nameof(DPI), DPI! }, { "REGISTRATIONDATE", Date.ToString()! } }
-            : new() { { nameof(NIT), NIT! }, { nameof(DPI), DPI! }, { "REGISTRATIONDATE", Date.ToString()! }, { "ADDRESS", Address!.Trim().ToUpper() } };
-
-        vCard theSeller = new(vCardLib.Enums.vCardVersion.v4)
+        switch (CurrentSeller is null)
         {
-            Uid = CurrentSeller?.Uid,
-            Language = new Language(CultureInfo.CurrentCulture.TwoLetterISOLanguageName),
-            FormattedName = Name!.Trim().ToUpper(),
-            BirthDay = Birthday.Date >= Date.Date ? null : Birthday.Date,
-            CustomFields = [.. customFields],
-            PhoneNumbers = [new TelephoneNumber(Phone!.Trim(), vCardLib.Enums.TelephoneNumberType.None)],
-            EmailAddresses = string.IsNullOrEmpty(Email) ? new() : [new EmailAddress(Email!.Trim().ToLower(), vCardLib.Enums.EmailAddressType.None)]
-        };
-
-        string token = CurrentSeller is null ? "newSeller" : "editSeller";
-
-        WeakReferenceMessenger.Default.Send(theSeller, token);
+            case false:
+                DTO6_2 editSeller = new()
+                {
+                    Id = CurrentSeller.Id,
+                    FullName = Name?.Trim().ToUpper(),
+                    NIT = NIT?.Trim().ToUpper(),
+                    NIP = DPI?.Trim().ToUpper(),
+                    Phone = Phone?.Trim(),
+                    Mail = Email?.Trim().ToLower(),
+                    Address = Address?.Trim().ToUpper(),
+                    Birthday = Birthday.Date <= DateTime.Now.AddYears(-18) ? Birthday.Date : null
+                };
+                WeakReferenceMessenger.Default.Send(editSeller, "editSeller");
+                break;
+            default:
+                DTO6_1 newSeller = new()
+                {
+                    FullName = Name?.Trim().ToUpper(),
+                    NIT = NIT?.Trim().ToUpper(),
+                    NIP = DPI?.Trim().ToUpper(),
+                    Phone = Phone?.Trim(),
+                    Mail = Email?.Trim().ToLower(),
+                    Address = Address?.Trim().ToUpper(),
+                    Birthday = Birthday.Date <= DateTime.Now.AddYears(-18) ? Birthday.Date : null
+                };
+                WeakReferenceMessenger.Default.Send(newSeller, "newSeller");
+                break;
+        }
 
         await Cancel();
     }
@@ -100,14 +111,14 @@ public partial class PgAddEditSellerViewModel : ObservableValidator
         base.OnPropertyChanged(e);
         if (e.PropertyName == nameof(CurrentSeller))
         {
-            Name = CurrentSeller!.FormattedName;
-            NIT = CurrentSeller.CustomFields.First(x => x.Key == nameof(NIT)).Value;
-            DPI = CurrentSeller.CustomFields.First(x => x.Key == nameof(DPI)).Value;
-            Phone = CurrentSeller.PhoneNumbers.First().Number;
-            Birthday = CurrentSeller!.BirthDay ?? DateTime.Now;
-            Email = CurrentSeller.EmailAddresses.FirstOrDefault().Value;
-            Address = CurrentSeller.CustomFields.FirstOrDefault(x => x.Key == "ADDRESS").Value;
-            Date = DateTime.Parse(CurrentSeller.CustomFields.FirstOrDefault(x => x.Key == "REGISTRATIONDATE").Value);
+            Name = CurrentSeller?.FullName;
+            NIT = CurrentSeller?.NIT;
+            DPI = CurrentSeller?.NIP;
+            Phone = CurrentSeller?.Phone;
+            Birthday = CurrentSeller?.Birthday ?? DateTime.Now;
+            Email = CurrentSeller?.Mail;
+            Address = CurrentSeller?.Address;
         }
     }
 }
+//TODO: poner en el dto de inserccion y modificacion una propiedad para la fecha de inserccion y de modificacion

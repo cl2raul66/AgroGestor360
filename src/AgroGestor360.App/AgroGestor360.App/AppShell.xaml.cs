@@ -6,7 +6,6 @@ using AgroGestor360.App.Views.Settings.BankAccounts;
 using AgroGestor360.App.Views.Settings.Connection;
 using AgroGestor360.App.Views.Settings.Customers;
 using AgroGestor360.App.Views.Settings.Products;
-using AgroGestor360.App.Views.Settings.Sales;
 using AgroGestor360.App.Views.Settings.Shareholders;
 using AgroGestor360.App.Views.Settings.Warehouse;
 
@@ -31,9 +30,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(PgLoans), typeof(PgLoans));
         Routing.RegisterRoute(nameof(PgAddLoan), typeof(PgAddLoan));
         Routing.RegisterRoute(nameof(PgAmortization), typeof(PgAmortization));
-        Routing.RegisterRoute(nameof(PgAddCustomerDiscountType), typeof(PgAddCustomerDiscountType));
         Routing.RegisterRoute(nameof(PgExpense), typeof(PgExpense));
         Routing.RegisterRoute(nameof(PgAddExpense), typeof(PgAddExpense));
-        Routing.RegisterRoute(nameof(PgSales), typeof(PgSales));
     }
 }

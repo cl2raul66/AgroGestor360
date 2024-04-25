@@ -1,4 +1,4 @@
-using AgroGestor360.Server.Sevices;
+using AgroGestor360.Server.Services;
 using AgroGestor360.Server.Tools.Configurations;
 using AgroGestor360.Server.Tools.Hubs;
 using AgroGestor360.Server.Tools.Middleware;
@@ -12,16 +12,14 @@ builder.Services.AddSingleton<BanksDbConfig>();
 builder.Services.AddSingleton<ContactsDbConfig>();
 builder.Services.AddSingleton<MerchandiseDbConfig>();
 builder.Services.AddSingleton<ProductsDbConfig>();
-builder.Services.AddSingleton<IBanksForLitedbService, BanksForLitedbService>();
-builder.Services.AddSingleton<IBankAccountsForLitedbService, BankAccountsForLitedbService>();
+builder.Services.AddSingleton<IBankAccountsLiteDbService,BankAccountsLiteDbService>();
 builder.Services.AddSingleton<IShareholderForLitedbService, ShareholderForLitedbService>();
-builder.Services.AddSingleton<ISellersForLitedbService, SellersForLitedbService>();
-builder.Services.AddSingleton<ICustomersForLitedbService, CustomersForLitedbService>();
 builder.Services.AddSingleton<IMerchandiseInLiteDbService, MerchandiseInLiteDbService>();
 builder.Services.AddSingleton<IArticlesForWarehouseInLiteDbService, ArticlesForWarehouseInLiteDbService>();
 builder.Services.AddSingleton<IArticlesForSalesInLiteDbService, ArticlesForSalesInLiteDbService>();
+builder.Services.AddSingleton<ICustomersInLiteDbService, CustomersInLiteDbService>();
+builder.Services.AddSingleton<ISellersInLiteDbService, SellersInLiteDbService>();
 builder.Services.AddSingleton<IProductsForSalesInLiteDbService, ProductsForSalesInLiteDbService>();
-builder.Services.AddSingleton<ITypesDiscountsCustomersService, TypesDiscountsCustomersService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();

@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroGestor360.Client", "AgroGestor360.Client\AgroGestor360.Client.csproj", "{FE2C8BA0-60BF-4F30-97B6-F75BB512E33F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgroGestor360.Client", "AgroGestor360.Client\AgroGestor360.Client.csproj", "{FE2C8BA0-60BF-4F30-97B6-F75BB512E33F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AC1FA7AD-3058-4D60-89B4-3C84E634663F}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

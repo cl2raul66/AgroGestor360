@@ -9,5 +9,14 @@ public partial class PgSettings : ContentPage
 		InitializeComponent();
 
 		BindingContext = vm;
+
+		CvOptions.SelectionChanged += (sender, e) =>
+		{
+            if (e.CurrentSelection.Count == 0)
+            {
+                CvOptions.SelectionMode = SelectionMode.None;
+            }
+            CvOptions.SelectionMode = SelectionMode.Single;
+        };
     }
 }

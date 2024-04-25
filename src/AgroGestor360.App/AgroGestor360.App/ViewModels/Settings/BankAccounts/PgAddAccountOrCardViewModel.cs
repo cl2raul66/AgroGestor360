@@ -4,13 +4,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using vCardLib.Models;
 
 namespace AgroGestor360.App.ViewModels;
 
 [QueryProperty(nameof(CurrentBank), nameof(CurrentBank))]
-[QueryProperty(nameof(BankAccountNumbers), nameof(BankAccountNumbers))]
 public partial class PgAddAccountOrCardViewModel : ObservableValidator
 {
     readonly IFinancialInstrumentTypeService financialInstrumentTypeServ;
@@ -22,10 +19,7 @@ public partial class PgAddAccountOrCardViewModel : ObservableValidator
     }
 
     [ObservableProperty]
-    Bank? currentBank;
-
-    [ObservableProperty]
-    List<string>? bankAccountNumbers;
+    string? currentBank;
 
     [ObservableProperty]
     string? alias;
@@ -42,25 +36,6 @@ public partial class PgAddAccountOrCardViewModel : ObservableValidator
     string? selectedFinancialType;
 
     [ObservableProperty]
-    [Required]
-    [MinLength(2)]
-    string? beneficiaryFullName;
-
-    [ObservableProperty]
-    [Required]
-    [MinLength(6)]
-    string? beneficiaryNIT;
-
-    [ObservableProperty]
-    [Required]
-    [Phone]
-    string? beneficiaryPhone;
-
-    [ObservableProperty]
-    [EmailAddress]
-    string? beneficiaryEMail;
-
-    [ObservableProperty]
     bool isVisibleInfo;
 
     [RelayCommand]
@@ -71,7 +46,7 @@ public partial class PgAddAccountOrCardViewModel : ObservableValidator
     {
         ValidateAllProperties();
 
-        if (HasErrors || string.IsNullOrEmpty(SelectedFinancialType) || BankAccountNumbers!.Contains(Number!))
+        if (HasErrors || string.IsNullOrEmpty(SelectedFinancialType))
         {
             IsVisibleInfo = true;
             await Task.Delay(3000);
@@ -80,19 +55,11 @@ public partial class PgAddAccountOrCardViewModel : ObservableValidator
         }
 
         BankAccount newBankAccount = new()
-        {
-            Alias = Alias!.Trim().ToUpper(),
+        {           
+            Alias = Alias?.Trim().ToUpper() ?? string.Empty,
             Number = Number!.Trim(),
-            BankName = CurrentBank!.Name,
-            InstrumentType = financialInstrumentTypeServ.GetByName(SelectedFinancialType) ?? 0,
-            Beneficiary = new vCard(vCardLib.Enums.vCardVersion.v4)
-            {
-                Language = new Language(CultureInfo.CurrentCulture.TwoLetterISOLanguageName),
-                FormattedName = BeneficiaryFullName!.Trim().ToUpper(),
-                PhoneNumbers = [new TelephoneNumber(BeneficiaryPhone!.Trim(), vCardLib.Enums.TelephoneNumberType.None)],
-                CustomFields = [new KeyValuePair<string, string>("NIT", BeneficiaryNIT!)],
-                EmailAddresses = string.IsNullOrEmpty(BeneficiaryEMail) ? new() : [new EmailAddress(BeneficiaryEMail!.Trim().ToLower(), vCardLib.Enums.EmailAddressType.None)]
-            }
+            BankName = CurrentBank!,
+            InstrumentType = financialInstrumentTypeServ.GetByName(SelectedFinancialType) ?? 0
         };
 
         WeakReferenceMessenger.Default.Send(newBankAccount, "addBankAccount");

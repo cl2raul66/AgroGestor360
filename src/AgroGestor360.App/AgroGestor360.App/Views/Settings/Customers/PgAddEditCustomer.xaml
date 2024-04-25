@@ -16,7 +16,8 @@
         HorizontalOptions="Center"
         MaximumWidthRequest="480"
         VerticalOptions="Center">
-        <Grid RowDefinitions="auto,*,auto" RowSpacing="8">
+        <Grid RowDefinitions="auto,*,auto" RowSpacing="14">
+            <!--#region ENCABEZADO-->
             <Label
                 FontSize="18"
                 TextTransform="Uppercase"
@@ -29,16 +30,21 @@
                         <Setter Property="Text" Value="Agregar cliente" />
                     </DataTrigger>
                     <DataTrigger
-                        Binding="{Binding CurrentCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Binding="{Binding CurrentCustomer, Mode=OneWay, Converter={ctk:IsNullConverter}}"
                         TargetType="Label"
-                        Value="true">
+                        Value="false">
                         <Setter Property="Text" Value="Editar cliente" />
                     </DataTrigger>
                 </Label.Triggers>
             </Label>
+            <!--#endregion-->
+            <!--#region CONTENIDO-->
             <ScrollView Grid.Row="1">
                 <VerticalStackLayout Spacing="8">
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8" IsVisible="{Binding CurrentCustomer, Mode=OneWay, Converter={ctk:IsNullConverter}}">
+                    <Grid
+                        ColumnDefinitions="*,*"
+                        ColumnSpacing="8"
+                        IsVisible="{Binding CurrentCustomer, Mode=OneWay, Converter={ctk:IsNullConverter}}">
                         <Grid RowDefinitions="auto,auto" RowSpacing="4">
                             <Label Text="Fecha:" />
                             <DatePicker Grid.Row="1" Date="{Binding Date}" />
@@ -151,8 +157,35 @@
                             Placeholder="Escriba aquí"
                             Text="{Binding Address}" />
                     </Grid>
+                    <ctk:Expander x:Name="expander" IsVisible="{Binding CurrentCustomer, Mode=OneWay, Converter={ctk:IsNullConverter}}">
+                        <ctk:Expander.Header>
+                            <StackLayout Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding IsExpanded, Source={x:Reference expander}, Mode=TwoWay}" />
+                                <Label Text="Aplicar descuento" VerticalOptions="Center" />
+                            </StackLayout>
+                        </ctk:Expander.Header>
+                        <ctk:Expander.Content>
+                            <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                                <Label Text="Seleccione un descuento: *" />
+                                <Picker
+                                    Grid.Row="1"
+                                    ItemsSource="{Binding Discounts}"
+                                    SelectedItem="{Binding SelectedDiscount}">
+                                    <Picker.ItemDisplayBinding>
+                                        <MultiBinding>
+                                            <MultiBinding.StringFormat>{0} - {1}%</MultiBinding.StringFormat>
+                                            <Binding Path="Name" />
+                                            <Binding Path="Value" />
+                                        </MultiBinding>
+                                    </Picker.ItemDisplayBinding>
+                                </Picker>
+                            </Grid>
+                        </ctk:Expander.Content>
+                    </ctk:Expander>
                 </VerticalStackLayout>
             </ScrollView>
+            <!--#endregion-->
+            <!--#region PIE-->
             <Grid
                 Grid.Row="2"
                 ColumnDefinitions="*,auto"
@@ -197,6 +230,7 @@
                         TextTransform="Uppercase" />
                 </HorizontalStackLayout>
             </Grid>
+            <!--#endregion-->
         </Grid>
     </Frame>
 

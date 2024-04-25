@@ -13,14 +13,14 @@ public partial class PgSettingsViewModel : ObservableObject
     readonly INavigationService navigationServ;
     readonly IApiService apiServ;
     readonly IOrganizationService organizationServ;
-    readonly string serverURL;
+    //readonly string serverURL;
 
     public PgSettingsViewModel(INavigationService navigationService, IApiService apiService, IOrganizationService organizationService)
     {
         navigationServ = navigationService;
         apiServ = apiService;
         organizationServ = organizationService;
-        serverURL = Preferences.Default.Get("serverurl", string.Empty);
+        //serverURL = Preferences.Default.Get("serverurl", string.Empty);
         SelectedMenu = string.Empty;
     }
 
@@ -45,6 +45,7 @@ public partial class PgSettingsViewModel : ObservableObject
                     break;
                 case "Entidad":
                     SelectedMenu = null;
+                    string serverURL = Preferences.Default.Get("serverurl", string.Empty);
                     var org = await organizationServ.GetOrganization(serverURL);
                     StringBuilder sb = new();
                     if (org is not null)
@@ -80,9 +81,6 @@ public partial class PgSettingsViewModel : ObservableObject
                     break;
                 case "Vendedores":
                     navigationServ.NavigateToView<CvSellersViewModel>(view => CurrentContent = view);
-                    break;
-                case "Ventas":
-                    navigationServ.NavigateToView<CvSalesViewModel>(view => CurrentContent = view);
                     break;
                 default:
                     navigationServ.NavigateToNullView(view => CurrentContent = view);

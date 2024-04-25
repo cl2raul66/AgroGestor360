@@ -3,12 +3,13 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
-using System.Globalization;
-using vCardLib.Models;
+using AgroGestor360.Client.Models;
+using AgroGestor360.App.Views.Settings.Customers;
 
 namespace AgroGestor360.App.ViewModels;
 
-[QueryProperty(nameof(CurrentCustomer), nameof(CurrentCustomer))]
+[QueryProperty(nameof(Discounts), nameof(Discounts))]
+[QueryProperty(nameof(CurrentCustomer), "CurrentCustomer")]
 public partial class PgAddEditCustomerViewModel : ObservableValidator
 {
     public PgAddEditCustomerViewModel()
@@ -18,7 +19,13 @@ public partial class PgAddEditCustomerViewModel : ObservableValidator
     }
 
     [ObservableProperty]
-    vCard? currentCustomer;
+    CustomerDiscountClass[]? discounts;
+
+    [ObservableProperty]
+    CustomerDiscountClass? selectedDiscount;
+
+    [ObservableProperty]
+    DTO5_3? currentCustomer;
 
     [ObservableProperty]
     DateTime date;
@@ -53,12 +60,16 @@ public partial class PgAddEditCustomerViewModel : ObservableValidator
 
     [ObservableProperty]
     bool isVisisbleInfo;
-    
+
     [ObservableProperty]
     bool isBusiness;
 
     [RelayCommand]
-    async Task Cancel() => await Shell.Current.GoToAsync("..", true);
+    async Task Cancel()
+    {
+        WeakReferenceMessenger.Default.Send("cancel", nameof(PgAddEditCustomer));
+        await Shell.Current.GoToAsync("..", true);
+    }
 
     [RelayCommand]
     async Task Add()
@@ -74,44 +85,57 @@ public partial class PgAddEditCustomerViewModel : ObservableValidator
             return;
         }
 
-        Dictionary<string, string> customFields = string.IsNullOrEmpty(Address)
-            ? new() { { nameof(NIT), NIT! }, { "REGISTRATIONDATE", Date.ToString()! } }
-            : new() { { nameof(NIT), NIT! }, { "REGISTRATIONDATE", Date.ToString()! }, { "ADDRESS", Address!.Trim().ToUpper() } };
-
-        vCard theCustomer = new(vCardLib.Enums.vCardVersion.v4)
+        switch (CurrentCustomer is null)
         {
-            Uid = CurrentCustomer?.Uid,
-            Language = new Language(CultureInfo.CurrentCulture.TwoLetterISOLanguageName),
-            FormattedName = Name!.Trim().ToUpper(),
-            BirthDay = Birthday.Date >= Date.Date ? null : Birthday.Date,
-            CustomFields = [.. customFields],
-            PhoneNumbers = [new TelephoneNumber(Phone!.Trim(), vCardLib.Enums.TelephoneNumberType.None)],
-            EmailAddresses = string.IsNullOrEmpty(Email) ? new() : [new EmailAddress(Email!.Trim().ToLower(), vCardLib.Enums.EmailAddressType.None)],
-            Organization = IsBusiness ? new Organization(BusinessName!, null, null) : null
-        };
+            case false:
+                DTO5_3 editCustomer = new()
+                {
+                    CustomerId = CurrentCustomer.CustomerId,
+                    CustomerFullName = Name?.Trim().ToUpper(),
+                    CustomerNIT = NIT!.Trim().ToUpper(),
+                    CustomerOrganizationName = BusinessName?.Trim().ToUpper(),
+                    CustomerPhone = Phone!.Trim(),
+                    CustomerMail = Email?.Trim().ToLower(),
+                    CustomerAddress = Address?.Trim().ToUpper(),
+                    Birthday = Birthday.Date <= DateTime.Now.AddYears(-18) ? Birthday.Date : null,
+                    Discount = CurrentCustomer!.Discount,
+                };
+                WeakReferenceMessenger.Default.Send(editCustomer, "editCustomer");
+                break;
+            default:
+                DTO5_2 newCustomer = new()
+                {
+                    CustomerFullName = Name?.Trim().ToUpper(),
+                    CustomerNIT = NIT!.Trim().ToUpper(),
+                    CustomerOrganizationName = BusinessName?.Trim().ToUpper(),
+                    CustomerPhone = Phone!.Trim(),
+                    CustomerMail = Email?.Trim().ToLower(),
+                    CustomerAddress = Address?.Trim().ToUpper(),
+                    Birthday = Birthday.Date <= DateTime.Now.AddYears(-18) ? Birthday.Date : null,
+                    Discount = SelectedDiscount,
+                };
+                WeakReferenceMessenger.Default.Send(newCustomer, "newCustomer");
+                break;
+        }
 
-        string token = CurrentCustomer is null ? "newCustomer" : "editCustomer";
-
-        WeakReferenceMessenger.Default.Send(theCustomer, token);
-
-        await Cancel();
+        await Shell.Current.GoToAsync("..", true);
     }
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
-        if (e.PropertyName == nameof(CurrentCustomer))
-        {
-            Name = CurrentCustomer!.FormattedName;
-            NIT = CurrentCustomer.CustomFields.First(x => x.Key == nameof(NIT)).Value;
-            Phone = CurrentCustomer.PhoneNumbers.First().Number;
-            Birthday = CurrentCustomer!.BirthDay ?? DateTime.Now;
-            Email = CurrentCustomer.EmailAddresses.FirstOrDefault().Value;
-            Address = CurrentCustomer.CustomFields.FirstOrDefault(x => x.Key == "ADDRESS").Value;
-            BusinessName = CurrentCustomer!.Organization?.Name;
-            Date = DateTime.Parse(CurrentCustomer.CustomFields.FirstOrDefault(x => x.Key == "REGISTRATIONDATE").Value);
 
-            IsBusiness = CurrentCustomer!.Organization is not null;
+        if (e.PropertyName == nameof(CurrentCustomer) && CurrentCustomer is not null)
+        {
+            Name = CurrentCustomer?.CustomerFullName;
+            NIT = CurrentCustomer?.CustomerNIT;
+            Phone = CurrentCustomer?.CustomerPhone;
+            Birthday = CurrentCustomer?.Birthday ?? DateTime.Now;
+            Email = CurrentCustomer?.CustomerMail;
+            Address = CurrentCustomer?.CustomerAddress;
+            BusinessName = CurrentCustomer?.CustomerOrganizationName;
+            IsBusiness = !string.IsNullOrEmpty(CurrentCustomer?.CustomerOrganizationName);
         }
     }
 }
+//todo: poner en el dto de inserccion y modificacion una propiedad para la fecha de inserccion y de modificacion

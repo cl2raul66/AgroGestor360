@@ -2,7 +2,7 @@
 using AgroGestor360.Server.Tools.Helpers;
 using LiteDB;
 
-namespace AgroGestor360.Server.Sevices;
+namespace AgroGestor360.Server.Services;
 
 public interface IArticlesForWarehouseInLiteDbService
 {

@@ -9,7 +9,6 @@ using AgroGestor360.App.Views.Settings.BankAccounts;
 using AgroGestor360.App.Views.Settings.Connection;
 using AgroGestor360.App.Views.Settings.Customers;
 using AgroGestor360.App.Views.Settings.Products;
-using AgroGestor360.App.Views.Settings.Sales;
 using AgroGestor360.App.Views.Settings.Shareholders;
 using AgroGestor360.App.Views.Settings.Warehouse;
 using AgroGestor360.Client.Services;
@@ -47,7 +46,6 @@ public static class MauiProgram
         });
         builder.Services.AddSingleton<IAuthService, AuthService>();
         builder.Services.AddSingleton<IOrganizationService, OrganizationService>();
-        builder.Services.AddSingleton<IBanksService, BanksService>();
         builder.Services.AddSingleton<IBankAccountsService, BankAccountsService>();
         builder.Services.AddSingleton<ISellersService, SellersService>();
         builder.Services.AddSingleton<ICustomersService, CustomersService>();
@@ -55,7 +53,6 @@ public static class MauiProgram
         builder.Services.AddSingleton<IArticlesForWarehouseService, ArticlesForWarehouseService>();
         builder.Services.AddSingleton<IArticlesForSalesService, ArticlesForSalesService>();
         builder.Services.AddSingleton<IProductsForSalesService, ProductsForSalesService>();
-        builder.Services.AddSingleton<ITypesDiscountsCustomersService, TypesDiscountsCustomersService>();
         builder.Services.AddSingleton<IFinancialInstrumentTypeService, FinancialInstrumentTypeService>();
         builder.Services.AddSingleton<IMeasurementService, MeasurementService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
@@ -82,8 +79,6 @@ public static class MauiProgram
         builder.Services.AddTransient<PgAmortization, PgAmortizationViewModel>();
         builder.Services.AddTransient<PgExpense, PgExpenseViewModel>();
         builder.Services.AddTransient<PgAddExpense, PgAddExpenseViewModel>();
-        builder.Services.AddTransient<CvSales, CvSalesViewModel>();
-        builder.Services.AddTransient<PgAddCustomerDiscountType, PgAddCustomerDiscountTypeViewModel>();
         builder.Services.AddTransient<CvUsers, CvUsersViewModel>();
         builder.Services.AddTransient<PgSales, PgSalesViewModel>();
         builder.Services.AddTransient<CvSellers, CvSellersViewModel>();

@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:model="clr-namespace:vCardLib.Models;assembly=vCardLib"
+    xmlns:model="clr-namespace:AgroGestor360.Client.Models;assembly=AgroGestor360.Client"
     xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     x:DataType="vm:CvCustomersViewModel">
 
@@ -19,10 +19,42 @@
                     TextTransform="Uppercase"
                     VerticalOptions="Center" />
                 <HorizontalStackLayout Grid.Column="2" Spacing="8">
-                    <!--<BoxView
+                    <Button
+                        Command="{Binding ChangeEnableGetByDiscountCommand}"
+                        FontFamily="icofont"
+                        Text="{StaticResource SaleDiscount}"
+                        ToolTipProperties.Text="Sin/Con descuentos">
+                        <Button.Triggers>
+                            <DataTrigger
+                                Binding="{Binding EnableGetByDiscount, Mode=OneWay}"
+                                TargetType="Button"
+                                Value="true">
+                                <Setter Property="BackgroundColor" Value="{StaticResource Tertiary}" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding EnableGetByDiscount, Mode=OneWay}"
+                                TargetType="Button"
+                                Value="false">
+                                <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                    <Button
+                        Command="{Binding UnSetDiscountCommand}"
+                        FontFamily="icofont"
+                        IsEnabled="{Binding SelectedCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Text="{StaticResource Close}"
+                        ToolTipProperties.Text="Eliminar descuento a cliente seleccionado" />
+                    <Button
+                        Command="{Binding SetDiscountCommand}"
+                        FontFamily="icofont"
+                        IsEnabled="{Binding SelectedCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Text="{StaticResource Check}"
+                        ToolTipProperties.Text="Agregar o modificar descuento a cliente seleccionado" />
+                    <BoxView
                         BackgroundColor="{StaticResource Gray300}"
                         CornerRadius="2"
-                        WidthRequest="2" />-->
+                        WidthRequest="2" />
                     <Button
                         Command="{Binding ShowAddCustomerCommand}"
                         FontFamily="icofont"
@@ -47,6 +79,7 @@
         <!--#region CONTENIDO-->
         <ScrollView Grid.Row="1">
             <CollectionView
+                x:Name="CvDTO5_1"
                 ItemsSource="{Binding Customers, Mode=OneWay}"
                 SelectedItem="{Binding SelectedCustomer}"
                 SelectionMode="Single">
@@ -54,47 +87,37 @@
                     <GridItemsLayout
                         HorizontalItemSpacing="4"
                         Orientation="Vertical"
-                        Span="6"
+                        Span="5"
                         VerticalItemSpacing="4" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:vCard">
+                    <DataTemplate x:DataType="model:DTO5_1">
                         <Border Style="{StaticResource BorderItem}">
-                            <VerticalStackLayout Spacing="4" VerticalOptions="CenterAndExpand">
+                            <Grid ColumnDefinitions="auto,*" ColumnSpacing="8">
                                 <Label
                                     FontFamily="icofont"
-                                    FontSize="48"
-                                    HorizontalOptions="Center"
-                                    TextColor="{StaticResource White}"
-                                    VerticalOptions="Center">
-                                    <Label.Triggers>
-                                        <DataTrigger
-                                            Binding="{Binding Organization, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
-                                            TargetType="Label"
-                                            Value="false">
-                                            <Setter Property="Text" Value="{StaticResource UiUser}" />
-                                        </DataTrigger>
-                                        <DataTrigger
-                                            Binding="{Binding Organization, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
-                                            TargetType="Label"
-                                            Value="true">
-                                            <Setter Property="Text" Value="{StaticResource Businessman}" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
-                                <Label
-                                    FontAttributes="Bold"
-                                    HorizontalOptions="Center"
-                                    Text="{Binding FormattedName}"
+                                    FontSize="36"
+                                    Text="{StaticResource Businessman}"
                                     TextColor="{StaticResource White}"
                                     VerticalOptions="Center" />
-                                <Label
-                                    FontAttributes="Bold"
-                                    HorizontalOptions="Center"
-                                    Text="{Binding BirthDay, Mode=OneWay, StringFormat='{0:dd-MM-yyyy}'}"
-                                    TextColor="{StaticResource White}"
-                                    VerticalOptions="Center" />
-                            </VerticalStackLayout>
+                                <VerticalStackLayout
+                                    Grid.Column="1"
+                                    Spacing="2"
+                                    VerticalOptions="CenterAndExpand">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        LineBreakMode="TailTruncation"
+                                        Text="{Binding CustomerName}"
+                                        TextColor="{StaticResource White}"
+                                        ToolTipProperties.Text="{Binding CustomerName}"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        Text="{Binding Discount.Value, Mode=OneWay, StringFormat='Descuento: {0} %', TargetNullValue='Descuento: 0', FallbackValue='Descuento: 0'}"
+                                        TextColor="{StaticResource White}"
+                                        TextTransform="Uppercase"
+                                        VerticalOptions="Center" />
+                                </VerticalStackLayout>
+                            </Grid>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

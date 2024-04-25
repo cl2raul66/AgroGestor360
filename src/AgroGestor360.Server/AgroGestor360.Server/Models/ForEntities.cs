@@ -41,18 +41,17 @@ public class UserGroup
     public string? Name { get; set; }
 }
 
-public class ClientClass
+public class Seller
 {
     public ObjectId? Id { get; set; }
-    public string? Title { get; set; }
-    public double? PercentageValue { get; set; }
+    public vCard? Contact { get; set; }
 }
 
-public class CustomerDiscountItem
+public class Customer
 {
-    public DateTime Date { get; set; }
-    public ObjectId? CustomerId { get; set; }
-    public int? CustomerDiscountClass { get; set; }
+    public ObjectId? Id { get; set; }
+    public vCard? Contact { get; set; }
+    public CustomerDiscountClass? Discount { get; set; }
 }
 
 public class CustomerDiscountClass
@@ -115,20 +114,10 @@ public class ProductOffering
 
 public class BankAccount
 {
-    public ObjectId? Id { get; set; }
-    public ObjectId? BankId { get; set; }
-    public string? Alias { get; set; }
     public string? Number { get; set; }
-    public vCard? Beneficiary { get; set; }
+    public string? BankName{ get; set; }
+    public string? Alias { get; set; }
     public FinancialInstrumentType InstrumentType { get; set; }
-    public bool Disabled { get; set; }
-}
-
-public class Bank
-{
-    public ObjectId? Id { get; set; }
-    public string? Name { get; set; }
-    public bool Disabled { get; set; }
 }
 
 public class Sale

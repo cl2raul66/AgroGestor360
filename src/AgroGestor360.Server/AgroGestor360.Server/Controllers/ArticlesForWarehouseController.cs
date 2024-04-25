@@ -1,5 +1,5 @@
 ﻿using AgroGestor360.Server.Models;
-using AgroGestor360.Server.Sevices;
+using AgroGestor360.Server.Services;
 using AgroGestor360.Server.Tools.Extensions;
 using LiteDB;
 using Microsoft.AspNetCore.Mvc;

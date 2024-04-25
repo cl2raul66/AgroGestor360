@@ -1,18 +1,16 @@
-﻿using System.Text;
+﻿using AgroGestor360.Client.Models;
+using System.Text;
 using System.Text.Json;
-using vCardLib.Models;
 
 namespace AgroGestor360.Client.Services;
 
 public interface ISellersService
 {
-    Task<bool> DeleteAsync(string serverURL, string id);
     Task<bool> ExistAsync(string serverURL);
-    Task<IEnumerable<vCard>> GetAllAsync(string serverURL);
-    Task<IEnumerable<vCard>> GetAllByNameAsync(string serverURL, string name);
-    Task<vCard?> GetByIdAsync(string serverURL, string id);
-    Task<bool> InsertAsync(string serverURL, vCard card);
-    Task<bool> UpdateAsync(string serverURL, vCard card);
+    Task<IEnumerable<DTO6>> GetAllAsync(string serverURL);
+    Task<DTO6_2?> GetByIdAsync(string serverURL, string id);
+    Task<string> InsertAsync(string serverURL, DTO6_1 dTO);
+    Task<bool> UpdateAsync(string serverURL, DTO6_2 dTO);
 }
 
 public class SellersService : ISellersService
@@ -30,7 +28,7 @@ public class SellersService : ISellersService
         return false;
     }
 
-    public async Task<IEnumerable<vCard>> GetAllAsync(string serverURL)
+    public async Task<IEnumerable<DTO6>> GetAllAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
@@ -43,79 +41,56 @@ public class SellersService : ISellersService
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<vCard>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+            return JsonSerializer.Deserialize<IEnumerable<DTO6>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
         }
         return [];
     }
 
-    public async Task<IEnumerable<vCard>> GetAllByNameAsync(string serverURL, string name)
+    public async Task<DTO6_2?> GetByIdAsync(string serverURL, string id)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/sellers/byname/{name}");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/sellers/{id}");
             if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
             {
-                return [];
+                return null;
             }
 
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<vCard>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
-        }
-        return [];
-    }
-
-    public async Task<vCard?> GetByIdAsync(string serverURL, string id)
-    {
-        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
-        {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/sellers/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<vCard>(content, ApiServiceBase.ProviderJSONOptions);
-            }
+            return JsonSerializer.Deserialize<DTO6_2>(content, ApiServiceBase.ProviderJSONOptions);
         }
         return null;
     }
 
-    public async Task<bool> InsertAsync(string serverURL, vCard card)
+    public async Task<string> InsertAsync(string serverURL, DTO6_1 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var content = new StringContent(JsonSerializer.Serialize(card), Encoding.UTF8, "application/json");
+            var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
             var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/sellers", content);
             if (response.IsSuccessStatusCode)
             {
-                return bool.Parse(await response.Content.ReadAsStringAsync());
+                return await response.Content.ReadAsStringAsync();
             }
         }
-        return false;
+        return string.Empty;
     }
 
-    public async Task<bool> UpdateAsync(string serverURL, vCard card)
+    public async Task<bool> UpdateAsync(string serverURL, DTO6_2 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var content = new StringContent(JsonSerializer.Serialize(card), Encoding.UTF8, "application/json");
+            var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
             var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/sellers", content);
             if (response.IsSuccessStatusCode)
             {
-                return bool.Parse(await response.Content.ReadAsStringAsync());
-            }
-        }
-        return false;
-    }
-
-    public async Task<bool> DeleteAsync(string serverURL, string id)
-    {
-        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
-        {
-            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/sellers/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                return bool.Parse(await response.Content.ReadAsStringAsync());
+                return true;
             }
         }
         return false;

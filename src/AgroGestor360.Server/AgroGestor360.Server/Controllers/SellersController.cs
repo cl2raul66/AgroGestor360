@@ -1,7 +1,8 @@
-﻿using AgroGestor360.Server.Sevices;
+﻿using AgroGestor360.Server.Models;
+using AgroGestor360.Server.Services;
+using AgroGestor360.Server.Tools.Extensions;
 using LiteDB;
 using Microsoft.AspNetCore.Mvc;
-using vCardLib.Models;
 
 namespace AgroGestor360.Server.Controllers;
 
@@ -9,60 +10,58 @@ namespace AgroGestor360.Server.Controllers;
 [Route("[controller]")]
 public class SellersController : ControllerBase
 {
-    private readonly ISellersForLitedbService sellerServ;
+    readonly ISellersInLiteDbService sellersServ;
 
-    public SellersController(ISellersForLitedbService sellerService)
+    public SellersController(ISellersInLiteDbService sellersService)
     {
-        sellerServ = sellerService;
+        sellersServ = sellersService;
     }
 
     [HttpGet("exist")]
-    public ActionResult<bool> Exist() => Ok(sellerServ.Exist);
-
-    [HttpGet]
-    public ActionResult<IEnumerable<vCard>> GetAll()
+    public IActionResult CheckExistence()
     {
-        var all = sellerServ.GetAll();
-        if (!all?.Any() ?? true)
-        {
-            return NotFound();
-        }
+        bool exist = sellersServ.Exist;
 
-        return Ok(all);
+        return Ok(exist);
     }
 
-    [HttpGet("byname/{name}")]
-    public IActionResult GetAllByName(string name)
+    [HttpGet]
+    public ActionResult<IEnumerable<DTO6>> GetAll()
     {
-        return Ok(sellerServ.GetAllByName(name));
+        var all = sellersServ.GetAll()?.Select(x => x.ToDTO6()) ?? [];
+
+        return !all?.Any() ?? true ? NotFound() : Ok(all);
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetById(string id)
+    public ActionResult<DTO6_2?> GetById(string id)
     {
-        var card = sellerServ.GetById(id);
-        return card is null ? NotFound() : Ok(card);
+        var find = sellersServ.GetById(new ObjectId(id));
+
+        return find is null ? NotFound() : Ok(find!.ToDTO6_2());
     }
 
     [HttpPost]
-    public ActionResult<bool> Post([FromBody] vCard card)
+    public ActionResult<string> Post([FromBody] DTO6_1 dTO)
     {
-        card.Uid = ObjectId.NewObjectId().ToString();
-        var id = sellerServ.Insert(card);
-        return Ok(!string.IsNullOrEmpty(id));
+        var entity = dTO.FromDTO6_1();
+        entity.Id = ObjectId.NewObjectId();
+
+        var result = sellersServ.Insert(entity);
+
+        return string.IsNullOrEmpty(result) ? NotFound() : Ok(result);
     }
 
     [HttpPut]
-    public ActionResult<bool> Put([FromBody] vCard card)
+    public ActionResult<bool> Put([FromBody] DTO6_2 dTO)
     {
-        var result = sellerServ.Update(card);
-        return Ok(result);
-    }
+        var entity = dTO.FromDTO6_2();
+        if (entity is null)
+        {
+            return NoContent();
+        }
+        var result = sellersServ.Update(entity);
 
-    [HttpDelete("{id}")]
-    public ActionResult<bool> Delete(string id)
-    {
-        var result = sellerServ.Delete(id);
         return Ok(result);
     }
 }

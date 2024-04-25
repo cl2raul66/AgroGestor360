@@ -1,7 +1,5 @@
 ﻿using AgroGestor360.Server.Models;
-using AgroGestor360.Server.Sevices;
-using AgroGestor360.Server.Tools.Extensions;
-using LiteDB;
+using AgroGestor360.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AgroGestor360.Server.Controllers;
@@ -10,104 +8,58 @@ namespace AgroGestor360.Server.Controllers;
 [Route("[controller]")]
 public class BankAccountsController : ControllerBase
 {
-    readonly IBankAccountsForLitedbService bankAccountsServ;
-    readonly IBanksForLitedbService banksServ;
+    readonly IBankAccountsLiteDbService bankAccountsService;
 
-    public BankAccountsController(IBankAccountsForLitedbService bankAccountsService, IBanksForLitedbService banksService)
+    public BankAccountsController(IBankAccountsLiteDbService bankAccountsService)
     {
-        bankAccountsServ = bankAccountsService;
-        banksServ = banksService;
+        this.bankAccountsService = bankAccountsService;
     }
 
     [HttpGet("exist")]
     public IActionResult CheckExistence()
     {
-        bool exist = bankAccountsServ.Exist;
+        bool exist = bankAccountsService.Exist;
 
         return Ok(exist);
     }
 
-    [HttpGet("{number}")]
-    public ActionResult<BankAccountDTO> Get(string number)
-    {
-        var find = bankAccountsServ.GetByNumber(number);
-        if (find is null)
-        {
-            return NotFound();
-        }
-
-        var dto = find!.ToBankAccountDTO();
-        dto.BankName = banksServ.GetById(find.BankId!).Name;
-
-        return Ok(dto);
-    }
-
-
     [HttpGet]
-    public ActionResult<IEnumerable<BankAccountDTO>> Get()
+    public ActionResult<IEnumerable<BankAccount>> GetAll()
     {
-        var all = bankAccountsServ.GetAllEnabled();
-        if (!all?.Any() ?? true)
-        {
-            return NotFound();
-        }
+        var bankAccounts = bankAccountsService.GetAll();
 
-        var allDTO = all!.Select(x =>
-        {
-            var dto = x.ToBankAccountDTO();
-            dto.BankName = banksServ.GetById(x.BankId!).Name;
-            return dto;
-        });
-
-        return Ok(allDTO);
+        return !bankAccounts?.Any() ?? true ? NotFound() : Ok(bankAccounts);
     }
 
-    [HttpGet("numbers")]
-    public ActionResult<IEnumerable<string>> GetAllNumbers()
+    [HttpGet("{id}")]
+    public ActionResult<BankAccount> GetById(string id)
     {
-        var all = bankAccountsServ.GetAllNumber();
-        if (!all?.Any() ?? true)
-        {
-            return NotFound();
-        }
+        var find = bankAccountsService.GetById(id);
 
-        return Ok(all);
+        return find is null ? NotFound() : Ok(find);
     }
 
     [HttpPost]
-    public ActionResult<bool> Post([FromBody] BankAccountDTO dTO)
+    public ActionResult<string> Post([FromBody] BankAccount bankAccount)
     {
-        var entity = dTO.ToBankAccount();
-        entity.Id = ObjectId.NewObjectId();
-        entity.BankId = banksServ.GetIdByName(dTO.BankName!);
+        var result = bankAccountsService.Insert(bankAccount);
 
-        string id = bankAccountsServ.Insert(entity);
-
-        return Ok(!string.IsNullOrEmpty(id));
+        return string.IsNullOrEmpty(result) ? NotFound() : Ok(result);
     }
 
     [HttpPut]
-    public IActionResult Put([FromBody] BankAccountDTO dTO)
+    public ActionResult<bool> Put([FromBody] BankAccount bankAccount)
     {
-        var entity = dTO.ToBankAccount();
-        var find = bankAccountsServ.GetByNumber(dTO.Number!);
-        if (find is null)
-        {
-            return NotFound();
-        }
-        entity.Id = find!.Id;
+        var result = bankAccountsService.Update(bankAccount);
 
-        var result = bankAccountsServ.Update(entity);
-
-        return Ok(result);
+        return !result ? NotFound() : Ok(result);
     }
 
-    [HttpDelete("{number}")]
-    public ActionResult<bool> Delete(string number)
+    [HttpDelete("{id}")]
+    public ActionResult<bool> Delete(string id)
     {
-        var find = bankAccountsServ.GetByNumber(number);
-        var deleted = bankAccountsServ.Delete(find!.Id!);
+        var result = bankAccountsService.Delete(id);
 
-        return Ok(deleted);
+        return !result ? NotFound() : Ok(result);
     }
 }

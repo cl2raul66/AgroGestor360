@@ -1,52 +1,8 @@
 ﻿// Ignore Spelling: DTO
 
 using AgroGestor360.Server.Tools.Enums;
-using LiteDB;
-using vCardLib.Models;
 
 namespace AgroGestor360.Server.Models;
-
-//public class ClientDeviceDTO
-//{
-//    public string? Id { get; set; }
-//    public DeviceInfo? Device { get; set; }
-//}
-
-//public class DeviceInfoDTO
-//{
-//    public string? Brand { get; set; }
-//    public string? Model { get; set; }
-//    public string? SerialNumber { get; set; }
-//    public string? SO { get; set; }
-//}
-
-//public class UserDTO
-//{
-//    public string? Id { get; set; }
-//    public vCard? Contact { get; set; }
-//    public bool IsAuthorized { get; set; }
-//    public List<string>? GroupsId { get; set; }
-//}
-
-//public class ClientClassDTO
-//{
-//    public string? Id { get; set; }
-//    public string? Title { get; set; }
-//    public double? PercentageValue { get; set; }
-//}
-
-//public class UserGroupDTO
-//{
-//    public string? Id { get; set; }
-//    public string? Name { get; set; }
-//}
-
-public class CustomerDiscountItemDTO
-{
-    public DateTime Date { get; set; }
-    public string? CustomerName { get; set; }
-    public int? CustomerDiscountClass { get; set; }
-}
 
 #region Merchandise
 /// <summary>
@@ -179,85 +135,125 @@ public class DTO4_3
     public string? Id { get; set; }
     public List<ProductOffering>? Offering { get; set; }
 }
+
 #endregion
 
-public class BankAccountDTO
+#region Customer
+/// <summary>
+/// Object: Customer for GET
+/// <para>
+/// string [CustomerId, CustomerName], CustomerDiscountClass [Discount]
+/// </para>
+/// </summary>
+public class DTO5_1
 {
-    public string? Number { get; set; }
-    public string? BankName { get; set; }
-    public string? Alias { get; set; }
-    public vCard? Beneficiary { get; set; }
-    public FinancialInstrumentType InstrumentType { get; set; }
+    public string? CustomerId { get; set; }
+    public string? CustomerName { get; set; }
+    public CustomerDiscountClass? Discount { get; set; }
 }
 
-public class BankDTO
+/// <summary>
+/// Object: Customer for POST
+/// <para>
+/// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName], CustomerDiscountClass [Discount]
+/// </para>
+/// </summary>
+public class DTO5_2
+{
+    public DateTime? Birthday { get; set; }
+    public string? CustomerFullName { get; set; }
+    public string? CustomerAddress { get; set; }
+    public string? CustomerPhone { get; set; }
+    public string? CustomerMail { get; set; }
+    public string? CustomerNIT { get; set; }
+    public string? CustomerNIP { get; set; }
+    public string? CustomerOccupation { get; set; }
+    public string? CustomerOrganizationName { get; set; }
+    public CustomerDiscountClass? Discount { get; set; }
+}
+
+/// <summary>
+/// Object: Customer for PUT by customer and/or discount
+/// <para>
+/// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName], CustomerDiscountClass [Discount]
+/// </para>
+/// </summary>
+public class DTO5_3
+{
+    public string? CustomerId { get; set; }
+    public DateTime? Birthday { get; set; }
+    public string? CustomerFullName { get; set; }
+    public string? CustomerAddress { get; set; }
+    public string? CustomerPhone { get; set; }
+    public string? CustomerMail { get; set; }
+    public string? CustomerNIT { get; set; }
+    public string? CustomerNIP { get; set; }
+    public string? CustomerOccupation { get; set; }
+    public string? CustomerOrganizationName { get; set; }
+    public CustomerDiscountClass? Discount { get; set; }
+}
+
+/// <summary>
+/// Object: Customer for PUT by discount
+/// <para>
+/// string [CustomerId], int [DiscountId]
+/// </para>
+/// </summary>
+public class DTO5_4
+{
+    public string? CustomerId { get; set; }
+    public int DiscountId { get; set; }
+}
+#endregion
+
+#region Seller
+/// <summary>
+/// Object: Seller for GET
+/// <para>
+/// string [Id, FullName]
+/// </para>
+/// </summary>
+/// </summary>
+public class DTO6
 {
     public string? Id { get; set; }
-    public string? Name { get; set; }
+    public string? FullName { get; set; }
 }
 
-//public class SaleDTO
-//{
-//    public string? Id { get; set; }
-//    public List<SaleProduct>? SaleProducts { get; set; }
-//    public string? SellerId { get; set; }
-//    public string? CustomerId { get; set; }
-//    public bool IsWithFEL { get; set; }
-//    public List<PaymentMethod>? Payments { get; set; }
-//}
+/// <summary>
+/// Object: Seller for POST
+/// <para>
+/// DateTime [Birthday], string [FullName, Address, Phone, Mail, NIT, NIP, Occupation], 
+/// </para>
+/// </summary>
+public class DTO6_1
+{
+    public DateTime? Birthday { get; set; }
+    public string? FullName { get; set; }
+    public string? Address { get; set; }
+    public string? Phone { get; set; }
+    public string? Mail { get; set; }
+    public string? NIT { get; set; }
+    public string? NIP { get; set; }
+    public string? Occupation { get; set; }
+}
 
-//public abstract class PaymentMethod
-//{
-//    public double Amount { get; set; }
-//}
-
-//public class ImmediatePaymentDTO : PaymentMethod
-//{
-//    public string? Reference { get; set; }
-//    public string? BankAccountId { get; set; }
-//    public ImmediatePaymentType Type { get; set; }
-//}
-
-//public class CreditPayment : PaymentMethod
-//{
-//    public CreditPaymentType Type { get; set; }
-//    public int NumberOfInstallments { get; set; }
-//}
-
-//public class SaleProductDTO
-//{
-//    public string? ProductId { get; set; }
-//    public double Quantity { get; set; }
-//    public string? ProductOfferingId { get; set; }
-//    public string? CustomerDiscountClassId { get; set; }
-//}
-
-//public class LoanDTO
-//{
-//    public string? Id { get; set; }
-//    public DateTime Date { get; set; }
-//    public string? LoanNumber { get; set; }
-//    public string? BankAccountId { get; set; }
-//    public double Amount { get; set; }
-//    public double Interest { get; set; }
-//    public string? Concept { get; set; }
-//    public LoanType Type { get; set; }
-//    public double Insurance { get; set; }
-//    public string? MoreDetails { get; set; }
-//}
-
-//public class ExpenseDTO
-//{
-//    public string? Id { get; set; }
-//}
-
-//public class BankTransactionDTO
-//{
-//    public string? BankAccountId { get; set; }
-//    public double TransactionAmount { get; set; }
-//}
-
-//public class TokenDTO
-//{
-//    public string? Id { get; set; }
-//}
+/// <summary>
+/// Object: Seller for PUT
+/// <para>
+/// DateTime [Birthday], string [Id, FullName, Address, Phone, Mail, NIT, NIP, Occupation], 
+/// </para>
+/// </summary>
+public class DTO6_2
+{
+    public DateTime? Birthday { get; set; }
+    public string? Id { get; set; }
+    public string? FullName { get; set; }
+    public string? Address { get; set; }
+    public string? Phone { get; set; }
+    public string? Mail { get; set; }
+    public string? NIT { get; set; }
+    public string? NIP { get; set; }
+    public string? Occupation { get; set; }
+}
+#endregion

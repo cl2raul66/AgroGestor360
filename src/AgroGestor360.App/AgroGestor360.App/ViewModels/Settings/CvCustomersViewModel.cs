@@ -1,16 +1,18 @@
 ﻿using AgroGestor360.App.Views;
 using AgroGestor360.App.Views.Settings.Customers;
+using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Text;
-using vCardLib.Models;
+using Windows.UI.ViewManagement.Core;
 
 namespace AgroGestor360.App.ViewModels;
 
-public partial  class CvCustomersViewModel : ObservableRecipient
+public partial class CvCustomersViewModel : ObservableRecipient
 {
     readonly ICustomersService customersServ;
     readonly IAuthService authServ;
@@ -21,98 +23,208 @@ public partial  class CvCustomersViewModel : ObservableRecipient
         customersServ = customersService;
         authServ = authService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
-        IsActive = true;
     }
 
     [ObservableProperty]
-    ObservableCollection<vCard>? customers;
+    ObservableCollection<DTO5_1>? customers;
 
     [ObservableProperty]
-    vCard? selectedCustomer;
+    DTO5_1? selectedCustomer;
+
+    [ObservableProperty]
+    bool? enableGetByDiscount;
+
+    [RelayCommand]
+    void ChangeEnableGetByDiscount()
+    {
+        EnableGetByDiscount = !EnableGetByDiscount;
+    }
+
+    [RelayCommand]
+    async Task SetDiscount()
+    {
+        var options = await customersServ.GetAllDiscountAsync(serverURL);
+        if (options is not null)
+        {
+            var selectedOpt = await Shell.Current.DisplayActionSheet("Seleccione un descuento", "Cancelar", null, options.Select(x => $"{x.Name} - {x.Value}%").ToArray());
+            if (!string.IsNullOrEmpty(selectedOpt))
+            {
+                var seccion = selectedOpt.Split('-');
+                var discount = options.FirstOrDefault(x => x.Name == seccion[0].Trim());
+
+                var result = await customersServ.UpdateDiscountAsync(serverURL, new() { CustomerId = SelectedCustomer!.CustomerId, DiscountId = discount!.Id });
+                if (result)
+                {
+                    if (EnableGetByDiscount!.Value)
+                    {
+                        int idx = Customers!.IndexOf(SelectedCustomer!);
+                        Customers[idx] = new() { CustomerId = SelectedCustomer!.CustomerId, CustomerName = SelectedCustomer!.CustomerName, Discount = discount };
+                    }
+                    else
+                    {
+                        Customers!.Remove(SelectedCustomer);
+
+                        if (Customers.Count == 0)
+                        {
+                            ChangeEnableGetByDiscount();
+                        }
+                    }
+                }
+            }
+        }
+        SelectedCustomer = null;
+    }
+
+    [RelayCommand]
+    async Task UnSetDiscount()
+    {
+        if (EnableGetByDiscount!.Value == false && (SelectedCustomer!.Discount is null || SelectedCustomer!.Discount.Value == 0))
+        {
+            return;
+        }
+
+        var result = await customersServ.UpdateDiscountAsync(serverURL, new() { CustomerId = SelectedCustomer!.CustomerId, DiscountId = 0 });
+        if (result)
+        {
+            Customers!.Remove(SelectedCustomer);
+
+            if (Customers.Count == 0)
+            {
+                ChangeEnableGetByDiscount();
+            }
+        }
+        SelectedCustomer = null;
+    }
+
 
     [RelayCommand]
     async Task ShowAddCustomer()
     {
-        await Shell.Current.GoToAsync(nameof(PgAddEditCustomer), true);
+        CustomerDiscountClass[] discounts = (await customersServ.GetAllDiscountAsync(serverURL)).ToArray();
+        var sendObject = new Dictionary<string, object>() { { "Discounts", discounts } };
+        IsActive = true;
+        await Shell.Current.GoToAsync(nameof(PgAddEditCustomer), true, sendObject);
     }
 
     [RelayCommand]
     async Task ShowEditCustomer()
     {
-        await Shell.Current.GoToAsync(nameof(PgAddEditCustomer), true, new Dictionary<string, object>() { { "CurrentCustomer", SelectedCustomer! } });
+        CustomerDiscountClass[] discounts = (await customersServ.GetAllDiscountAsync(serverURL)).ToArray();
+        var currentCustomer = await customersServ.GetByIdAsync(serverURL, SelectedCustomer!.CustomerId!);
+        var sendObject = new Dictionary<string, object>() {
+            { "Discounts", discounts },
+            { "CurrentCustomer", currentCustomer! }
+        };
+        IsActive = true;
+        await Shell.Current.GoToAsync(nameof(PgAddEditCustomer), true, sendObject);
     }
 
     [RelayCommand]
     async Task ShowDeleteCustomer()
     {
-        StringBuilder sb = new();
-        sb.AppendLine($"¿Seguro que quiere eliminar el cliente: {SelectedCustomer!.FormattedName}?");
-        sb.AppendLine("Inserte la contraseña:");
-        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar cliente", sb.ToString(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
-        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
-        {
-            SelectedCustomer = null;
-            return;
-        }
+        //StringBuilder sb = new();
+        //sb.AppendLine($"¿Seguro que quiere eliminar el cliente: {SelectedCustomer!.CustomerName}?");
+        //sb.AppendLine("Inserte la contraseña:");
+        //var pwd = await Shell.Current.DisplayPromptAsync("Eliminar cliente", sb.ToString(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+        //if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
+        //{
+        //    SelectedCustomer = null;
+        //    return;
+        //}
 
-        var approved = await authServ.AuthRoot(serverURL, pwd);
-        if (!approved)
-        {
-            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-            SelectedCustomer = null;
-            return;
-        }
+        //var approved = await authServ.AuthRoot(serverURL, pwd);
+        //if (!approved)
+        //{
+        //    await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+        //    SelectedCustomer = null;
+        //    return;
+        //}
 
-        var result = await customersServ.DeleteAsync(serverURL, SelectedCustomer!.Uid!);
-        if (result)
-        {
-            Customers!.Remove(SelectedCustomer);
-            SelectedCustomer = null;
-        }
+        //var result = await customersServ.DeleteAsync(serverURL, SelectedCustomer!.Uid!);
+        //if (result)
+        //{
+        //    Customers!.Remove(SelectedCustomer);
+        //    SelectedCustomer = null;
+        //}
+        await Task.CompletedTask;
     }
 
     protected override void OnActivated()
     {
         base.OnActivated();
-        WeakReferenceMessenger.Default.Register<CvCustomersViewModel, vCard, string>(this, "newCustomer", async (r, m) =>
+        WeakReferenceMessenger.Default.Register<CvCustomersViewModel, DTO5_2, string>(this, "newCustomer", async (r, m) =>
         {
-            bool result = await customersServ.InsertAsync(serverURL, m);
-            if (result)
+            string result = await customersServ.InsertAsync(serverURL, m);
+            if (!string.IsNullOrEmpty(result))
             {
                 r.Customers ??= [];
-                r.Customers.Insert(0, m);
+                r.Customers.Insert(0, new() { CustomerId = result, CustomerName = m.CustomerFullName, Discount = m.Discount });
             }
-
             r.SelectedCustomer = null;
+            IsActive = false;
         });
 
-        WeakReferenceMessenger.Default.Register<CvCustomersViewModel, vCard, string>(this, "editCustomer", async (r, m) =>
+        WeakReferenceMessenger.Default.Register<CvCustomersViewModel, DTO5_3, string>(this, "editCustomer", async (r, m) =>
         {
             bool result = await customersServ.UpdateAsync(serverURL, m);
             if (result)
             {
                 int idx = r.Customers!.IndexOf(SelectedCustomer!);
-                r.Customers[idx] = m;
+                r.Customers[idx] = new DTO5_1() { CustomerId = m.CustomerId, CustomerName = m.CustomerFullName, Discount = m.Discount };
             }
 
             r.SelectedCustomer = null;
+            IsActive = false;
         });
+
+        WeakReferenceMessenger.Default.Register<CvCustomersViewModel, string, string>(this, nameof(PgAddEditCustomer), (r, m) =>
+        {
+            if (m == "cancel")
+            {
+                r.SelectedCustomer = null;
+                IsActive = false;
+            }
+
+        });
+    }
+
+    protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.PropertyName == nameof(EnableGetByDiscount))
+        {
+            Customers ??= [];
+            if (EnableGetByDiscount!.Value)
+            {
+                Customers = new(await customersServ.GetAllWithDiscountAsync(serverURL));
+            }
+            else
+            {
+                Customers = new(await customersServ.GetAllWithoutDiscountAsync(serverURL));
+            }
+            SelectedCustomer = null;
+        }
     }
 
     #region EXTRA
     public async void Initialize()
     {
-        await GetSellers();
+        await GetCustomers();
     }
 
-    private async Task GetSellers()
+    async Task GetCustomers()
     {
         bool exist = await customersServ.ExistAsync(serverURL);
         if (exist)
         {
-            var getsellers = await customersServ.GetAllAsync(serverURL);
-            Customers = new(getsellers!);
+            EnableGetByDiscount = false;
+            if (!Customers!.Any())
+            {
+                EnableGetByDiscount = true;
+            }
         }
     }
+
+
     #endregion
 }
