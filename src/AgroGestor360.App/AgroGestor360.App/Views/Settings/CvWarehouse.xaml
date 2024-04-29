@@ -20,6 +20,7 @@
                     VerticalOptions="Center" />
                 <HorizontalStackLayout Grid.Column="2" Spacing="8">
                     <Button
+                        Command="{Binding SetMerchandiseEntryCommand}"
                         FontFamily="icofont"
                         IsEnabled="{Binding SelectedWarehouse, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                         Text="{StaticResource Inbox}"

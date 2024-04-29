@@ -1,5 +1,4 @@
 ﻿using AgroGestor360.App.Models;
-using AgroGestor360.App.Views.Settings.Customers;
 using AgroGestor360.App.Views.Settings.Warehouse;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
@@ -7,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
+using System.Text;
 
 namespace AgroGestor360.App.ViewModels;
 
@@ -32,6 +32,37 @@ public partial class CvWarehouseViewModel : ObservableRecipient
     DTO2? selectedWarehouse;
 
     [RelayCommand]
+    async Task SetMerchandiseEntry()
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("Va a realizar entrada del la siguiente mercancía:");
+        sb.AppendLine($"Nombre: {SelectedWarehouse!.MerchandiseName}");
+        if (SelectedWarehouse!.Packaging is not null)
+        {
+            sb.AppendLine($"Empaque: {SelectedWarehouse!.Packaging!.Value} {SelectedWarehouse!.Packaging!.Unit}");
+        }
+        sb.AppendLine($"Existencia: {SelectedWarehouse!.Quantity}");
+        sb.AppendLine("Especifique la cantidad:");
+
+        var addQuantity = await Shell.Current.DisplayPromptAsync("Entrada de mercancía", sb.ToString(), "Entrada", "Cancelar", "0", 10, Keyboard.Numeric);
+
+        if (string.IsNullOrEmpty(addQuantity) || !double.TryParse(addQuantity, out double theQuantity))
+        {
+            SelectedWarehouse = null;
+            return;
+        }
+
+        var result = await articlesForWarehouseServ.UpdateAsync(serverURL, new() { MerchandiseId = SelectedWarehouse!.MerchandiseId, Quantity = SelectedWarehouse!.Quantity + theQuantity });
+
+        if (result)
+        {
+            int idx = Warehouses!.IndexOf(SelectedWarehouse);
+            SelectedWarehouse.Quantity += theQuantity;
+            Warehouses[idx] = SelectedWarehouse;
+        }
+    }
+
+    [RelayCommand]
     async Task ShowAddMerchandise()
     {
         IsActive = true;
@@ -52,21 +83,14 @@ public partial class CvWarehouseViewModel : ObservableRecipient
     {
         IsActive = true;
         Dictionary<string, object> sendData = [];
-        if (SelectedWarehouse is not null)
-        {
-            var merchandise = await merchandiseServ.GetByIdAsync(serverURL, SelectedWarehouse!.MerchandiseId!);
-            sendData.Add("CurrentMerchandise", merchandise!);
-        }
+        var merchandise = await merchandiseServ.GetByIdAsync(serverURL, SelectedWarehouse!.MerchandiseId!);
+        sendData.Add("CurrentMerchandise", merchandise!);
         var categories = await merchandiseServ.GetAllCategoriesAsync(serverURL);
         if (categories.Any())
         {
-            sendData.Add("Categories", categories.ToList());
-            await Shell.Current.GoToAsync(nameof(PgAddEditWarehouse), true, sendData);
+            sendData.Add("Categories", categories.ToList());            
         }
-        else
-        {
-            await Shell.Current.GoToAsync(nameof(PgAddEditWarehouse), true);
-        }
+        await Shell.Current.GoToAsync(nameof(PgAddEditWarehouse), true, sendData);
     }
 
     protected override void OnActivated()

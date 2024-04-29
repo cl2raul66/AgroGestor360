@@ -1,5 +1,4 @@
 ﻿using AgroGestor360.App.Models;
-using AgroGestor360.App.Views;
 using AgroGestor360.App.Views.Settings.Products;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
@@ -46,12 +45,12 @@ public partial class CvProductsViewModel : ObservableRecipient
         {
             return;
         }
-        //var articleszeroprice = getArticles!.Where(x => x.Price == 0);
-        //if (articleszeroprice.Any())
-        //{
-        //    Articles = new(articleszeroprice);
-        //    IsZeroPrice = true;
-        //}
+        var articleszeroprice = getArticles!.Where(x => x.Price == 0);
+        if (articleszeroprice.Any())
+        {
+            Articles = new(articleszeroprice);
+            IsZeroPrice = true;
+        }
     }
 
     [RelayCommand]
@@ -62,54 +61,52 @@ public partial class CvProductsViewModel : ObservableRecipient
         {
             return;
         }
-        //var articleszeroprice = getArticles!.Where(x => x.Price > 0);
-        //if (articleszeroprice.Any())
-        //{
-        //    Articles = new(articleszeroprice);
-        //    IsZeroPrice = false;
-        //}
+        var articleszeroprice = getArticles!.Where(x => x.Price > 0);
+        if (articleszeroprice.Any())
+        {
+            Articles = new(articleszeroprice);
+            IsZeroPrice = false;
+        }
     }
 
     [RelayCommand]
-    async Task ShowSetSellingPrice()
+    async Task ShowArticlePriceChange()
     {
-        var theSelection = SelectedArticle;
-        SelectedArticle = null;
-
         StringBuilder sb = new();
-        sb.AppendLine($"NOMBRE: {theSelection!.MerchandiseName}");
-        if (theSelection.Price > 0)
+        sb.AppendLine("Va a cambiar el precio inicial del siguiente artículo:");
+        sb.AppendLine($"Nombre: {SelectedArticle!.MerchandiseName}");
+        if (SelectedArticle!.Packaging is not null)
         {
-            sb.AppendLine($"PRECIO ANTERIOR: {theSelection.Price.ToString("0.00")}");
+            sb.AppendLine($"Empaque: {SelectedArticle!.Packaging!.Value} {SelectedArticle!.Packaging!.Unit}");
         }
-        sb.AppendLine($"PRESENTACION: {theSelection.Packaging?.Value.ToString("0.00")} {theSelection.Packaging?.Unit}");
-        //if (!string.IsNullOrEmpty(theSelection.Category))
-        //{
-        //    sb.AppendLine($"CATEGORIA: {theSelection.Category}");
-        //}
+        sb.AppendLine($"Precio inicial actual: {SelectedArticle!.Price}");
+        sb.AppendLine("Especifique la cantidad:");
 
-        string price = await Shell.Current.DisplayPromptAsync("Establecer precio de venta", sb.ToString(), "Establecer", "Cancelar", "0.00");
-        if (string.IsNullOrEmpty(price) || !double.TryParse(price, out double changePrice))
+        var newPrice = await Shell.Current.DisplayPromptAsync("Modificar precio inicial", sb.ToString(), "Modificar", "Cancelar", "0.00", 10, Keyboard.Numeric);
+
+        if (string.IsNullOrEmpty(newPrice) || !double.TryParse(newPrice, out double thePrice))
         {
+            SelectedArticle = null;
             return;
         }
-        var entity = new DTO3_1() { MerchandiseId = theSelection!.MerchandiseId, Price = changePrice };
-        var result = await articlesForSalesServ.UpdateAsync(serverURL, entity!);
+
+        var result = await articlesForSalesServ.UpdateAsync(serverURL, new() { MerchandiseId = SelectedArticle!.MerchandiseId, Price = SelectedArticle!.Price + thePrice });
+
         if (result)
         {
             if (IsZeroPrice)
             {
-                Articles!.Remove(theSelection);
-                if (!Articles.Any())
+                Articles!.Remove(SelectedArticle!);
+                if (Articles!.Count == 0)
                 {
                     await GetArticlesNonZeroPrice();
                 }
             }
             else
             {
-                int idx = Articles!.IndexOf(theSelection);
-                theSelection.Price = changePrice;
-                Articles[idx] = theSelection;
+                int idx = Articles!.IndexOf(SelectedArticle);
+                SelectedArticle.Price += thePrice;
+                Articles[idx] = SelectedArticle;
             }
         }
     }
@@ -204,7 +201,7 @@ public partial class CvProductsViewModel : ObservableRecipient
 
         WeakReferenceMessenger.Default.Register<CvProductsViewModel, ProductOffering, string>(this, "NewProductOffering", async (r, m) =>
         {
-            bool result = await productsForSalesServ.UpdateAsync(serverURL, new DTO4_3 () { Id = SelectedProduct!.Id, Offer = m });
+            bool result = await productsForSalesServ.UpdateAsync(serverURL, new DTO4_3() { Id = SelectedProduct!.Id, Offer = m });
             if (result)
             {
                 r.Offers ??= [];
@@ -240,21 +237,17 @@ public partial class CvProductsViewModel : ObservableRecipient
     public async void Initialize()
     {
         //await Task.WhenAll(GetArticles(), GetProducts());
-        await Task.CompletedTask;
+        await GetArticles();
     }
 
-    //async Task GetArticles()
-    //{
-    //    bool exist = await articlesForSalesServ.CheckExistence(serverURL);
-    //    if (exist)
-    //    {
-    //        await GetArticlesZeroPrice();
-    //        if (Articles is null)
-    //        {
-    //            await GetArticlesNonZeroPrice();
-    //        }
-    //    }
-    //}
+    async Task GetArticles()
+    {
+        await GetArticlesZeroPrice();
+        if (Articles is null)
+        {
+            await GetArticlesNonZeroPrice();
+        }
+    }
 
     //async Task GetProducts()
     //{

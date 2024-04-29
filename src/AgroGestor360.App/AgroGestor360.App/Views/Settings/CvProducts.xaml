@@ -8,51 +8,6 @@
     xmlns:ts="clr-namespace:AgroGestor360.App.Tools.DataTemplateSelectors"
     xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     x:DataType="vm:CvProductsViewModel">
-    <ContentView.Resources>
-        <ResourceDictionary>
-            <DataTemplate x:Key="PriceZeroTemplate" x:DataType="model:DTO3">
-                <Border Style="{StaticResource BorderItem}">
-                    <Label LineBreakMode="TailTruncation">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span Text="{Binding MerchandiseName, Mode=OneWay, StringFormat='{0}'}" TextColor="{StaticResource White}" />
-                                <Span Text=" " />
-                                <Span Text="{Binding Packaging.Value, Mode=OneWay, StringFormat='[{0:F2}'}" TextColor="{StaticResource White}" />
-                                <Span Text=" " />
-                                <Span Text="{Binding Packaging.Unit, Mode=OneWay, StringFormat='{0}]', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
-                </Border>
-            </DataTemplate>
-            <DataTemplate x:Key="PriceNonZeroTemplate" x:DataType="model:DTO3">
-                <Border Style="{StaticResource BorderItem}">
-                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                        <Label LineBreakMode="MiddleTruncation">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span Text="{Binding MerchandiseName, Mode=OneWay, StringFormat='{0}'}" TextColor="{StaticResource White}" />
-                                    <Span Text=" " />
-                                    <Span Text="{Binding Packaging.Value, Mode=OneWay, StringFormat='[{0:F2}'}" TextColor="{StaticResource White}" />
-                                    <Span Text=" " />
-                                    <Span Text="{Binding Packaging.Unit, Mode=OneWay, StringFormat='{0}]', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-                        <Label
-                            Grid.Column="1"
-                            LineBreakMode="TailTruncation"
-                            Text="{Binding Price, StringFormat='Precio: {0:F2}'}"
-                            TextColor="{StaticResource White}" />
-                    </Grid>
-                </Border>
-            </DataTemplate>
-            <ts:ArticlesTemplateSelector
-                x:Key="ArticlesPricesTemplateSelector"
-                ArticlePriceNonZeroTemplate="{StaticResource PriceNonZeroTemplate}"
-                ArticlePriceZeroTemplate="{StaticResource PriceZeroTemplate}" />
-        </ResourceDictionary>
-    </ContentView.Resources>
 
     <Grid RowDefinitions="auto,*" RowSpacing="8">
         <!--#region ENCABEZADO-->
@@ -147,13 +102,36 @@
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1">
                     <CollectionView
-                        ItemTemplate="{StaticResource ArticlesPricesTemplateSelector}"
                         ItemsSource="{Binding Articles, Mode=OneWay}"
                         SelectedItem="{Binding SelectedArticle, Mode=TwoWay}"
                         SelectionMode="Single">
                         <CollectionView.ItemsLayout>
                             <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:DTO3">
+                                <Border Style="{StaticResource BorderItem}">
+                                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                                        <Label Text="{Binding MerchandiseName}" TextColor="{StaticResource White}" />
+                                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                                            <Label FontSize="12" VerticalOptions="Center">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="{Binding Packaging.Value, Mode=OneWay, StringFormat='{0:F2}'}" TextColor="{StaticResource White}" />
+                                                        <Span Text=" " />
+                                                        <Span Text="{Binding Packaging.Unit, Mode=OneWay, StringFormat='{0:F2}'}" TextColor="{StaticResource White}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                            <Label
+                                                FontAttributes="Bold"
+                                                Text="{Binding Price, Mode=OneWay, StringFormat='{0:F2}'}"
+                                                TextColor="{StaticResource White}" />
+                                        </HorizontalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
                     </CollectionView>
                 </ScrollView>
                 <Frame Grid.Row="2" Padding="8">
@@ -178,7 +156,7 @@
                             CornerRadius="2"
                             WidthRequest="2" />-->
                             <Button
-                                Command="{Binding ShowSetSellingPriceCommand}"
+                                Command="{Binding ShowArticlePriceChangeCommand}"
                                 FontFamily="icofont"
                                 IsEnabled="{Binding SelectedArticle, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource Dollar}"

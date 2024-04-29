@@ -102,40 +102,8 @@ public class MerchandiseController : ControllerBase
             return NotFound();
         }
 
-        merchandiseServ.Commit();
-        articlesForWarehouseServ.Commit();
-        articlesForSalesServ.Commit();
+        AllCommit();
         return Ok(resultMerchandise);
-
-        //var entityMerchandise = dTO.FromDTO1();
-        //entityMerchandise.Id = ObjectId.NewObjectId();
-        //var resultMerchandise = merchandiseServ.Insert(entityMerchandise);
-
-        //if (string.IsNullOrEmpty(resultMerchandise))
-        //{
-        //    return NotFound();
-        //}
-
-        //var entityArticleItemForWarehouse = ArticleItemForWarehouseFabric(entityMerchandise);
-        //var resultArticleItemForWarehouse = articlesForWarehouseServ.Insert(entityArticleItemForWarehouse);
-
-        //if (string.IsNullOrEmpty(resultArticleItemForWarehouse))
-        //{
-        //    merchandiseServ.Delete(new ObjectId(resultMerchandise));
-        //    return NotFound();
-        //}
-
-        //var entityArticleItemForSale = ArticleItemForSaleFabric(entityMerchandise);
-        //var resultArticleItemForSales = articlesForSalesServ.Insert(entityArticleItemForSale);
-
-        //if (string.IsNullOrEmpty(resultArticleItemForSales))
-        //{
-        //    merchandiseServ.Delete(new ObjectId(resultMerchandise));
-        //    articlesForWarehouseServ.Delete(new ObjectId(resultArticleItemForWarehouse));
-        //    return NotFound();
-        ////}
-
-        //return Ok(resultMerchandise);
     }
     
     [HttpPut]
@@ -146,10 +114,13 @@ public class MerchandiseController : ControllerBase
             return BadRequest();
         }
 
+        var entityMerchandise = dTO.FromDTO1();
+
+        var Quantity = articlesForWarehouseServ.GetById(entityMerchandise.Id!)?.Quantity ?? 0;
+        var Price = articlesForSalesServ.GetById(entityMerchandise.Id!)?.Price ?? 0;
+
         merchandiseServ.BeginTrans();
 
-        var entityMerchandise = dTO.FromDTO1();
-        //var backupMerchandise = merchandiseServ.GetById(entityMerchandise.Id!);
         var resultMerchandise = merchandiseServ.Update(entityMerchandise);
 
         if (!resultMerchandise)
@@ -159,7 +130,6 @@ public class MerchandiseController : ControllerBase
         }
 
         articlesForWarehouseServ.BeginTrans();
-        var Quantity = articlesForWarehouseServ.GetById(entityMerchandise.Id!)?.Quantity ?? 0;
         var entityArticleItemForWarehouse = ArticleItemForWarehouseFabric(entityMerchandise, Quantity);
         var resultArticleItemForWarehouse = articlesForWarehouseServ.Update(entityArticleItemForWarehouse);
 
@@ -167,12 +137,10 @@ public class MerchandiseController : ControllerBase
         {
             merchandiseServ.Rollback();
             articlesForWarehouseServ.Rollback();
-            //merchandiseServ.Update(backupMerchandise);
             return NotFound();
         }
 
         articlesForSalesServ.BeginTrans();
-        var Price = articlesForSalesServ.GetById(entityMerchandise.Id!)?.Price ?? 0;
         var entityArticleItemForSale = ArticleItemForSaleFabric(entityMerchandise, Price);
         var resultArticleItemForSales = articlesForSalesServ.Update(entityArticleItemForSale);
         if (!resultArticleItemForSales)
@@ -180,12 +148,10 @@ public class MerchandiseController : ControllerBase
             merchandiseServ.Rollback();
             articlesForWarehouseServ.Rollback();
             articlesForSalesServ.Rollback();
-            //merchandiseServ.Update(backupMerchandise);
-            //articlesForWarehouseServ.Update(backupArticleItemForWarehouse);
             return NotFound();
         }
 
-        merchandiseServ.Commit();
+        AllCommit();
         return Ok();
     }
 
@@ -244,6 +210,13 @@ public class MerchandiseController : ControllerBase
             MerchandiseId = entity.Id,
             Packaging = entity.Packaging
         };
+    }
+
+    void AllCommit()
+    {
+        merchandiseServ.Commit();
+        articlesForWarehouseServ.Commit();
+        articlesForSalesServ.Commit();
     }
     #endregion
 }
