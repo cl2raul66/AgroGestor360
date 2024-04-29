@@ -20,10 +20,25 @@
                     VerticalOptions="Center" />
                 <HorizontalStackLayout Grid.Column="2" Spacing="8">
                     <Button
-                        Command="{Binding AddWarehouseCommand}"
+                        FontFamily="icofont"
+                        IsEnabled="{Binding SelectedWarehouse, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Text="{StaticResource Inbox}"
+                        ToolTipProperties.Text="Entrada de mercancia seleccionada" />
+                    <BoxView
+                        BackgroundColor="{StaticResource Gray300}"
+                        CornerRadius="2"
+                        WidthRequest="2" />
+                    <Button
+                        Command="{Binding ShowAddMerchandiseCommand}"
                         FontFamily="icofont"
                         Text="{StaticResource Plus}"
-                        ToolTipProperties.Text="Agregar" />
+                        ToolTipProperties.Text="Agregar nueva mercancia" />
+                    <Button
+                        Command="{Binding ShowEditMerchandiseCommand}"
+                        FontFamily="icofont"
+                        IsEnabled="{Binding SelectedWarehouse, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Text="{StaticResource UiEdit}"
+                        ToolTipProperties.Text="Editar mercancia" />
                     <Button
                         FontFamily="icofont"
                         IsEnabled="{Binding SelectedWarehouse, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
@@ -36,6 +51,7 @@
         <!--#region CONTENIDO-->
         <ScrollView Grid.Row="1">
             <CollectionView
+                x:Name="CvDTO2"
                 ItemsSource="{Binding Warehouses, Mode=OneWay}"
                 SelectedItem="{Binding SelectedWarehouse}"
                 SelectionMode="Single">
@@ -43,43 +59,35 @@
                     <GridItemsLayout
                         HorizontalItemSpacing="4"
                         Orientation="Vertical"
-                        Span="7"
+                        Span="5"
                         VerticalItemSpacing="4" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:DTO2_1">
+                    <DataTemplate x:DataType="model:DTO2">
                         <Border Style="{StaticResource BorderItem}">
-                            <VerticalStackLayout Spacing="4">
+                            <VerticalStackLayout Spacing="0">
                                 <Label
+                                    FontAttributes="Bold"
                                     FontSize="Title"
                                     HorizontalOptions="Center"
                                     Text="{Binding Quantity, Mode=OneWay}"
                                     TextColor="{StaticResource White}" />
                                 <Label
-                                    HorizontalOptions="Center"
-                                    LineBreakMode="TailTruncation"
-                                    Text="{Binding Name, Mode=OneWay}"
-                                    TextColor="{StaticResource White}" />
-                                <Grid ColumnDefinitions="*,auto" ColumnSpacing="2">
-                                    <Label
-                                        FontSize="10"
-                                        LineBreakMode="TailTruncation"
-                                        Text="{Binding Category, Mode=OneWay, Converter={StaticResource MerchandiseCategoryToHumanId}}"
-                                        TextColor="{StaticResource White}"
-                                        ToolTipProperties.Text="{Binding Category}" />
-                                    <Label
-                                        Grid.Column="1"
-                                        FontSize="10"
-                                        ToolTipProperties.Text="{Binding Unit}">
-                                        <Label.FormattedText>
-                                            <FormattedString>
-                                                <Span Text="{Binding Value, Mode=OneWay, StringFormat='{0:F2}'}" TextColor="{StaticResource White}" />
-                                                <Span Text=" " />
-                                                <Span Text="{Binding Unit, Mode=OneWay, Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
-                                            </FormattedString>
-                                        </Label.FormattedText>
-                                    </Label>
-                                </Grid>
+                                    FontAttributes="Bold"
+                                    HorizontalTextAlignment="Center"
+                                    LineBreakMode="MiddleTruncation"
+                                    Text="{Binding MerchandiseName, Mode=OneWay}"
+                                    TextColor="{StaticResource White}"
+                                    ToolTipProperties.Text="{Binding MerchandiseName, Mode=OneWay}" />
+                                <Label FontSize="10" HorizontalTextAlignment="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding Packaging.Value, Mode=OneWay, TargetNullValue='', StringFormat='{0:F2}'}" TextColor="{StaticResource White}" />
+                                            <Span Text=" " />
+                                            <Span Text="{Binding Packaging.Unit, Mode=OneWay, TargetNullValue='Unidad', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
                             </VerticalStackLayout>
                         </Border>
                     </DataTemplate>

@@ -33,37 +33,35 @@ public class ProductsForSalesController : ControllerBase
         return !all?.Any() ?? true ? NotFound() : Ok(all);
     }
 
-    [HttpGet("getall1")]
-    public ActionResult<IEnumerable<DTO4_1>> GetAll1()
+    [HttpGet("offers/{id}")]
+    public ActionResult<IEnumerable<ProductOffering>> GetOffersById(string id)
     {
-        var all = productsForSalesServ.GetAll()?.Select(x => x.ToDTO4_1()) ?? [];
-
-        return !all?.Any() ?? true ? NotFound() : Ok(all);
-    }
-
-    [HttpGet("get3/{id}")]
-    public ActionResult<DTO4_3> GetProductOffering(string id)
-    {
-        var find = productsForSalesServ.GetById(new ObjectId(id));
-
-        if (find is null)
+        if (string.IsNullOrEmpty(id))
         {
-            NotFound();
+            return BadRequest();
         }
 
-        var result = find!.ToDTO4_3();
+        var found = productsForSalesServ.GetById(new ObjectId(id));
+        if (!found?.Offering?.Any() ?? true)
+        {
+            return NotFound();
+        }
 
-        return !result.Offering?.Any() ?? true ? NotFound() : Ok(result);
+        return Ok(found!.Offering);
     }
 
     [HttpGet("{id}")]
-    public ActionResult<DTO4> Get(string id)
+    public ActionResult<DTO4> GetById(string id)
     {
-        var find = productsForSalesServ.GetById(new ObjectId(id));
+        if (string.IsNullOrEmpty(id))
+        {
+            return BadRequest();
+        }
 
+        var find = productsForSalesServ.GetById(new ObjectId(id));
         if (find is null)
         {
-            NotFound();
+            return NotFound();
         }
 
         var dTO = find!.ToDTO4();
@@ -72,59 +70,89 @@ public class ProductsForSalesController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<string> Post([FromBody] DTO4 dTO)
+    public ActionResult<string> Post([FromBody] DTO4_1 dTO)
     {
-        var entity = dTO.FromDTO4();
+        if (dTO is null)
+        {
+            return BadRequest();
+        }
+        var entity = dTO.FromDTO4_1();
         entity.Id = ObjectId.NewObjectId();
 
-        return productsForSalesServ.Insert(entity);
-    }
+        var result = productsForSalesServ.Insert(entity);
 
-    [HttpPut]
-    public IActionResult Put([FromBody] DTO4 dTO)
-    {
-        var updated = productsForSalesServ.Update(dTO.FromDTO4());
-
-        return Ok(updated);
+        return string.IsNullOrEmpty(result) ? NotFound() : Ok();
     }
 
     [HttpPut("send2")]
     public IActionResult ChangeQuantity([FromBody] DTO4_2 dTO)
     {
-        ProductItemForSale entity = dTO.FromDTO4_2();
-        var find = productsForSalesServ.GetById(entity.Id!);
-        entity.Article = find.Article;
-        entity.Offering = find.Offering;
-        var updated = productsForSalesServ.Update(entity);
+        if (string.IsNullOrEmpty(dTO.Id))
+        {
+            return BadRequest();
+        }
 
-        return Ok(updated);
+        var found = productsForSalesServ.GetById(new ObjectId(dTO.Id));
+        if (found is null)
+        {
+            return NotFound();
+        }
+        found.ProductQuantity = dTO.ProductQuantity;
+        var result = productsForSalesServ.Update(found);
+
+        return result ? Ok() : NotFound();
     }
 
     [HttpPut("send3")]
     public IActionResult ChangeOffering([FromBody] DTO4_3 dTO)
     {
-        var find = productsForSalesServ.GetById(new ObjectId(dTO.Id));
-        var offering = find.Offering;
-        offering ??= [];
-        offering.Insert(0, dTO.Offering!.Last());
-        ProductItemForSale entity = new()
+        if (string.IsNullOrEmpty(dTO.Id) || dTO.Offer is null)
         {
-            Id = find.Id,
-            Name = find.Name,
-            Quantity = find.Quantity,
-            Article = find.Article,
-            Offering = offering
-        };
-        var updated = productsForSalesServ.Update(entity);
+            return BadRequest();
+        }
 
-        return Ok(updated);
+        var found = productsForSalesServ.GetById(new ObjectId(dTO.Id));
+        if (found is null)
+        {
+            return NotFound();
+        }
+
+        found.Offering = [.. found.Offering, dTO.Offer!];
+
+        var result = productsForSalesServ.Update(found);
+
+        return result ? Ok() : NotFound();
+    }
+
+    [HttpPut("send4")]
+    public IActionResult ChangeOfferingRemove([FromBody] DTO4_4 dTO)
+    {
+        if (string.IsNullOrEmpty(dTO.Id) || dTO.OfferId < 1)
+        {
+            return BadRequest();
+        }
+
+        var found = productsForSalesServ.GetById(new ObjectId(dTO.Id));
+        if (found is null)
+        {
+            return NotFound();
+        }
+        found.Offering = found.Offering?.Where(x => x.Id != dTO.OfferId).ToArray();
+
+        var result = productsForSalesServ.Update(found);
+
+        return result ? Ok() : NotFound();
     }
 
     [HttpDelete("{id}")]
     public IActionResult Delete(string id)
     {
-        var deleted = productsForSalesServ.Delete(new ObjectId(id));
+        if (string.IsNullOrEmpty(id))
+        {
+            return BadRequest();
+        }
+        var result = productsForSalesServ.Delete(new ObjectId(id));
 
-        return Ok(deleted);
+        return result ? Ok() : NotFound();
     }
 }

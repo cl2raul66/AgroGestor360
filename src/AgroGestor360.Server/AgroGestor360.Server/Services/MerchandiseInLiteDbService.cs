@@ -1,5 +1,5 @@
 ﻿using AgroGestor360.Server.Models;
-using AgroGestor360.Server.Tools.Configurations;
+using AgroGestor360.Server.Tools.Helpers;
 using LiteDB;
 
 namespace AgroGestor360.Server.Services;
@@ -8,28 +8,44 @@ public interface IMerchandiseInLiteDbService
 {
     bool Exist { get; }
 
+    void BeginTrans();
+    void Commit();
     bool Delete(ObjectId id);
     IEnumerable<MerchandiseItem> GetAll();
-    IEnumerable<MerchandiseCategory> GetAllCategories();
+    IEnumerable<string> GetAllCategories();
     MerchandiseItem GetById(ObjectId id);
     string Insert(MerchandiseItem entity);
+    void Rollback();
     bool Update(MerchandiseItem entity);
 }
 
 public class MerchandiseInLiteDbService : IMerchandiseInLiteDbService
 {
+    readonly LiteDatabase db;
     readonly ILiteCollection<MerchandiseItem> collection;
 
-    public MerchandiseInLiteDbService(MerchandiseDbConfig dbConfig)
+    public MerchandiseInLiteDbService()
     {
-        collection = dbConfig.Bd.GetCollection<MerchandiseItem>();
+        var cnx = new ConnectionString()
+        {
+            Filename = FileHelper.GetFileDbPath("Merchandise")
+        };
+
+        db = new(cnx);
+        collection = db.GetCollection<MerchandiseItem>();
     }
+
+    public void BeginTrans() => db.BeginTrans();
+
+    public void Commit() => db.Commit();
+
+    public void Rollback() => db.Rollback();
 
     public bool Exist => collection.Count() > 0;
 
-    public IEnumerable<MerchandiseItem> GetAll() => collection.FindAll() ?? [];
+    public IEnumerable<MerchandiseItem> GetAll() => collection.FindAll();
 
-    public IEnumerable<MerchandiseCategory> GetAllCategories() => collection.Find(Query.All())?.Select(x => x.Category ?? new()).DistinctBy(c => c?.Name).Where(c => c != null) ?? [];
+    public IEnumerable<string> GetAllCategories() => collection.Find(Query.All()).Select(x => x.Category ?? string.Empty).Distinct();
 
     public MerchandiseItem GetById(ObjectId id) => collection.FindById(id);
 

@@ -22,7 +22,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(PgSetURL), typeof(PgSetURL));
         Routing.RegisterRoute(nameof(PgAddAccountOrCard), typeof(PgAddAccountOrCard));
         Routing.RegisterRoute(nameof(PgAddEditShareholder), typeof(PgAddEditShareholder));
-        Routing.RegisterRoute(nameof(PgAddWarehouse), typeof(PgAddWarehouse));
+        Routing.RegisterRoute(nameof(PgAddEditWarehouse), typeof(PgAddEditWarehouse));
         Routing.RegisterRoute(nameof(PgAddProduct), typeof(PgAddProduct));
         Routing.RegisterRoute(nameof(PgCreateOffer), typeof(PgCreateOffer));
         Routing.RegisterRoute(nameof(PgAddEditCustomer), typeof(PgAddEditCustomer));

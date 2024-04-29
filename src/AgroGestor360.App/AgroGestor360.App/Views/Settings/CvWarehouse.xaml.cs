@@ -9,6 +9,15 @@ public partial class CvWarehouse : ContentView
 		InitializeComponent();
 
 		vm.Initialize();
-		BindingContext = vm;
-	}
+        BindingContext = vm;
+
+        CvDTO2.SelectionChanged += (s, e) =>
+        {
+            if (e.CurrentSelection.Count == 0)
+            {
+                CvDTO2.SelectionMode = SelectionMode.None;
+            }
+            CvDTO2.SelectionMode = SelectionMode.Single;
+        };
+    }
 }

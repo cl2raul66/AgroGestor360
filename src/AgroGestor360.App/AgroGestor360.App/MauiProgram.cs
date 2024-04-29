@@ -73,7 +73,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CvCustomers, CvCustomersViewModel>();
         builder.Services.AddTransient<PgAddEditCustomer, PgAddEditCustomerViewModel>();
         builder.Services.AddTransient<CvWarehouse, CvWarehouseViewModel>();
-        builder.Services.AddTransient<PgAddWarehouse, PgAddWarehouseViewModel>();
+        builder.Services.AddTransient<PgAddEditWarehouse, PgAddEditWarehouseViewModel>();
         builder.Services.AddTransient<PgLoans, PgLoansViewModel>();
         builder.Services.AddTransient<PgAddLoan, PgAddLoanViewModel>();
         builder.Services.AddTransient<PgAmortization, PgAmortizationViewModel>();
@@ -102,6 +102,5 @@ public static class MauiProgram
                 .Build();
             builder.Configuration.AddConfiguration(config);
         }
-
     }
 }

@@ -8,17 +8,19 @@ public interface IArticlesForWarehouseInLiteDbService
 {
     bool Exist { get; }
 
+    void BeginTrans();
+    void Commit();
     bool Delete(ObjectId id);
     IEnumerable<ArticleItemForWarehouse> GetAll();
-    IEnumerable<MerchandiseCategory> GetAllCategories();
-    IEnumerable<MerchandiseItem> GetAllMerchandise();
     ArticleItemForWarehouse GetById(ObjectId id);
     string Insert(ArticleItemForWarehouse entity);
+    void Rollback();
     bool Update(ArticleItemForWarehouse entity);
 }
 
 public class ArticlesForWarehouseInLiteDbService : IArticlesForWarehouseInLiteDbService
 {
+    readonly LiteDatabase db;
     readonly ILiteCollection<ArticleItemForWarehouse> collection;
 
     public ArticlesForWarehouseInLiteDbService()
@@ -28,17 +30,22 @@ public class ArticlesForWarehouseInLiteDbService : IArticlesForWarehouseInLiteDb
             Filename = FileHelper.GetFileDbPath("Article_Warehouse")
         };
 
-        LiteDatabase db = new(cnx);
+        var mapper = new BsonMapper();
+        mapper.Entity<ArticleItemForWarehouse>().Id(x => x.MerchandiseId);
+
+        db = new(cnx, mapper);
         collection = db.GetCollection<ArticleItemForWarehouse>();
     }
+
+    public void BeginTrans() => db.BeginTrans();
+
+    public void Commit() => db.Commit();
+
+    public void Rollback() => db.Rollback();
 
     public bool Exist => collection.Count() > 0;
 
     public IEnumerable<ArticleItemForWarehouse> GetAll() => collection.FindAll();
-
-    public IEnumerable<MerchandiseItem> GetAllMerchandise() => collection.Find(Query.All())?.Select(x => x.Merchandise ?? new()) ?? [];
-
-    public IEnumerable<MerchandiseCategory> GetAllCategories() => collection.Find(Query.All())?.Select(x => x.Merchandise?.Category ?? new())?.DistinctBy(c => c?.Name)?.Where(c => c != null) ?? [];
 
     public ArticleItemForWarehouse GetById(ObjectId id) => collection.FindById(id);
 

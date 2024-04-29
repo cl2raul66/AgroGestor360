@@ -32,17 +32,17 @@ public partial class PgCreateOfferViewModel : ObservableValidator
     [ObservableProperty]
     string? salePrice;
 
-    public string NameOffer => $"{CurrentProduct?.Name} - {OfferId}";
+    public string NameOffer => $"{CurrentProduct?.ProductName} - {OfferId}";
 
     public string ProductInfo
     {
         get
         {
             StringBuilder sb = new();
-            sb.AppendLine($"Nombre: {CurrentProduct?.Name}");
-            sb.AppendLine($"CATEGORIA: {CurrentProduct?.Category}");
-            sb.AppendLine($"PRECIO: {CurrentProduct?.SalePrice.ToString("0.00")}");
-            sb.AppendLine($"PRESENTACION: {CurrentProduct?.Value} {CurrentProduct?.Unit}");
+            sb.AppendLine($"Nombre: {CurrentProduct?.ProductName}");
+            //sb.AppendLine($"CATEGORIA: {CurrentProduct?.Category}");
+            sb.AppendLine($"PRECIO: {CurrentProduct?.ArticlePrice.ToString("0.00")}");
+            sb.AppendLine($"PRESENTACION: {CurrentProduct?.Packaging?.Value} {CurrentProduct?.Packaging?.Unit}");
             return sb.ToString().TrimEnd();
         }
     }
@@ -80,7 +80,7 @@ public partial class PgCreateOfferViewModel : ObservableValidator
         {
             SalePrice = string.IsNullOrEmpty(UnitQuantity) || !double.TryParse(UnitQuantity, out var quantity)
                 ? "0.00"
-                : (quantity * CurrentProduct!.SalePrice).ToString("0.00");
+                : (quantity * CurrentProduct!.ArticlePrice).ToString("0.00");
         }
     }
 }

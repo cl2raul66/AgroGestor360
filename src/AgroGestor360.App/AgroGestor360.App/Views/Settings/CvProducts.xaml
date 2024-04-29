@@ -10,32 +10,32 @@
     x:DataType="vm:CvProductsViewModel">
     <ContentView.Resources>
         <ResourceDictionary>
-            <DataTemplate x:Key="PriceZeroTemplate" x:DataType="model:DTO3_1">
+            <DataTemplate x:Key="PriceZeroTemplate" x:DataType="model:DTO3">
                 <Border Style="{StaticResource BorderItem}">
                     <Label LineBreakMode="TailTruncation">
                         <Label.FormattedText>
                             <FormattedString>
-                                <Span Text="{Binding Name, Mode=OneWay, StringFormat='{0}'}" TextColor="{StaticResource White}" />
+                                <Span Text="{Binding MerchandiseName, Mode=OneWay, StringFormat='{0}'}" TextColor="{StaticResource White}" />
                                 <Span Text=" " />
-                                <Span Text="{Binding Value, Mode=OneWay, StringFormat='[{0:F2}'}" TextColor="{StaticResource White}" />
+                                <Span Text="{Binding Packaging.Value, Mode=OneWay, StringFormat='[{0:F2}'}" TextColor="{StaticResource White}" />
                                 <Span Text=" " />
-                                <Span Text="{Binding Unit, Mode=OneWay, StringFormat='{0}]', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
+                                <Span Text="{Binding Packaging.Unit, Mode=OneWay, StringFormat='{0}]', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
                 </Border>
             </DataTemplate>
-            <DataTemplate x:Key="PriceNonZeroTemplate" x:DataType="model:DTO3_1">
+            <DataTemplate x:Key="PriceNonZeroTemplate" x:DataType="model:DTO3">
                 <Border Style="{StaticResource BorderItem}">
                     <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                         <Label LineBreakMode="MiddleTruncation">
                             <Label.FormattedText>
                                 <FormattedString>
-                                    <Span Text="{Binding Name, Mode=OneWay, StringFormat='{0}'}" TextColor="{StaticResource White}" />
+                                    <Span Text="{Binding MerchandiseName, Mode=OneWay, StringFormat='{0}'}" TextColor="{StaticResource White}" />
                                     <Span Text=" " />
-                                    <Span Text="{Binding Value, Mode=OneWay, StringFormat='[{0:F2}'}" TextColor="{StaticResource White}" />
+                                    <Span Text="{Binding Packaging.Value, Mode=OneWay, StringFormat='[{0:F2}'}" TextColor="{StaticResource White}" />
                                     <Span Text=" " />
-                                    <Span Text="{Binding Unit, Mode=OneWay, StringFormat='{0}]', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
+                                    <Span Text="{Binding Packaging.Unit, Mode=OneWay, StringFormat='{0}]', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
                                 </FormattedString>
                             </Label.FormattedText>
                         </Label>
@@ -280,18 +280,18 @@
                                         <Label LineBreakMode="MiddleTruncation">
                                             <Label.FormattedText>
                                                 <FormattedString>
-                                                    <Span Text="{Binding Name, Mode=OneWay, StringFormat='{0}'}" TextColor="{StaticResource White}" />
+                                                    <Span Text="{Binding ProductName, Mode=OneWay, StringFormat='{0}'}" TextColor="{StaticResource White}" />
                                                     <Span Text=" " />
-                                                    <Span Text="{Binding Value, Mode=OneWay, StringFormat='[{0:F2}'}" TextColor="{StaticResource White}" />
+                                                    <Span Text="{Binding Packaging.Value, Mode=OneWay, StringFormat='[{0:F2}'}" TextColor="{StaticResource White}" />
                                                     <Span Text=" " />
-                                                    <Span Text="{Binding Unit, Mode=OneWay, StringFormat='{0}]', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
+                                                    <Span Text="{Binding Packaging.Unit, Mode=OneWay, StringFormat='{0}]', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
                                         </Label>
                                         <Label
                                             Grid.Column="1"
                                             LineBreakMode="TailTruncation"
-                                            Text="{Binding SalePrice, StringFormat='Precio: {0:F2}'}"
+                                            Text="{Binding ArticlePrice, StringFormat='Precio: {0:F2}'}"
                                             TextColor="{StaticResource White}" />
                                     </Grid>
                                 </Border>

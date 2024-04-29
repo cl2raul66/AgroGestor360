@@ -52,7 +52,6 @@
                             <x:String>Clientes</x:String>
                             <x:String>Productos</x:String>
                             <x:String>Vendedores</x:String>
-                            <x:String>Ventas</x:String>
                         </x:Array>
                     </CollectionView.ItemsSource>
                     <CollectionView.ItemTemplate>

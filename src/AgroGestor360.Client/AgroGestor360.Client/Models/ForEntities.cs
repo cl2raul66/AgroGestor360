@@ -35,14 +35,6 @@ public class BankAccount
 }
 
 /// <summary>
-/// Represents a merchandise category.
-/// </summary>
-public class MerchandiseCategory
-{
-    public string? Name { get; set; }
-}
-
-/// <summary>
 /// Represents a presentation.
 /// </summary>
 public class Presentation
@@ -74,109 +66,158 @@ public class CustomerDiscountClass
 
 #region Merchandise
 /// <summary>
-/// Represents a merchandise item.
+/// Represents a merchandise item for GET, POST and PUT operations.
+/// <code>
+/// string [Id, Name, Description, Category]
+/// Presentation [Packaging]
+/// </code>
 /// </summary>
 public class DTO1
 {
     public string? Id { get; set; }
     public string? Name { get; set; }
     public Presentation? Packaging { get; set; }
-    public MerchandiseCategory? Category { get; set; }
+    public string? Category { get; set; }
     public string? Description { get; set; }
 }
 #endregion
 
 #region Warehouse
 /// <summary>
-/// Represents an article item for warehouse.
+/// Represents a article item of warehouse for GET 
+/// <code>
+/// string [MerchandiseId, MerchandiseName]
+/// Presentation [Packaging]
+/// double [Quantity]
+/// </code>
 /// </summary>
 public class DTO2
 {
-    public string? Id { get; set; }
-    public DTO1? Merchandise { get; set; }
+    public string? MerchandiseId { get; set; }
+    public string? MerchandiseName { get; set; }
+    public Presentation? Packaging { get; set; }
     public double Quantity { get; set; }
 }
 
 /// <summary>
-/// Represents an article item for warehouse.
+/// Represents a article item of warehouse for PUT 
+/// <code>
+/// string [MerchandiseId]
+/// double [Quantity]
+/// </code>
 /// </summary>
 public class DTO2_1
 {
-    public string? Id { get; set; }
-    public string? Name { get; set; }
-    public string? Unit { get; set; }
-    public double Value { get; set; }
-    public string? Category { get; set; }
+    public string? MerchandiseId { get; set; }
     public double Quantity { get; set; }
 }
 #endregion
 
 #region Sales
 /// <summary>
-/// Represents an article item for sale.
+/// Represents a article item of Sale for GET
+/// <code>
+/// string [MerchandiseId, MerchandiseName] 
+/// Presentation [Packaging] 
+/// double [Price] 
+/// </code>
 /// </summary>
 public class DTO3
 {
-    public string? Id { get; set; }
-    public DTO1? Merchandise { get; set; }
+    public string? MerchandiseId { get; set; }
+    public string? MerchandiseName { get; set; }
+    public Presentation? Packaging { get; set; }
     public double Price { get; set; }
 }
 
 /// <summary>
-/// Represents an article item for sale.
+/// Represents a article item of Sale for PUT
+/// <code>
+/// string [MerchandiseId] 
+/// double [Price] 
+/// </code>
 /// </summary>
 public class DTO3_1
 {
-    public string? Id { get; set; }
-    public string? Name { get; set; }
-    public string? Unit { get; set; }
-    public double Value { get; set; }
-    public string? Category { get; set; }
+    public string? MerchandiseId { get; set; }
     public double Price { get; set; }
 }
 
 /// <summary>
-/// Represents a product item for sale.
+/// Represents a product item of sale for GET
+/// <code>
+/// string [Id, MerchandiseId, ProductName]
+/// double [ProductQuantity, ArticlePrice] 
+/// Presentation [Packaging] 
+/// bool [HasOffers]
+/// </code>
 /// </summary>
 public class DTO4
 {
     public string? Id { get; set; }
-    public DTO3? Article { get; set; }
-    public string? Name { get; set; }
-    public double Quantity { get; set; }
-    public List<ProductOffering>? Offering { get; set; }
+    public string? MerchandiseId { get; set; }
+    public string? ProductName { get; set; }
+    public double ProductQuantity { get; set; }
+    public double ArticlePrice { get; set; }
+    public Presentation? Packaging { get; set; }
+    public bool HasOffers { get; set; }
 }
 
 /// <summary>
-/// Represents a product item for sale.
+/// Represents a product item of sale for POST
+/// <code>
+/// string [Id, MerchandiseId, ProductName]
+/// double [ProductQuantity, ArticlePrice] 
+/// Presentation [Packaging] 
+/// </code>
 /// </summary>
 public class DTO4_1
 {
     public string? Id { get; set; }
-    public string? Name { get; set; }
-    public double Quantity { get; set; }
-    public double SalePrice { get; set; }
-    public string? Unit { get; set; }
-    public double Value { get; set; }
-    public string? Category { get; set; }
+    public string? MerchandiseId { get; set; }
+    public string? ProductName { get; set; }
+    public double ProductQuantity { get; set; }
+    public double ArticlePrice { get; set; }
+    public Presentation? Packaging { get; set; }
 }
 
 /// <summary>
-/// Represents a product item for sale.
+/// Represents a product item of sale for PUT by quantity
+/// <code>
+/// string [Id]
+/// double [ProductQuantity] 
+/// </code>
 /// </summary>
 public class DTO4_2
 {
     public string? Id { get; set; }
-    public double Quantity { get; set; }
+    public double ProductQuantity { get; set; }
 }
 
 /// <summary>
-/// Represents a product item for sale.
+/// Represents a product item of sale for PUT by adding an offering
+/// <code>
+/// string [Id]
+/// ProductOffering [Offer] 
+/// </code>
 /// </summary>
 public class DTO4_3
 {
     public string? Id { get; set; }
-    public List<ProductOffering>? Offering { get; set; }
+    public ProductOffering? Offer { get; set; }
+}
+
+/// <summary>
+/// Represents a product item of sale for PUT by removing an offering
+/// <code>
+/// string [Id]
+/// int [OfferId] 
+/// </code>
+/// </summary>
+public class DTO4_4
+{
+    public string? Id { get; set; }
+    public int OfferId { get; set; }
 }
 #endregion
 

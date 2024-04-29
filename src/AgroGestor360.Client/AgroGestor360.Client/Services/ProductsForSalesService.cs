@@ -1,4 +1,5 @@
 ﻿using AgroGestor360.Client.Models;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 
@@ -6,16 +7,13 @@ namespace AgroGestor360.Client.Services;
 
 public interface IProductsForSalesService
 {
-    Task<bool> ChangeOfferingAsync(string serverURL, DTO4_3 entity);
-    Task<bool> ChangeQuantityAsync(string serverURL, DTO4_2 entity);
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string id);
-    Task<IEnumerable<DTO4_1>> GetAll1Async(string serverURL);
     Task<IEnumerable<DTO4>> GetAllAsync(string serverURL);
     Task<DTO4?> GetByIdAsync(string serverURL, string id);
-    Task<DTO4_3?> GetProductOfferingAsync(string serverURL, string id);
-    Task<string> InsertAsync(string serverURL, DTO4 entity);
-    Task<bool> UpdateAsync(string serverURL, DTO4 entity);
+    Task<IEnumerable<ProductOffering>> GetOffersById(string serverURL, string id);
+    Task<string> InsertAsync(string serverURL, DTO4_1 entity);
+    Task<bool> UpdateAsync(string serverURL, object dTO);
 }
 
 public class ProductsForSalesService : IProductsForSalesService
@@ -41,7 +39,7 @@ public class ProductsForSalesService : IProductsForSalesService
         {
             var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/productsforsales");
 
-            if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
+            if (response.StatusCode is HttpStatusCode.NotFound)
             {
                 return [];
             }
@@ -56,46 +54,26 @@ public class ProductsForSalesService : IProductsForSalesService
         return [];
     }
 
-    public async Task<IEnumerable<DTO4_1>> GetAll1Async(string serverURL)
+    public async Task<IEnumerable<ProductOffering>> GetOffersById(string serverURL, string id)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/productsforsales/getall1");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/productsforsales/offers/{id}");
 
-            if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
+            switch (response.StatusCode)
             {
-                return [];
-            }
-            else
-            {
-                response.EnsureSuccessStatusCode();
+                case HttpStatusCode.NotFound:
+                case HttpStatusCode.BadRequest:
+                    return [];
+                default:
+                    response.EnsureSuccessStatusCode();
+                    break;
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<DTO4_1>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+            return JsonSerializer.Deserialize<IEnumerable<ProductOffering>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
         }
         return [];
-    }
-
-    public async Task<DTO4_3?> GetProductOfferingAsync(string serverURL, string id)
-    {
-        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
-        {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/productsforsales/get3/{id}");
-
-            if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
-            {
-                return null;
-            }
-            else
-            {
-                response.EnsureSuccessStatusCode();
-            }
-
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<DTO4_3>(content, ApiServiceBase.ProviderJSONOptions);
-        }
-        return null;
     }
 
     public async Task<DTO4?> GetByIdAsync(string serverURL, string id)
@@ -104,13 +82,14 @@ public class ProductsForSalesService : IProductsForSalesService
         {
             var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/productsforsales/{id}");
 
-            if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
+            switch (response.StatusCode)
             {
-                return null;
-            }
-            else
-            {
-                response.EnsureSuccessStatusCode();
+                case HttpStatusCode.NotFound:
+                case HttpStatusCode.BadRequest:
+                    return null;
+                default:
+                    response.EnsureSuccessStatusCode();
+                    break;
             }
 
             var content = await response.Content.ReadAsStringAsync();
@@ -119,7 +98,7 @@ public class ProductsForSalesService : IProductsForSalesService
         return null;
     }
 
-    public async Task<string> InsertAsync(string serverURL, DTO4 entity)
+    public async Task<string> InsertAsync(string serverURL, DTO4_1 entity)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
@@ -135,36 +114,23 @@ public class ProductsForSalesService : IProductsForSalesService
         return string.Empty;
     }
 
-    public async Task<bool> UpdateAsync(string serverURL, DTO4 entity)
+    public async Task<bool> UpdateAsync(string serverURL, object dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var entityJson = JsonSerializer.Serialize(entity);
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/productsforsales", new StringContent(entityJson, Encoding.UTF8, "application/json"));
-
-            return response.IsSuccessStatusCode;
-        }
-        return false;
-    }
-
-    public async Task<bool> ChangeQuantityAsync(string serverURL, DTO4_2 entity)
-    {
-        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
-        {
-            var entityJson = JsonSerializer.Serialize(entity);
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/productsforsales/send2", new StringContent(entityJson, Encoding.UTF8, "application/json"));
-
-            return response.IsSuccessStatusCode;
-        }
-        return false;
-    }
-
-    public async Task<bool> ChangeOfferingAsync(string serverURL, DTO4_3 entity)
-    {
-        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
-        {
-            var entityJson = JsonSerializer.Serialize(entity);
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/productsforsales/send3", new StringContent(entityJson, Encoding.UTF8, "application/json"));
+            var entityJson = JsonSerializer.Serialize(dTO);
+            string route = dTO switch
+            {
+                DTO4_2 => "send2",
+                DTO4_3 => "send3",
+                DTO4_4 => "send4",
+                _ => string.Empty
+            };
+            if (string.IsNullOrEmpty(route))
+            {
+                return false;
+            }
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/productsforsales/{route}", new StringContent(entityJson, Encoding.UTF8, "application/json"));
 
             return response.IsSuccessStatusCode;
         }

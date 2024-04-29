@@ -30,10 +30,10 @@ public partial class CvProductsViewModel : ObservableRecipient
 
     #region ARTICLE
     [ObservableProperty]
-    ObservableCollection<DTO3_1>? articles;
+    ObservableCollection<DTO3>? articles;
 
     [ObservableProperty]
-    DTO3_1? selectedArticle;
+    DTO3? selectedArticle;
 
     [ObservableProperty]
     bool isZeroPrice;
@@ -41,33 +41,33 @@ public partial class CvProductsViewModel : ObservableRecipient
     [RelayCommand]
     async Task GetArticlesZeroPrice()
     {
-        var getArticles = await articlesForSalesServ.GetAll1Async(serverURL);
+        var getArticles = await articlesForSalesServ.GetAllAsync(serverURL);
         if (getArticles is null)
         {
             return;
         }
-        var articleszeroprice = getArticles!.Where(x => x.Price == 0);
-        if (articleszeroprice.Any())
-        {
-            Articles = new(articleszeroprice);
-            IsZeroPrice = true;
-        }
+        //var articleszeroprice = getArticles!.Where(x => x.Price == 0);
+        //if (articleszeroprice.Any())
+        //{
+        //    Articles = new(articleszeroprice);
+        //    IsZeroPrice = true;
+        //}
     }
 
     [RelayCommand]
     async Task GetArticlesNonZeroPrice()
     {
-        var getArticles = await articlesForSalesServ.GetAll1Async(serverURL);
+        var getArticles = await articlesForSalesServ.GetAllAsync(serverURL);
         if (getArticles is null)
         {
             return;
         }
-        var articleszeroprice = getArticles!.Where(x => x.Price > 0);
-        if (articleszeroprice.Any())
-        {
-            Articles = new(articleszeroprice);
-            IsZeroPrice = false;
-        }
+        //var articleszeroprice = getArticles!.Where(x => x.Price > 0);
+        //if (articleszeroprice.Any())
+        //{
+        //    Articles = new(articleszeroprice);
+        //    IsZeroPrice = false;
+        //}
     }
 
     [RelayCommand]
@@ -77,24 +77,24 @@ public partial class CvProductsViewModel : ObservableRecipient
         SelectedArticle = null;
 
         StringBuilder sb = new();
-        sb.AppendLine($"NOMBRE: {theSelection!.Name}");
+        sb.AppendLine($"NOMBRE: {theSelection!.MerchandiseName}");
         if (theSelection.Price > 0)
         {
             sb.AppendLine($"PRECIO ANTERIOR: {theSelection.Price.ToString("0.00")}");
         }
-        sb.AppendLine($"PRESENTACION: {theSelection.Value.ToString("0.00")} {theSelection.Unit}");
-        if (!string.IsNullOrEmpty(theSelection.Category))
-        {
-            sb.AppendLine($"CATEGORIA: {theSelection.Category}");
-        }
+        sb.AppendLine($"PRESENTACION: {theSelection.Packaging?.Value.ToString("0.00")} {theSelection.Packaging?.Unit}");
+        //if (!string.IsNullOrEmpty(theSelection.Category))
+        //{
+        //    sb.AppendLine($"CATEGORIA: {theSelection.Category}");
+        //}
 
         string price = await Shell.Current.DisplayPromptAsync("Establecer precio de venta", sb.ToString(), "Establecer", "Cancelar", "0.00");
         if (string.IsNullOrEmpty(price) || !double.TryParse(price, out double changePrice))
         {
             return;
         }
-        var entity = new DTO3() { Id = theSelection!.Id, Price = changePrice };
-        var result = await articlesForSalesServ.ChangePriceAsync(serverURL, entity);
+        var entity = new DTO3_1() { MerchandiseId = theSelection!.MerchandiseId, Price = changePrice };
+        var result = await articlesForSalesServ.UpdateAsync(serverURL, entity!);
         if (result)
         {
             if (IsZeroPrice)
@@ -117,10 +117,10 @@ public partial class CvProductsViewModel : ObservableRecipient
 
     #region PRODUCT
     [ObservableProperty]
-    ObservableCollection<DTO4_1>? products;
+    ObservableCollection<DTO4>? products;
 
     [ObservableProperty]
-    DTO4_1? selectedProduct;
+    DTO4? selectedProduct;
 
     [RelayCommand]
     async Task AddProduct()
@@ -134,10 +134,10 @@ public partial class CvProductsViewModel : ObservableRecipient
     {
         StringBuilder sb = new();
         sb.AppendLine($"Seguro que quiere eliminar el siguiente producto:");
-        sb.AppendLine($"Nombre: {SelectedProduct!.Name}");
-        sb.AppendLine($"Categoría: {SelectedProduct!.Category}");
-        sb.AppendLine($"Presentación: {SelectedProduct!.Value} {SelectedProduct!.Unit}");
-        sb.AppendLine($"Precio: {SelectedProduct!.SalePrice.ToString("0.00")}");
+        sb.AppendLine($"Nombre: {SelectedProduct!.ProductName}");
+        //sb.AppendLine($"Categoría: {SelectedProduct!.Category}");
+        sb.AppendLine($"Presentación: {SelectedProduct!.Packaging?.Value} {SelectedProduct!.Packaging?.Unit}");
+        sb.AppendLine($"Precio: {SelectedProduct!.ArticlePrice.ToString("0.00")}");
         sb.AppendLine("");
         sb.AppendLine("Inserte la contraseña:");
         var pwd = await Shell.Current.DisplayPromptAsync("Eliminar producto", sb.ToString().Trim(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
@@ -187,26 +187,24 @@ public partial class CvProductsViewModel : ObservableRecipient
         WeakReferenceMessenger.Default.Register<CvProductsViewModel, PgAddProductMessage, string>(this, nameof(PgAddProductMessage), async (r, m) =>
         {
             var article = await articlesForSalesServ.GetByIdAsync(serverURL, m.ArticleId);
-            DTO4 newProduct = new() { Name = m.Name, Article = article, Quantity = m.Quantity };
+            DTO4_1 newProduct = new() { ProductName = m.Name, ArticlePrice = article!.Price, ProductQuantity = m.Quantity };
             var result = await productsForSalesServ.InsertAsync(serverURL, newProduct);
             if (!string.IsNullOrEmpty(result))
             {
                 r.Products ??= [];
-                r.Products.Insert(0, new DTO4_1()
+                r.Products.Insert(0, new DTO4()
                 {
-                    Quantity = m.Quantity,
-                    Category = article!.Merchandise!.Category!.Name,
-                    Name = m.Name,
-                    Value = article!.Merchandise!.Packaging!.Value,
-                    Unit = article!.Merchandise!.Packaging!.Unit,
-                    SalePrice = m.Quantity * article!.Price
+                    ProductQuantity = m.Quantity,
+                    ProductName = m.Name,
+                    Packaging = article!.Packaging,
+                    ArticlePrice = m.Quantity * article!.Price
                 });
             }
         });
 
         WeakReferenceMessenger.Default.Register<CvProductsViewModel, ProductOffering, string>(this, "NewProductOffering", async (r, m) =>
         {
-            bool result = await productsForSalesServ.ChangeOfferingAsync(serverURL, new() { Id = SelectedProduct!.Id, Offering = [m] });
+            bool result = await productsForSalesServ.UpdateAsync(serverURL, new DTO4_3 () { Id = SelectedProduct!.Id, Offer = m });
             if (result)
             {
                 r.Offers ??= [];
@@ -225,15 +223,15 @@ public partial class CvProductsViewModel : ObservableRecipient
             {
                 Offers ??= [];
 
-                var getOffers = await productsForSalesServ.GetProductOfferingAsync(serverURL, SelectedProduct!.Id!);
-                if (getOffers?.Offering?.Any() ?? false)
-                {
-                    Offers = new(getOffers!.Offering);
-                }
-                else
-                {
-                    Offers = null;
-                }
+                var getOffers = await productsForSalesServ.UpdateAsync(serverURL, SelectedProduct!.Id!);
+                //if (getOffers?.Offering?.Any() ?? false)
+                //{
+                //    Offers = new(getOffers!.Offering);
+                //}
+                //else
+                //{
+                //    Offers = null;
+                //}
             }
         }
     }
@@ -241,34 +239,35 @@ public partial class CvProductsViewModel : ObservableRecipient
     #region EXTRA
     public async void Initialize()
     {
-        await Task.WhenAll(GetArticles(), GetProducts());
+        //await Task.WhenAll(GetArticles(), GetProducts());
+        await Task.CompletedTask;
     }
 
-    async Task GetArticles()
-    {
-        bool exist = await articlesForSalesServ.CheckExistence(serverURL);
-        if (exist)
-        {
-            await GetArticlesZeroPrice();
-            if (Articles is null)
-            {
-                await GetArticlesNonZeroPrice();
-            }
-        }
-    }
+    //async Task GetArticles()
+    //{
+    //    bool exist = await articlesForSalesServ.CheckExistence(serverURL);
+    //    if (exist)
+    //    {
+    //        await GetArticlesZeroPrice();
+    //        if (Articles is null)
+    //        {
+    //            await GetArticlesNonZeroPrice();
+    //        }
+    //    }
+    //}
 
-    async Task GetProducts()
-    {
-        bool exist = await productsForSalesServ.CheckExistence(serverURL);
-        if (exist)
-        {
-            var getProducts = await productsForSalesServ.GetAll1Async(serverURL);
-            if (getProducts is null)
-            {
-                return;
-            }
-            Products = new(getProducts);
-        }
-    }
+    //async Task GetProducts()
+    //{
+    //    bool exist = await productsForSalesServ.CheckExistence(serverURL);
+    //    if (exist)
+    //    {
+    //        var getProducts = await productsForSalesServ.GetAll1Async(serverURL);
+    //        if (getProducts is null)
+    //        {
+    //            return;
+    //        }
+    //        Products = new(getProducts);
+    //    }
+    //}
     #endregion
 }

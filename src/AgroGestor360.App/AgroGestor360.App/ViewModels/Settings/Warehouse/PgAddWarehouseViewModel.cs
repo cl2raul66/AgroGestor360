@@ -1,4 +1,6 @@
-﻿using AgroGestor360.App.Services;
+﻿using AgroGestor360.App.Models;
+using AgroGestor360.App.Services;
+using AgroGestor360.App.Views.Settings.Warehouse;
 using AgroGestor360.Client.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -10,11 +12,12 @@ using System.ComponentModel.DataAnnotations;
 namespace AgroGestor360.App.ViewModels;
 
 [QueryProperty(nameof(Categories), nameof(Categories))]
-public partial class PgAddWarehouseViewModel : ObservableValidator
+[QueryProperty(nameof(CurrentMerchandise), nameof(CurrentMerchandise))]
+public partial class PgAddEditWarehouseViewModel : ObservableValidator
 {
     readonly IMeasurementService measurementServ;
 
-    public PgAddWarehouseViewModel(IMeasurementService measurementService)
+    public PgAddEditWarehouseViewModel(IMeasurementService measurementService)
     {
         measurementServ = measurementService;
         Magnitudes = new(measurementServ.GetMeasurementNames());
@@ -22,10 +25,13 @@ public partial class PgAddWarehouseViewModel : ObservableValidator
     }
 
     [ObservableProperty]
-    List<MerchandiseCategory>? categories;
+    DTO1? currentMerchandise;
 
     [ObservableProperty]
-    MerchandiseCategory? selectedCategory;
+    List<string>? categories;
+
+    [ObservableProperty]
+    string? selectedCategory;
 
     [ObservableProperty]
     string? newCategory;
@@ -39,7 +45,6 @@ public partial class PgAddWarehouseViewModel : ObservableValidator
     string? name;
 
     [ObservableProperty]
-    [Required]
     string? quantity;
 
     [ObservableProperty]
@@ -81,46 +86,91 @@ public partial class PgAddWarehouseViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    async Task Cancel() => await Shell.Current.GoToAsync("..", true);
+    async Task Cancel()
+    {
+        WeakReferenceMessenger.Default.Send("cancel", nameof(PgAddEditWarehouse));
+        await Shell.Current.GoToAsync("..", true);
+    }
 
     [RelayCommand]
-    async Task Add()
+    async Task AddOrEdit()
     {
         ValidateAllProperties();
 
-        double theQuantity = 0;
-        double theValue = 0;
-
-        if (HasErrors || !double.TryParse(Quantity, out theQuantity) || (!IsUnit && !double.TryParse(Value, out theValue)))
+        if (CurrentMerchandise is null)
         {
-            IsVisisbleInfo = true;
-            await Task.Delay(3000);
-            IsVisisbleInfo = false;
+            double theQuantity = 0;
+            double theValue = 0;
 
-            return;
+            if (HasErrors || (!double.TryParse(Quantity, out theQuantity)) || (!IsUnit && !double.TryParse(Value, out theValue)))
+            {
+                IsVisisbleInfo = true;
+                await Task.Delay(3000);
+                IsVisisbleInfo = false;
+
+                return;
+            }
+
+            DTO1 merchandise = new()
+            {
+                Name = Name!.Trim().ToUpper(),
+                Category = string.IsNullOrEmpty(NewCategory) ? SelectedCategory : NewCategory.Trim().ToUpper(),
+                Description = Description?.Trim().ToUpper(),
+                Packaging = IsUnit ? null : new() { Measure = SelectedMagnitude, Unit = SelectedUnit, Value = theValue }
+            };
+
+            WeakReferenceMessenger.Default.Send(new PgAddWarehouseMessage(merchandise, theQuantity), "AddMerchandise");
+        }
+        else
+        {
+            double theValue = 0;
+
+            if (HasErrors || (!IsUnit && !double.TryParse(Value, out theValue)))
+            {
+                IsVisisbleInfo = true;
+                await Task.Delay(3000);
+                IsVisisbleInfo = false;
+
+                return;
+            }
+            DTO1 merchandise = new()
+            {
+                Id = CurrentMerchandise.Id,
+                Name = Name!.Trim().ToUpper(),
+                Category = string.IsNullOrEmpty(NewCategory) ? SelectedCategory : NewCategory.Trim().ToUpper(),
+                Description = Description?.Trim().ToUpper(),
+                Packaging = IsUnit ? null : new() { Measure = SelectedMagnitude, Unit = SelectedUnit, Value = theValue }
+            };
+            WeakReferenceMessenger.Default.Send(merchandise, "EditMerchandise");
         }
 
-        DTO1 merchandise = new()
-        {
-            Name = Name!.Trim().ToUpper(),
-            Category = string.IsNullOrEmpty(NewCategory) ? SelectedCategory : new() { Name = NewCategory.Trim().ToUpper()},
-            Description = Description?.Trim().ToUpper(),
-            Packaging = IsUnit ? null : new() { Measure = SelectedMagnitude, Unit = SelectedUnit, Value = theValue }
-        };
-
-        WeakReferenceMessenger.Default.Send(new DTO2() { Merchandise = merchandise, Quantity = theQuantity }, "AddWarehouse");
-
-        await Cancel();
+        await Shell.Current.GoToAsync("..", true);
     }
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
+        if (e.PropertyName == nameof(CurrentMerchandise))
+        {
+            if (CurrentMerchandise is not null)
+            {
+                Name = CurrentMerchandise?.Name;
+                SelectedCategory = Categories?.FirstOrDefault(x => x == CurrentMerchandise?.Category);
+                Description = CurrentMerchandise?.Description;
+                if (CurrentMerchandise?.Packaging is not null)
+                {
+                    SelectedMagnitude = CurrentMerchandise.Packaging.Measure;
+                    SelectedUnit = CurrentMerchandise.Packaging.Unit;
+                    Value = CurrentMerchandise.Packaging.Value.ToString();
+                }
+            }
+        }
+
         if (e.PropertyName == nameof(Categories))
         {
             if (Categories?.Any() ?? false)
             {
-                IsSetNewCategory = false; 
+                IsSetNewCategory = false;
             }
         }
 

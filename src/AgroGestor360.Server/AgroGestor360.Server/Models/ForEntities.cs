@@ -61,18 +61,21 @@ public class CustomerDiscountClass
     public double Value { get; set; }
 }
 
+///<summary>
+/// Object: MerchandiseItem 
+/// <code>
+/// string [Name, Category, Description]
+/// ObjectId [Id]
+/// Presentation [Packaging]
+/// </code>
+/// </summary>
 public class MerchandiseItem
 {
-    public ObjectId? Id { get; set; }
     public string? Name { get; set; }
-    public Presentation? Packaging { get; set; }
-    public MerchandiseCategory? Category { get; set; }
+    public string? Category { get; set; }
     public string? Description { get; set; }
-}
-
-public class MerchandiseCategory
-{
-    public string? Name { get; set; }
+    public ObjectId? Id { get; set; }
+    public Presentation? Packaging { get; set; }
 }
 
 public class Presentation
@@ -82,27 +85,49 @@ public class Presentation
     public double Value { get; set; }
 }
 
+///<summary>
+/// Object: ArticleItemForWarehouse 
+/// <code>
+/// ObjectId [MerchandiseId]
+/// string [MerchandiseName]
+/// double [Quantity]
+/// Presentation [Packaging]
+/// </code>
+/// </summary>
 public class ArticleItemForWarehouse
 {
-    public ObjectId? Id { get; set; }
-    public MerchandiseItem? Merchandise { get; set; }
     public double Quantity { get; set; }
+    public string? MerchandiseName { get; set; }
+    public ObjectId? MerchandiseId { get; set; }
+    public Presentation? Packaging { get; set; }
 }
 
+///<summary>
+/// Object: ArticleItemForSale 
+/// <code>
+/// ObjectId [MerchandiseId]
+/// string [MerchandiseName]
+/// double [Price]
+/// Presentation [Packaging]
+/// </code>
+/// </summary>
 public class ArticleItemForSale
 {
-    public ObjectId? Id { get; set; }
-    public MerchandiseItem? Merchandise { get; set; }
+    public ObjectId? MerchandiseId { get; set; }
+    public string? MerchandiseName { get; set; }
+    public Presentation? Packaging { get; set; }
     public double Price { get; set; }
 }
 
 public class ProductItemForSale
 {
     public ObjectId? Id { get; set; }
-    public ArticleItemForSale? Article { get; set; }
-    public string? Name { get; set; }
-    public double Quantity { get; set; }
-    public List<ProductOffering>? Offering { get; set; }
+    public ObjectId? MerchandiseId { get; set; }
+    public Presentation? Packaging { get; set; }
+    public double ArticlePrice { get; set; }
+    public string? ProductName { get; set; }
+    public double ProductQuantity { get; set; }
+    public ProductOffering[]? Offering { get; set; }
 }
 
 public class ProductOffering

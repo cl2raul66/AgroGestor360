@@ -15,21 +15,20 @@ public partial class PgAddProductViewModel : ObservableValidator
 {
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ArticleInfo))]
-    DTO3_1? currentArticle;
+    DTO3? currentArticle;
 
     public string ArticleInfo
     {
         get
         {
-            Name = CurrentArticle?.Name;
             StringBuilder sb = new();
-            sb.AppendLine($"ARTICULO: {CurrentArticle?.Name}");
-            if (!string.IsNullOrEmpty(CurrentArticle?.Category))
-            {
-                sb.AppendLine($"CATEGORIA: {CurrentArticle!.Category}");
-            }
+            sb.AppendLine($"ARTICULO: {CurrentArticle?.MerchandiseName}");
+            //if (!string.IsNullOrEmpty(CurrentArticle?.Category))
+            //{
+            //    sb.AppendLine($"CATEGORIA: {CurrentArticle!.Category}");
+            //}
             sb.AppendLine($"PRECIO: {CurrentArticle?.Price.ToString("0.00")}");
-            sb.AppendLine($"PRESENTACION: {CurrentArticle?.Value.ToString("0.00")} {CurrentArticle?.Unit}");
+            sb.AppendLine($"PRESENTACION: {CurrentArticle?.Packaging?.Value.ToString("0.00")} {CurrentArticle?.Packaging?.Unit}");
             return sb.ToString().TrimEnd();
         }
     }
@@ -66,7 +65,7 @@ public partial class PgAddProductViewModel : ObservableValidator
             return;
         }
 
-        _ = WeakReferenceMessenger.Default.Send(new PgAddProductMessage(CurrentArticle!.Id!, Name!.Trim().ToUpper(), theQuantity), nameof(PgAddProductMessage));
+        _ = WeakReferenceMessenger.Default.Send(new PgAddProductMessage(CurrentArticle!.MerchandiseId!, Name!.Trim().ToUpper(), theQuantity), nameof(PgAddProductMessage));
         await Cancel();
     }
 

@@ -10,7 +10,7 @@ public interface IMerchandiseService
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string id);
     Task<IEnumerable<DTO1>> GetAllAsync(string serverURL);
-    Task<IEnumerable<MerchandiseCategory>> GetAllCategoriesAsync(string serverURL);
+    Task<IEnumerable<string>> GetAllCategoriesAsync(string serverURL);
     Task<DTO1?> GetByIdAsync(string serverURL, string id);
     Task<string> InsertAsync(string serverURL, DTO1 entity);
     Task<bool> UpdateAsync(string serverURL, DTO1 entity);
@@ -26,8 +26,8 @@ public class MerchandiseService : IMerchandiseService
 
             if (response.IsSuccessStatusCode)
             {
-                var exist = bool.Parse(await response.Content.ReadAsStringAsync());
-                return exist;
+                var result = bool.Parse(await response.Content.ReadAsStringAsync());
+                return result;
             }
         }
         return false;
@@ -54,11 +54,11 @@ public class MerchandiseService : IMerchandiseService
         return [];
     }
 
-    public async Task<IEnumerable<MerchandiseCategory>> GetAllCategoriesAsync(string serverURL)
+    public async Task<IEnumerable<string>> GetAllCategoriesAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/merchandise/allcategories");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/merchandise/getallcategories");
 
             if (response.StatusCode is HttpStatusCode.NotFound)
             {
@@ -69,9 +69,8 @@ public class MerchandiseService : IMerchandiseService
                 response.EnsureSuccessStatusCode();
             }
 
-
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<MerchandiseCategory>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+            return JsonSerializer.Deserialize<IEnumerable<string>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
         }
         return [];
     }
@@ -82,7 +81,15 @@ public class MerchandiseService : IMerchandiseService
         {
             var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/merchandise/{id}");
 
-            response.EnsureSuccessStatusCode();
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.NotFound:
+                case HttpStatusCode.BadRequest:
+                    return null;
+                default:
+                    response.EnsureSuccessStatusCode();
+                    break;
+            }
 
             var content = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<DTO1>(content, ApiServiceBase.ProviderJSONOptions);
