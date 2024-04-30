@@ -56,7 +56,10 @@ public partial class PgAddEditSellerViewModel : ObservableValidator
     bool isVisisbleInfo;
 
     [RelayCommand]
-    async Task Cancel() => await Shell.Current.GoToAsync("..", true);
+    async Task Cancel()
+    {
+        await Shell.Current.GoToAsync("..", true);
+    }
 
     [RelayCommand]
     async Task Add()
@@ -86,7 +89,7 @@ public partial class PgAddEditSellerViewModel : ObservableValidator
                     Address = Address?.Trim().ToUpper(),
                     Birthday = Birthday.Date <= DateTime.Now.AddYears(-18) ? Birthday.Date : null
                 };
-                WeakReferenceMessenger.Default.Send(editSeller, "editSeller");
+                _ = WeakReferenceMessenger.Default.Send(editSeller, "editSeller");
                 break;
             default:
                 DTO6_1 newSeller = new()
@@ -99,11 +102,11 @@ public partial class PgAddEditSellerViewModel : ObservableValidator
                     Address = Address?.Trim().ToUpper(),
                     Birthday = Birthday.Date <= DateTime.Now.AddYears(-18) ? Birthday.Date : null
                 };
-                WeakReferenceMessenger.Default.Send(newSeller, "newSeller");
+                _ = WeakReferenceMessenger.Default.Send(newSeller, "newSeller");
                 break;
         }
 
-        await Cancel();
+        await Shell.Current.GoToAsync("..", true);
     }
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)

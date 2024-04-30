@@ -44,6 +44,12 @@ public partial class PgAddProductViewModel : ObservableValidator
     bool isVisibleInfo;
 
     [RelayCommand]
+    void CopyName()
+    {
+        Name = CurrentArticle?.MerchandiseName;
+    }
+
+    [RelayCommand]
     async Task Cancel()
     {
         _ = WeakReferenceMessenger.Default.Send("cancel", nameof(CvProductsViewModel));
@@ -65,7 +71,16 @@ public partial class PgAddProductViewModel : ObservableValidator
             return;
         }
 
-        _ = WeakReferenceMessenger.Default.Send(new PgAddProductMessage(CurrentArticle!.MerchandiseId!, Name!.Trim().ToUpper(), theQuantity), nameof(PgAddProductMessage));
+        DTO4_1 newProduct = new()
+        {
+            ProductQuantity = theQuantity,
+            MerchandiseId = CurrentArticle!.MerchandiseId,
+            ArticlePrice = theQuantity * CurrentArticle!.Price,
+            ProductName = Name!.Trim().ToUpper(),
+            Packaging = CurrentArticle!.Packaging
+        };
+
+        _ = WeakReferenceMessenger.Default.Send(newProduct, "newProduct");
 
         await Shell.Current.GoToAsync("..", true);
     }

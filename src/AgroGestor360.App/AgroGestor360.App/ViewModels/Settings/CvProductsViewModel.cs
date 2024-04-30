@@ -25,7 +25,6 @@ public partial class CvProductsViewModel : ObservableRecipient
         productsForSalesServ = productsForSalesService;
         authServ = authService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
-        IsActive = true;
     }
 
     #region ARTICLE
@@ -52,7 +51,7 @@ public partial class CvProductsViewModel : ObservableRecipient
             Articles = new(articleszeroprice);
             IsZeroPrice = true;
         }
-        SelectedArticle = null;
+        AllSelectedAsNull();
     }
 
     [RelayCommand]
@@ -69,7 +68,7 @@ public partial class CvProductsViewModel : ObservableRecipient
             Articles = new(articleszeroprice);
             IsZeroPrice = false;
         }
-        SelectedArticle = null;
+        AllSelectedAsNull();
     }
 
     [RelayCommand]
@@ -89,7 +88,7 @@ public partial class CvProductsViewModel : ObservableRecipient
 
         if (string.IsNullOrEmpty(newPrice) || !double.TryParse(newPrice, out double thePrice))
         {
-            SelectedArticle = null;
+            AllSelectedAsNull();
             return;
         }
 
@@ -112,6 +111,7 @@ public partial class CvProductsViewModel : ObservableRecipient
                 Articles[idx] = SelectedArticle;
             }
         }
+        AllSelectedAsNull();
     }
     #endregion
 
@@ -125,6 +125,7 @@ public partial class CvProductsViewModel : ObservableRecipient
     [RelayCommand]
     async Task AddProduct()
     {
+        IsActive = true;
         Dictionary<string, object> sendObject = new() { { "CurrentArticle", SelectedArticle! } };
         await Shell.Current.GoToAsync(nameof(PgAddProduct), true, sendObject);
     }
@@ -172,6 +173,7 @@ public partial class CvProductsViewModel : ObservableRecipient
     [RelayCommand]
     async Task CreateOffer()
     {
+        IsActive = true;
         Dictionary<string, object> sendObject = new() {
             { "CurrentProduct", SelectedProduct! },
             { "OfferId", (Offers?.Max(x => x.Id) ?? 0) + 1 }
@@ -183,30 +185,25 @@ public partial class CvProductsViewModel : ObservableRecipient
     protected override void OnActivated()
     {
         base.OnActivated();
-        WeakReferenceMessenger.Default.Register<CvProductsViewModel, PgAddProductMessage, string>(this, nameof(PgAddProductMessage), async (r, m) =>
+        WeakReferenceMessenger.Default.Register<CvProductsViewModel, DTO4_1, string>(this, "newProduct", async (r, m) =>
         {
-            DTO4_1 newProduct = new() { 
-                ProductQuantity = m.Quantity, 
-                MerchandiseId = SelectedArticle!.MerchandiseId,
-                ProductName = m.Name,
-                ArticlePrice = m.Quantity * SelectedArticle!.Price,
-                Packaging = SelectedArticle!.Packaging
-            };
-            var result = await productsForSalesServ.InsertAsync(serverURL, newProduct);
+            var result = await productsForSalesServ.InsertAsync(serverURL, m); 
             if (!string.IsNullOrEmpty(result))
             {
                 r.Products ??= [];
                 r.Products.Insert(0, new DTO4()
                 {
                     Id = result,
-                    MerchandiseId = SelectedArticle!.MerchandiseId,
-                    ProductQuantity = m.Quantity,
-                    ProductName = m.Name,
-                    ArticlePrice = m.Quantity * SelectedArticle!.Price,
-                    Packaging = SelectedArticle!.Packaging
+                    MerchandiseId = m.MerchandiseId,
+                    ProductQuantity = m.ProductQuantity,
+                    ProductName = m.ProductName,
+                    ArticlePrice = m.ArticlePrice,
+                    Packaging = m.Packaging
                 });
             }
-            SelectedArticle = null;
+
+            IsActive = false;
+            AllSelectedAsNull();
         });
 
         WeakReferenceMessenger.Default.Register<CvProductsViewModel, ProductOffering, string>(this, "NewProductOffering", async (r, m) =>
@@ -218,15 +215,15 @@ public partial class CvProductsViewModel : ObservableRecipient
                 r.Offers.Insert(0, m);
             }
 
+            IsActive = false;
+            AllSelectedAsNull();
         });
 
         WeakReferenceMessenger.Default.Register<CvProductsViewModel, string, string>(this, nameof(CvProductsViewModel), (r, m) =>
         {
             if (m == "cancel")
             {
-                r.SelectedArticle = null;
-                r.SelectedProduct = null;
-                r.SelectedOffert = null;
+                AllSelectedAsNull();
                 IsActive = false;
             }
         });
@@ -281,6 +278,13 @@ public partial class CvProductsViewModel : ObservableRecipient
             }
             Products = new(getProducts);
         }
+    }
+
+    void AllSelectedAsNull()
+    {
+        SelectedArticle = null;
+        SelectedProduct = null;
+        SelectedOffert = null;
     }
     #endregion
 }

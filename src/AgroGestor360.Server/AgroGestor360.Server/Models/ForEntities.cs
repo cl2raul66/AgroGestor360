@@ -119,6 +119,16 @@ public class ArticleItemForSale
     public double Price { get; set; }
 }
 
+/// <summary>
+/// Object: ProductItemForSale 
+/// <code>
+/// ObjectId [Id, MerchandiseId]
+/// string [ProductName]
+/// double [ProductQuantity, ArticlePrice] 
+/// Presentation [Packaging] 
+/// Array ProductOffering [Offering]
+/// </code>
+/// </summary>
 public class ProductItemForSale
 {
     public ObjectId? Id { get; set; }

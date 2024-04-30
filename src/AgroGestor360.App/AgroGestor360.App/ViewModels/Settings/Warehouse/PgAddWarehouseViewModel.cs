@@ -88,7 +88,7 @@ public partial class PgAddEditWarehouseViewModel : ObservableValidator
     [RelayCommand]
     async Task Cancel()
     {
-        WeakReferenceMessenger.Default.Send("cancel", nameof(PgAddEditWarehouse));
+        _ = WeakReferenceMessenger.Default.Send("cancel", nameof(PgAddEditWarehouse));
         await Shell.Current.GoToAsync("..", true);
     }
 
@@ -119,7 +119,7 @@ public partial class PgAddEditWarehouseViewModel : ObservableValidator
                 Packaging = IsUnit ? null : new() { Measure = SelectedMagnitude, Unit = SelectedUnit, Value = theValue }
             };
 
-            WeakReferenceMessenger.Default.Send(new PgAddWarehouseMessage(merchandise, theQuantity), "AddMerchandise");
+            _ = WeakReferenceMessenger.Default.Send(new PgAddWarehouseMessage(merchandise, theQuantity), "AddMerchandise");
         }
         else
         {
@@ -141,7 +141,7 @@ public partial class PgAddEditWarehouseViewModel : ObservableValidator
                 Description = Description?.Trim().ToUpper(),
                 Packaging = IsUnit ? null : new() { Measure = SelectedMagnitude, Unit = SelectedUnit, Value = theValue }
             };
-            WeakReferenceMessenger.Default.Send(merchandise, "EditMerchandise");
+            _ = WeakReferenceMessenger.Default.Send(merchandise, "EditMerchandise");
         }
 
         await Shell.Current.GoToAsync("..", true);

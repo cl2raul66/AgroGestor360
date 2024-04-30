@@ -81,7 +81,7 @@ public class ProductsForSalesController : ControllerBase
 
         var result = productsForSalesServ.Insert(entity);
 
-        return string.IsNullOrEmpty(result) ? NotFound() : Ok();
+        return string.IsNullOrEmpty(result) ? NotFound() : Ok(result);
     }
 
     [HttpPut("send2")]

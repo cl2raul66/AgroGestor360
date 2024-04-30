@@ -77,7 +77,7 @@
         </Frame>
         <!--#endregion-->
         <!--#region CONTENIDO-->
-        <ScrollView Grid.Row="1">
+        <ScrollView Grid.Row="1" Orientation="Both">
             <CollectionView
                 ItemsSource="{Binding Customers, Mode=OneWay}"
                 SelectedItem="{Binding SelectedCustomer}"

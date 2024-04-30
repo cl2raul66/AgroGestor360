@@ -32,9 +32,11 @@
                             TextTransform="Uppercase"
                             VerticalOptions="Center" />
                         <Button
+                            Command="{Binding CopyNameCommand}"
                             FontFamily="icofont"
                             HorizontalOptions="End"
-                            Text="{StaticResource UiCopy}" />
+                            Text="{StaticResource Copy}"
+                            ToolTipProperties.Text="Copiar nombre del articulo al nombre de producto" />
                     </Grid>
                     <Label Text="{Binding ArticleInfo}" />
                     <Grid RowDefinitions="auto,auto" RowSpacing="4">
