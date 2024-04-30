@@ -47,9 +47,9 @@
         <!--#region CONTENIDO-->
         <ScrollView Grid.Row="1">
             <CollectionView
-                x:Name="CvDTO6"
                 ItemsSource="{Binding Sellers, Mode=OneWay}"
                 SelectedItem="{Binding SelectedSeller}"
+                SelectionChanged="OnSelectionChanged"
                 SelectionMode="Single">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout

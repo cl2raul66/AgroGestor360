@@ -24,12 +24,18 @@
                 VerticalOptions="Center" />
             <ScrollView Grid.Row="1">
                 <VerticalStackLayout Spacing="8">
-                    <Label
-                        FontSize="14"
-                        HorizontalOptions="Center"
-                        Text="Información del artículo"
-                        TextTransform="Uppercase"
-                        VerticalOptions="Center" />
+                    <Grid>
+                        <Label
+                            FontSize="14"
+                            HorizontalOptions="Center"
+                            Text="Información del artículo"
+                            TextTransform="Uppercase"
+                            VerticalOptions="Center" />
+                        <Button
+                            FontFamily="icofont"
+                            HorizontalOptions="End"
+                            Text="{StaticResource UiCopy}" />
+                    </Grid>
                     <Label Text="{Binding ArticleInfo}" />
                     <Grid RowDefinitions="auto,auto" RowSpacing="4">
                         <Label Text="Nombre: *" />

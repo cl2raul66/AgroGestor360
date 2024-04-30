@@ -1,5 +1,6 @@
 ﻿using AgroGestor360.App.Models;
 using AgroGestor360.App.Views.Settings.Products;
+using AgroGestor360.App.Views.Settings.Warehouse;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -51,6 +52,7 @@ public partial class CvProductsViewModel : ObservableRecipient
             Articles = new(articleszeroprice);
             IsZeroPrice = true;
         }
+        SelectedArticle = null;
     }
 
     [RelayCommand]
@@ -67,6 +69,7 @@ public partial class CvProductsViewModel : ObservableRecipient
             Articles = new(articleszeroprice);
             IsZeroPrice = false;
         }
+        SelectedArticle = null;
     }
 
     [RelayCommand]
@@ -132,7 +135,6 @@ public partial class CvProductsViewModel : ObservableRecipient
         StringBuilder sb = new();
         sb.AppendLine($"Seguro que quiere eliminar el siguiente producto:");
         sb.AppendLine($"Nombre: {SelectedProduct!.ProductName}");
-        //sb.AppendLine($"Categoría: {SelectedProduct!.Category}");
         sb.AppendLine($"Presentación: {SelectedProduct!.Packaging?.Value} {SelectedProduct!.Packaging?.Unit}");
         sb.AppendLine($"Precio: {SelectedProduct!.ArticlePrice.ToString("0.00")}");
         sb.AppendLine("");
@@ -183,20 +185,28 @@ public partial class CvProductsViewModel : ObservableRecipient
         base.OnActivated();
         WeakReferenceMessenger.Default.Register<CvProductsViewModel, PgAddProductMessage, string>(this, nameof(PgAddProductMessage), async (r, m) =>
         {
-            var article = await articlesForSalesServ.GetByIdAsync(serverURL, m.ArticleId);
-            DTO4_1 newProduct = new() { ProductName = m.Name, ArticlePrice = article!.Price, ProductQuantity = m.Quantity };
+            DTO4_1 newProduct = new() { 
+                ProductQuantity = m.Quantity, 
+                MerchandiseId = SelectedArticle!.MerchandiseId,
+                ProductName = m.Name,
+                ArticlePrice = m.Quantity * SelectedArticle!.Price,
+                Packaging = SelectedArticle!.Packaging
+            };
             var result = await productsForSalesServ.InsertAsync(serverURL, newProduct);
             if (!string.IsNullOrEmpty(result))
             {
                 r.Products ??= [];
                 r.Products.Insert(0, new DTO4()
                 {
+                    Id = result,
+                    MerchandiseId = SelectedArticle!.MerchandiseId,
                     ProductQuantity = m.Quantity,
                     ProductName = m.Name,
-                    Packaging = article!.Packaging,
-                    ArticlePrice = m.Quantity * article!.Price
+                    ArticlePrice = m.Quantity * SelectedArticle!.Price,
+                    Packaging = SelectedArticle!.Packaging
                 });
             }
+            SelectedArticle = null;
         });
 
         WeakReferenceMessenger.Default.Register<CvProductsViewModel, ProductOffering, string>(this, "NewProductOffering", async (r, m) =>
@@ -208,6 +218,17 @@ public partial class CvProductsViewModel : ObservableRecipient
                 r.Offers.Insert(0, m);
             }
 
+        });
+
+        WeakReferenceMessenger.Default.Register<CvProductsViewModel, string, string>(this, nameof(CvProductsViewModel), (r, m) =>
+        {
+            if (m == "cancel")
+            {
+                r.SelectedArticle = null;
+                r.SelectedProduct = null;
+                r.SelectedOffert = null;
+                IsActive = false;
+            }
         });
     }
 
@@ -236,8 +257,7 @@ public partial class CvProductsViewModel : ObservableRecipient
     #region EXTRA
     public async void Initialize()
     {
-        //await Task.WhenAll(GetArticles(), GetProducts());
-        await GetArticles();
+        await Task.WhenAll(GetArticles(), GetProducts());
     }
 
     async Task GetArticles()
@@ -249,18 +269,18 @@ public partial class CvProductsViewModel : ObservableRecipient
         }
     }
 
-    //async Task GetProducts()
-    //{
-    //    bool exist = await productsForSalesServ.CheckExistence(serverURL);
-    //    if (exist)
-    //    {
-    //        var getProducts = await productsForSalesServ.GetAll1Async(serverURL);
-    //        if (getProducts is null)
-    //        {
-    //            return;
-    //        }
-    //        Products = new(getProducts);
-    //    }
-    //}
+    async Task GetProducts()
+    {
+        bool exist = await productsForSalesServ.CheckExistence(serverURL);
+        if (exist)
+        {
+            var getProducts = await productsForSalesServ.GetAllAsync(serverURL);
+            if (getProducts is null)
+            {
+                return;
+            }
+            Products = new(getProducts);
+        }
+    }
     #endregion
 }

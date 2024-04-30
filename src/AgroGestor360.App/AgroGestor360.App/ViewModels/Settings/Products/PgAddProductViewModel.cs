@@ -1,5 +1,4 @@
 ﻿using AgroGestor360.App.Models;
-using AgroGestor360.App.Views.Settings.Products;
 using AgroGestor360.Client.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -23,12 +22,8 @@ public partial class PgAddProductViewModel : ObservableValidator
         {
             StringBuilder sb = new();
             sb.AppendLine($"ARTICULO: {CurrentArticle?.MerchandiseName}");
-            //if (!string.IsNullOrEmpty(CurrentArticle?.Category))
-            //{
-            //    sb.AppendLine($"CATEGORIA: {CurrentArticle!.Category}");
-            //}
-            sb.AppendLine($"PRECIO: {CurrentArticle?.Price.ToString("0.00")}");
             sb.AppendLine($"PRESENTACION: {CurrentArticle?.Packaging?.Value.ToString("0.00")} {CurrentArticle?.Packaging?.Unit}");
+            sb.AppendLine($"PRECIO: {CurrentArticle?.Price.ToString("0.00")}");
             return sb.ToString().TrimEnd();
         }
     }
@@ -49,7 +44,12 @@ public partial class PgAddProductViewModel : ObservableValidator
     bool isVisibleInfo;
 
     [RelayCommand]
-    async Task Cancel() => await Shell.Current.GoToAsync("..", true);
+    async Task Cancel()
+    {
+        _ = WeakReferenceMessenger.Default.Send("cancel", nameof(CvProductsViewModel));
+
+        await Shell.Current.GoToAsync("..", true);
+    }
 
     [RelayCommand]
     async Task Add()
@@ -66,7 +66,8 @@ public partial class PgAddProductViewModel : ObservableValidator
         }
 
         _ = WeakReferenceMessenger.Default.Send(new PgAddProductMessage(CurrentArticle!.MerchandiseId!, Name!.Trim().ToUpper(), theQuantity), nameof(PgAddProductMessage));
-        await Cancel();
+
+        await Shell.Current.GoToAsync("..", true);
     }
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)

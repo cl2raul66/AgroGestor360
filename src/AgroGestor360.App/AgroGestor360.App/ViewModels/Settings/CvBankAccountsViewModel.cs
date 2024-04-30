@@ -21,7 +21,6 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         authServ = authService;
         bankAccountsServ = bankAccountsService;
-        IsActive = true;
     }
 
     [ObservableProperty]
@@ -39,9 +38,8 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
     [RelayCommand]
     async Task ShowAddAccountOrCard()
     {
-        Dictionary<string, object> sendData = new() {
-            { "CurrentBank", SelectedBank! }
-        };
+        IsActive = true;
+        Dictionary<string, object> sendData = new() { { "CurrentBank", SelectedBank! } };
         await Shell.Current.GoToAsync(nameof(PgAddAccountOrCard), true, sendData);
     }
 
@@ -51,17 +49,24 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
         var result = await Shell.Current.DisplayPromptAsync("Agregar banco", "Nombre:", "Agregar", "Cancelar", "Escriba aquí");
         if (string.IsNullOrEmpty(result) || string.IsNullOrWhiteSpace(result))
         {
+            SelectedBank = null;
+            SelectedBankAccount = null;
             return;
         }
         var name = result.Trim().ToUpper();
         if (Banks?.Any(x => x == name) ?? false)
         {
+            SelectedBank = null;
+            SelectedBankAccount = null;
             return;
         }
         Banks ??= [];
         Banks.Insert(0, name);
         string json = JsonSerializer.Serialize(Banks);
         Preferences.Default.Set("banks", json);
+
+        SelectedBank = null;
+        SelectedBankAccount = null;
     }
 
     [RelayCommand]
@@ -100,8 +105,21 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
             bool result = await bankAccountsServ.InsertAsync(serverURL, m);
             if (result)
             {
-                BankAccounts ??= [];
-                BankAccounts.Insert(0, m);
+                r.BankAccounts ??= [];
+                r.BankAccounts.Insert(0, m);
+            }
+
+            IsActive = false;
+            r.SelectedBank = null;
+        });
+
+        WeakReferenceMessenger.Default.Register<CvBankAccountsViewModel, string, string>(this, nameof(PgAddAccountOrCard), (r, m) =>
+        {
+            if (m == "cancel")
+            {
+                SelectedBank = null;
+                SelectedBankAccount = null;
+                IsActive = false;
             }
         });
     }

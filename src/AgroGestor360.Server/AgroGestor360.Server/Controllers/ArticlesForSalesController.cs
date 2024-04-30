@@ -59,6 +59,14 @@ public class ArticlesForSalesController : ControllerBase
         }
         found.Price = dTO.Price;
 
-        return articlesForSalesServ.Update(found) ? Ok() : NotFound();
+        try
+        {
+            var result = articlesForSalesServ.Update(found);
+            return result ? Ok() : NotFound();
+        }
+        catch (Exception)
+        {
+            return NotFound();
+        }
     }
 }

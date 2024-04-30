@@ -10,15 +10,18 @@ public partial class CvSellers : ContentView
 
 		vm.Initialize();
 		BindingContext = vm;
-
-		CvDTO6.SelectionChanged += (s, e) =>
-        {
-			if (e.CurrentSelection.Count == 0)
-			{
-                CvDTO6.SelectionMode = SelectionMode.None;
-            }
-            CvDTO6.SelectionMode = SelectionMode.Single;
-        };
-		//todo: aqui esta el modo de deseleccionar un item del collectionview
 	}
+
+    void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var collectionView = sender as CollectionView;
+        if (collectionView is not null)
+        {
+            if (e.CurrentSelection.Count == 0)
+            {
+                collectionView.SelectionMode = SelectionMode.None;
+            }
+            collectionView.SelectionMode = SelectionMode.Single;
+        }
+    }
 }

@@ -104,6 +104,7 @@
                     <CollectionView
                         ItemsSource="{Binding Articles, Mode=OneWay}"
                         SelectedItem="{Binding SelectedArticle, Mode=TwoWay}"
+                        SelectionChanged="OnSelectionChanged"
                         SelectionMode="Single">
                         <CollectionView.ItemsLayout>
                             <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
@@ -117,9 +118,9 @@
                                             <Label FontSize="12" VerticalOptions="Center">
                                                 <Label.FormattedText>
                                                     <FormattedString>
-                                                        <Span Text="{Binding Packaging.Value, Mode=OneWay, StringFormat='{0:F2}'}" TextColor="{StaticResource White}" />
+                                                        <Span Text="{Binding Packaging.Value, Mode=OneWay, StringFormat='{0:F2}', FallbackValue='Por'}" TextColor="{StaticResource White}" />
                                                         <Span Text=" " />
-                                                        <Span Text="{Binding Packaging.Unit, Mode=OneWay, StringFormat='{0:F2}'}" TextColor="{StaticResource White}" />
+                                                        <Span Text="{Binding Packaging.Unit, Mode=OneWay, StringFormat='{0:F2}', FallbackValue='unidad'}" TextColor="{StaticResource White}" />
                                                     </FormattedString>
                                                 </Label.FormattedText>
                                             </Label>
@@ -164,9 +165,43 @@
                             <Button
                                 Command="{Binding AddProductCommand}"
                                 FontFamily="icofont"
-                                IsEnabled="{Binding SelectedArticle, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource ArrowRight}"
-                                ToolTipProperties.Text="Crear producto a partir de este artículo" />
+                                ToolTipProperties.Text="Crear producto a partir de este artículo">
+                                <Button.IsEnabled>
+                                    <MultiBinding>
+                                        <MultiBinding.Converter>
+                                            <ctk:VariableMultiValueConverter ConditionType="Exact" Count="2" />
+                                        </MultiBinding.Converter>
+                                        <Binding
+                                            Converter="{ctk:InvertedBoolConverter}"
+                                            Mode="OneWay"
+                                            Path="IsZeroPrice" />
+                                        <Binding
+                                            Converter="{ctk:IsNotNullConverter}"
+                                            Mode="OneWay"
+                                            Path="SelectedArticle" />
+                                    </MultiBinding>
+                                </Button.IsEnabled>
+                                <!--<Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                        <Style.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding IsZeroPrice}"
+                                                TargetType="Button"
+                                                Value="False">
+                                                <Setter Property="IsEnabled" Value="True" />
+                                            </DataTrigger>
+                                            <DataTrigger
+                                                Binding="{Binding SelectedArticle}"
+                                                TargetType="Button"
+                                                Value="{x:Null}">
+                                                <Setter Property="IsEnabled" Value="False" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>-->
+                            </Button>
                         </HorizontalStackLayout>
                     </Grid>
                 </Frame>

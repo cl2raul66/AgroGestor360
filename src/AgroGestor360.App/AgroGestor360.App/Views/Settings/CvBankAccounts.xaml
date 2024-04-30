@@ -52,6 +52,7 @@
                     <CollectionView
                         ItemsSource="{Binding Banks, Mode=OneWay}"
                         SelectedItem="{Binding SelectedBank, Mode=TwoWay}"
+                        SelectionChanged="OnSelectionChanged"
                         SelectionMode="Single">
                         <CollectionView.ItemsLayout>
                             <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
@@ -136,6 +137,7 @@
                     <CollectionView
                         ItemsSource="{Binding BankAccounts, Mode=OneWay}"
                         SelectedItem="{Binding SelectedBank}"
+                        SelectionChanged="OnSelectionChanged"
                         SelectionMode="Single">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout

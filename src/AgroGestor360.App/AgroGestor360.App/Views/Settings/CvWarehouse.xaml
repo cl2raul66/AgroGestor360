@@ -83,9 +83,9 @@
                                 <Label FontSize="10" HorizontalTextAlignment="Center">
                                     <Label.FormattedText>
                                         <FormattedString>
-                                            <Span Text="{Binding Packaging.Value, Mode=OneWay, TargetNullValue='', StringFormat='{0:F2}'}" TextColor="{StaticResource White}" />
+                                            <Span Text="{Binding Packaging.Value, Mode=OneWay, FallbackValue='Por', TargetNullValue='Por', StringFormat='{0:F2}'}" TextColor="{StaticResource White}" />
                                             <Span Text=" " />
-                                            <Span Text="{Binding Packaging.Unit, Mode=OneWay, TargetNullValue='Unidad', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
+                                            <Span Text="{Binding Packaging.Unit, Mode=OneWay, FallbackValue='unidad', TargetNullValue='unidad', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
                                         </FormattedString>
                                     </Label.FormattedText>
                                 </Label>
