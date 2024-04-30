@@ -8,16 +8,20 @@ public interface IProductsForSalesInLiteDbService
 {
     bool Exist { get; }
 
+    void BeginTrans();
+    void Commit();
     bool Delete(ObjectId id);
     IEnumerable<ProductItemForSale> GetAll();
     ProductItemForSale GetById(ObjectId id);
     string Insert(ProductItemForSale entity);
+    void Rollback();
     bool Update(ProductItemForSale entity);
 }
 
 public class ProductsForSalesInLiteDbService : IProductsForSalesInLiteDbService
 {
     readonly ILiteCollection<ProductItemForSale> collection;
+    readonly LiteDatabase db;
 
     public ProductsForSalesInLiteDbService()
     {
@@ -26,9 +30,15 @@ public class ProductsForSalesInLiteDbService : IProductsForSalesInLiteDbService
             Filename = FileHelper.GetFileDbPath("Products_Sales")
         };
 
-        LiteDatabase db = new(cnx);
+        db = new(cnx);
         collection = db.GetCollection<ProductItemForSale>();
     }
+
+    public void BeginTrans() => db.BeginTrans();
+
+    public void Commit() => db.Commit();
+
+    public void Rollback() => db.Rollback();
 
     public bool Exist => collection.Count() > 0;
 

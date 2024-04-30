@@ -31,7 +31,7 @@
                         Text="Información del producto"
                         TextTransform="Uppercase"
                         VerticalOptions="Center" />
-                    <Label Text="{Binding ProductInfo}" />
+                    <Label Text="{Binding ProductInfo, Mode=OneWay}" />
                     <Grid RowDefinitions="auto,auto" RowSpacing="4">
                         <Label Text="Nombre:" />
                         <Label

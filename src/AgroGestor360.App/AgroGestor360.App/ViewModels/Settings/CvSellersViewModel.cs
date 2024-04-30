@@ -68,6 +68,7 @@ public partial class CvSellersViewModel : ObservableRecipient
         //    Sellers!.Remove(SelectedSeller);
         //    SelectedSeller = null;
         //}
+        await Task.CompletedTask;
     }
 
     protected override void OnActivated()

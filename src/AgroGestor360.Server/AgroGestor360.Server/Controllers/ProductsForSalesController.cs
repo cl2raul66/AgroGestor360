@@ -117,7 +117,14 @@ public class ProductsForSalesController : ControllerBase
             return NotFound();
         }
 
-        found.Offering = [.. found.Offering, dTO.Offer!];
+        if (found.Offering is null)
+        {
+            found.Offering = [dTO.Offer!];
+        }
+        else if (!found.Offering.Any(x => x.Id == dTO.Offer!.Id))
+        {
+            found.Offering = [.. found.Offering, dTO.Offer!];
+        }
 
         var result = productsForSalesServ.Update(found);
 

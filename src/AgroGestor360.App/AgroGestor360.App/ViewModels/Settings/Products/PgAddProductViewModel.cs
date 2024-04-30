@@ -1,5 +1,4 @@
-﻿using AgroGestor360.App.Models;
-using AgroGestor360.Client.Models;
+﻿using AgroGestor360.Client.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;

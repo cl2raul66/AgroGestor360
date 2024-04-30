@@ -1,6 +1,4 @@
-﻿using AgroGestor360.App.Models;
-using AgroGestor360.App.Views.Settings.Products;
-using AgroGestor360.App.Views.Settings.Warehouse;
+﻿using AgroGestor360.App.Views.Settings.Products;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -206,17 +204,20 @@ public partial class CvProductsViewModel : ObservableRecipient
             AllSelectedAsNull();
         });
 
-        WeakReferenceMessenger.Default.Register<CvProductsViewModel, ProductOffering, string>(this, "NewProductOffering", async (r, m) =>
+        WeakReferenceMessenger.Default.Register<CvProductsViewModel, DTO4_3, string>(this, "NewProductOffering", async (r, m) =>
         {
-            bool result = await productsForSalesServ.UpdateAsync(serverURL, new DTO4_3() { Id = SelectedProduct!.Id, Offer = m });
+            var lastSelectedProductId = r.SelectedProduct!.Id;
+            bool result = await productsForSalesServ.UpdateAsync(serverURL, m);
             if (result)
             {
-                r.Offers ??= [];
-                r.Offers.Insert(0, m);
+                int idx = r.Products!.IndexOf(SelectedProduct!);
+                SelectedProduct!.HasOffers = true;
+                r.Products![idx] = SelectedProduct!;
             }
 
             IsActive = false;
             AllSelectedAsNull();
+            r.SelectedProduct = r.Products!.First(x => x.Id == lastSelectedProductId);
         });
 
         WeakReferenceMessenger.Default.Register<CvProductsViewModel, string, string>(this, nameof(CvProductsViewModel), (r, m) =>
@@ -236,17 +237,7 @@ public partial class CvProductsViewModel : ObservableRecipient
         {
             if (SelectedProduct is not null)
             {
-                Offers ??= [];
-
-                var getOffers = await productsForSalesServ.UpdateAsync(serverURL, SelectedProduct!.Id!);
-                //if (getOffers?.Offering?.Any() ?? false)
-                //{
-                //    Offers = new(getOffers!.Offering);
-                //}
-                //else
-                //{
-                //    Offers = null;
-                //}
+                Offers = new(await productsForSalesServ.GetOffersById(serverURL, SelectedProduct.Id!));
             }
         }
     }

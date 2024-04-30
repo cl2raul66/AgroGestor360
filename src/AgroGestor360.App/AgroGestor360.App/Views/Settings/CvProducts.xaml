@@ -287,25 +287,47 @@
                                 <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="model:DTO4_1">
+                                <DataTemplate x:DataType="model:DTO4">
                                     <Border Style="{StaticResource BorderItem}">
                                         <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                                            <Label LineBreakMode="MiddleTruncation">
-                                                <Label.FormattedText>
-                                                    <FormattedString>
-                                                        <Span Text="{Binding ProductName, Mode=OneWay, StringFormat='{0}'}" TextColor="{StaticResource White}" />
-                                                        <Span Text=" " />
-                                                        <Span Text="{Binding Packaging.Value, Mode=OneWay, StringFormat='[{0:F2}'}" TextColor="{StaticResource White}" />
-                                                        <Span Text=" " />
-                                                        <Span Text="{Binding Packaging.Unit, Mode=OneWay, StringFormat='{0}]', Converter={StaticResource UnitToAbbreviation}}" TextColor="{StaticResource White}" />
-                                                    </FormattedString>
-                                                </Label.FormattedText>
-                                            </Label>
-                                            <Label
-                                                Grid.Column="1"
-                                                LineBreakMode="TailTruncation"
-                                                Text="{Binding ArticlePrice, StringFormat='Precio: {0:F2}'}"
-                                                TextColor="{StaticResource White}" />
+                                            <HorizontalStackLayout Spacing="8">
+                                                <Label
+                                                    FontFamily="icofont"
+                                                    TextColor="{StaticResource White}"
+                                                    ToolTipProperties.Text="Tiene ofertas"
+                                                    VerticalOptions="Center">
+                                                    <Label.Triggers>
+                                                        <DataTrigger
+                                                            Binding="{Binding HasOffers, Mode=OneWay}"
+                                                            TargetType="Label"
+                                                            Value="true">
+                                                            <Setter Property="Text" Value="{StaticResource GiftBox}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger
+                                                            Binding="{Binding HasOffers, Mode=OneWay}"
+                                                            TargetType="Label"
+                                                            Value="false">
+                                                            <Setter Property="Text" Value="" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                                <Label Text="{Binding ProductName}" TextColor="{StaticResource White}" />
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                                                <Label FontSize="12" VerticalOptions="Center">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding Packaging.Value, Mode=OneWay, StringFormat='{0:F2}', FallbackValue='Por'}" TextColor="{StaticResource White}" />
+                                                            <Span Text=" " />
+                                                            <Span Text="{Binding Packaging.Unit, Mode=OneWay, StringFormat='{0:F2}', FallbackValue='unidad'}" TextColor="{StaticResource White}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                                <Label
+                                                    FontAttributes="Bold"
+                                                    Text="{Binding ArticlePrice, Mode=OneWay, StringFormat='{0:F2}'}"
+                                                    TextColor="{StaticResource White}" />
+                                            </HorizontalStackLayout>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

@@ -15,7 +15,7 @@ public partial class PgCreateOfferViewModel : ObservableValidator
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NameOffer))]
     [NotifyPropertyChangedFor(nameof(ProductInfo))]
-    DTO4_1? currentProduct;
+    DTO4? currentProduct;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NameOffer))]
@@ -38,11 +38,14 @@ public partial class PgCreateOfferViewModel : ObservableValidator
     {
         get
         {
+            if (CurrentProduct is null)
+            {
+                return string.Empty;
+            }
             StringBuilder sb = new();
             sb.AppendLine($"Nombre: {CurrentProduct?.ProductName}");
-            //sb.AppendLine($"CATEGORIA: {CurrentProduct?.Category}");
             sb.AppendLine($"PRECIO: {CurrentProduct?.ArticlePrice.ToString("0.00")}");
-            sb.AppendLine($"PRESENTACION: {CurrentProduct?.Packaging?.Value} {CurrentProduct?.Packaging?.Unit}");
+            sb.AppendLine($"PRESENTACION: {CurrentProduct?.Packaging?.Value.ToString("0.00")} {CurrentProduct?.Packaging?.Unit}");
             return sb.ToString().TrimEnd();
         }
     }
@@ -51,7 +54,12 @@ public partial class PgCreateOfferViewModel : ObservableValidator
     bool isVisibleInfo;
 
     [RelayCommand]
-    async Task Cancel() => await Shell.Current.GoToAsync("..", true);
+    async Task Cancel()
+    {
+        _ = WeakReferenceMessenger.Default.Send("cancel", nameof(CvProductsViewModel));
+
+        await Shell.Current.GoToAsync("..", true);
+    }
 
     [RelayCommand]
     async Task Add()
@@ -66,11 +74,11 @@ public partial class PgCreateOfferViewModel : ObservableValidator
             return;
         }
 
-        ProductOffering newProductOffering = new() { Id = OfferId, Quantity = quantity, BonusAmount = rebated };
+        DTO4_3 newProductOffering = new() { Id = CurrentProduct!.Id, Offer = new() { Id = OfferId, Quantity = quantity, BonusAmount = rebated } };
 
         _ = WeakReferenceMessenger.Default.Send(newProductOffering, "NewProductOffering");
 
-        await Cancel();
+        await Shell.Current.GoToAsync("..", true);
     }
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
