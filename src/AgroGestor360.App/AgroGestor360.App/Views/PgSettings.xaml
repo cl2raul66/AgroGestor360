@@ -48,10 +48,10 @@
                             <x:String>Conexión</x:String>
                             <x:String>Entidad</x:String>
                             <x:String>Bancos</x:String>
-                            <x:String>Almacén</x:String>
-                            <x:String>Clientes</x:String>
-                            <x:String>Productos</x:String>
                             <x:String>Vendedores</x:String>
+                            <x:String>Clientes</x:String>
+                            <x:String>Almacén</x:String>
+                            <x:String>Productos</x:String>
                         </x:Array>
                     </CollectionView.ItemsSource>
                     <CollectionView.ItemTemplate>
