@@ -16,7 +16,7 @@
         HorizontalOptions="Center"
         MaximumWidthRequest="480"
         VerticalOptions="Center">
-        <Grid RowDefinitions="auto,*,auto" RowSpacing="8">
+        <Grid RowDefinitions="auto,*,auto" RowSpacing="16">
             <Label
                 FontSize="18"
                 TextTransform="Uppercase"
@@ -38,21 +38,12 @@
             </Label>
             <ScrollView Grid.Row="1">
                 <VerticalStackLayout Spacing="8">
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                        <Grid
-                            IsVisible="{Binding CurrentSeller, Mode=OneWay, Converter={ctk:IsNullConverter}}"
-                            RowDefinitions="auto,auto"
-                            RowSpacing="4">
-                            <Label Text="Fecha:" />
-                            <DatePicker Grid.Row="1" Date="{Binding Date}" />
-                        </Grid>
-                        <Grid
-                            Grid.Column="1"
-                            RowDefinitions="auto,auto"
-                            RowSpacing="4">
-                            <Label Text="Fecha de nacimiento:" />
-                            <DatePicker Grid.Row="1" Date="{Binding Birthday}" />
-                        </Grid>
+                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                        <Label Text="Fecha de nacimiento:" />
+                        <DatePicker
+                            Grid.Row="1"
+                            Date="{Binding Birthday}"
+                            Format="dd/MM/yyyy" />
                     </Grid>
                     <Grid RowDefinitions="auto,auto" RowSpacing="4">
                         <Label Text="Nombre completo: *" />
@@ -91,30 +82,32 @@
                                 Text="{Binding DPI}" />
                         </Grid>
                     </Grid>
-                    <Grid
-                        Grid.Column="1"
-                        RowDefinitions="auto,auto"
-                        RowSpacing="4">
-                        <Label Text="Teléfono principal: *" />
-                        <Entry
-                            Grid.Row="1"
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Keyboard="Telephone"
-                            Placeholder="Escriba aquí"
-                            Text="{Binding Phone}" />
-                    </Grid>
-                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                        <Label Text="Correo electrónico principal:" />
-                        <Entry
-                            Grid.Row="1"
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Keyboard="Email"
-                            Placeholder="Escriba aquí"
-                            Text="{Binding Email}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                            <Label Text="Teléfono principal: *" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Keyboard="Telephone"
+                                Placeholder="Escriba aquí"
+                                Text="{Binding Phone}" />
+                        </Grid>
+                        <Grid
+                            Grid.Column="1"
+                            RowDefinitions="auto,auto"
+                            RowSpacing="4">
+                            <Label Text="Correo electrónico principal:" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Keyboard="Email"
+                                Placeholder="Escriba aquí"
+                                Text="{Binding Email}" />
+                        </Grid>
                     </Grid>
                     <Grid RowDefinitions="auto,auto" RowSpacing="4">
                         <Label Text="Dirección de residencia:" />

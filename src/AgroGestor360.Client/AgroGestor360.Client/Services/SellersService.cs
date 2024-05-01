@@ -6,6 +6,7 @@ namespace AgroGestor360.Client.Services;
 
 public interface ISellersService
 {
+    Task<bool> DeleteAsync(string serverURL, string id);
     Task<bool> ExistAsync(string serverURL);
     Task<IEnumerable<DTO6>> GetAllAsync(string serverURL);
     Task<DTO6_2?> GetByIdAsync(string serverURL, string id);
@@ -90,7 +91,20 @@ public class SellersService : ISellersService
             var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/sellers", content);
             if (response.IsSuccessStatusCode)
             {
-                return true;
+                return bool.Parse(await response.Content.ReadAsStringAsync());
+            }
+        }
+        return false;
+    }
+
+    public async Task<bool> DeleteAsync(string serverURL, string id)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/sellers/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return bool.Parse(await response.Content.ReadAsStringAsync());
             }
         }
         return false;

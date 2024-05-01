@@ -55,12 +55,28 @@ public class SellersController : ControllerBase
     [HttpPut]
     public ActionResult<bool> Put([FromBody] DTO6_2 dTO)
     {
+        if (dTO is null)
+        {
+            return BadRequest();
+        }
         var entity = dTO.FromDTO6_2();
         if (entity is null)
         {
-            return NoContent();
+            return NotFound();
         }
         var result = sellersServ.Update(entity);
+
+        return Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    public ActionResult<bool> Delete(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return BadRequest();
+        }
+        var result = sellersServ.Delete(new ObjectId(id));
 
         return Ok(result);
     }

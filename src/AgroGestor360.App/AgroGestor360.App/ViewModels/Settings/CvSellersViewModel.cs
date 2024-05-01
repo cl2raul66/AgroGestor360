@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
+using System.Text;
 
 namespace AgroGestor360.App.ViewModels;
 
@@ -19,7 +20,6 @@ public partial class CvSellersViewModel : ObservableRecipient
         sellersServ = sellersService;
         authServ = authService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
-        IsActive = true;
     }
 
     [ObservableProperty]
@@ -31,12 +31,14 @@ public partial class CvSellersViewModel : ObservableRecipient
     [RelayCommand]
     async Task ShowAddSeller()
     {
+        IsActive = true;
         await Shell.Current.GoToAsync(nameof(PgAddEditSeller), true);
     }
 
     [RelayCommand]
     async Task ShowEditSeller()
     {
+        IsActive = true;
         var currentSeller = await sellersServ.GetByIdAsync(serverURL, SelectedSeller!.Id!);
         await Shell.Current.GoToAsync(nameof(PgAddEditSeller), true, new Dictionary<string, object>() { { "CurrentSeller", currentSeller! } });
     }
@@ -44,31 +46,30 @@ public partial class CvSellersViewModel : ObservableRecipient
     [RelayCommand]
     async Task ShowDeleteSeller()
     {
-        //StringBuilder sb = new();
-        //sb.AppendLine($"¿Seguro que quiere eliminar el vendedor: {SelectedSeller!.FormattedName}?");
-        //sb.AppendLine("Inserte la contraseña:");
-        //var pwd = await Shell.Current.DisplayPromptAsync("Eliminar vendedor", sb.ToString(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
-        //if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
-        //{
-        //    SelectedSeller = null;
-        //    return;
-        //}
+        StringBuilder sb = new();
+        sb.AppendLine($"¿Seguro que quiere eliminar el vendedor: {SelectedSeller!.FullName}?");
+        sb.AppendLine("");
+        sb.AppendLine("Inserte la contraseña:");
+        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar vendedor", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
+        {
+            SelectedSeller = null;
+            return;
+        }
 
-        //var approved = await authServ.AuthRoot(serverURL, pwd);
-        //if (!approved)
-        //{
-        //    await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-        //    SelectedSeller = null;
-        //    return;
-        //}
+        var approved = await authServ.AuthRoot(serverURL, pwd);
+        if (!approved)
+        {
+            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+            SelectedSeller = null;
+            return;
+        }
 
-        //var result = await sellersServ.DeleteAsync(serverURL, SelectedSeller!.Uid!);
-        //if (result)
-        //{
-        //    Sellers!.Remove(SelectedSeller);
-        //    SelectedSeller = null;
-        //}
-        await Task.CompletedTask;
+        var result = await sellersServ.DeleteAsync(serverURL, SelectedSeller!.Id!);
+        if (result)
+        {
+            Sellers!.Remove(SelectedSeller);
+        }
     }
 
     protected override void OnActivated()
@@ -83,6 +84,7 @@ public partial class CvSellersViewModel : ObservableRecipient
                 r.Sellers.Insert(0, new() { FullName = m.FullName, Id = result });
             }
 
+            IsActive = false;
             r.SelectedSeller = null;
         });
 
@@ -91,13 +93,22 @@ public partial class CvSellersViewModel : ObservableRecipient
             bool result = await sellersServ.UpdateAsync(serverURL, m);
             if (result)
             {
-                int idx = r.Sellers!.IndexOf(SelectedSeller!);
+                int idx = r.Sellers!.IndexOf(r.SelectedSeller!);
                 r.Sellers[idx] = new() { FullName = m.FullName, Id = m.Id };
             }
 
+            IsActive = false;
             r.SelectedSeller = null;
         });
 
+        WeakReferenceMessenger.Default.Register<CvSellersViewModel, string, string>(this, nameof(PgAddEditSeller), (r, m) =>
+        {
+            if (m == "cancel")
+            {
+                IsActive = false;
+                r.SelectedSeller = null;
+            }
+        });
         //todo: implementar mensaje de cancelacion
     }
 

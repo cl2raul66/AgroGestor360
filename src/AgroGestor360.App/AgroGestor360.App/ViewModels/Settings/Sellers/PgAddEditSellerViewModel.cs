@@ -1,4 +1,5 @@
-﻿using AgroGestor360.Client.Models;
+﻿using AgroGestor360.App.Views.Settings;
+using AgroGestor360.Client.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -58,6 +59,8 @@ public partial class PgAddEditSellerViewModel : ObservableValidator
     [RelayCommand]
     async Task Cancel()
     {
+        _ = WeakReferenceMessenger.Default.Send("cancel", nameof(PgAddEditSeller));
+
         await Shell.Current.GoToAsync("..", true);
     }
 

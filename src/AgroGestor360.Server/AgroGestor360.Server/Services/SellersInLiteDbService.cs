@@ -8,6 +8,7 @@ public interface ISellersInLiteDbService
 {
     bool Exist { get; }
 
+    bool Delete(ObjectId id);
     IEnumerable<Seller> GetAll();
     Seller GetById(ObjectId id);
     string Insert(Seller entity);
@@ -31,11 +32,13 @@ public class SellersInLiteDbService : ISellersInLiteDbService
 
     public bool Exist => collection.Count() > 0;
 
+    public IEnumerable<Seller> GetAll() => collection.FindAll();
+
     public Seller GetById(ObjectId id) => collection.FindById(id);
 
     public string Insert(Seller entity) => collection.Insert(entity).AsObjectId.ToString();
 
     public bool Update(Seller entity) => collection.Update(entity);
 
-    public IEnumerable<Seller> GetAll() => collection.FindAll();
+    public bool Delete(ObjectId id) => collection.Delete(id);
 }
