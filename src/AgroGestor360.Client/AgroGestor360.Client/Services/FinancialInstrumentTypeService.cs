@@ -6,6 +6,7 @@ public interface IFinancialInstrumentTypeService
 {
     IEnumerable<string> GetAll();
     FinancialInstrumentType? GetByName(string name);
+    string GetNameByType(FinancialInstrumentType type);
 }
 
 public class FinancialInstrumentTypeService : IFinancialInstrumentTypeService
@@ -29,4 +30,17 @@ public class FinancialInstrumentTypeService : IFinancialInstrumentTypeService
     {
         return translations.FirstOrDefault(x => x.Value == name).Key;
     }
+
+    public string GetNameByType(FinancialInstrumentType type)
+    {
+        if (translations.TryGetValue(type, out var translation))
+        {
+            return translation;
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+
 }

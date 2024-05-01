@@ -25,7 +25,7 @@
         <Grid
             Grid.Row="1"
             Padding="8"
-            ColumnDefinitions="300,auto,*"
+            ColumnDefinitions="250,auto,*"
             ColumnSpacing="8">
             <!--#region PANEL IZQUIERDO-->
             <Grid RowDefinitions="auto,*,auto" RowSpacing="8">
@@ -136,7 +136,7 @@
                 <ScrollView Grid.Row="1">
                     <CollectionView
                         ItemsSource="{Binding BankAccounts, Mode=OneWay}"
-                        SelectedItem="{Binding SelectedBank}"
+                        SelectedItem="{Binding SelectedBankAccount}"
                         SelectionChanged="OnSelectionChanged"
                         SelectionMode="Single">
                         <CollectionView.ItemsLayout>
@@ -155,7 +155,7 @@
                                         VerticalOptions="CenterAndExpand">
                                         <Label
                                             FontFamily="icofont"
-                                            FontSize="52"
+                                            FontSize="36"
                                             HorizontalOptions="Center"
                                             TextColor="{StaticResource White}"
                                             VerticalOptions="Center">
@@ -201,17 +201,22 @@
                                         <VerticalStackLayout
                                             Grid.Column="1"
                                             Spacing="4"
-                                            VerticalOptions="Center">
+                                            VerticalOptions="CenterAndExpand">
                                             <Label
-                                                LineBreakMode="MiddleTruncation"
+                                                FontAttributes="Bold"
+                                                LineBreakMode="TailTruncation"
                                                 Text="{Binding Alias, Mode=OneWay}"
-                                                TextColor="{StaticResource White}" />
-                                            <Label>
+                                                TextColor="{StaticResource White}"
+                                                ToolTipProperties.Text="{Binding Alias, Mode=OneWay}" />
+                                            <Label FontSize="12">
                                                 <Label.FormattedText>
                                                     <FormattedString>
                                                         <Span Text="{Binding BankName}" TextColor="{StaticResource White}" />
                                                         <Span Text=": " TextColor="{StaticResource White}" />
-                                                        <Span Text="{Binding Number}" TextColor="{StaticResource White}" />
+                                                        <Span
+                                                            FontAttributes="Bold"
+                                                            Text="{Binding Number}"
+                                                            TextColor="{StaticResource White}" />
                                                     </FormattedString>
                                                 </Label.FormattedText>
                                             </Label>
@@ -226,6 +231,7 @@
                     <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                         <HorizontalStackLayout Grid.Column="1" Spacing="8">
                             <Button
+                                Command="{Binding DeleteBankAccountCommand}"
                                 FontFamily="icofont"
                                 IsEnabled="{Binding SelectedBankAccount, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource UiDelete}"

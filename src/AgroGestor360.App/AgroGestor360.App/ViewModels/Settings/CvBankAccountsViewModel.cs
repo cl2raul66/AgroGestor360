@@ -14,39 +14,28 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
 {
     readonly string serverURL;
     readonly IAuthService authServ;
-    readonly IBankAccountsService bankAccountsServ;
+    readonly IBankAccountsService bankAccountsServ; 
+    readonly IFinancialInstrumentTypeService financialInstrumentTypeServ;
 
-    public CvBankAccountsViewModel(IAuthService authService, IBankAccountsService bankAccountsService)
+    public CvBankAccountsViewModel(IAuthService authService, IBankAccountsService bankAccountsService, IFinancialInstrumentTypeService financialInstrumentTypeService)
     {
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         authServ = authService;
         bankAccountsServ = bankAccountsService;
+        financialInstrumentTypeServ = financialInstrumentTypeService;
     }
 
+    #region BANKS
     [ObservableProperty]
     ObservableCollection<string>? banks;
 
     [ObservableProperty]
     string? selectedBank;
 
-    [ObservableProperty]
-    ObservableCollection<BankAccount>? bankAccounts;
-
-    [ObservableProperty]
-    BankAccount? selectedBankAccount;
-
-    [RelayCommand]
-    async Task ShowAddAccountOrCard()
-    {
-        IsActive = true;
-        Dictionary<string, object> sendData = new() { { "CurrentBank", SelectedBank! } };
-        await Shell.Current.GoToAsync(nameof(PgAddAccountOrCard), true, sendData);
-    }
-
     [RelayCommand]
     async Task AddBank()
     {
-        var result = await Shell.Current.DisplayPromptAsync("Agregar banco", "Nombre:", "Agregar", "Cancelar", "Escriba aquí");
+        var result = await Shell.Current.DisplayPromptAsync("Agregar banco", "Nombre del banco:", "Agregar", "Cancelar", "Escriba aquí");
         if (string.IsNullOrEmpty(result) || string.IsNullOrWhiteSpace(result))
         {
             SelectedBank = null;
@@ -74,11 +63,13 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
     {
         StringBuilder sb = new();
         sb.AppendLine($"¿Seguro que quiere eliminar el banco: {SelectedBank!}?");
+        sb.AppendLine("");
         sb.AppendLine("Inserte la contraseña:");
-        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar banco", sb.ToString(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar banco", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
         if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
         {
             SelectedBank = null;
+            SelectedBankAccount = null;
             return;
         }
 
@@ -87,6 +78,7 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
         {
             await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
             SelectedBank = null;
+            SelectedBankAccount = null;
             return;
         }
         bool result = Banks!.Remove(SelectedBank!);
@@ -96,6 +88,59 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
             Preferences.Default.Set("banks", json);
         }
     }
+    #endregion
+
+    #region BANK ACCOUNTS
+    [ObservableProperty]
+    ObservableCollection<BankAccount>? bankAccounts;
+
+    [ObservableProperty]
+    BankAccount? selectedBankAccount;
+
+    [RelayCommand]
+    async Task ShowAddAccountOrCard()
+    {
+        IsActive = true;
+        Dictionary<string, object> sendData = new() { { "CurrentBank", SelectedBank! } };
+        await Shell.Current.GoToAsync(nameof(PgAddAccountOrCard), true, sendData);
+    }
+
+    [RelayCommand]
+    async Task DeleteBankAccount()
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"Seguro que quiere eliminar a :");
+        sb.AppendLine($"Banco: {SelectedBankAccount!.BankName}");
+        sb.AppendLine($"Número: {SelectedBankAccount!.Number}");
+        sb.AppendLine($"Tipo: {financialInstrumentTypeServ.GetNameByType(SelectedBankAccount!.InstrumentType)}"); 
+        sb.AppendLine("");
+        sb.AppendLine("Inserte la contraseña:");
+        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar cuenta", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
+        {
+            SelectedBank = null;
+            SelectedBankAccount = null;
+            return;
+        }
+
+        var approved = await authServ.AuthRoot(serverURL, pwd);
+        if (!approved)
+        {
+            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+            SelectedBank = null;
+            SelectedBankAccount = null;
+            return;
+        }
+        bool result = await bankAccountsServ.DeleteAsync(serverURL, SelectedBankAccount!.Number!);
+        if (result)
+        {
+            BankAccounts!.Remove(SelectedBankAccount!);
+        }
+
+        SelectedBank = null;
+        SelectedBankAccount = null;
+    }
+    #endregion
 
     protected override void OnActivated()
     {
@@ -111,14 +156,15 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
 
             IsActive = false;
             r.SelectedBank = null;
+            r.SelectedBankAccount = null;
         });
 
         WeakReferenceMessenger.Default.Register<CvBankAccountsViewModel, string, string>(this, nameof(PgAddAccountOrCard), (r, m) =>
         {
             if (m == "cancel")
             {
-                SelectedBank = null;
-                SelectedBankAccount = null;
+                r.SelectedBank = null;
+                r.SelectedBankAccount = null;
                 IsActive = false;
             }
         });

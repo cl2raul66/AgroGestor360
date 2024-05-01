@@ -1,4 +1,5 @@
-﻿using AgroGestor360.Client.Models;
+﻿using AgroGestor360.App.Views.Settings.BankAccounts;
+using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -39,7 +40,12 @@ public partial class PgAddAccountOrCardViewModel : ObservableValidator
     bool isVisibleInfo;
 
     [RelayCommand]
-    async Task Cancel() => await Shell.Current.GoToAsync("..", true);
+    async Task Cancel()
+    {
+        _ = WeakReferenceMessenger.Default.Send("cancel", nameof(PgAddAccountOrCard));
+
+        await Shell.Current.GoToAsync("..", true);
+    }
 
     [RelayCommand]
     async Task Add()
@@ -55,15 +61,15 @@ public partial class PgAddAccountOrCardViewModel : ObservableValidator
         }
 
         BankAccount newBankAccount = new()
-        {           
+        {
             Alias = Alias?.Trim().ToUpper() ?? string.Empty,
             Number = Number!.Trim(),
             BankName = CurrentBank!,
             InstrumentType = financialInstrumentTypeServ.GetByName(SelectedFinancialType) ?? 0
         };
 
-        WeakReferenceMessenger.Default.Send(newBankAccount, "addBankAccount");
+        _ = WeakReferenceMessenger.Default.Send(newBankAccount, "addBankAccount");
 
-        await Cancel();
+        await Shell.Current.GoToAsync("..", true);
     }
 }
