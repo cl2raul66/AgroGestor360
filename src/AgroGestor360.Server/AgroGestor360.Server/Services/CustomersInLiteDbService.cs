@@ -8,6 +8,7 @@ public interface ICustomersInLiteDbService
 {
     bool Exist { get; }
 
+    bool Delete(ObjectId id);
     IEnumerable<Customer> GetAllWithDiscount();
     IEnumerable<Customer> GetAllWithoutDiscount();
     Customer GetById(ObjectId id);
@@ -45,4 +46,6 @@ public class CustomersInLiteDbService : ICustomersInLiteDbService
     public IEnumerable<Customer> GetAllWithoutDiscount() => collection.Find(Query.All()).Where(x => x.Discount is null);
 
     public CustomerDiscountClass? GetDiscountById(int discountId) => collection.FindOne(x => x.Discount != null && x.Discount.Id == discountId)?.Discount;
+
+    public bool Delete(ObjectId id) => collection.Delete(id);
 }

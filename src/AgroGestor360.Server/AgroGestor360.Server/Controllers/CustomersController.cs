@@ -102,4 +102,18 @@ public class CustomersController : ControllerBase
 
         return Ok(result);
     }
+
+
+
+    [HttpDelete("{id}")]
+    public ActionResult<bool> Delete(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return BadRequest();
+        }
+        var result = customersServ.Delete(new ObjectId(id));
+
+        return Ok(result);
+    }
 }

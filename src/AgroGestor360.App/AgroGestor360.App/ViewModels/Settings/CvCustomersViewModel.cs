@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text;
+using System.Xml.Linq;
 using Windows.UI.ViewManagement.Core;
 
 namespace AgroGestor360.App.ViewModels;
@@ -32,7 +33,7 @@ public partial class CvCustomersViewModel : ObservableRecipient
     DTO5_1? selectedCustomer;
 
     [ObservableProperty]
-    bool? enableGetByDiscount;
+    bool enableGetByDiscount = true;
 
     [RelayCommand]
     void ChangeEnableGetByDiscount()
@@ -47,15 +48,15 @@ public partial class CvCustomersViewModel : ObservableRecipient
         if (options is not null)
         {
             var selectedOpt = await Shell.Current.DisplayActionSheet("Seleccione un descuento", "Cancelar", null, options.Select(x => $"{x.Name} - {x.Value}%").ToArray());
-            if (!string.IsNullOrEmpty(selectedOpt))
-            {
+            if (!string.IsNullOrEmpty(selectedOpt) && selectedOpt != "Cancelar")
+             {
                 var seccion = selectedOpt.Split('-');
                 var discount = options.FirstOrDefault(x => x.Name == seccion[0].Trim());
 
                 var result = await customersServ.UpdateDiscountAsync(serverURL, new() { CustomerId = SelectedCustomer!.CustomerId, DiscountId = discount!.Id });
                 if (result)
                 {
-                    if (EnableGetByDiscount!.Value)
+                    if (EnableGetByDiscount)
                     {
                         int idx = Customers!.IndexOf(SelectedCustomer!);
                         Customers[idx] = new() { CustomerId = SelectedCustomer!.CustomerId, CustomerName = SelectedCustomer!.CustomerName, Discount = discount };
@@ -78,7 +79,7 @@ public partial class CvCustomersViewModel : ObservableRecipient
     [RelayCommand]
     async Task UnSetDiscount()
     {
-        if (EnableGetByDiscount!.Value == false && (SelectedCustomer!.Discount is null || SelectedCustomer!.Discount.Value == 0))
+        if (EnableGetByDiscount == false && (SelectedCustomer!.Discount is null || SelectedCustomer!.Discount.Value == 0))
         {
             return;
         }
@@ -100,53 +101,56 @@ public partial class CvCustomersViewModel : ObservableRecipient
     [RelayCommand]
     async Task ShowAddCustomer()
     {
+        IsActive = true;
         CustomerDiscountClass[] discounts = (await customersServ.GetAllDiscountAsync(serverURL)).ToArray();
         var sendObject = new Dictionary<string, object>() { { "Discounts", discounts } };
-        IsActive = true;
         await Shell.Current.GoToAsync(nameof(PgAddEditCustomer), true, sendObject);
     }
 
     [RelayCommand]
     async Task ShowEditCustomer()
     {
+        IsActive = true;
         CustomerDiscountClass[] discounts = (await customersServ.GetAllDiscountAsync(serverURL)).ToArray();
         var currentCustomer = await customersServ.GetByIdAsync(serverURL, SelectedCustomer!.CustomerId!);
         var sendObject = new Dictionary<string, object>() {
             { "Discounts", discounts },
             { "CurrentCustomer", currentCustomer! }
         };
-        IsActive = true;
         await Shell.Current.GoToAsync(nameof(PgAddEditCustomer), true, sendObject);
     }
 
     [RelayCommand]
     async Task ShowDeleteCustomer()
     {
-        //StringBuilder sb = new();
-        //sb.AppendLine($"¿Seguro que quiere eliminar el cliente: {SelectedCustomer!.CustomerName}?");
-        //sb.AppendLine("Inserte la contraseña:");
-        //var pwd = await Shell.Current.DisplayPromptAsync("Eliminar cliente", sb.ToString(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
-        //if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
-        //{
-        //    SelectedCustomer = null;
-        //    return;
-        //}
+        StringBuilder sb = new();
+        sb.AppendLine($"¿Seguro que quiere eliminar el cliente: {SelectedCustomer!.CustomerName}?");
+        sb.AppendLine("");
+        sb.AppendLine("Inserte la contraseña:");
+        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar cliente", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
+        {
+            SelectedCustomer = null;
+            return;
+        }
 
-        //var approved = await authServ.AuthRoot(serverURL, pwd);
-        //if (!approved)
-        //{
-        //    await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-        //    SelectedCustomer = null;
-        //    return;
-        //}
+        var approved = await authServ.AuthRoot(serverURL, pwd);
+        if (!approved)
+        {
+            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+            SelectedCustomer = null;
+            return;
+        }
 
-        //var result = await customersServ.DeleteAsync(serverURL, SelectedCustomer!.Uid!);
-        //if (result)
-        //{
-        //    Customers!.Remove(SelectedCustomer);
-        //    SelectedCustomer = null;
-        //}
-        await Task.CompletedTask;
+        var result = await customersServ.DeleteAsync(serverURL, SelectedCustomer!.CustomerId!);
+        if (result)
+        {
+            Customers!.Remove(SelectedCustomer);
+            if (!Customers.Any())
+            {
+                ChangeEnableGetByDiscount();
+            }
+        }
     }
 
     protected override void OnActivated()
@@ -157,6 +161,10 @@ public partial class CvCustomersViewModel : ObservableRecipient
             string result = await customersServ.InsertAsync(serverURL, m);
             if (!string.IsNullOrEmpty(result))
             {
+                if (EnableGetByDiscount)
+                {
+                    ChangeEnableGetByDiscount();
+                }
                 r.Customers ??= [];
                 r.Customers.Insert(0, new() { CustomerId = result, CustomerName = m.CustomerFullName, Discount = m.Discount });
             }
@@ -184,7 +192,6 @@ public partial class CvCustomersViewModel : ObservableRecipient
                 r.SelectedCustomer = null;
                 IsActive = false;
             }
-
         });
     }
 
@@ -194,13 +201,17 @@ public partial class CvCustomersViewModel : ObservableRecipient
         if (e.PropertyName == nameof(EnableGetByDiscount))
         {
             Customers ??= [];
-            if (EnableGetByDiscount!.Value)
+            if (EnableGetByDiscount)
             {
                 Customers = new(await customersServ.GetAllWithDiscountAsync(serverURL));
             }
             else
             {
                 Customers = new(await customersServ.GetAllWithoutDiscountAsync(serverURL));
+                if (Customers?.Count == 0)
+                {
+                    EnableGetByDiscount = true;
+                }
             }
             SelectedCustomer = null;
         }
@@ -218,13 +229,7 @@ public partial class CvCustomersViewModel : ObservableRecipient
         if (exist)
         {
             EnableGetByDiscount = false;
-            if (!Customers!.Any())
-            {
-                EnableGetByDiscount = true;
-            }
         }
     }
-
-
     #endregion
 }

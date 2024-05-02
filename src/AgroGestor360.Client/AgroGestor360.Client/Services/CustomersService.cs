@@ -6,6 +6,7 @@ namespace AgroGestor360.Client.Services;
 
 public interface ICustomersService
 {
+    Task<bool> DeleteAsync(string serverURL, string id);
     Task<bool> ExistAsync(string serverURL);
     Task<IEnumerable<CustomerDiscountClass>> GetAllDiscountAsync(string serverURL);
     Task<IEnumerable<DTO5_1>> GetAllWithDiscountAsync(string serverURL);
@@ -133,6 +134,19 @@ public class CustomersService : ICustomersService
         {
             var content = new StringContent(JsonSerializer.Serialize(dTO), Encoding.UTF8, "application/json");
             var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/customers/updatediscount", content);
+            if (response.IsSuccessStatusCode)
+            {
+                return bool.Parse(await response.Content.ReadAsStringAsync());
+            }
+        }
+        return false;
+    }
+
+    public async Task<bool> DeleteAsync(string serverURL, string id)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/customers/{id}");
             if (response.IsSuccessStatusCode)
             {
                 return bool.Parse(await response.Content.ReadAsStringAsync());

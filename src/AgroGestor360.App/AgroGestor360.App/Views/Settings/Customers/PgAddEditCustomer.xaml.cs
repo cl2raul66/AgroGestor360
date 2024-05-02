@@ -9,5 +9,5 @@ public partial class PgAddEditCustomer : ContentPage
 		InitializeComponent();
 
 		BindingContext = vm;
-	}
+    }
 }

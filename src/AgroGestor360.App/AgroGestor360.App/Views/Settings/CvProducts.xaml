@@ -181,25 +181,6 @@
                                                 Path="SelectedArticle" />
                                         </MultiBinding>
                                     </Button.IsEnabled>
-                                    <!--<Button.Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="IsEnabled" Value="False" />
-                                        <Style.Triggers>
-                                            <DataTrigger
-                                                Binding="{Binding IsZeroPrice}"
-                                                TargetType="Button"
-                                                Value="False">
-                                                <Setter Property="IsEnabled" Value="True" />
-                                            </DataTrigger>
-                                            <DataTrigger
-                                                Binding="{Binding SelectedArticle}"
-                                                TargetType="Button"
-                                                Value="{x:Null}">
-                                                <Setter Property="IsEnabled" Value="False" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>-->
                                 </Button>
                             </HorizontalStackLayout>
                         </Grid>

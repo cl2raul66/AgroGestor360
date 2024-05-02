@@ -22,29 +22,42 @@
                     <Button
                         Command="{Binding ChangeEnableGetByDiscountCommand}"
                         FontFamily="icofont"
-                        Text="{StaticResource SaleDiscount}"
-                        ToolTipProperties.Text="Sin/Con descuentos">
+                        Text="{StaticResource SaleDiscount}">
                         <Button.Triggers>
                             <DataTrigger
                                 Binding="{Binding EnableGetByDiscount, Mode=OneWay}"
                                 TargetType="Button"
                                 Value="true">
                                 <Setter Property="BackgroundColor" Value="{StaticResource Tertiary}" />
+                                <Setter Property="ToolTipProperties.Text" Value="Ver clientes sin descuentos" />
                             </DataTrigger>
                             <DataTrigger
                                 Binding="{Binding EnableGetByDiscount, Mode=OneWay}"
                                 TargetType="Button"
                                 Value="false">
                                 <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                <Setter Property="ToolTipProperties.Text" Value="Ver clientes con descuentos" />
                             </DataTrigger>
                         </Button.Triggers>
                     </Button>
                     <Button
                         Command="{Binding UnSetDiscountCommand}"
                         FontFamily="icofont"
-                        IsEnabled="{Binding SelectedCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                         Text="{StaticResource Close}"
-                        ToolTipProperties.Text="Eliminar descuento a cliente seleccionado" />
+                        ToolTipProperties.Text="Eliminar descuento a cliente seleccionado">
+                        <Button.IsEnabled>
+                            <MultiBinding>
+                                <MultiBinding.Converter>
+                                    <ctk:VariableMultiValueConverter ConditionType="Exact" Count="2" />
+                                </MultiBinding.Converter>
+                                <Binding Mode="OneWay" Path="EnableGetByDiscount" />
+                                <Binding
+                                    Converter="{ctk:IsNotNullConverter}"
+                                    Mode="OneWay"
+                                    Path="SelectedCustomer" />
+                            </MultiBinding>
+                        </Button.IsEnabled>
+                    </Button>
                     <Button
                         Command="{Binding SetDiscountCommand}"
                         FontFamily="icofont"
