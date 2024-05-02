@@ -12,10 +12,12 @@ public interface IProductsForSalesInLiteDbService
     void Commit();
     bool Delete(ObjectId id);
     IEnumerable<ProductItemForSale> GetAll();
+    IEnumerable<ProductItemForSale> GetAllByMerchandiseId(ObjectId merchandiseId);
     ProductItemForSale GetById(ObjectId id);
     string Insert(ProductItemForSale entity);
     void Rollback();
     bool Update(ProductItemForSale entity);
+    int DeleteByMerchandiseId(ObjectId merchandiseId);
 }
 
 public class ProductsForSalesInLiteDbService : IProductsForSalesInLiteDbService
@@ -44,6 +46,8 @@ public class ProductsForSalesInLiteDbService : IProductsForSalesInLiteDbService
 
     public IEnumerable<ProductItemForSale> GetAll() => collection.FindAll();
 
+    public IEnumerable<ProductItemForSale> GetAllByMerchandiseId(ObjectId merchandiseId) => collection.Find(x => x.MerchandiseId == merchandiseId);
+
     public ProductItemForSale GetById(ObjectId id) => collection.FindById(id);
 
     public string Insert(ProductItemForSale entity) => collection.Insert(entity).AsObjectId.ToString();
@@ -51,4 +55,6 @@ public class ProductsForSalesInLiteDbService : IProductsForSalesInLiteDbService
     public bool Update(ProductItemForSale entity) => collection.Update(entity);
 
     public bool Delete(ObjectId id) => collection.Delete(id);
+
+    public int DeleteByMerchandiseId(ObjectId merchandiseId) => collection.DeleteMany(x => x.MerchandiseId == merchandiseId);
 }

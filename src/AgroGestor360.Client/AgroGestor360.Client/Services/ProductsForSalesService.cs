@@ -10,6 +10,7 @@ public interface IProductsForSalesService
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string id);
     Task<IEnumerable<DTO4>> GetAllAsync(string serverURL);
+    Task<IEnumerable<DTO4>> GetAllByMerchandiseId(string serverURL, string merchandiseId);
     Task<DTO4?> GetByIdAsync(string serverURL, string id);
     Task<IEnumerable<ProductOffering>> GetOffersById(string serverURL, string id);
     Task<string> InsertAsync(string serverURL, DTO4_1 entity);
@@ -38,6 +39,27 @@ public class ProductsForSalesService : IProductsForSalesService
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/productsforsales");
+
+            if (response.StatusCode is HttpStatusCode.NotFound)
+            {
+                return [];
+            }
+            else
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<DTO4>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+        }
+        return [];
+    }
+
+    public async Task<IEnumerable<DTO4>> GetAllByMerchandiseId(string serverURL, string merchandiseId)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/productsforsales/getallbymerchandiseid/{merchandiseId}");
 
             if (response.StatusCode is HttpStatusCode.NotFound)
             {

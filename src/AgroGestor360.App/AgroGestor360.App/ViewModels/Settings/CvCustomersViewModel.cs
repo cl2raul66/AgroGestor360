@@ -44,6 +44,28 @@ public partial class CvCustomersViewModel : ObservableRecipient
     [RelayCommand]
     async Task SetDiscount()
     {
+        if (EnableGetByDiscount)
+        {
+            StringBuilder sb = new();
+            sb.AppendLine($"¿Va a modificar el descuento al cliente: {SelectedCustomer!.CustomerName}?");
+            sb.AppendLine("");
+            sb.AppendLine("Inserte la contraseña:");
+            var pwd = await Shell.Current.DisplayPromptAsync("Modificar descuento", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+            if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
+            {
+                SelectedCustomer = null;
+                return;
+            }
+
+            var approved = await authServ.AuthRoot(serverURL, pwd);
+            if (!approved)
+            {
+                await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+                SelectedCustomer = null;
+                return;
+            }
+        }
+
         var options = await customersServ.GetAllDiscountAsync(serverURL);
         if (options is not null)
         {
@@ -79,8 +101,22 @@ public partial class CvCustomersViewModel : ObservableRecipient
     [RelayCommand]
     async Task UnSetDiscount()
     {
-        if (EnableGetByDiscount == false && (SelectedCustomer!.Discount is null || SelectedCustomer!.Discount.Value == 0))
+        StringBuilder sb = new();
+        sb.AppendLine($"¿Seguro que quiere eliminar el descuento al cliente: {SelectedCustomer!.CustomerName}?");
+        sb.AppendLine("");
+        sb.AppendLine("Inserte la contraseña:");
+        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar descuento", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
         {
+            SelectedCustomer = null;
+            return;
+        }
+
+        var approved = await authServ.AuthRoot(serverURL, pwd);
+        if (!approved)
+        {
+            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+            SelectedCustomer = null;
             return;
         }
 

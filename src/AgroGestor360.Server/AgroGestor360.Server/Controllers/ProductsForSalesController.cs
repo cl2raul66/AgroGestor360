@@ -33,6 +33,19 @@ public class ProductsForSalesController : ControllerBase
         return !all?.Any() ?? true ? NotFound() : Ok(all);
     }
 
+    [HttpGet("getallbymerchandiseid/{merchandiseId}")]
+    public ActionResult<IEnumerable<DTO4>> GetAllByMerchandiseId(string merchandiseId)
+    {
+        if (string.IsNullOrEmpty(merchandiseId))
+        {
+            return BadRequest();
+        }
+
+        var all = productsForSalesServ.GetAllByMerchandiseId(new ObjectId(merchandiseId))?.Select(x => x.ToDTO4()) ?? [];
+
+        return !all?.Any() ?? true ? NotFound() : Ok(all);
+    }
+
     [HttpGet("offers/{id}")]
     public ActionResult<IEnumerable<ProductOffering>> GetOffersById(string id)
     {

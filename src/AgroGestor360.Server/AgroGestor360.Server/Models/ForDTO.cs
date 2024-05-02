@@ -159,6 +159,22 @@ public class DTO4_4
     public string? Id { get; set; }
     public int OfferId { get; set; }
 }
+//todo: esto es para mostrar la información del producto para eliminar
+/// <summary>
+/// Represents a product item of sale for PUT by removing an offering
+/// <code>
+/// string [ProductName]
+/// double [ProductQuantity, ArticlePrice] 
+/// </code>
+/// </summary>
+public class DTO4_5
+{
+    public string? ProductName { get; set; }
+    public double ProductQuantity { get; set; }
+    public double ArticlePrice { get; set; }
+    public Presentation? Packaging { get; set; }
+    public ProductOffering? Offer { get; set; }
+}
 #endregion
 
 #region Customer

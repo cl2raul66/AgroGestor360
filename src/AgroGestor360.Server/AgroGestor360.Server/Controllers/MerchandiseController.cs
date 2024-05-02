@@ -13,12 +13,14 @@ public class MerchandiseController : ControllerBase
     readonly IMerchandiseInLiteDbService merchandiseServ;
     readonly IArticlesForWarehouseInLiteDbService articlesForWarehouseServ;
     readonly IArticlesForSalesInLiteDbService articlesForSalesServ;
+    readonly IProductsForSalesInLiteDbService productsForSalesServ;
 
-    public MerchandiseController(IMerchandiseInLiteDbService merchandiseService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService, IArticlesForSalesInLiteDbService articlesForSalesIService)
+    public MerchandiseController(IMerchandiseInLiteDbService merchandiseService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService, IArticlesForSalesInLiteDbService articlesForSalesIService, IProductsForSalesInLiteDbService productsForSalesService)
     {
         merchandiseServ = merchandiseService;
         articlesForWarehouseServ = articlesForWarehouseService;
         articlesForSalesServ = articlesForSalesIService;
+        productsForSalesServ = productsForSalesService;
     }
 
     [HttpGet("exist")]
@@ -78,7 +80,7 @@ public class MerchandiseController : ControllerBase
             merchandiseServ.Rollback();
             return NotFound();
         }
-        
+
         articlesForWarehouseServ.BeginTrans();
         var entityArticleItemForWarehouse = ArticleItemForWarehouseFabric(entityMerchandise);
         var resultArticleItemForWarehouse = articlesForWarehouseServ.Insert(entityArticleItemForWarehouse);
@@ -105,7 +107,7 @@ public class MerchandiseController : ControllerBase
         AllCommit();
         return Ok(resultMerchandise);
     }
-    
+
     [HttpPut]
     public IActionResult Put([FromBody] DTO1 dTO)
     {
@@ -151,7 +153,28 @@ public class MerchandiseController : ControllerBase
             return NotFound();
         }
 
-        AllCommit();
+        var entitysProductsForSales = productsForSalesServ.GetAllByMerchandiseId(entityMerchandise.Id!);
+        if (!entitysProductsForSales.Any())
+        {
+            AllCommit();
+            return Ok();
+        }
+        productsForSalesServ.BeginTrans();
+        foreach (var item in entitysProductsForSales)
+        {
+            item.Packaging = entityMerchandise.Packaging;
+            var resultProductForSales = productsForSalesServ.Update(item);
+            if (!resultProductForSales)
+            {
+                merchandiseServ.Rollback();
+                articlesForWarehouseServ.Rollback();
+                articlesForSalesServ.Rollback();
+                productsForSalesServ.Rollback();
+                return NotFound();
+            }
+        }
+
+        AllCommit(true);
         return Ok();
     }
 
@@ -164,28 +187,49 @@ public class MerchandiseController : ControllerBase
         }
 
         var merchandiseId = new ObjectId(id);
-        var backupMerchandise = merchandiseServ.GetById(merchandiseId);
+
+        merchandiseServ.BeginTrans();
         var resultMerchandise = merchandiseServ.Delete(merchandiseId);
-
-        if (resultMerchandise)
+        if (!resultMerchandise)
         {
-            var backupArticleItemForWarehouse = articlesForWarehouseServ.GetById(merchandiseId);
-            var resultArticleItemForWarehouse = articlesForWarehouseServ.Delete(merchandiseId);
-            if (!resultArticleItemForWarehouse)
-            {
-                merchandiseServ.Insert(backupMerchandise);
-                return NotFound();
-            }
-
-            var resultArticleItemForSales = articlesForSalesServ.Delete(merchandiseId);
-            if (!resultArticleItemForSales)
-            {
-                merchandiseServ.Insert(backupMerchandise);
-                articlesForWarehouseServ.Insert(backupArticleItemForWarehouse);
-                return NotFound();
-            }
+            return NotFound();
         }
 
+        articlesForWarehouseServ.BeginTrans();
+        var resultArticleItemForWarehouse = articlesForWarehouseServ.Delete(merchandiseId);
+        if (!resultArticleItemForWarehouse)
+        {
+            merchandiseServ.Rollback();
+            return NotFound();
+        }
+
+        articlesForSalesServ.BeginTrans();
+        var resultArticleItemForSales = articlesForSalesServ.Delete(merchandiseId);
+        if (!resultArticleItemForSales)
+        {
+            merchandiseServ.Rollback();
+            articlesForWarehouseServ.Rollback();
+            return NotFound();
+        }
+
+        var entitysProductsForSales = productsForSalesServ.GetAllByMerchandiseId(merchandiseId);
+        if (!entitysProductsForSales.Any())
+        {
+            AllCommit();
+            return Ok();
+        }
+        productsForSalesServ.BeginTrans();
+        var resultProductForSales = productsForSalesServ.DeleteByMerchandiseId(merchandiseId);
+        if (resultProductForSales != entitysProductsForSales.Count())
+        {
+            merchandiseServ.Rollback();
+            articlesForWarehouseServ.Rollback();
+            articlesForSalesServ.Rollback();
+            productsForSalesServ.Rollback();
+            return NotFound();
+        }
+
+        AllCommit(true);
         return Ok();
     }
 
@@ -212,11 +256,15 @@ public class MerchandiseController : ControllerBase
         };
     }
 
-    void AllCommit()
+    void AllCommit(bool hasProducts = false)
     {
         merchandiseServ.Commit();
         articlesForWarehouseServ.Commit();
         articlesForSalesServ.Commit();
+        if (hasProducts)
+        {
+            productsForSalesServ.Commit();
+        }
     }
     #endregion
 }

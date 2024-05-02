@@ -1,4 +1,5 @@
 ﻿using AgroGestor360.App.Models;
+using AgroGestor360.App.Views;
 using AgroGestor360.App.Views.Settings.Warehouse;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
@@ -15,13 +16,17 @@ public partial class CvWarehouseViewModel : ObservableRecipient
     readonly IMerchandiseService merchandiseServ;
     readonly IArticlesForWarehouseService articlesForWarehouseServ;
     readonly IAuthService authServ;
+    readonly IProductsForSalesService productsServ;
+    readonly IArticlesForSalesService articlesForSalesServ;
     readonly string serverURL;
 
-    public CvWarehouseViewModel(IArticlesForWarehouseService articlesForWarehouseService, IMerchandiseService merchandiseService, IAuthService authService)
+    public CvWarehouseViewModel(IArticlesForWarehouseService articlesForWarehouseService, IMerchandiseService merchandiseService, IAuthService authService, IProductsForSalesService productsForSalesService, IArticlesForSalesService articlesForSalesService)
     {
         merchandiseServ = merchandiseService;
         articlesForWarehouseServ = articlesForWarehouseService;
         authServ = authService;
+        productsServ = productsForSalesService;
+        articlesForSalesServ = articlesForSalesService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
     }
 
@@ -88,9 +93,61 @@ public partial class CvWarehouseViewModel : ObservableRecipient
         var categories = await merchandiseServ.GetAllCategoriesAsync(serverURL);
         if (categories.Any())
         {
-            sendData.Add("Categories", categories.ToList());            
+            sendData.Add("Categories", categories.ToList());
         }
         await Shell.Current.GoToAsync(nameof(PgAddEditWarehouse), true, sendData);
+    }
+
+    [RelayCommand]
+    async Task DeleteMerchandise()
+    {
+        //todo: crear objetos dto para mostrar la siguiente información
+        var merchandise = await merchandiseServ.GetByIdAsync(serverURL, SelectedWarehouse!.MerchandiseId!);
+        var articleforsale = await articlesForSalesServ.GetByIdAsync(serverURL, SelectedWarehouse!.MerchandiseId!);
+        var products = await productsServ.GetAllByMerchandiseId(serverURL, SelectedWarehouse!.MerchandiseId!);
+        StringBuilder sb = new();
+        sb.AppendLine($"Tenga en cuenta que al eliminar la mercancía del almacén, también se eliminara el articulo, producto y sus ofertas relacionados");
+        sb.AppendLine($"INFORMACION:");
+        sb.AppendLine($"Nombre: {SelectedWarehouse!.MerchandiseName}");
+        sb.AppendLine($"Categoría: {merchandise!.Category}");
+        sb.AppendLine(merchandise!.Packaging is null ? "Presentación: Por Unidad" : $"Presentación: {merchandise!.Packaging.Value:0.00} {merchandise!.Packaging.Unit}");
+        if (!string.IsNullOrEmpty(merchandise!.Description))
+        {
+            sb.AppendLine($"Descripción: {merchandise!.Description}");
+        }
+        sb.AppendLine($"Existencia en almacén: {SelectedWarehouse.Quantity}");
+        sb.AppendLine($"Precio inicial: {articleforsale!.Price}");
+        if (products is not null || products!.Any())
+        {
+            sb.AppendLine($"PRODUCTOS RELACIONADOS Y SUS OFERTAS");
+            foreach (var item in products!)
+            {
+                sb.AppendLine($"Producto: {item.ProductQuantity} - {item.ProductName} {item.ArticlePrice:0.00}" + (item.HasOffers ? "Con ofertas" : "Sin ofertas"));
+            }
+        }
+        sb.AppendLine($"¿Seguro que quiere eliminar?");
+        sb.AppendLine("");
+        sb.AppendLine("Inserte la contraseña:");
+        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar mercancía", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
+        {
+            SelectedWarehouse = null;
+            return;
+        }
+
+        var approved = await authServ.AuthRoot(serverURL, pwd);
+        if (!approved)
+        {
+            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+            SelectedWarehouse = null;
+            return;
+        }
+
+        var result = await merchandiseServ.DeleteAsync(serverURL, SelectedWarehouse!.MerchandiseId!);
+        if (result)
+        {
+            Warehouses!.Remove(SelectedWarehouse);
+        }
     }
 
     protected override void OnActivated()

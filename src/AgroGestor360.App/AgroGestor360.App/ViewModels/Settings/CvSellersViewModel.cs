@@ -39,6 +39,26 @@ public partial class CvSellersViewModel : ObservableRecipient
     async Task ShowEditSeller()
     {
         IsActive = true;
+
+        StringBuilder sb = new();
+        sb.AppendLine($"Usted va a editar el vendedor: {SelectedSeller!.FullName}");
+        sb.AppendLine("");
+        sb.AppendLine("Inserte la contraseña:");
+        var pwd = await Shell.Current.DisplayPromptAsync("editar vendedor", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
+        {
+            SelectedSeller = null;
+            return;
+        }
+
+        var approved = await authServ.AuthRoot(serverURL, pwd);
+        if (!approved)
+        {
+            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+            SelectedSeller = null;
+            return;
+        }
+
         var currentSeller = await sellersServ.GetByIdAsync(serverURL, SelectedSeller!.Id!);
         await Shell.Current.GoToAsync(nameof(PgAddEditSeller), true, new Dictionary<string, object>() { { "CurrentSeller", currentSeller! } });
     }

@@ -41,6 +41,7 @@
                         Text="{StaticResource UiEdit}"
                         ToolTipProperties.Text="Editar mercancia" />
                     <Button
+                        Command="{Binding DeleteMerchandiseCommand}"
                         FontFamily="icofont"
                         IsEnabled="{Binding SelectedWarehouse, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                         Text="{StaticResource UiDelete}"
