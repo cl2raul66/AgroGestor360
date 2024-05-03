@@ -37,43 +37,31 @@
             ColumnSpacing="16">
             <ScrollView>
                 <CollectionView
-                    x:Name="CvOptions"
-                    SelectedItem="{Binding SelectedMenu}"
+                    ItemsSource="{Binding Menu, Mode=OneWay}"
+                    SelectedItem="{Binding SelectedMenu, Mode=TwoWay}"
+                    SelectionChanged="CollectionView_SelectionChanged"
                     SelectionMode="Single">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
-                    <CollectionView.ItemsSource>
-                        <x:Array Type="{x:Type x:String}">
-                            <x:String>Conexión</x:String>
-                            <x:String>Entidad</x:String>
-                            <x:String>Bancos</x:String>
-                            <x:String>Vendedores</x:String>
-                            <x:String>Clientes</x:String>
-                            <x:String>Almacén</x:String>
-                            <x:String>Productos</x:String>
-                        </x:Array>
-                    </CollectionView.ItemsSource>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Border Style="{StaticResource BorderItem}">
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Body"
-                                    HorizontalOptions="Center"
-                                    Text="{Binding .}"
-                                    TextColor="{StaticResource White}" />
+                                <Label FontAttributes="Bold" FontSize="Body">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span
+                                                FontFamily="icofont"
+                                                Text="{StaticResource ArrowRight}"
+                                                TextColor="{StaticResource White}" />
+                                            <Span Text=" " />
+                                            <Span Text="{Binding .}" TextColor="{StaticResource White}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
-                    <!--<CollectionView.GroupHeaderTemplate>
-                        <DataTemplate>
-                            <Label
-                                FontAttributes="Bold"
-                                FontSize="Subtitle"
-                                Text="{Binding Key}" />
-                        </DataTemplate>
-                    </CollectionView.GroupHeaderTemplate>-->
                 </CollectionView>
             </ScrollView>
             <Grid Grid.Column="1">

@@ -122,7 +122,7 @@ public partial class CvWarehouseViewModel : ObservableRecipient
             sb.AppendLine($"PRODUCTOS RELACIONADOS Y SUS OFERTAS");
             foreach (var item in products!)
             {
-                sb.AppendLine($"Producto: {item.ProductQuantity} - {item.ProductName} {item.ArticlePrice:0.00}" + (item.HasOffers ? "Con ofertas" : "Sin ofertas"));
+                sb.AppendLine($"Producto: {item.ProductQuantity} - {item.ProductName} {item.ArticlePrice:0.00} " + (item.HasOffers ? "[Con ofertas]" : "[Sin ofertas]"));
             }
         }
         sb.AppendLine($"¿Seguro que quiere eliminar?");

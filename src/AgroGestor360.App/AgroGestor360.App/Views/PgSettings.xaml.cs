@@ -9,14 +9,18 @@ public partial class PgSettings : ContentPage
 		InitializeComponent();
 
 		BindingContext = vm;
+    }
 
-		CvOptions.SelectionChanged += (sender, e) =>
-		{
+    private void CollectionView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var collectionView = sender as CollectionView;
+        if (collectionView is not null)
+        {
             if (e.CurrentSelection.Count == 0)
             {
-                CvOptions.SelectionMode = SelectionMode.None;
+                collectionView.SelectionMode = SelectionMode.None;
             }
-            CvOptions.SelectionMode = SelectionMode.Single;
-        };
+            collectionView.SelectionMode = SelectionMode.Single;
+        }
     }
 }

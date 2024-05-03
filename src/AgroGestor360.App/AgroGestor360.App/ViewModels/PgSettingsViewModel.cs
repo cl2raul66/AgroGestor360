@@ -13,22 +13,31 @@ public partial class PgSettingsViewModel : ObservableObject
     readonly INavigationService navigationServ;
     readonly IApiService apiServ;
     readonly IOrganizationService organizationServ;
-    //readonly string serverURL;
 
     public PgSettingsViewModel(INavigationService navigationService, IApiService apiService, IOrganizationService organizationService)
     {
         navigationServ = navigationService;
         apiServ = apiService;
         organizationServ = organizationService;
-        //serverURL = Preferences.Default.Get("serverurl", string.Empty);
         SelectedMenu = string.Empty;
     }
 
-    [ObservableProperty]
-    ContentView? currentContent;
+    public IEnumerable<string> Menu =>
+    [
+        "Conexión",
+        "Entidad",
+        "Bancos",
+        "Vendedores",
+        "Clientes",
+        "Almacén",
+        "Productos"
+    ];
 
     [ObservableProperty]
     string? selectedMenu;
+
+    [ObservableProperty]
+    ContentView? currentContent;
 
     [RelayCommand]
     async Task GoToBack() => await Shell.Current.GoToAsync("..", true);
