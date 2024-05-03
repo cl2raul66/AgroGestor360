@@ -163,6 +163,10 @@ public class MerchandiseController : ControllerBase
         foreach (var item in entitysProductsForSales)
         {
             item.Packaging = entityMerchandise.Packaging;
+            if (item.ProductQuantity == 1)
+            {
+                item.ProductName = entityMerchandise.Name;
+            }
             var resultProductForSales = productsForSalesServ.Update(item);
             if (!resultProductForSales)
             {
@@ -219,8 +223,9 @@ public class MerchandiseController : ControllerBase
             return Ok();
         }
         productsForSalesServ.BeginTrans();
+        int totalItems = entitysProductsForSales.Count();
         var resultProductForSales = productsForSalesServ.DeleteByMerchandiseId(merchandiseId);
-        if (resultProductForSales != entitysProductsForSales.Count())
+        if (resultProductForSales != totalItems)
         {
             merchandiseServ.Rollback();
             articlesForWarehouseServ.Rollback();

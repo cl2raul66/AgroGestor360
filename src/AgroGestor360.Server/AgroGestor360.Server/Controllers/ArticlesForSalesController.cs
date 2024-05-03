@@ -11,10 +11,12 @@ namespace AgroGestor360.Server.Controllers;
 public class ArticlesForSalesController : ControllerBase
 {
     readonly IArticlesForSalesInLiteDbService articlesForSalesServ;
+    readonly IProductsForSalesInLiteDbService productsForSalesServ;
 
-    public ArticlesForSalesController(IArticlesForSalesInLiteDbService articlesForSalesService)
+    public ArticlesForSalesController(IArticlesForSalesInLiteDbService articlesForSalesService, IProductsForSalesInLiteDbService productsForSalesService)
     {
         articlesForSalesServ = articlesForSalesService;
+        productsForSalesServ = productsForSalesService;
     }
 
     [HttpGet]
@@ -59,14 +61,35 @@ public class ArticlesForSalesController : ControllerBase
         }
         found.Price = dTO.Price;
 
-        try
+        articlesForSalesServ.BeginTrans();
+        bool resultArticleItemForSale = articlesForSalesServ.Update(found);
+        if (!resultArticleItemForSale)
         {
-            var result = articlesForSalesServ.Update(found);
-            return result ? Ok() : NotFound();
-        }
-        catch (Exception)
-        {
+            articlesForSalesServ.Rollback();
             return NotFound();
         }
+
+        var entitysProductsForSales = productsForSalesServ.GetAllByMerchandiseId(found.MerchandiseId!);
+        if (!entitysProductsForSales.Any())
+        {
+            articlesForSalesServ.Commit();
+            return Ok();
+        }
+        productsForSalesServ.BeginTrans();
+        foreach (var item in entitysProductsForSales)
+        {
+            item.ArticlePrice = item.ProductQuantity * dTO.Price;            
+            var resultProductForSales = productsForSalesServ.Update(item);
+            if (!resultProductForSales)
+            {
+                articlesForSalesServ.Rollback();
+                productsForSalesServ.Rollback();
+                return NotFound();
+            }
+        }
+
+        articlesForSalesServ.Commit();
+        productsForSalesServ.Commit();
+        return Ok();
     }
 }

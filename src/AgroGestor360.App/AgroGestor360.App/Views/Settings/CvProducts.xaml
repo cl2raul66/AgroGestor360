@@ -399,18 +399,21 @@
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="model:ProductOffering">
                                     <Border Style="{StaticResource BorderItem}">
-                                        <Grid ColumnDefinitions="auto,*,*" ColumnSpacing="8">
+                                        <Grid ColumnDefinitions="auto,*" ColumnSpacing="8">
                                             <Label Text="{Binding Id, Mode=OneWay, StringFormat='No. {0}'}" TextColor="{StaticResource White}" />
                                             <Label
                                                 Grid.Column="1"
-                                                HorizontalOptions="Center"
-                                                Text="{Binding Quantity, Mode=OneWay, StringFormat='Cantidad {0}'}"
-                                                TextColor="{StaticResource White}" />
-                                            <Label
-                                                Grid.Column="2"
-                                                HorizontalOptions="Center"
-                                                Text="{Binding BonusAmount, Mode=OneWay, StringFormat='Cantidad extra {0}'}"
-                                                TextColor="{StaticResource White}" />
+                                                FontAttributes="Bold"
+                                                HorizontalOptions="Center">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="Cantidad " TextColor="{StaticResource White}" />
+                                                        <Span Text="{Binding BonusAmount, Mode=OneWay}" TextColor="{StaticResource White}" />
+                                                        <Span Text=" x " TextColor="{StaticResource White}" />
+                                                        <Span Text="{Binding Quantity, Mode=OneWay}" TextColor="{StaticResource White}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -425,8 +428,9 @@
                             CornerRadius="2"
                             WidthRequest="2" />-->
                                 <Button
+                                    Command="{Binding DeleteOfferCommand}"
                                     FontFamily="icofont"
-                                    IsEnabled="False"
+                                    IsEnabled="{Binding SelectedOffert, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                     Text="{StaticResource UiDelete}"
                                     ToolTipProperties.Text="Eliminar" />
                             </HorizontalStackLayout>

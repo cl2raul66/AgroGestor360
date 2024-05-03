@@ -49,7 +49,7 @@ public class Presentation
 /// </summary>
 public class ProductOffering
 {
-    public int? Id { get; set; }
+    public int Id { get; set; }
     public double Quantity { get; set; }
     public double BonusAmount { get; set; }
 }

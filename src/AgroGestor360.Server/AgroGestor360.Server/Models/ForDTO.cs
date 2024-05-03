@@ -1,7 +1,5 @@
 ﻿// Ignore Spelling: DTO
 
-using LiteDB;
-
 namespace AgroGestor360.Server.Models;
 
 #region Merchandise
