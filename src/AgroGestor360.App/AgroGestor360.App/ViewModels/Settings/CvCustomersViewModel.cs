@@ -1,5 +1,4 @@
-﻿using AgroGestor360.App.Views;
-using AgroGestor360.App.Views.Settings.Customers;
+﻿using AgroGestor360.App.Views.Settings.Customers;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -8,8 +7,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text;
-using System.Xml.Linq;
-using Windows.UI.ViewManagement.Core;
 
 namespace AgroGestor360.App.ViewModels;
 

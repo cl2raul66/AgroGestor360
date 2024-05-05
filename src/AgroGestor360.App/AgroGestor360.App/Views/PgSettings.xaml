@@ -45,7 +45,7 @@
                         <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate x:DataType="x:String">
                             <Border Style="{StaticResource BorderItem}">
                                 <Label FontAttributes="Bold" FontSize="Body">
                                     <Label.FormattedText>
