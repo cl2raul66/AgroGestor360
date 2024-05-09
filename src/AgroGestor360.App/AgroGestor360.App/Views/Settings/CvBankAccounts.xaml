@@ -22,7 +22,18 @@
         </Frame>
         <!--#endregion-->
         <!--#region CONTENIDO-->
-        <ScrollView Grid.Row="1" Orientation="Both">
+        <ActivityIndicator
+            Grid.Row="1"
+            HeightRequest="92"
+            HorizontalOptions="CenterAndExpand"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}"
+            VerticalOptions="CenterAndExpand"
+            WidthRequest="92" />
+        <ScrollView
+            Grid.Row="1"
+            IsVisible="{Binding IsBusy, Converter={ctk:InvertedBoolConverter}}"
+            Orientation="Both">
             <Grid
                 Padding="8"
                 ColumnDefinitions="250,auto,*"

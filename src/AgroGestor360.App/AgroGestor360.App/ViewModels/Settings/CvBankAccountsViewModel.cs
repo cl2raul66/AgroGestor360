@@ -25,6 +25,9 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
         financialInstrumentTypeServ = financialInstrumentTypeService;
     }
 
+    [ObservableProperty]
+    bool isBusy;
+
     #region BANKS
     [ObservableProperty]
     ObservableCollection<string>? banks;
@@ -173,7 +176,9 @@ public partial class CvBankAccountsViewModel : ObservableRecipient
     #region EXTRA
     public async void Initialize()
     {
+        IsBusy = true;
         await Task.WhenAll(GetBanks(), GetBankAccounts());
+        IsBusy = false;
     }
 
     async Task GetBanks()

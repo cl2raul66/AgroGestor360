@@ -51,11 +51,19 @@
         </Frame>
         <!--#endregion-->
         <!--#region CONTENIDO-->
-        <ScrollView Grid.Row="1">
+        <ActivityIndicator
+            Grid.Row="1"
+            HeightRequest="96"
+            HorizontalOptions="CenterAndExpand"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}"
+            VerticalOptions="CenterAndExpand"
+            WidthRequest="96" />
+        <ScrollView Grid.Row="1" IsVisible="{Binding IsBusy, Converter={ctk:InvertedBoolConverter}}">
             <CollectionView
-                x:Name="CvDTO2"
                 ItemsSource="{Binding Warehouses, Mode=OneWay}"
                 SelectedItem="{Binding SelectedWarehouse}"
+                SelectionChanged="OnSelectionChanged"
                 SelectionMode="Single">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout

@@ -90,7 +90,18 @@
         </Frame>
         <!--#endregion-->
         <!--#region CONTENIDO-->
-        <ScrollView Grid.Row="1" Orientation="Both">
+        <ActivityIndicator
+            Grid.Row="1"
+            HeightRequest="96"
+            HorizontalOptions="CenterAndExpand"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}"
+            VerticalOptions="CenterAndExpand"
+            WidthRequest="96" />
+        <ScrollView
+            Grid.Row="1"
+            IsVisible="{Binding IsBusy, Converter={ctk:InvertedBoolConverter}}"
+            Orientation="Both">
             <CollectionView
                 ItemsSource="{Binding Customers, Mode=OneWay}"
                 SelectedItem="{Binding SelectedCustomer}"

@@ -4,20 +4,24 @@ namespace AgroGestor360.App.Views.Settings;
 
 public partial class CvWarehouse : ContentView
 {
-	public CvWarehouse(CvWarehouseViewModel vm)
-	{
-		InitializeComponent();
+    public CvWarehouse(CvWarehouseViewModel vm)
+    {
+        InitializeComponent();
 
-		vm.Initialize();
+        vm.Initialize();
         BindingContext = vm;
+    }
 
-        CvDTO2.SelectionChanged += (s, e) =>
+    void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var collectionView = sender as CollectionView;
+        if (collectionView is not null)
         {
             if (e.CurrentSelection.Count == 0)
             {
-                CvDTO2.SelectionMode = SelectionMode.None;
+                collectionView.SelectionMode = SelectionMode.None;
             }
-            CvDTO2.SelectionMode = SelectionMode.Single;
-        };
+            collectionView.SelectionMode = SelectionMode.Single;
+        }
     }
 }

@@ -12,7 +12,9 @@ public static class CustomersDTOExtension
         return new DTO5_1
         {
             CustomerId = entity.Id!.ToString(),
-            CustomerName = entity.Contact!.FormattedName,
+            CustomerName = string.IsNullOrEmpty(entity.Contact?.Organization?.Name)
+                ? entity.Contact?.FormattedName
+                : entity.Contact?.Organization?.Name,
             Discount = entity.Discount
         };
     }
@@ -35,7 +37,9 @@ public static class CustomersDTOExtension
                 CustomFields = [.. customFields],
                 Title = dTO.CustomerOccupation,
                 BirthDay = dTO.Birthday,
-                Organization = string.IsNullOrEmpty(dTO.CustomerOrganizationName) ? new vCardLib.Models.Organization(dTO.CustomerOrganizationName!, null, null) : null
+                Organization = string.IsNullOrEmpty(dTO.CustomerOrganizationName) 
+                    ? null
+                    : new vCardLib.Models.Organization(dTO.CustomerOrganizationName!, null, null)
             },
             Discount = dTO.Discount
         };
@@ -60,7 +64,9 @@ public static class CustomersDTOExtension
                 CustomFields = [.. customFields],
                 Title = dTO.CustomerOccupation,
                 BirthDay = dTO.Birthday,
-                Organization = string.IsNullOrEmpty(dTO.CustomerOrganizationName) ? new vCardLib.Models.Organization(dTO.CustomerOrganizationName!, null, null) : null
+                Organization = string.IsNullOrEmpty(dTO.CustomerOrganizationName)
+                    ? null
+                    : new vCardLib.Models.Organization(dTO.CustomerOrganizationName!, null, null)
             },
             Discount = dTO.Discount
         };
@@ -73,6 +79,7 @@ public static class CustomersDTOExtension
             CustomerId = entity.Id!.ToString(),
             CustomerFullName = entity.Contact?.FormattedName,
             CustomerOccupation = entity.Contact?.Title,
+            CustomerOrganizationName = entity.Contact?.Organization?.Name,
             Birthday = entity.Contact!.BirthDay,
             CustomerPhone = entity.Contact?.PhoneNumbers.FirstOrDefault().Number,
             CustomerMail = entity.Contact?.EmailAddresses.FirstOrDefault().Value,

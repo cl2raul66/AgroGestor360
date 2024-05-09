@@ -219,6 +219,73 @@ public class DTO4_4
     public string? Id { get; set; }
     public int OfferId { get; set; }
 }
+
+/// <summary>
+/// Represents a quotation for GET
+/// <code>
+/// double [TotalAmount]
+/// DateTime [QuotationDate]
+/// string [Code, SellerId, SellerName, CustomerId, CustomerName]
+/// </code>
+/// </summary>
+public class DTO7
+{
+    public double TotalAmount { get; set; }
+    public DateTime QuotationDate { get; set; }
+    public string? Code { get; set; }
+    public string? SellerId { get; set; }
+    public string? SellerName { get; set; }
+    public string? CustomerId { get; set; }
+    public string? CustomerName { get; set; }
+}
+
+/// <summary>
+/// Represents a quotation for POST
+/// <code>
+/// DateTime [QuotationDate]
+/// string [SellerId, CustomerId]
+/// Array DTO7_3 [ProductItems]
+/// </code>
+/// </summary>
+public class DTO7_1
+{
+    public DateTime QuotationDate { get; set; }
+    public string? SellerId { get; set; }
+    public string? CustomerId { get; set; }
+    public DTO7_3[]? ProductItems { get; set; }
+}
+
+/// <summary>
+/// Represents a quotation for PUT
+/// <code>
+/// string [Code, SellerId, CustomerId]
+/// Array DTO7_3 [ProductItems]
+/// </code>
+/// </summary>
+public class DTO7_2
+{
+    public string? Code { get; set; }
+    public string? SellerId { get; set; }
+    public string? CustomerId { get; set; }
+    public DTO7_3[]? ProductItems { get; set; }
+}
+
+/// <summary>
+/// Object: ProductItemForQuotation
+/// <code>
+/// bool [HasCustomerDiscount]
+/// int [OfferId]
+/// double [Quantity]
+/// string [ProductId]
+/// </code>
+/// </summary>
+public class DTO7_3
+{
+    public bool HasCustomerDiscount { get; set; }
+    public int OfferId { get; set; }
+    public double Quantity { get; set; }
+    public string? ProductId { get; set; }
+}
 #endregion
 
 #region Customer

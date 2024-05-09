@@ -216,7 +216,38 @@ public class BankTransaction
     public double TransactionAmount { get; set; }
 }
 
-public class Token
+/// <summary>
+/// Object: Quotation
+/// <code>
+/// bool [HasCustomerDiscount, WasDelivered]
+/// DateTime [QuotationDate]
+/// Guid [Code]
+/// Seller [Seller]
+/// Customer [Customer]
+/// Array ProductItemQuotation [ProductItems]
+/// </code>
+/// </summary>
+public class Quotation
 {
-    public string? Id { get; set; }
+    public bool WasDelivered { get; set; }
+    public DateTime QuotationDate { get; set; }
+    public Guid Code { get; set; }
+    public Seller? Seller { get; set; }
+    public Customer? Customer { get; set; }
+    public ProductItemForQuotation[]? ProductItems { get; set; }
+}
+
+/// <summary>
+/// Object: ProductItemForQuotation
+/// <code>
+/// int [OfferId]
+/// double [Quantity]
+/// productItemForSale [Product]
+/// </summary>
+public class ProductItemForQuotation
+{
+    public bool HasCustomerDiscount { get; set; }
+    public int OfferId { get; set; }
+    public double Quantity { get; set; }
+    public ProductItemForSale? Product { get; set; }
 }

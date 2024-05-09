@@ -12,8 +12,4 @@
     <PackageReference Include="vCardLib.dll" Version="5.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\SQL\" />
-  </ItemGroup>
-
 </Project>

@@ -4,6 +4,7 @@ using AgroGestor360.App.ViewModels;
 using AgroGestor360.App.Views;
 using AgroGestor360.App.Views.Expense;
 using AgroGestor360.App.Views.Loans;
+using AgroGestor360.App.Views.Sales;
 using AgroGestor360.App.Views.Settings;
 using AgroGestor360.App.Views.Settings.BankAccounts;
 using AgroGestor360.App.Views.Settings.Connection;
@@ -53,6 +54,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IArticlesForWarehouseService, ArticlesForWarehouseService>();
         builder.Services.AddSingleton<IArticlesForSalesService, ArticlesForSalesService>();
         builder.Services.AddSingleton<IProductsForSalesService, ProductsForSalesService>();
+        builder.Services.AddSingleton<IQuotesService, QuotesService>();
         builder.Services.AddSingleton<IFinancialInstrumentTypeService, FinancialInstrumentTypeService>();
         builder.Services.AddSingleton<IMeasurementService, MeasurementService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
@@ -83,6 +85,7 @@ public static class MauiProgram
         builder.Services.AddTransient<PgSales, PgSalesViewModel>();
         builder.Services.AddTransient<CvSellers, CvSellersViewModel>();
         builder.Services.AddTransient<PgAddEditSeller, PgAddEditSellerViewModel>();
+        builder.Services.AddTransient<PgAddEditQuote, PgAddEditQuoteViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();

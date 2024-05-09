@@ -24,6 +24,9 @@ public partial class CvCustomersViewModel : ObservableRecipient
     }
 
     [ObservableProperty]
+    bool isBusy;
+
+    [ObservableProperty]
     ObservableCollection<DTO5_1>? customers;
 
     [ObservableProperty]
@@ -253,7 +256,9 @@ public partial class CvCustomersViewModel : ObservableRecipient
     #region EXTRA
     public async void Initialize()
     {
+        IsBusy = true;
         await GetCustomers();
+        IsBusy = false;
     }
 
     async Task GetCustomers()

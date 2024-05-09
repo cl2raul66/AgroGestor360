@@ -31,6 +31,9 @@ public partial class CvWarehouseViewModel : ObservableRecipient
     }
 
     [ObservableProperty]
+    bool isBusy;
+
+    [ObservableProperty]
     ObservableCollection<DTO2>? warehouses;
 
     [ObservableProperty]
@@ -209,7 +212,9 @@ public partial class CvWarehouseViewModel : ObservableRecipient
     #region EXTRA
     public async void Initialize()
     {
+        IsBusy = true;
         await GetWarehouse();
+        IsBusy = false;
     }
 
     async Task GetWarehouse()

@@ -1,4 +1,5 @@
 ﻿using AgroGestor360.Client.Models;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 
@@ -8,6 +9,7 @@ public interface ICustomersService
 {
     Task<bool> DeleteAsync(string serverURL, string id);
     Task<bool> ExistAsync(string serverURL);
+    Task<IEnumerable<DTO5_1>> GetAllAsync(string serverURL);
     Task<IEnumerable<CustomerDiscountClass>> GetAllDiscountAsync(string serverURL);
     Task<IEnumerable<DTO5_1>> GetAllWithDiscountAsync(string serverURL);
     Task<IEnumerable<DTO5_1>> GetAllWithoutDiscountAsync(string serverURL);
@@ -50,12 +52,30 @@ public class CustomersService : ICustomersService
         return [];
     }
 
+    public async Task<IEnumerable<DTO5_1>> GetAllAsync(string serverURL)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers");
+            if (response.StatusCode is HttpStatusCode.NotFound)
+            {
+                return [];
+            }
+
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<DTO5_1>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+        }
+        return [];
+    }
+
     public async Task<IEnumerable<DTO5_1>> GetAllWithDiscountAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers/getallwithdiscount");
-            if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
+            if (response.StatusCode is HttpStatusCode.NotFound)
             {
                 return [];
             }
@@ -73,7 +93,7 @@ public class CustomersService : ICustomersService
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers/getallwithoutdiscount");
-            if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
+            if (response.StatusCode is HttpStatusCode.NotFound)
             {
                 return [];
             }

@@ -30,6 +30,14 @@ public class CustomersController : ControllerBase
     [HttpGet("getalldiscount")]
     public ActionResult<IEnumerable<CustomerDiscountClass>> GetAllDiscount() => !AllDiscount?.Any() ?? true ? NotFound() : Ok(AllDiscount);
 
+    [HttpGet]
+    public ActionResult<IEnumerable<DTO5_1>> GetAll()
+    {
+        var customers = customersServ.GetAll()?.Select(x => x.ToDTO5_1()) ?? [];
+
+        return !customers?.Any() ?? true ? NotFound() : Ok(customers);
+    }
+
     [HttpGet("getallwithdiscount")]
     public ActionResult<IEnumerable<DTO5_1>> GetAllWithDiscount()
     {

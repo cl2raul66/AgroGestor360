@@ -25,6 +25,9 @@ public partial class CvProductsViewModel : ObservableRecipient
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
     }
 
+    [ObservableProperty]
+    bool isBusy;
+
     #region ARTICLE
     [ObservableProperty]
     ObservableCollection<DTO3>? articles;
@@ -297,7 +300,9 @@ public partial class CvProductsViewModel : ObservableRecipient
     #region EXTRA
     public async void Initialize()
     {
+        IsBusy = true;
         await Task.WhenAll(GetArticles(), GetProducts());
+        IsBusy = false;
     }
 
     async Task GetArticles()

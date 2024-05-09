@@ -1,5 +1,4 @@
 ﻿using AgroGestor360.App.Services;
-using AgroGestor360.App.ViewModels;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,13 +10,11 @@ namespace AgroGestor360.App.ViewModels;
 public partial class PgSettingsViewModel : ObservableObject
 {
     readonly INavigationService navigationServ;
-    readonly IApiService apiServ;
     readonly IOrganizationService organizationServ;
 
-    public PgSettingsViewModel(INavigationService navigationService, IApiService apiService, IOrganizationService organizationService)
+    public PgSettingsViewModel(INavigationService navigationService, IOrganizationService organizationService)
     {
         navigationServ = navigationService;
-        apiServ = apiService;
         organizationServ = organizationService;
         SelectedMenu = string.Empty;
     }

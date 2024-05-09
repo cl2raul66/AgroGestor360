@@ -19,12 +19,12 @@
                     Text="Catálogo de Productos"
                     TextTransform="Uppercase"
                     VerticalOptions="Center" />
-                <HorizontalStackLayout Grid.Column="2" Spacing="8">
-                    <!--<BoxView
+                <!--<HorizontalStackLayout Grid.Column="2" Spacing="8">
+                    <BoxView
                         BackgroundColor="{StaticResource Gray300}"
                         CornerRadius="2"
-                        WidthRequest="2" />-->
-                    <!--<Button
+                        WidthRequest="2" />
+                    <Button
                         Command="{Binding ViewArticlesCommand}"
                         FontFamily="icofont"
                         Text="{StaticResource Dropbox}"
@@ -33,13 +33,24 @@
                         Command="{Binding ViewProductsCommand}"
                         FontFamily="icofont"
                         Text="{StaticResource Box}"
-                        ToolTipProperties.Text="Ver productos" />-->
-                </HorizontalStackLayout>
+                        ToolTipProperties.Text="Ver productos" />
+                </HorizontalStackLayout>-->
             </Grid>
         </Frame>
         <!--#endregion-->
         <!--#region CONTENIDO-->
-        <ScrollView Grid.Row="1" Orientation="Both">
+        <ActivityIndicator
+            Grid.Row="1"
+            HeightRequest="96"
+            HorizontalOptions="CenterAndExpand"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}"
+            VerticalOptions="CenterAndExpand"
+            WidthRequest="96" />
+        <ScrollView
+            Grid.Row="1"
+            IsVisible="{Binding IsBusy, Converter={ctk:InvertedBoolConverter}}"
+            Orientation="Both">
             <!--  TODO: poner ScrollView en el contenido para todos los ContentView que lo requieran  -->
             <Grid ColumnDefinitions="*,auto,*,auto,300" ColumnSpacing="8">
                 <!--#region VISTA DE ARTICULOS-->

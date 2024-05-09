@@ -20,6 +20,7 @@ builder.Services.AddSingleton<IArticlesForSalesInLiteDbService, ArticlesForSales
 builder.Services.AddSingleton<ICustomersInLiteDbService, CustomersInLiteDbService>();
 builder.Services.AddSingleton<ISellersInLiteDbService, SellersInLiteDbService>();
 builder.Services.AddSingleton<IProductsForSalesInLiteDbService, ProductsForSalesInLiteDbService>();
+builder.Services.AddSingleton<IQuotesInLiteDbService, QuotesInLiteDbService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
