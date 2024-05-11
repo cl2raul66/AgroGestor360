@@ -46,6 +46,7 @@ public static class MauiProgram
             return apiService;
         });
         builder.Services.AddSingleton<IAuthService, AuthService>();
+        builder.Services.AddSingleton<IReportsService, ReportsService>();
         builder.Services.AddSingleton<IOrganizationService, OrganizationService>();
         builder.Services.AddSingleton<IBankAccountsService, BankAccountsService>();
         builder.Services.AddSingleton<ISellersService, SellersService>();

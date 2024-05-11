@@ -15,14 +15,24 @@ public partial class PgSalesViewModel : ObservableRecipient
     readonly ISellersService sellersServ;
     readonly ICustomersService customersServ;
     readonly IQuotesService quotationsServ;
+    readonly IReportsService reportsServ;
 
-    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService)
-    {
+    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService)
+    {        
         quotationsServ = quotesService;
         sellersServ = sellersService;
         customersServ = customersService;
         productsForSalesServ = productsForSalesService;
+        reportsServ = reportsService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
+
+        Task.Run(() =>
+        {
+            foreach (var f in Directory.GetFiles(FileSystem.CacheDirectory, "*.pdf"))
+            {
+                File.Delete(f);
+            }
+        });
     }
 
     [ObservableProperty]
@@ -78,6 +88,39 @@ public partial class PgSalesViewModel : ObservableRecipient
             Quotations!.Remove(SelectedQuotation);
         }
     }
+
+    [RelayCommand]
+    async Task ShareQuoteReport()
+    {
+        string file = GenerateFile();
+
+        var result = await reportsServ.GeneratePDFCustomerQuoteReportAsync(serverURL, SelectedQuotation!.Code!, file);
+
+        if (File.Exists(file) && result)
+        {
+            await Share.Default.RequestAsync(new ShareFileRequest
+            {
+                Title = $"Compartir cotización seleccionada",
+                File = new ShareFile(file)
+            });
+        }
+    }
+
+    [RelayCommand]
+    async Task ViewQuoteReport()
+    {
+        string file = GenerateFile();
+
+        var result = await reportsServ.GeneratePDFCustomerQuoteReportAsync(serverURL, SelectedQuotation!.Code!, file);
+
+        if (File.Exists(file) && result)
+        {
+            await Launcher.OpenAsync(new OpenFileRequest
+            {
+                File = new ReadOnlyFile(file)
+            });
+        }
+    }
     #endregion
 
     #region ORDERS
@@ -120,6 +163,15 @@ public partial class PgSalesViewModel : ObservableRecipient
         IsBusy = true;
         Quotations = new(await quotationsServ.GetAllAsync(serverURL));
         IsBusy = false;
+    }
+
+    string GenerateFile()
+    {
+        string title = $"{SelectedQuotation!.QuotationDate:yyyyMMdd} - Cotización de {SelectedQuotation!.TotalAmount:F2} para {SelectedQuotation!.CustomerName}";
+
+        string file = Path.Combine(FileSystem.CacheDirectory, title + ".pdf");
+
+        return file;        
     }
     #endregion
 }

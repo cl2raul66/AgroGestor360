@@ -179,10 +179,17 @@
                     <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                         <HorizontalStackLayout Spacing="8">
                             <Button
+                                Command="{Binding ShareQuoteReportCommand}"
                                 FontFamily="icofont"
                                 IsEnabled="{Binding SelectedQuotation, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource Share}"
                                 ToolTipProperties.Text="Compartir cotización seleccionada" />
+                            <Button
+                                Command="{Binding ViewQuoteReportCommand}"
+                                FontFamily="icofont"
+                                IsEnabled="{Binding SelectedQuotation, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                                Text="{StaticResource FilePdf}"
+                                ToolTipProperties.Text="Ver como PDF, la cotización seleccionada" />
                         </HorizontalStackLayout>
                         <HorizontalStackLayout Grid.Column="1" Spacing="8">
                             <Button

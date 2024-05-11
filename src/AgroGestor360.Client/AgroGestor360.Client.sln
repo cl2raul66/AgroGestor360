@@ -5,10 +5,7 @@ VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgroGestor360.Client", "AgroGestor360.Client\AgroGestor360.Client.csproj", "{FE2C8BA0-60BF-4F30-97B6-F75BB512E33F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AC1FA7AD-3058-4D60-89B4-3C84E634663F}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfPreviewer", "PdfPreviewer\PdfPreviewer.csproj", "{2696B373-4777-4E2E-AF28-73F7005799D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +17,10 @@ Global
 		{FE2C8BA0-60BF-4F30-97B6-F75BB512E33F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE2C8BA0-60BF-4F30-97B6-F75BB512E33F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE2C8BA0-60BF-4F30-97B6-F75BB512E33F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2696B373-4777-4E2E-AF28-73F7005799D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2696B373-4777-4E2E-AF28-73F7005799D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2696B373-4777-4E2E-AF28-73F7005799D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2696B373-4777-4E2E-AF28-73F7005799D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
