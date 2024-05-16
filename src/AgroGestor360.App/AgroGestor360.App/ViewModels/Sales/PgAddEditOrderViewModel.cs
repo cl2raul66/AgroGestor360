@@ -1,31 +1,41 @@
-﻿using AgroGestor360.App.Models;
-using AgroGestor360.App.Views.Sales;
-using AgroGestor360.Client.Models;
+﻿using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
-using AgroGestor360.Client.Tools;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
+using AgroGestor360.App.Models;
+using AgroGestor360.Client.Tools;
 
 namespace AgroGestor360.App.ViewModels;
 
 [QueryProperty(nameof(Sellers), "sellers")]
 [QueryProperty(nameof(Customers), "customers")]
 [QueryProperty(nameof(Products), "products")]
-public partial class PgAddEditQuoteViewModel : ObservableValidator
+[QueryProperty(nameof(CurrentOrder), "currentOrder")]
+public partial class PgAddEditOrderViewModel : ObservableValidator
 {
     readonly IProductsForSalesService productsForSalesServ;
+    readonly IArticlesForWarehouseService articlesForWarehouseServ;
+    readonly IQuotesService quotesServ;
     readonly string serverURL;
 
-    public PgAddEditQuoteViewModel(IProductsForSalesService productsForSalesService)
+    public PgAddEditOrderViewModel(IProductsForSalesService productsForSalesService, IArticlesForWarehouseService articlesForWarehouseService, IQuotesService quotesService)
     {
         productsForSalesServ = productsForSalesService;
+        articlesForWarehouseServ = articlesForWarehouseService;
+        quotesServ = quotesService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         Date = DateTime.Now;
     }
+
+    [ObservableProperty]
+    DTO8_4? currentOrder;
+
+    [ObservableProperty]
+    int productsPending;
 
     [ObservableProperty]
     string? textInfo;
@@ -38,6 +48,9 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
 
     [ObservableProperty]
     DTO4? selectedProduct;
+
+    [ObservableProperty]
+    double stock;
 
     [ObservableProperty]
     List<DTO6>? sellers;
@@ -99,6 +112,18 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
             TextInfo = null;
             return;
         }
+        if (theQuantity <= 0)
+        {
+            TextInfo = " La cantidad debe ser mayor a 0";
+            await Task.Delay(4000);
+            TextInfo = null;
+            return;
+        }
+        if (Stock < theQuantity)
+        {
+            ProductsPending += 1;
+        }
+
         ProductItems ??= [];
         ProductItems.Insert(0, new() { ProductItemQuantity = theQuantity, Product = SelectedProduct! });
 
@@ -109,10 +134,22 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    void RemoveProductitem(ProductItem productitem)
+    async Task RemoveProductitem(ProductItem productitem)
     {
-        ProductItems!.Remove(SelectedProductItem!);
-        UpdateTotalQuote();
+        var theQuantity = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProductItem?.Product?.Id ?? string.Empty))?.Quantity ?? 0;
+
+        var selectedQuantity = SelectedProductItem!.ProductOffer is null ? SelectedProductItem!.ProductItemQuantity : SelectedProductItem!.ProductOffer.Quantity;
+        if (theQuantity < selectedQuantity)
+        {
+            ProductsPending -= 1;
+        }
+        bool result = ProductItems!.Remove(SelectedProductItem!);
+        if (result)
+        {
+            UpdateTotalQuote();
+            return;
+        }
+        ProductsPending += 1;
     }
 
     [RelayCommand]
@@ -202,22 +239,25 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
                 DTO9 dto = new()
                 {
                     ProductItemForSaleId = x.Product!.Id,
-                    OfferId = x.ProductOffer!.Id 
+                    OfferId = x.ProductOffer!.Id
                 };
                 productItems.Add(dto);
             }
         }
 
-        DTO7_1 quotation = new()
+        DTO8_1 order = new()
         {
-            Status = QuotationStatus.Draft,
+            Code = CurrentOrder is not null ? CurrentOrder.Code : string.Empty,
+            Status = ProductsPending > 0 ? OrderStatus.Pending : OrderStatus.Processing,
             Date = Date,
             CustomerId = SelectedCustomer!.CustomerId,
             SellerId = SelectedSeller!.Id,
             ProductItems = [.. productItems]
         };
 
-        _ = WeakReferenceMessenger.Default.Send(quotation, "addquote");
+        string token = CurrentOrder is not null ? "addorderfromquote" : "addorder";
+
+        _ = WeakReferenceMessenger.Default.Send(order, token);
 
         await Shell.Current.GoToAsync("..");
     }
@@ -228,6 +268,8 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
         _ = WeakReferenceMessenger.Default.Send("cancel", nameof(PgSalesViewModel));
         await Shell.Current.GoToAsync("..");
     }
+
+    bool WaitPropertyChanged;
 
     protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
     {
@@ -270,6 +312,56 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
                 if (SelectedProductItem.CustomerDiscountClass is null && SelectedProductItem.ProductOffer is null)
                 {
                     IsNormalPrice = true;
+                }
+                WaitPropertyChanged = false;
+            }
+        }
+
+        if (e.PropertyName == nameof(SelectedProduct))
+        {
+            if (SelectedProduct is not null)
+            {
+                Stock = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProduct.MerchandiseId!))?.Quantity ?? 0;
+                WaitPropertyChanged = false;
+            }
+        }
+
+        if (e.PropertyName == nameof(CurrentOrder))
+        {
+            if (CurrentOrder is not null)
+            {
+                SelectedSeller = Sellers?.FirstOrDefault(x => x.Id == CurrentOrder.Seller!.Id);
+                SelectedCustomer = Customers?.FirstOrDefault(x => x.CustomerId == CurrentOrder.Customer!.CustomerId);
+                foreach (var item in CurrentOrder.Products!)
+                {
+                    Quantity = item.Quantity.ToString("F2");
+                    SelectedProduct = Products?.FirstOrDefault(x => x.Id == item!.ProductItemForSaleId);
+                    WaitPropertyChanged = true;
+                    while (WaitPropertyChanged)
+                    {
+                        await Task.Delay(1000);
+                    }
+                    await SendProductItem();
+                    SelectedProductItem = ProductItems?.FirstOrDefault(x => x.Product!.Id == item.ProductItemForSaleId);
+                    WaitPropertyChanged = true;
+                    while (WaitPropertyChanged)
+                    {
+                        await Task.Delay(1000);
+                    }
+                    if (item.HasCustomerDiscount)
+                    {
+                        IsCustomerDiscount = true;
+                    }
+                    else if (item.OfferId > 0)
+                    {
+                        IsProductOffer = true;
+                        SelectedOffer = Offers?.FirstOrDefault(x => x.Id == item.OfferId);
+                    }
+                    else
+                    {
+                        IsNormalPrice = true;
+                    }
+                    SetDiscount();
                 }
             }
         }

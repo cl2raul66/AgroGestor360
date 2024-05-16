@@ -7,6 +7,7 @@ namespace AgroGestor360.Server.Services;
 public interface ICustomersInLiteDbService
 {
     bool Exist { get; }
+    bool ExistById(ObjectId id);
 
     bool Delete(ObjectId id); 
     IEnumerable<Customer> GetAll();
@@ -35,6 +36,8 @@ public class CustomersInLiteDbService : ICustomersInLiteDbService
     }
 
     public bool Exist => collection.Count() > 0;
+
+    public bool ExistById(ObjectId id) => collection.FindById(id) is not null;
 
     public Customer GetById(ObjectId id) => collection.FindById(id);
 

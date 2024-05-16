@@ -152,24 +152,59 @@
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="model:DTO7">
-                                <Border Style="{StaticResource BorderItem}">
-                                    <VerticalStackLayout Spacing="2">
-                                        <Grid>
+                                <Border Style="{StaticResource BorderItemForSales}">
+                                    <Grid RowDefinitions="auto,auto">
+                                        <Border
+                                            BackgroundColor="#45111111"
+                                            StrokeShape="RoundRectangle 4"
+                                            StrokeThickness="0" />
+                                        <Grid
+                                            Padding="8"
+                                            ColumnDefinitions="*,auto"
+                                            ColumnSpacing="8">
+                                            <HorizontalStackLayout Spacing="8">
+                                                <Label
+                                                    FontFamily="icofont"
+                                                    FontSize="16"
+                                                    TextColor="{StaticResource White}">
+                                                    <Label.Triggers>
+                                                        <DataTrigger
+                                                            Binding="{Binding IsDraftStatus}"
+                                                            TargetType="Label"
+                                                            Value="true">
+                                                            <Setter Property="Text" Value="{StaticResource UiClock}" />
+                                                            <Setter Property="ToolTipProperties.Text" Value="Pedido pendiente a enviar" />
+                                                        </DataTrigger>
+                                                        <DataTrigger
+                                                            Binding="{Binding IsDraftStatus}"
+                                                            TargetType="Label"
+                                                            Value="false">
+                                                            <Setter Property="Text" Value="{StaticResource UiCheck}" />
+                                                            <Setter Property="ToolTipProperties.Text" Value="Pedido enviado" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                                <Label
+                                                    FontAttributes="Bold"
+                                                    Text="{Binding Date, StringFormat='{0:dd} {0:MMMM} {0:yyyy}'}"
+                                                    TextColor="{StaticResource White}"
+                                                    TextTransform="Uppercase" />
+                                            </HorizontalStackLayout>
                                             <Label
+                                                Grid.Column="1"
                                                 FontAttributes="Bold"
-                                                Text="{Binding QuotationDate, StringFormat='{0:dd} {0:MMMM} {0:yyyy}'}"
-                                                TextColor="{StaticResource White}"
-                                                TextTransform="Uppercase" />
-                                            <Label
-                                                FontAttributes="Bold"
-                                                HorizontalOptions="End"
                                                 Text="{Binding TotalAmount, StringFormat='TOTAL: {0:N2}'}"
                                                 TextColor="{StaticResource White}" />
                                         </Grid>
-                                        <Label Text="{Binding Code, StringFormat='No.: {0}'}" TextColor="{StaticResource White}" />
-                                        <Label Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" TextColor="{StaticResource White}" />
-                                        <Label Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" TextColor="{StaticResource White}" />
-                                    </VerticalStackLayout>
+                                        <VerticalStackLayout
+                                            Grid.Row="1"
+                                            Padding="8,4"
+                                            Spacing="2">
+                                            <Label Text="{Binding Code, StringFormat='No.: {0}'}" TextColor="{StaticResource White}" />
+                                            <Label Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" TextColor="{StaticResource White}" />
+                                            <Label Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" TextColor="{StaticResource White}" />
+                                        </VerticalStackLayout>
+                                    </Grid>
                                 </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
@@ -194,14 +229,33 @@
                         <HorizontalStackLayout Grid.Column="1" Spacing="8">
                             <Button
                                 FontFamily="icofont"
-                                IsEnabled="{Binding SelectedQuotation, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource Ticket}"
-                                ToolTipProperties.Text="Facturación de la cotización seleccionada" />
+                                ToolTipProperties.Text="Facturación de la cotización seleccionada">
+                                <Button.IsEnabled>
+                                    <MultiBinding Converter="{ctk:VariableMultiValueConverter ConditionType=Exact, Count=2}">
+                                        <Binding Converter="{ctk:IsNotNullConverter}" Path="SelectedQuotation" />
+                                        <Binding
+                                            Converter="{ctk:InvertedBoolConverter}"
+                                            Path="SelectedQuotation.IsDraftStatus"
+                                            TargetNullValue="false" />
+                                    </MultiBinding>
+                                </Button.IsEnabled>
+                            </Button>
                             <Button
+                                Command="{Binding CreateOrderFomQuoteCommand}"
                                 FontFamily="icofont"
-                                IsEnabled="{Binding SelectedQuotation, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource ArrowRight}"
-                                ToolTipProperties.Text="Crear pedido a partir de la cotización seleccionada" />
+                                ToolTipProperties.Text="Crear pedido a partir de la cotización seleccionada">
+                                <Button.IsEnabled>
+                                    <MultiBinding Converter="{ctk:VariableMultiValueConverter ConditionType=Exact, Count=2}">
+                                        <Binding Converter="{ctk:IsNotNullConverter}" Path="SelectedQuotation" />
+                                        <Binding
+                                            Converter="{ctk:InvertedBoolConverter}"
+                                            Path="SelectedQuotation.IsDraftStatus"
+                                            TargetNullValue="false" />
+                                    </MultiBinding>
+                                </Button.IsEnabled>
+                            </Button>
                             <BoxView
                                 BackgroundColor="{StaticResource Gray300}"
                                 CornerRadius="2"
@@ -293,7 +347,74 @@
                     </HorizontalStackLayout>-->
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1" Grid.Column="2">
-                    <CollectionView />
+                    <CollectionView
+                        ItemsSource="{Binding Orders}"
+                        SelectedItem="{Binding SelectedOrder}"
+                        SelectionChanged="OnSelectionChanged"
+                        SelectionMode="Single">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout
+                                HorizontalItemSpacing="2"
+                                Orientation="Vertical"
+                                Span="2"
+                                VerticalItemSpacing="2" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:DTO8">
+                                <Border Style="{StaticResource BorderItemForSales}">
+                                    <Grid RowDefinitions="auto,auto">
+                                        <Border
+                                            BackgroundColor="#45111111"
+                                            StrokeShape="RoundRectangle 4"
+                                            StrokeThickness="0" />
+                                        <Grid
+                                            Padding="8"
+                                            ColumnDefinitions="*,auto"
+                                            ColumnSpacing="8">
+                                            <HorizontalStackLayout Spacing="8">
+                                                <Label
+                                                    FontFamily="icofont"
+                                                    FontSize="16"
+                                                    IsVisible="{Binding IsPendingStatus}"
+                                                    Text="{StaticResource UiClock}"
+                                                    TextColor="{StaticResource White}">
+                                                    <Label.Triggers>
+                                                        <DataTrigger
+                                                            Binding="{Binding IsPendingStatus}"
+                                                            TargetType="Label"
+                                                            Value="True">
+                                                            <Setter Property="ToolTipProperties.Text" Value="Pedido pendiente" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                                <Label
+                                                    FontAttributes="Bold"
+                                                    Text="{Binding Date, StringFormat='{0:dd} {0:MMMM} {0:yyyy}'}"
+                                                    TextColor="{StaticResource White}"
+                                                    TextTransform="Uppercase"
+                                                    VerticalOptions="CenterAndExpand" />
+                                            </HorizontalStackLayout>
+                                            <Label
+                                                Grid.Column="1"
+                                                FontAttributes="Bold"
+                                                Text="{Binding TotalAmount, StringFormat='TOTAL: {0:N2}'}"
+                                                TextColor="{StaticResource White}"
+                                                VerticalOptions="CenterAndExpand" />
+                                        </Grid>
+                                        <VerticalStackLayout
+                                            Grid.Row="1"
+                                            Padding="8,4"
+                                            Spacing="2">
+                                            <Label Text="{Binding Code, StringFormat='No.: {0}'}" TextColor="{StaticResource White}" />
+                                            <Label Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" TextColor="{StaticResource White}" />
+                                            <Label Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" TextColor="{StaticResource White}" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </ScrollView>
                 <Frame
                     Grid.Row="2"
@@ -310,12 +431,14 @@
                                 CornerRadius="2"
                                 WidthRequest="2" />
                             <Button
+                                Command="{Binding ShowAddEditOrderCommand}"
                                 FontFamily="icofont"
                                 Text="{StaticResource Plus}"
                                 ToolTipProperties.Text="Agregar pedido" />
                             <Button
+                                Command="{Binding RemovedOrderCommand}"
                                 FontFamily="icofont"
-                                IsEnabled="False"
+                                IsEnabled="{Binding SelectedOrder, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource UiDelete}"
                                 ToolTipProperties.Text="Cancelar pedido" />
                         </HorizontalStackLayout>

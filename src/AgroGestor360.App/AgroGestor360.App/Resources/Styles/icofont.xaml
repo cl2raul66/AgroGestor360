@@ -2332,7 +2332,7 @@
     <x:String x:Key="DuotoneicofontPrivacy">&#x13b90;</x:String>
     <x:String x:Key="Icon109">&#x13b91;</x:String>
     <x:String x:Key="DuotoneicofontPublish">&#x13b92;</x:String>
-    <x:String x:Key="Icon110">&#x13b93;</x:String>
+    <x:String x:Key="Publish">&#x13b93;</x:String>
     <x:String x:Key="DuotoneicofontPurge">&#x13b94;</x:String>
     <x:String x:Key="Icon111">&#x13b95;</x:String>
     <x:String x:Key="DuotoneicofontQuestionSignCircle">&#x13b96;</x:String>

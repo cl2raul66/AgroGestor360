@@ -98,6 +98,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\Sales\PgAddEditOrder.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Sales\PgAddEditQuote.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -189,6 +192,12 @@
 
 	<ItemGroup>
 	  <Compile Remove="C:\Users\elrau\.nuget\packages\microsoft.windowsappsdk\1.4.240211001\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Views\Sales\PgAddEditOrder.xaml.cs">
+	    <DependentUpon>PgAddEditOrder.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 </Project>

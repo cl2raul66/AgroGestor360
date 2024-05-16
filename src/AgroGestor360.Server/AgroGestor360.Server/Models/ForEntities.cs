@@ -217,9 +217,8 @@ public class BankTransaction
 }
 
 /// <summary>
-/// Object: Quotation
+/// Object: Document
 /// <code>
-/// bool [HasCustomerDiscount, WasDelivered]
 /// DateTime [QuotationDate]
 /// Guid [Code]
 /// Seller [Seller]
@@ -227,24 +226,23 @@ public class BankTransaction
 /// Array ProductItemQuotation [ProductItems]
 /// </code>
 /// </summary>
-public class Quotation
+public abstract class Document
 {
-    public bool WasDelivered { get; set; }
-    public DateTime QuotationDate { get; set; }
+    public DateTime Date { get; set; }
     public Guid Code { get; set; }
     public Seller? Seller { get; set; }
     public Customer? Customer { get; set; }
-    public ProductItemForQuotation[]? ProductItems { get; set; }
+    public ProductItemForDocument[]? ProductItems { get; set; }
 }
 
 /// <summary>
-/// Object: ProductItemForQuotation
+/// Object: ProductItemForDocument
 /// <code>
 /// int [OfferId]
 /// double [Quantity]
 /// productItemForSale [Product]
 /// </summary>
-public class ProductItemForQuotation
+public class ProductItemForDocument
 {
     public bool HasCustomerDiscount { get; set; }
     public int OfferId { get; set; }
@@ -252,35 +250,34 @@ public class ProductItemForQuotation
     public ProductItemForSale? Product { get; set; }
 }
 
-#region Report
-public class CustomerQuoteReport()
+/// <summary>
+/// Object: Quotation
+/// <code>
+/// bool [WasDelivered]
+/// DateTime [QuotationDate]
+/// Guid [Code]
+/// Seller [Seller]
+/// Customer [Customer]
+/// Array ProductItemForDocument [ProductItems]
+/// </code>
+/// </summary>
+public class Quotation : Document
 {
-    #region ORGANIZATION
-    public string? OrganizationName { get; set; }
-    public string? OrganizationAddress { get; set; }
-    public string? OrganizationPhone { get; set; }
-    public string? OrganizationEmail { get; set; }
-    #endregion
-    #region QUOTATION INFORMATION
-    public string? QuotationCode { get; set; }
-    public DateTime QuotationDate { get; set; }
-    public double TotalAmount { get; set; }
-    #endregion
-    #region SELLER
-    public string? SellerName { get; set; }
-    #endregion
-    #region CUSTOMER
-    public string? CustomerName { get; set; }
-    public string? CustomerPhone { get; set; }
-    #endregion
-    #region PRODUCT ITEMS
-    public Product[]? ProductItems { get; set; }
-    #endregion
-    public class Product
-    {
-        public string? ProductName { get; set; }
-        public double ProductQuantity { get; set; }
-        public double ArticlePrice { get; set; }
-    }
+    public QuotationStatus Status { get; set; }
 }
-#endregion
+
+/// <summary>
+/// Object: Order
+/// <code>
+/// DateTime [QuotationDate]
+/// Guid [Code]
+/// Seller [Seller]
+/// Customer [Customer]
+/// Array ProductItemForDocument [ProductItems]
+/// OrderStatus [Status]
+/// </code>
+/// </summary>
+public class Order : Document
+{
+    public OrderStatus Status { get; set; }
+}

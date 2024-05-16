@@ -65,7 +65,7 @@ public class ReportsController : ControllerBase
                 OrganizationEmail = organization?.Email,
 
                 QuotationCode = code,
-                QuotationDate = quotation.QuotationDate,
+                QuotationDate = quotation.Date,
 
                 SellerName = quotation.Seller!.Contact!.FormattedName,
 

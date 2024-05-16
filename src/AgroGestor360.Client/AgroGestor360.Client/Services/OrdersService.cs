@@ -5,25 +5,26 @@ using System.Text.Json;
 
 namespace AgroGestor360.Client.Services;
 
-public interface IQuotesService
+public interface IOrdersService
 {
-    Task<bool> ChangesByStatusAsync(string serverURL, DTO7_3 dTO);
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string code);
-    Task<IEnumerable<DTO7>> GetAllAsync(string serverURL);
-    Task<DTO7?> GetByCodeAsync(string serverURL, string code);
-    Task<DTO8_2?> GetOrderByCodeAsync(string serverURL, string code);
-    Task<string> InsertAsync(string serverURL, DTO7_1 dTO);
-    Task<bool> UpdateAsync(string serverURL, DTO7_2 dTO);
+    Task<IEnumerable<DTO8>> GetAllAsync(string serverURL);
+    Task<DTO8?> GetByCodeAsync(string serverURL, string code);
+    Task<DTO8_4?> GetDTO8_4FromQuotationAsync(string serverURL, DTO7 dTO);
+    Task<string> InsertAsync(string serverURL, DTO8_1 dTO);
+    Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO);
+    Task<bool> UpdateAsync(string serverURL, DTO8_2 dTO);
+    Task<bool> UpdateByProductsAndStatus(string serverURL, DTO8_3 dTO);
 }
 
-public class QuotesService : IQuotesService
+public class OrdersService : IOrdersService
 {
     public async Task<bool> CheckExistence(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/quotes/exist");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/orders/exist");
 
             if (response.IsSuccessStatusCode)
             {
@@ -34,11 +35,11 @@ public class QuotesService : IQuotesService
         return false;
     }
 
-    public async Task<IEnumerable<DTO7>> GetAllAsync(string serverURL)
+    public async Task<IEnumerable<DTO8>> GetAllAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/quotes");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/orders");
 
             if (response.StatusCode is HttpStatusCode.NotFound)
             {
@@ -50,63 +51,59 @@ public class QuotesService : IQuotesService
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<DTO7>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+            return JsonSerializer.Deserialize<IEnumerable<DTO8>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
         }
         return [];
     }
 
-    public async Task<DTO7?> GetByCodeAsync(string serverURL, string code)
-    {
-        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
-        {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/quotes/{code}");
-
-            switch (response.StatusCode)
-            {
-                case HttpStatusCode.NotFound:
-                case HttpStatusCode.BadRequest:
-                    return null;
-                default:
-                    response.EnsureSuccessStatusCode();
-                    break;
-            }
-
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<DTO7>(content, ApiServiceBase.ProviderJSONOptions);
-        }
-        return null;
-    }
-
-    public async Task<DTO8_2?> GetOrderByCodeAsync(string serverURL, string code)
-    {
-        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
-        {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/quotes/getorderbycode/{code}");
-
-            switch (response.StatusCode)
-            {
-                case HttpStatusCode.NotFound:
-                case HttpStatusCode.BadRequest:
-                    return null;
-                default:
-                    response.EnsureSuccessStatusCode();
-                    break;
-            }
-
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<DTO8_2>(content, ApiServiceBase.ProviderJSONOptions);
-        }
-        return null;
-    }
-
-    public async Task<string> InsertAsync(string serverURL, DTO7_1 dTO)
+    public async Task<DTO8_4?> GetDTO8_4FromQuotationAsync(string serverURL, DTO7 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/quotes", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/orders/getdto8_4fromquotation", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<DTO8_4>(responseContent, ApiServiceBase.ProviderJSONOptions);
+            }
+        }
+        return null;
+    }
+
+    public async Task<DTO8?> GetByCodeAsync(string serverURL, string code)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/orders/{code}");
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.NotFound:
+                case HttpStatusCode.BadRequest:
+                    return null;
+                default:
+                    response.EnsureSuccessStatusCode();
+                    break;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<DTO8>(content, ApiServiceBase.ProviderJSONOptions);
+        }
+        return null;
+    }
+
+    public async Task<string> InsertAsync(string serverURL, DTO8_1 dTO)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/orders", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -116,28 +113,45 @@ public class QuotesService : IQuotesService
         return string.Empty;
     }
 
-    public async Task<bool> UpdateAsync(string serverURL, DTO7_2 dTO)
+    public async Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/quotes", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/orders/insertfromquote", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+        }
+        return string.Empty;
+    }
+
+    public async Task<bool> UpdateAsync(string serverURL, DTO8_2 dTO)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/orders", content);
 
             return response.IsSuccessStatusCode;
         }
         return false;
     }
 
-    public async Task<bool> ChangesByStatusAsync(string serverURL, DTO7_3 dTO)
+    public async Task<bool> UpdateByProductsAndStatus(string serverURL, DTO8_3 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/quotes/changerbystatus", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/orders/updatebyproductsandstatus", content);
 
             return response.IsSuccessStatusCode;
         }
@@ -148,7 +162,7 @@ public class QuotesService : IQuotesService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/quotes/{code}");
+            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/orders/{code}");
 
             return response.IsSuccessStatusCode;
         }

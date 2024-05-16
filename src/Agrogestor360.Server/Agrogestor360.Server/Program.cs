@@ -21,6 +21,8 @@ builder.Services.AddSingleton<ICustomersInLiteDbService, CustomersInLiteDbServic
 builder.Services.AddSingleton<ISellersInLiteDbService, SellersInLiteDbService>();
 builder.Services.AddSingleton<IProductsForSalesInLiteDbService, ProductsForSalesInLiteDbService>();
 builder.Services.AddSingleton<IQuotesInLiteDbService, QuotesInLiteDbService>();
+builder.Services.AddSingleton<IWasteQuotationInLiteDbService, WasteQuotationInLiteDbService>();
+builder.Services.AddSingleton<IOrdersInLiteDbService, OrdersInLiteDbService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();

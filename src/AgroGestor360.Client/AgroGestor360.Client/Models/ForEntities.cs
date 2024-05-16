@@ -221,8 +221,9 @@ public class DTO4_4
 }
 
 /// <summary>
-/// Represents a quotation for GET
+/// Represents a quotation for GET or POST from order
 /// <code>
+/// bool [IsDraftStatus]
 /// double [TotalAmount]
 /// DateTime [QuotationDate]
 /// string [Code, SellerId, SellerName, CustomerId, CustomerName]
@@ -230,8 +231,9 @@ public class DTO4_4
 /// </summary>
 public class DTO7
 {
+    public bool IsDraftStatus { get; set; }
     public double TotalAmount { get; set; }
-    public DateTime QuotationDate { get; set; }
+    public DateTime Date { get; set; }
     public string? Code { get; set; }
     public string? SellerId { get; set; }
     public string? SellerName { get; set; }
@@ -242,49 +244,155 @@ public class DTO7
 /// <summary>
 /// Represents a quotation for POST
 /// <code>
+/// QuotationStatus [Status]
 /// DateTime [QuotationDate]
 /// string [SellerId, CustomerId]
-/// Array DTO7_3 [ProductItems]
+/// Array DTO9 [ProductsItemsForSale]
 /// </code>
 /// </summary>
 public class DTO7_1
 {
-    public DateTime QuotationDate { get; set; }
+    public QuotationStatus Status { get; set; }
+    public DateTime Date { get; set; }
     public string? SellerId { get; set; }
     public string? CustomerId { get; set; }
-    public DTO7_3[]? ProductItems { get; set; }
+    public DTO9[]? ProductItems { get; set; }
 }
 
 /// <summary>
 /// Represents a quotation for PUT
 /// <code>
+/// QuotationStatus [Status]
 /// string [Code, SellerId, CustomerId]
-/// Array DTO7_3 [ProductItems]
+/// Array DTO9 [ProductsItemsForSale]
 /// </code>
 /// </summary>
 public class DTO7_2
 {
+    public QuotationStatus Status { get; set; }
     public string? Code { get; set; }
     public string? SellerId { get; set; }
     public string? CustomerId { get; set; }
-    public DTO7_3[]? ProductItems { get; set; }
+    public DTO9[]? ProductItems { get; set; }
 }
 
 /// <summary>
-/// Object: ProductItemForQuotation
+/// Represents a quotation for PUT or Delete by status
 /// <code>
-/// bool [HasCustomerDiscount]
-/// int [OfferId]
-/// double [Quantity]
-/// string [ProductId]
+/// QuotationStatus [Status]
+/// string [Code]
 /// </code>
 /// </summary>
 public class DTO7_3
 {
+    public QuotationStatus Status { get; set; }
+    public string? Code { get; set; }
+}
+
+/// <summary>
+/// Represents a order for GET
+/// <code>
+/// bool [IsPendingStatus]
+/// double [TotalAmount]
+/// DateTime [Date]
+/// string [Code, SellerId, SellerName, CustomerId, CustomerName]
+/// </code>
+/// </summary>
+public class DTO8
+{
+    public bool IsPendingStatus { get; set; }
+    public double TotalAmount { get; set; }
+    public DateTime Date { get; set; }
+    public string? Code { get; set; }
+    public string? SellerId { get; set; }
+    public string? SellerName { get; set; }
+    public string? CustomerId { get; set; }
+    public string? CustomerName { get; set; }
+}
+
+/// <summary>
+/// Represents a order for POST
+/// <code>
+/// OrderStatus [Status]
+/// DateTime [QuotationDate]
+/// string [Code, SellerId, CustomerId]
+/// Array DTO9 [ProductsItemsForSale]
+/// </code>
+/// </summary>
+public class DTO8_1
+{
+    public DateTime Date { get; set; }
+    public string? Code { get; set; }
+    public string? SellerId { get; set; }
+    public string? CustomerId { get; set; }
+    public DTO9[]? ProductItems { get; set; }
+    public OrderStatus Status { get; set; }
+}
+
+/// <summary>
+/// Represents a order for PUT or GET from quotation
+/// <code>
+/// string [Code, SellerId, CustomerId]
+/// Array DTO9 [ProductsItemsForSale]
+/// OrderStatus [Status]
+/// </code>
+/// </summary>
+public class DTO8_2
+{
+    public string? Code { get; set; }
+    public string? SellerId { get; set; }
+    public string? CustomerId { get; set; }
+    public DTO9[]? ProductItems { get; set; }
+    public OrderStatus Status { get; set; }
+}
+
+/// <summary>
+/// Represents a order for PUT by products and status
+/// <code>
+/// string [Code]
+/// Array DTO9 [ProductsItemsForSale]
+/// OrderStatus [Status]
+/// </code>
+/// </summary>
+public class DTO8_3
+{
+    public string? Code { get; set; }
+    public DTO9[]? ProductItems { get; set; }
+    public OrderStatus Status { get; set; }
+}
+
+/// <summary>
+/// Represents a entity for create order from a quotation.
+/// <code>
+/// string [Code]
+/// DTO5_1 [Customer]
+/// DTO6 [Seller]
+/// Array DTO9 [Products]
+/// </code>
+/// </summary>
+public class DTO8_4
+{
+    public string? Code { get; set; }
+    public DTO5_1? Customer { get; set; }
+    public DTO6? Seller { get; set; }
+    public DTO9[]? Products { get; set; }
+}
+
+/// <summary>
+/// Object: ProductItemForDocument
+/// <code>
+/// bool [HasCustomerDiscount]
+/// int [OfferId]
+/// double [Quantity]
+/// string [ProductItemForSaleId]
+/// </code>
+/// </summary>
+public class DTO9
+{
     public bool HasCustomerDiscount { get; set; }
     public int OfferId { get; set; }
     public double Quantity { get; set; }
-    public string? ProductId { get; set; }
+    public string? ProductItemForSaleId { get; set; }
 }
 #endregion
 
@@ -408,38 +516,5 @@ public class DTO6_2
     public string? NIT { get; set; }
     public string? NIP { get; set; }
     public string? Occupation { get; set; }
-}
-#endregion
-
-#region Report
-public class CustomerQuoteReport()
-{
-    #region ORGANIZATION
-    public string? OrganizationName { get; set; }
-    public string? OrganizationAddress { get; set; }
-    public string? OrganizationPhone { get; set; }
-    public string? OrganizationEmail { get; set; }
-    #endregion
-    #region QUOTATION INFORMATION
-    public string? QuotationCode { get; set; }
-    public DateTime QuotationDate { get; set; }
-    public double TotalAmount { get; set; }
-    #endregion
-    #region SELLER
-    public string? SellerName { get; set; }
-    #endregion
-    #region CUSTOMER
-    public string? CustomerName { get; set; }
-    public string? CustomerPhone { get; set; }
-    #endregion
-    #region PRODUCT ITEMS
-    public Product[]? ProductItems { get; set; }
-    #endregion
-    public class Product
-    {
-        public string? ProductName { get; set; }
-        public double ProductQuantity { get; set; }
-        public double ArticlePrice { get; set; }
-    }
 }
 #endregion

@@ -56,6 +56,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IArticlesForSalesService, ArticlesForSalesService>();
         builder.Services.AddSingleton<IProductsForSalesService, ProductsForSalesService>();
         builder.Services.AddSingleton<IQuotesService, QuotesService>();
+        builder.Services.AddSingleton<IOrdersService, OrdersService>();
         builder.Services.AddSingleton<IFinancialInstrumentTypeService, FinancialInstrumentTypeService>();
         builder.Services.AddSingleton<IMeasurementService, MeasurementService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
@@ -87,6 +88,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CvSellers, CvSellersViewModel>();
         builder.Services.AddTransient<PgAddEditSeller, PgAddEditSellerViewModel>();
         builder.Services.AddTransient<PgAddEditQuote, PgAddEditQuoteViewModel>();
+        builder.Services.AddTransient<PgAddEditOrder, PgAddEditOrderViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();

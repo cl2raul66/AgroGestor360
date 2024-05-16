@@ -4,27 +4,24 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public interface IQuotesInLiteDbService
+public interface IWasteQuotationInLiteDbService
 {
-    bool Exist { get; }
-
     bool Delete(Guid code);
     IEnumerable<Quotation> GetAll();
     Quotation GetById(Guid code);
-    string Insert(Quotation quotation);
-    bool Update(Quotation quotation);
+    string Insert(Quotation entity);
 }
 
-public class QuotesInLiteDbService : IQuotesInLiteDbService
+public class WasteQuotationInLiteDbService : IWasteQuotationInLiteDbService
 {
-    private readonly LiteDatabase db;
+    readonly LiteDatabase db;
     readonly ILiteCollection<Quotation> collection;
 
-    public QuotesInLiteDbService()
+    public WasteQuotationInLiteDbService()
     {
         var cnx = new ConnectionString()
         {
-            Filename = FileHelper.GetFileDbPath("Quotes")
+            Filename = FileHelper.GetFileDbPath("Quotes_Waste")
         };
         var mapper = new BsonMapper();
 
@@ -36,15 +33,11 @@ public class QuotesInLiteDbService : IQuotesInLiteDbService
         collection.EnsureIndex(x => x.Code);
     }
 
-    public bool Exist => collection.Count() > 0;
-
     public Quotation GetById(Guid code) => collection.FindById(code);
 
     public IEnumerable<Quotation> GetAll() => collection.FindAll();
 
-    public string Insert(Quotation quotation) => collection.Insert(quotation).AsGuid.ToString();
-
-    public bool Update(Quotation quotation) => collection.Update(quotation);
+    public string Insert(Quotation entity) => collection.Insert(entity).AsGuid.ToString();
 
     public bool Delete(Guid code) => collection.Delete(code);
 }

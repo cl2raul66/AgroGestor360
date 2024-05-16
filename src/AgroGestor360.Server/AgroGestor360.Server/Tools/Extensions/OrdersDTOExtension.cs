@@ -1,22 +1,22 @@
 ﻿using AgroGestor360.Server.Models;
+using AgroGestor360.Server.Tools.Enums;
 
 namespace AgroGestor360.Server.Tools.Extensions;
 
-public static class QuotationDTOExtension
+public static class OrdersDTOExtension
 {
-    public static DTO7 ToDTO7(this Quotation entity)
+    public static DTO8 ToDTO8(this Order entity)
     {
-        DTO7 dTO = new()
+        DTO8 dTO = new()
         {
-            IsDraftStatus = entity.Status is Enums.QuotationStatus.Draft,
-            Code = entity.Code.ToString().Trim('-').ToUpper(),
+            IsPendingStatus = entity.Status is OrderStatus.Pending,
+            Code = entity.Code.ToString(),
             Date = entity.Date,
             SellerName = entity.Seller?.Contact?.FormattedName,
             SellerId = entity.Seller?.Id?.ToString(),
             CustomerName = string.IsNullOrEmpty(entity.Customer?.Contact?.Organization?.Name)
                     ? entity.Customer?.Contact?.FormattedName
                     : entity.Customer?.Contact?.Organization?.Name,
-            CustomerId = entity.Customer?.Id?.ToString(),
             TotalAmount = 0,
         };
         double totalAmount = 0;
