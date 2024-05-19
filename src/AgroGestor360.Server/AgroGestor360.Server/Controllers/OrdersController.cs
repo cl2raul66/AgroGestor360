@@ -51,7 +51,7 @@ public class OrdersController : ControllerBase
         {
             if (orderStatus is not OrderStatus.Pending)
             {
-                foreach (var pi in item.ProductItems!)
+                foreach (var pi in item.Products!)
                 {
                     var stock = quantityByArticle.FirstOrDefault(x => x.MerchandiseId == pi.Product!.MerchandiseId).Quantity;
                     if (pi.OfferId > 0)
@@ -94,6 +94,62 @@ public class OrdersController : ControllerBase
         return Ok(found.ToDTO8());
     }
 
+    [HttpGet("getproductitemsbycode/{code}")]
+    public ActionResult<IEnumerable<string>> GetProductItemsByCode(string code)
+    {
+        if (string.IsNullOrEmpty(code))
+        {
+            return BadRequest();
+        }
+
+        var found = ordersServ.GetById(new Guid(code));
+        if (found is null)
+        {
+            return NotFound();
+        }
+
+        UpdateOrderStatusBasedOnStock(found);
+        //todo: check if this is correct or if it should be a list of strings
+        List<string> result = [];
+        foreach (var pi in found.Products!)
+        {
+            string texto;
+
+            if (pi.HasCustomerDiscount)
+            {
+                texto = string.Format("{0,-20} {1,-10:F2} {2,-10} (Descuento) {3,-10:N2}",
+                    pi.Product!.ProductName,
+                    pi.Product!.Packaging!.Value,
+                    pi.Product!.Packaging!.Unit,
+                    pi.Product.ArticlePrice -= pi.Product.ArticlePrice * (found.Customer!.Discount!.Value / 100.00));
+            }
+            else if (pi.OfferId > 0)
+            {
+                var o = pi.Product!.Offering![pi.OfferId - 1];
+                texto = string.Format("{0,-20}-{1,-1} {2,-10:F2} {3,-10} (Oferta {4,-20} {5,-1} extra) {6,-10:N2}",
+                    pi.Product!.ProductName,
+                    pi.OfferId,
+                    pi.Product!.Packaging!.Value,
+                    pi.Product!.Packaging!.Unit,
+                    o.BonusAmount,
+                    o.BonusAmount == 1 ? "unidad" : "unidades",
+                    pi.Product.ArticlePrice);
+            }
+            else
+            {
+                texto = string.Format("{0,-20} {1,-10:F2} {2,-10} {3,-10:N2}",
+                    pi.Product!.ProductName,
+                    pi.Product!.Packaging!.Value,
+                    pi.Product!.Packaging!.Unit,
+                    pi.Product.ArticlePrice);
+            }
+
+            result.Add(texto);
+        }
+
+        return Ok(result);
+    }
+
     [HttpPost("getdto8_4fromquotation")]
     public ActionResult<DTO8_4> GetDTO8_4FromQuotation([FromBody] DTO7 dTO)
     {
@@ -119,7 +175,7 @@ public class OrdersController : ControllerBase
 
         var quotation = quotesServ.GetById(new(dTO.Code!));
         var products = new List<DTO9>();
-        foreach (var productItem in quotation.ProductItems!)
+        foreach (var productItem in quotation.Products!)
         {
             var product = productItem.Product;
             DTO9 dTO9 = new()
@@ -147,12 +203,13 @@ public class OrdersController : ControllerBase
 
         var customer = customersServ.GetById(new ObjectId(dTO.CustomerId));
         var seller = sellersServ.GetById(new ObjectId(dTO.SellerId));
-        List<ProductItemForDocument> productItems = [];
+        List<ProductSaleBase> productItems = [];
+        List<ArticleItemForWarehouse> articleItems = [];
 
         foreach (var item in dTO.ProductItems!)
-        {
+        {            
             ProductItemForSale product = productsForSalesServ.GetById(new ObjectId(item.ProductItemForSaleId));
-            ProductItemForDocument productItemForOrder = new()
+            ProductSaleBase productItemForOrder = new()
             {
                 HasCustomerDiscount = item.HasCustomerDiscount,
                 OfferId = item.OfferId,
@@ -160,7 +217,12 @@ public class OrdersController : ControllerBase
                 Product = product
             };
 
+            ArticleItemForWarehouse articleItemForWarehouse = articlesForWarehouseServ.GetById(product.MerchandiseId!);
+            articleItemForWarehouse.Reserved = item.Quantity;
+            articleItemForWarehouse.Quantity -= item.Quantity;
+
             productItems.Add(productItemForOrder);
+            articleItems.Add(articleItemForWarehouse);
         }
 
         Order entity = new()
@@ -170,11 +232,17 @@ public class OrdersController : ControllerBase
             Date = dTO.Date,
             Seller = seller,
             Customer = customer,
-            ProductItems = [.. productItems]
+            Products = [.. productItems]
         };
-        var result = ordersServ.Insert(entity);
 
-        return string.IsNullOrEmpty(result) ? NotFound() : Ok(result);
+        var resultInsert = ordersServ.Insert(entity);
+        if (string.IsNullOrEmpty(resultInsert))
+        {
+            return NotFound();
+        }
+        var resultUpdateManyInWarehouse = articlesForWarehouseServ.UpdateMany([.. articleItems]);
+
+        return resultUpdateManyInWarehouse ? Ok(resultInsert) : NotFound();
     }
 
     [HttpPost("insertfromquote")]
@@ -195,12 +263,13 @@ public class OrdersController : ControllerBase
         var customer = customersServ.GetById(new ObjectId(dTO.CustomerId));
         var seller = sellersServ.GetById(new ObjectId(dTO.SellerId));
 
-        List<ProductItemForDocument> productItems = [];
+        List<ProductSaleBase> productItems = [];
+        List<ArticleItemForWarehouse> articleItems = [];
 
-        foreach (var item in found.ProductItems!)
+        foreach (var item in found.Products!)
         {
             ProductItemForSale product = productsForSalesServ.GetById(new ObjectId(item.Product!.Id));
-            ProductItemForDocument productItemForOrder = new()
+            ProductSaleBase productItemForOrder = new()
             {
                 HasCustomerDiscount = item.HasCustomerDiscount,
                 OfferId = item.OfferId,
@@ -208,7 +277,12 @@ public class OrdersController : ControllerBase
                 Product = product
             };
 
+            ArticleItemForWarehouse articleItemForWarehouse = articlesForWarehouseServ.GetById(product.MerchandiseId!);
+            articleItemForWarehouse.Reserved = item.Quantity;
+            articleItemForWarehouse.Quantity -= item.Quantity;
+
             productItems.Add(productItemForOrder);
+            articleItems.Add(articleItemForWarehouse);
         }
 
         Order entity = new()
@@ -218,14 +292,19 @@ public class OrdersController : ControllerBase
             Date = DateTime.Now,
             Seller = seller,
             Customer = customer,
-            ProductItems = [.. productItems]
+            Products = [.. productItems]
         };
 
         UpdateOrderStatusBasedOnStock(entity);
 
-        var result = ordersServ.Insert(entity);
+        var resultInsert = ordersServ.Insert(entity);
+        if (string.IsNullOrEmpty(resultInsert))
+        {
+            return NotFound();
+        }
+        var resultUpdateManyInWarehouse = articlesForWarehouseServ.UpdateMany([.. articleItems]);
 
-        return string.IsNullOrEmpty(result) ? NotFound() : Ok(result);
+        return resultUpdateManyInWarehouse ? Ok(resultInsert) : NotFound();
     }
 
     [HttpPut]
@@ -257,28 +336,39 @@ public class OrdersController : ControllerBase
             entity.Seller = seller;
         }
 
-        List<ProductItemForDocument> productItems = [];
+        List<ProductSaleBase> productItems = [];
+        List<ArticleItemForWarehouse> articleItems = [];
 
         foreach (var item in dTO.ProductItems!)
         {
             ProductItemForSale product = productsForSalesServ.GetById(new ObjectId(item.ProductItemForSaleId));
-            ProductItemForDocument productItemForOrder = new()
+            ProductSaleBase productItemForOrder = new()
             {
                 HasCustomerDiscount = item.HasCustomerDiscount,
                 OfferId = item.OfferId,
                 Quantity = item.Quantity,
-                Product = product,
-
+                Product = product
             };
 
+            ArticleItemForWarehouse articleItemForWarehouse = articlesForWarehouseServ.GetById(product.MerchandiseId!);
+            articleItemForWarehouse.Reserved = item.Quantity;
+            articleItemForWarehouse.Quantity -= item.Quantity;
+
             productItems.Add(productItemForOrder);
+            articleItems.Add(articleItemForWarehouse);
         }
 
-        entity.ProductItems = [.. productItems];
+        entity.Products = [.. productItems];
 
-        var result = ordersServ.Update(entity);
+        var resultUpdate = ordersServ.Update(entity);
 
-        return !result ? NotFound() : Ok();
+        if (!resultUpdate)
+        {
+            return NotFound();
+        }
+        var resultUpdateManyInWarehouse = articlesForWarehouseServ.UpdateMany([.. articleItems]);
+
+        return resultUpdateManyInWarehouse ? Ok() : NotFound();
     }
 
     [HttpPut("updatebyproductsandstatus")]
@@ -295,29 +385,40 @@ public class OrdersController : ControllerBase
             return NotFound();
         }
 
-        List<ProductItemForDocument> productItems = [];
+        List<ProductSaleBase> productItems = [];
+        List<ArticleItemForWarehouse> articleItems = [];
 
         foreach (var item in dTO.ProductItems!)
         {
             ProductItemForSale product = productsForSalesServ.GetById(new ObjectId(item.ProductItemForSaleId));
-            ProductItemForDocument productItemForOrder = new()
+            ProductSaleBase productItemForOrder = new()
             {
                 HasCustomerDiscount = item.HasCustomerDiscount,
                 OfferId = item.OfferId,
                 Quantity = item.Quantity,
-                Product = product,
-
+                Product = product
             };
 
+            ArticleItemForWarehouse articleItemForWarehouse = articlesForWarehouseServ.GetById(product.MerchandiseId!);
+            articleItemForWarehouse.Reserved = item.Quantity;
+            articleItemForWarehouse.Quantity -= item.Quantity;
+
             productItems.Add(productItemForOrder);
+            articleItems.Add(articleItemForWarehouse);
         }
 
-        entity.ProductItems = [.. productItems];
+        entity.Products = [.. productItems];
         entity.Status = dTO.Status;
 
-        var result = ordersServ.Update(entity);
+        var resultUpdate = ordersServ.Update(entity);
 
-        return !result ? NotFound() : Ok();
+        if (!resultUpdate)
+        {
+            return NotFound();
+        }
+        var resultUpdateManyInWarehouse = articlesForWarehouseServ.UpdateMany([.. articleItems]);
+
+        return resultUpdateManyInWarehouse ? Ok() : NotFound();
     }
 
     [HttpDelete("{code}")]
@@ -338,7 +439,7 @@ public class OrdersController : ControllerBase
     {
         var quantityByArticle = articlesForWarehouseServ.GetAll().Select(x => (x.MerchandiseId, x.Quantity));
 
-        foreach (var pi in order.ProductItems!)
+        foreach (var pi in order.Products!)
         {
             if (order.Status is not OrderStatus.Pending)
             {

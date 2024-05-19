@@ -78,7 +78,7 @@ public class QuotesController : ControllerBase
             Code = found.Code.ToString(),
             CustomerId = found.Customer!.Id!.ToString(),
             SellerId = found.Seller!.Id!.ToString(),
-            ProductItems = found.ProductItems!.Select(x => new DTO9()
+            ProductItems = found.Products!.Select(x => new DTO9()
             {
                 HasCustomerDiscount = x.HasCustomerDiscount,
                 OfferId = x.OfferId,
@@ -100,12 +100,12 @@ public class QuotesController : ControllerBase
 
         var customer = customersServ.GetById(new ObjectId(dTO.CustomerId));
         var seller = sellersServ.GetById(new ObjectId(dTO.SellerId));
-        List<ProductItemForDocument> productItems = [];
+        List<ProductSaleBase> productItems = [];
 
         foreach (var item in dTO.ProductItems!)
         {
             ProductItemForSale product = productsForSalesServ.GetById(new ObjectId(item.ProductItemForSaleId));
-            ProductItemForDocument productItemForQuotation = new()
+            ProductSaleBase productItemForQuotation = new()
             {
                 HasCustomerDiscount = item.HasCustomerDiscount,
                 OfferId = item.OfferId,
@@ -123,7 +123,7 @@ public class QuotesController : ControllerBase
             Date = dTO.Date,
             Seller = seller,
             Customer = customer,
-            ProductItems = [.. productItems]
+            Products = [.. productItems]
         };
         var result = quotesServ.Insert(entity);
 
@@ -159,12 +159,12 @@ public class QuotesController : ControllerBase
             entity.Seller = seller;
         }
 
-        List<ProductItemForDocument> productItems = [];
+        List<ProductSaleBase> productItems = [];
 
         foreach (var item in dTO.ProductItems!)
         {
             ProductItemForSale product = productsForSalesServ.GetById(new ObjectId(item.ProductItemForSaleId));
-            ProductItemForDocument productItemForQuotation = new()
+            ProductSaleBase productItemForQuotation = new()
             {
                 HasCustomerDiscount = item.HasCustomerDiscount,
                 OfferId = item.OfferId,
@@ -175,7 +175,7 @@ public class QuotesController : ControllerBase
             productItems.Add(productItemForQuotation);
         }
 
-        entity.ProductItems = [.. productItems];
+        entity.Products = [.. productItems];
 
         var result = quotesServ.Update(entity);
 

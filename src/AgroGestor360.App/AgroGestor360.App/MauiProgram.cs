@@ -1,4 +1,5 @@
 ﻿using AgroGestor360.App.Services;
+using AgroGestor360.App.Tools;
 using AgroGestor360.App.View.Settings;
 using AgroGestor360.App.ViewModels;
 using AgroGestor360.App.Views;
@@ -42,6 +43,7 @@ public static class MauiProgram
             var configuration = serviceProvider.GetService<IConfiguration>();
             var apiService = new ApiService();
             apiService.ConnectToHttpClient();
+            apiService.SetClientDevicePlatform(CurrentDevicePlatform.GetDevicePlatform());
             apiService.SetClientAccessToken(configuration!["License:ClientAccessToken"]!);
             return apiService;
         });
@@ -57,7 +59,10 @@ public static class MauiProgram
         builder.Services.AddSingleton<IProductsForSalesService, ProductsForSalesService>();
         builder.Services.AddSingleton<IQuotesService, QuotesService>();
         builder.Services.AddSingleton<IOrdersService, OrdersService>();
+        builder.Services.AddSingleton<IInvoicesService, InvoicesService>();
         builder.Services.AddSingleton<IFinancialInstrumentTypeService, FinancialInstrumentTypeService>();
+        builder.Services.AddSingleton<IImmediatePaymentTypeService, ImmediatePaymentTypeService>();
+        builder.Services.AddSingleton<ICreditPaymentTypeService, CreditPaymentTypeService>();
         builder.Services.AddSingleton<IMeasurementService, MeasurementService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
 
@@ -89,6 +94,7 @@ public static class MauiProgram
         builder.Services.AddTransient<PgAddEditSeller, PgAddEditSellerViewModel>();
         builder.Services.AddTransient<PgAddEditQuote, PgAddEditQuoteViewModel>();
         builder.Services.AddTransient<PgAddEditOrder, PgAddEditOrderViewModel>();
+        builder.Services.AddTransient<PgAddEditSale, PgAddEditSaleViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();

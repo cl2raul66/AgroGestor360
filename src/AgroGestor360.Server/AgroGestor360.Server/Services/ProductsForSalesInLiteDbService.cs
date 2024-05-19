@@ -11,13 +11,14 @@ public interface IProductsForSalesInLiteDbService
     void BeginTrans();
     void Commit();
     bool Delete(ObjectId id);
+    int DeleteByMerchandiseId(ObjectId merchandiseId);
     IEnumerable<ProductItemForSale> GetAll();
     IEnumerable<ProductItemForSale> GetAllByMerchandiseId(ObjectId merchandiseId);
     ProductItemForSale GetById(ObjectId id);
+    IEnumerable<ProductItemForSale> GetManyById(IEnumerable<ObjectId> ids);
     string Insert(ProductItemForSale entity);
     void Rollback();
     bool Update(ProductItemForSale entity);
-    int DeleteByMerchandiseId(ObjectId merchandiseId);
 }
 
 public class ProductsForSalesInLiteDbService : IProductsForSalesInLiteDbService
@@ -49,6 +50,8 @@ public class ProductsForSalesInLiteDbService : IProductsForSalesInLiteDbService
     public IEnumerable<ProductItemForSale> GetAllByMerchandiseId(ObjectId merchandiseId) => collection.Find(x => x.MerchandiseId == merchandiseId);
 
     public ProductItemForSale GetById(ObjectId id) => collection.FindById(id);
+
+    public IEnumerable<ProductItemForSale> GetManyById(IEnumerable<ObjectId> ids) => collection.Find(x => ids.Contains(x.Id));
 
     public string Insert(ProductItemForSale entity) => collection.Insert(entity).AsObjectId.ToString();
 

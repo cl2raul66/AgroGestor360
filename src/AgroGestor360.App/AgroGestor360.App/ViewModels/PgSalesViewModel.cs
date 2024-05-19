@@ -21,8 +21,9 @@ public partial class PgSalesViewModel : ObservableRecipient
     readonly IReportsService reportsServ;
     readonly IOrdersService ordersServ;
     readonly IAuthService authServ;
+    readonly IInvoicesService invoicesServ;
 
-    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, IAuthService authService)
+    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, IAuthService authService, IInvoicesService invoicesService)
     {
         quotationsServ = quotesService;
         sellersServ = sellersService;
@@ -31,6 +32,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         reportsServ = reportsService;
         ordersServ = ordersService;
         authServ = authService;
+        invoicesServ = invoicesService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
 
         Task.Run(() =>
@@ -55,9 +57,10 @@ public partial class PgSalesViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    void ViewBills()
+    async Task ViewBills()
     {
         IsBillsVisible = true;
+        Invoices = new(await invoicesServ.GetAllAsync(serverURL));
     }
 
     [RelayCommand]
@@ -326,10 +329,106 @@ public partial class PgSalesViewModel : ObservableRecipient
             Orders!.Remove(SelectedOrder);
         }
     }
+
+    [RelayCommand]
+    async Task ShowOrderDetail()
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"No.: {SelectedOrder!.Code}");
+        sb.AppendLine($"Fecha de creación: {SelectedOrder!.Date:dd MMM yyyy}");
+        sb.AppendLine($"Vendedor: {SelectedOrder!.SellerName}");
+        sb.AppendLine($"Cliente: {SelectedOrder!.CustomerName}");
+        sb.AppendLine($"Estado: " + (SelectedOrder!.IsPendingStatus ? "Pendiente" : "Procesando"));
+        sb.AppendLine("");
+        sb.AppendLine("Productos:");
+        var productos = await ordersServ.GetProductItemsByCodeAsync(serverURL, SelectedOrder!.Code!);
+        foreach (var item in productos)
+        {
+            sb.AppendLine(item);
+        }
+        sb.AppendLine("");
+        sb.AppendLine($"Total: {SelectedOrder!.TotalAmount:N2}");
+        await Shell.Current.DisplayAlert("Información", sb.ToString(), "Cerrar");
+        SelectedOrder = null;
+        SelectedQuotation = null;
+    }
     #endregion
 
     #region BILLING
+    [ObservableProperty]
+    ObservableCollection<DTO10>? invoices;
 
+    [ObservableProperty]
+    DTO10? selectedInvoice;
+
+    [RelayCommand]
+    async Task ShowAddEditSale()
+    {
+        IsActive = true;
+        var sellers = await sellersServ.GetAllAsync(serverURL);
+        var customers = await customersServ.GetAllAsync(serverURL);
+        var products = await productsForSalesServ.GetAllAsync(serverURL);
+
+        Dictionary<string, object> sendData = new()
+        {
+            { "sellers", sellers.ToList() },
+            { "customers", customers.ToList()},
+            { "products", products.ToList() }
+        };
+
+        await Shell.Current.GoToAsync(nameof(PgAddEditSale), true, sendData);
+    }
+
+    [RelayCommand]
+    async Task RemovedInvoice()
+    {
+        string[] options = ["Por rechazo del cliente.", "Por error del operador."];
+        bool deletedInInvoice;
+
+        var selectedOption = await Shell.Current.DisplayActionSheet("Seleccione el motivo de la eliminación", "Cancelar", null, options);
+
+        switch (selectedOption)
+        {
+            case "Por rechazo del cliente.":
+               
+                break;
+
+            case "Por error del operador.":
+                string invoiceStatus = SelectedInvoice!.Status switch
+                {
+                    InvoiceStatus.Cancelled => "Cancelada",
+                    InvoiceStatus.Paid => "Pagada",
+                    _ => "Pendiente"
+                };
+                StringBuilder sb = new();
+                sb.AppendLine($"¿Seguro que quiere eliminar la siguiente factura?");
+                sb.AppendLine("");
+                if (!string.IsNullOrEmpty(SelectedInvoice!.NumberFEL))
+                {
+                    sb.AppendLine($"Número FEL: {SelectedInvoice!.NumberFEL}");
+                }
+                sb.AppendLine($"No.: {SelectedInvoice!.Code}");
+                sb.AppendLine($"Estado de la factura: {invoiceStatus}");
+                sb.AppendLine($"Fecha de creación: {SelectedInvoice!.Date:dd MMM yyyy}");
+                sb.AppendLine($"Vendedor: {SelectedInvoice!.SellerName}");
+                sb.AppendLine($"Cliente: {SelectedInvoice!.CustomerName}");
+                sb.AppendLine($"Total: {SelectedInvoice!.TotalAmount:N2}");
+                var pwd = await Shell.Current.DisplayAlert("Eliminar factura", sb.ToString(), "Eliminar", "Cancelar");
+                if (!pwd)
+                {
+                    SelectedOrder = null;
+                    SelectedQuotation = null;
+                    return;
+                }
+
+                var result = await invoicesServ.DeleteAsync(serverURL, SelectedInvoice!.Code!);
+                if (result)
+                {
+                    Invoices!.Remove(SelectedInvoice);
+                }
+                break;
+        }
+    }
     #endregion
 
     protected override void OnActivated()
@@ -387,6 +486,20 @@ public partial class PgSalesViewModel : ObservableRecipient
             ShowAddEditOrderState = false;
         });
 
+        WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_1, string>(this, "addinvoice", async (r, m) =>
+        {
+            IsActive = false;
+            var result = await invoicesServ.InsertAsync(serverURL, m);
+            if (!string.IsNullOrEmpty(result))
+            {
+                r.Invoices ??= [];
+                var invoice = await invoicesServ.GetByCodeAsync(serverURL, result);
+                r.Invoices.Insert(0, invoice!);
+            }
+            r.SelectedOrder = null;
+            r.SelectedQuotation = null;
+        });
+
         WeakReferenceMessenger.Default.Register<PgSalesViewModel, string, string>(this, nameof(PgSalesViewModel), (r, m) =>
         {
             if (m == "cancel")
@@ -417,6 +530,10 @@ public partial class PgSalesViewModel : ObservableRecipient
         IsBusy = true;
         Quotations = new(await quotationsServ.GetAllAsync(serverURL));
         Orders = new(await ordersServ.GetAllAsync(serverURL));
+        if (IsBillsVisible)
+        {
+            Invoices = new(await invoicesServ.GetAllAsync(serverURL));
+        }
         IsBusy = false;
     }
 

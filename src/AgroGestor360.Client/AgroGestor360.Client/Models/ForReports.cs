@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AgroGestor360.Client.Models;
+﻿namespace AgroGestor360.Client.Models;
 
 #region QUOTE
 public class CustomerQuoteReport()

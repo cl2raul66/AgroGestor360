@@ -90,13 +90,14 @@ public class Presentation
 /// <code>
 /// ObjectId [MerchandiseId]
 /// string [MerchandiseName]
-/// double [Quantity]
+/// double [Quantity, Reserved]
 /// Presentation [Packaging]
 /// </code>
 /// </summary>
 public class ArticleItemForWarehouse
 {
     public double Quantity { get; set; }
+    public double Reserved { get; set; }
     public string? MerchandiseName { get; set; }
     public ObjectId? MerchandiseId { get; set; }
     public Presentation? Packaging { get; set; }
@@ -147,6 +148,13 @@ public class ProductOffering
     public double BonusAmount { get; set; }
 }
 
+/// <summary>
+/// Object: BankAccount => Represents a bank account for a ledger record.
+/// <code>
+/// string [Number, BankName, Alias]
+/// FinancialInstrumentType [InstrumentType]
+/// </code>
+/// </summary>
 public class BankAccount
 {
     public string? Number { get; set; }
@@ -155,40 +163,36 @@ public class BankAccount
     public FinancialInstrumentType InstrumentType { get; set; }
 }
 
-public class Sale
-{
-    public ObjectId? Id { get; set; }
-    public List<SaleProduct>? SaleProducts { get; set; }
-    public ObjectId? SellerId { get; set; }
-    public ObjectId? CustomerId { get; set; }
-    public bool IsWithFEL { get; set; }
-    public List<PaymentMethod>? Payments { get; set; }
-}
-
-public abstract class PaymentMethod
+/// <summary>
+/// Object: ImmediatePayment => Represents a payment method for immediate payment.
+/// <code>
+/// double [Amount]
+/// string [ReferenceNo]
+/// ImmediatePaymentType [Type]
+/// </code>
+/// </summary>
+public class ImmediatePayment
 {
     public double Amount { get; set; }
-}
-
-public class ImmediatePayment : PaymentMethod
-{
-    public string? Reference { get; set; }
-    public ObjectId? BankAccountId { get; set; }
+    public string? ReferenceNo { get; set; }
     public ImmediatePaymentType Type { get; set; }
 }
 
-public class CreditPayment : PaymentMethod
+/// <summary>
+/// Object: CreditPayment => Represents a payment method for credit payment.
+/// <code>
+/// double [Amount]
+/// string [ReferenceNo]
+/// int [NumberOfInstallments]
+/// CreditPaymentType [Type]
+/// </code>
+/// </summary>
+public class CreditPayment
 {
-    public CreditPaymentType Type { get; set; }
+    public double Amount { get; set; }
+    public string? ReferenceNo { get; set; }
     public int NumberOfInstallments { get; set; }
-}
-
-public class SaleProduct
-{
-    public ObjectId? ProductId { get; set; }
-    public double Quantity { get; set; }
-    public ObjectId? ProductOfferingId { get; set; }
-    public ObjectId? CustomerDiscountClassId { get; set; }
+    public CreditPaymentType Type { get; set; }
 }
 
 public class Loan
@@ -210,6 +214,13 @@ public class Expense
     public ObjectId? Id { get; set; }
 }
 
+/// <summary>
+/// Object: BankTransaction => Represents a bank transaction for a ledger record.
+/// <code>
+/// ObjectId [BankAccountId]
+/// double [TransactionAmount]
+/// </code>
+/// </summary>
 public class BankTransaction
 {
     public ObjectId? BankAccountId { get; set; }
@@ -217,7 +228,7 @@ public class BankTransaction
 }
 
 /// <summary>
-/// Object: Document
+/// Object: SaleBase => Represents a base class of sale for Quotation, Order and Invoice.
 /// <code>
 /// DateTime [QuotationDate]
 /// Guid [Code]
@@ -226,23 +237,24 @@ public class BankTransaction
 /// Array ProductItemQuotation [ProductItems]
 /// </code>
 /// </summary>
-public abstract class Document
+public abstract class SaleBase
 {
     public DateTime Date { get; set; }
     public Guid Code { get; set; }
     public Seller? Seller { get; set; }
     public Customer? Customer { get; set; }
-    public ProductItemForDocument[]? ProductItems { get; set; }
+    public ProductSaleBase[]? Products { get; set; }
 }
 
 /// <summary>
-/// Object: ProductItemForDocument
+/// Object: ProductSaleBase => Represents a product of base sale.
 /// <code>
 /// int [OfferId]
 /// double [Quantity]
 /// productItemForSale [Product]
+/// </code>
 /// </summary>
-public class ProductItemForDocument
+public class ProductSaleBase
 {
     public bool HasCustomerDiscount { get; set; }
     public int OfferId { get; set; }
@@ -251,7 +263,7 @@ public class ProductItemForDocument
 }
 
 /// <summary>
-/// Object: Quotation
+/// Object: Quotation => Represent a quotation.
 /// <code>
 /// bool [WasDelivered]
 /// DateTime [QuotationDate]
@@ -261,13 +273,13 @@ public class ProductItemForDocument
 /// Array ProductItemForDocument [ProductItems]
 /// </code>
 /// </summary>
-public class Quotation : Document
+public class Quotation : SaleBase
 {
     public QuotationStatus Status { get; set; }
 }
 
 /// <summary>
-/// Object: Order
+/// Object: Order => Represent an order.
 /// <code>
 /// DateTime [QuotationDate]
 /// Guid [Code]
@@ -277,7 +289,29 @@ public class Quotation : Document
 /// OrderStatus [Status]
 /// </code>
 /// </summary>
-public class Order : Document
+public class Order : SaleBase
 {
     public OrderStatus Status { get; set; }
+}
+
+/// <summary>
+/// Object: Invoice => Represent an invoice for a sale.
+/// <code>
+/// DateTime [QuotationDate]
+/// Guid [Code]
+/// Seller [Seller]
+/// Customer [Customer]
+/// Array ProductItemForDocument [ProductItems]
+/// InvoiceStatus [Status]
+/// string [NumberFEL]
+/// ImmediatePayments: Array of immediate payments
+/// CreditsPayments: Array of credit payments
+/// </code>
+/// </summary>
+public class Invoice : SaleBase
+{
+    public InvoiceStatus Status { get; set; }
+    public string? NumberFEL { get; set; }
+    public ImmediatePayment[]? ImmediatePayments { get; set; }
+    public CreditPayment[]? CreditsPayments { get; set; }
 }

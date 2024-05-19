@@ -16,6 +16,7 @@ public interface IArticlesForWarehouseInLiteDbService
     string Insert(ArticleItemForWarehouse entity);
     void Rollback();
     bool Update(ArticleItemForWarehouse entity);
+    bool UpdateMany(ArticleItemForWarehouse[] entity);
 }
 
 public class ArticlesForWarehouseInLiteDbService : IArticlesForWarehouseInLiteDbService
@@ -52,6 +53,26 @@ public class ArticlesForWarehouseInLiteDbService : IArticlesForWarehouseInLiteDb
     public string Insert(ArticleItemForWarehouse entity) => collection.Insert(entity).AsObjectId.ToString();
 
     public bool Update(ArticleItemForWarehouse entity) => collection.Update(entity);
+
+    public bool UpdateMany(ArticleItemForWarehouse[] entity)
+    {
+        db.BeginTrans();
+        List<bool> changed = [];
+        foreach (var item in entity)
+        {
+            try
+            {
+                changed.Add(collection.Update(item));
+            }
+            catch (Exception)
+            {
+                db.Rollback();
+                return false;
+            }
+        }
+        db.Commit();
+        return changed.Count(x => x) == entity.Length;
+    }
 
     public bool Delete(ObjectId id) => collection.Delete(id);
 }

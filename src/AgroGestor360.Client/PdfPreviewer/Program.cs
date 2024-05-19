@@ -19,7 +19,7 @@ if (SelectedQuotation is null)
     return;
 }
 
-string title = $"{SelectedQuotation.QuotationDate:yyyyMMdd} - Cotización de {SelectedQuotation.TotalAmount:F2} para {SelectedQuotation.CustomerName}";
+string title = $"{SelectedQuotation.Date:yyyyMMdd} - Cotización de {SelectedQuotation.TotalAmount:F2} para {SelectedQuotation.CustomerName}";
 Console.WriteLine($"El titulo del fichero sera este: {title}");
 
 string cacheDirectory = Path.GetTempPath();

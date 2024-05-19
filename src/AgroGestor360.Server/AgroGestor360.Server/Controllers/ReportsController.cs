@@ -32,7 +32,7 @@ public class ReportsController : ControllerBase
             var quotation = quotesServ.GetById(new Guid(code));
 
             List<CustomerQuoteReport.Product> products = [];
-            foreach (var p in quotation.ProductItems!)
+            foreach (var p in quotation.Products!)
             {
                 CustomerQuoteReport.Product productItem = new()
                 {

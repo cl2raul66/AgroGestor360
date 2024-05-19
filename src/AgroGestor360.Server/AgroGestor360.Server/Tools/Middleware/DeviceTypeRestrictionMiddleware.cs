@@ -13,10 +13,16 @@ public class DeviceTypeRestrictionMiddleware(RequestDelegate next, IConfiguratio
         var userAgent = context.Request.Headers.UserAgent.ToString();
         var token = context.Request.Headers["ClientAccessToken"].ToString();
 
+        // Registra la dirección IP y el sistema operativo
+        Console.WriteLine($"Dirección IP: {connection.RemoteIpAddress}");
+        Console.WriteLine($"Sistema operativo: {(userAgent.Contains("Windows") ? "Windows" : (userAgent.Contains("Android") ? "Android" : "Desconocido"))}");
+
+
         if (token != clientAccessToken)
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             await context.Response.WriteAsync("Token de acceso a clientes inválido.");
+            Console.WriteLine("Resultado: Solo se permite un cliente PC local."); // Registra el resultado
             return;
         }
 
@@ -26,6 +32,7 @@ public class DeviceTypeRestrictionMiddleware(RequestDelegate next, IConfiguratio
             {
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
                 await context.Response.WriteAsync("Solo se permite un cliente PC local.");
+                Console.WriteLine("Resultado: Solo se permiten clientes Android no locales."); // Registra el resultado
                 return;
             }
         }
@@ -37,6 +44,7 @@ public class DeviceTypeRestrictionMiddleware(RequestDelegate next, IConfiguratio
         }
 
         await _next(context);
+        Console.WriteLine("Resultado: Solicitud pasó la verificación."); // Registra el resultado si la solicitud pasó la verificación
     }
 }
 

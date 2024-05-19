@@ -36,5 +36,6 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(PgSales), typeof(PgSales));
         Routing.RegisterRoute(nameof(PgAddEditQuote), typeof(PgAddEditQuote));
         Routing.RegisterRoute(nameof(PgAddEditOrder), typeof(PgAddEditOrder));
+        Routing.RegisterRoute(nameof(PgAddEditSale), typeof(PgAddEditSale));
     }
 }

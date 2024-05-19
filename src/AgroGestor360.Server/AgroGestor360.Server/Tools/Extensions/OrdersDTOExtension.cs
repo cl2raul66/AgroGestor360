@@ -20,7 +20,7 @@ public static class OrdersDTOExtension
             TotalAmount = 0,
         };
         double totalAmount = 0;
-        foreach (var pi in entity.ProductItems!)
+        foreach (var pi in entity.Products!)
         {
             double itemPrice = pi.Product!.ArticlePrice;
             if (pi.HasCustomerDiscount)

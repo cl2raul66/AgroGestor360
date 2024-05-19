@@ -21,7 +21,11 @@
         <Frame Grid.Row="1" VerticalOptions="Center">
             <VerticalStackLayout Spacing="16">
                 <HorizontalStackLayout Spacing="16">
-                    <Image MaximumHeightRequest="270" Source="signin.png" />
+                    <Image
+                        IsVisible="{OnIdiom Phone='False',
+                                            Default='True'}"
+                        MaximumHeightRequest="270"
+                        Source="signin.png" />
                     <VerticalStackLayout MinimumWidthRequest="300" Spacing="16">
                         <Grid RowDefinitions="auto,auto" RowSpacing="4">
                             <Label Text="Usuario:" />

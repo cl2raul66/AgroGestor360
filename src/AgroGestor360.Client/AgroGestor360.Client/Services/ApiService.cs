@@ -1,16 +1,16 @@
 ﻿using AgroGestor360.Client.Tools.Helpers;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Net;
-using System.Runtime.InteropServices;
 
 namespace AgroGestor360.Client.Services;
 
 public interface IApiService
 {
     Task<bool> CheckUrl(string serverURL);
-    Task<bool> ConnectToServerHub(string serverURL);
-    void SetClientAccessToken(string clientaccesstoken);
     void ConnectToHttpClient();
+    Task<bool> ConnectToServerHub(string serverURL);
+    void SetClientAccessToken(string accessToken);
+    void SetClientDevicePlatform(string os);
 }
 
 public class ApiService : IApiService
@@ -21,8 +21,11 @@ public class ApiService : IApiService
         {
             Timeout = TimeSpan.FromSeconds(30)
         };
+    }
 
-        ApiServiceBase.ProviderHttpClient.DefaultRequestHeaders.UserAgent.ParseAdd(RuntimeInformation.OSDescription);
+    public void SetClientDevicePlatform(string os)
+    {
+        ApiServiceBase.ProviderHttpClient!.DefaultRequestHeaders.UserAgent.ParseAdd(os);
     }
 
     public void SetClientAccessToken(string accessToken)
@@ -60,7 +63,9 @@ public class ApiService : IApiService
                     .WithUrl($"{serverURL}/serverStatusHub", options =>
                     {
                         options.Headers.Add("ClientAccessToken", ApiServiceBase.ProviderHttpClient!.DefaultRequestHeaders.GetValues("ClientAccessToken").First());
-                        options.Headers.Add("UserAgent", RuntimeInformation.OSDescription);
+                        //options.Headers.Add("UserAgent", RuntimeInformation.OSDescription);
+                        var userAgent = ApiServiceBase.ProviderHttpClient.DefaultRequestHeaders.UserAgent.ToString();
+                        options.Headers.Add("UserAgent", userAgent);
                     })
                     .WithAutomaticReconnect(new RetryPolicy())
                     .Build();

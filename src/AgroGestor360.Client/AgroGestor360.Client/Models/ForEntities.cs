@@ -20,21 +20,6 @@ public class Organization
 }
 
 /// <summary>
-/// BankAccount: Represents a bank account.
-/// <code>
-/// string [Number, BankName, Alias]
-/// FinancialInstrumentType [InstrumentType]
-/// </code>
-/// </summary>
-public class BankAccount
-{
-    public string? Number { get; set; }
-    public string? BankName { get; set; }
-    public string? Alias { get; set; }
-    public FinancialInstrumentType InstrumentType { get; set; }
-}
-
-/// <summary>
 /// Represents a presentation.
 /// </summary>
 public class Presentation
@@ -64,6 +49,53 @@ public class CustomerDiscountClass
     public double Value { get; set; }
 }
 
+/// <summary>
+/// Object: BankAccount => Represents a bank account for a ledger record.
+/// <code>
+/// string [Number, BankName, Alias]
+/// FinancialInstrumentType [InstrumentType]
+/// </code>
+/// </summary>
+public class BankAccount
+{
+    public string? Number { get; set; }
+    public string? BankName { get; set; }
+    public string? Alias { get; set; }
+    public FinancialInstrumentType InstrumentType { get; set; }
+}
+
+/// <summary>
+/// Object: ImmediatePayment => Represents a payment method for immediate payment.
+/// <code>
+/// double [Amount]
+/// string [ReferenceNo]
+/// ImmediatePaymentType [Type]
+/// </code>
+/// </summary>
+public class ImmediatePayment
+{
+    public double Amount { get; set; }
+    public string? ReferenceNo { get; set; }
+    public ImmediatePaymentType Type { get; set; }
+}
+
+/// <summary>
+/// Object: CreditPayment => Represents a payment method for credit payment.
+/// <code>
+/// double [Amount]
+/// string [ReferenceNo]
+/// int [NumberOfInstallments]
+/// CreditPaymentType [Type]
+/// </code>
+/// </summary>
+public class CreditPayment
+{
+    public double Amount { get; set; }
+    public string? ReferenceNo { get; set; }
+    public int NumberOfInstallments { get; set; }
+    public CreditPaymentType Type { get; set; }
+}
+
 #region Merchandise
 /// <summary>
 /// Represents a merchandise item for GET, POST and PUT operations.
@@ -88,7 +120,7 @@ public class DTO1
 /// <code>
 /// string [MerchandiseId, MerchandiseName]
 /// Presentation [Packaging]
-/// double [Quantity]
+/// double [Quantity, Reserved]
 /// </code>
 /// </summary>
 public class DTO2
@@ -97,21 +129,147 @@ public class DTO2
     public string? MerchandiseName { get; set; }
     public Presentation? Packaging { get; set; }
     public double Quantity { get; set; }
+    public double Reserved { get; set; }
 }
 
 /// <summary>
 /// Represents a article item of warehouse for PUT 
 /// <code>
 /// string [MerchandiseId]
-/// double [Quantity]
+/// double [Quantity, Reserved]
 /// </code>
 /// </summary>
 public class DTO2_1
 {
     public string? MerchandiseId { get; set; }
     public double Quantity { get; set; }
+    public double Reserved { get; set; }
 }
 #endregion
+
+#region Customer
+/// <summary>
+/// Represents a customer for GET.
+/// <code>
+/// string [CustomerId, CustomerName]
+/// CustomerDiscountClass [Discount]
+/// </code>
+/// </summary>
+public class DTO5_1
+{
+    public string? CustomerId { get; set; }
+    public string? CustomerName { get; set; }
+    public CustomerDiscountClass? Discount { get; set; }
+}
+
+/// <summary>
+/// Represents a customer for POST.
+/// <code>
+/// DateTime [Birthday]
+/// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName]
+/// CustomerDiscountClass [Discount]
+/// </code>
+/// </summary>
+public class DTO5_2
+{
+    public DateTime? Birthday { get; set; }
+    public string? CustomerFullName { get; set; }
+    public string? CustomerAddress { get; set; }
+    public string? CustomerPhone { get; set; }
+    public string? CustomerMail { get; set; }
+    public string? CustomerNIT { get; set; }
+    public string? CustomerNIP { get; set; }
+    public string? CustomerOccupation { get; set; }
+    public string? CustomerOrganizationName { get; set; }
+    public CustomerDiscountClass? Discount { get; set; }
+}
+
+/// <summary>
+/// Represents a customer for GET by id and PUT for customer and discount.
+/// <code>
+/// DateTime [Birthday]
+/// string [CustomerId, CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName]
+/// CustomerDiscountClass [Discount]
+/// </code>
+/// </summary>
+public class DTO5_3
+{
+    public DateTime? Birthday { get; set; }
+    public string? CustomerId { get; set; }
+    public string? CustomerFullName { get; set; }
+    public string? CustomerAddress { get; set; }
+    public string? CustomerPhone { get; set; }
+    public string? CustomerMail { get; set; }
+    public string? CustomerNIT { get; set; }
+    public string? CustomerNIP { get; set; }
+    public string? CustomerOccupation { get; set; }
+    public string? CustomerOrganizationName { get; set; }
+    public CustomerDiscountClass? Discount { get; set; }
+}
+
+/// <summary>
+/// Represents a customer for PUT by discount.
+/// <code>
+/// string [CustomerId]
+/// int [DiscountId]
+/// </code>
+/// </summary>
+public class DTO5_4
+{
+    public string? CustomerId { get; set; }
+    public int DiscountId { get; set; }
+}
+#endregion
+
+#region Sellers
+/// <summary>
+/// Represents a seller for GET.
+/// string [Id, FullName]
+/// </summary>
+public class DTO6
+{
+    public string? Id { get; set; }
+    public string? FullName { get; set; }
+}
+
+/// <summary>
+/// Represents a seller for POST.
+/// DateTime [Birthday]
+/// string [FullName, Address, Phone, Mail, NIT, NIP, Occupation]
+/// </summary>
+public class DTO6_1
+{
+    public DateTime? Birthday { get; set; }
+    public string? FullName { get; set; }
+    public string? Address { get; set; }
+    public string? Phone { get; set; }
+    public string? Mail { get; set; }
+    public string? NIT { get; set; }
+    public string? NIP { get; set; }
+    public string? Occupation { get; set; }
+}
+
+/// <summary>
+/// Represents a seller for Get by Id and PUT.
+/// <code>
+/// DateTime [Birthday]
+/// string [Id, FullName, Address, Phone, Mail, NIT, NIP, Occupation]
+/// </code>
+/// </summary>
+public class DTO6_2
+{
+    public DateTime? Birthday { get; set; }
+    public string? Id { get; set; }
+    public string? FullName { get; set; }
+    public string? Address { get; set; }
+    public string? Phone { get; set; }
+    public string? Mail { get; set; }
+    public string? NIT { get; set; }
+    public string? NIP { get; set; }
+    public string? Occupation { get; set; }
+}
+#endregion
+
 
 #region Sales
 /// <summary>
@@ -354,7 +512,7 @@ public class DTO8_2
 /// OrderStatus [Status]
 /// </code>
 /// </summary>
-public class DTO8_3
+public class DTO10_2
 {
     public string? Code { get; set; }
     public DTO9[]? ProductItems { get; set; }
@@ -394,127 +552,62 @@ public class DTO9
     public double Quantity { get; set; }
     public string? ProductItemForSaleId { get; set; }
 }
-#endregion
 
-#region Customer
 /// <summary>
-/// Represents a customer for GET.
+/// Represents a invoice of GET method for invoice with credit payment type.
 /// <code>
-/// string [CustomerId, CustomerName]
-/// CustomerDiscountClass [Discount]
+/// Paid: Amount paid
+/// DaysRemaining: Days remaining to pay
+/// TotalAmount: Total amount of the invoice
+/// Date: Date of the invoice
+/// Code: Code of the invoice and key in database
+/// SellerId: Id of the seller
+/// SellerName: Name of the seller
+/// CustomerId: Id of the customer
+/// CustomerName: Name of the customer
+/// NumberFEL: Number of the invoice in FEL
+/// Status: Status of the invoice
 /// </code>
 /// </summary>
-public class DTO5_1
+public class DTO10
 {
+    public double Paid { get; set; }
+    public int DaysRemaining { get; set; }
+    public double TotalAmount { get; set; }
+    public DateTime Date { get; set; }
+    public string? Code { get; set; }
+    public string? SellerId { get; set; }
+    public string? SellerName { get; set; }
     public string? CustomerId { get; set; }
     public string? CustomerName { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
+    public string? NumberFEL { get; set; }
+    public InvoiceStatus Status { get; set; }
 }
 
 /// <summary>
-/// Represents a customer for POST.
+/// Represents a invoice for POST
 /// <code>
-/// DateTime [Birthday]
-/// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName]
-/// CustomerDiscountClass [Discount]
+/// Date: Date of the invoice
+/// Code: Code of the invoice and key in database
+/// SellerId: Id of the seller
+/// CustomerId: Id of the customer
+/// NumberFEL: Number of the invoice in FEL
+/// Status: Status of the invoice
+/// Products: Array of products
+/// ImmediatePayments: Array of immediate payments
+/// CreditsPayments: Array of credit payments
 /// </code>
 /// </summary>
-public class DTO5_2
+public class DTO10_1
 {
-    public DateTime? Birthday { get; set; }
-    public string? CustomerFullName { get; set; }
-    public string? CustomerAddress { get; set; }
-    public string? CustomerPhone { get; set; }
-    public string? CustomerMail { get; set; }
-    public string? CustomerNIT { get; set; }
-    public string? CustomerNIP { get; set; }
-    public string? CustomerOccupation { get; set; }
-    public string? CustomerOrganizationName { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
-}
-
-/// <summary>
-/// Represents a customer for GET by id and PUT for customer and discount.
-/// <code>
-/// DateTime [Birthday]
-/// string [CustomerId, CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName]
-/// CustomerDiscountClass [Discount]
-/// </code>
-/// </summary>
-public class DTO5_3
-{
-    public DateTime? Birthday { get; set; }
+    public DateTime Date { get; set; }
+    public string? Code { get; set; }
+    public string? SellerId { get; set; }
     public string? CustomerId { get; set; }
-    public string? CustomerFullName { get; set; }
-    public string? CustomerAddress { get; set; }
-    public string? CustomerPhone { get; set; }
-    public string? CustomerMail { get; set; }
-    public string? CustomerNIT { get; set; }
-    public string? CustomerNIP { get; set; }
-    public string? CustomerOccupation { get; set; }
-    public string? CustomerOrganizationName { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
-}
-
-/// <summary>
-/// Represents a customer for PUT by discount.
-/// <code>
-/// string [CustomerId]
-/// int [DiscountId]
-/// </code>
-/// </summary>
-public class DTO5_4
-{
-    public string? CustomerId { get; set; }
-    public int DiscountId { get; set; }
-}
-#endregion
-
-#region Sellers
-/// <summary>
-/// Represents a seller for GET.
-/// string [Id, FullName]
-/// </summary>
-public class DTO6
-{
-    public string? Id { get; set; }
-    public string? FullName { get; set; }
-}
-
-/// <summary>
-/// Represents a seller for POST.
-/// DateTime [Birthday]
-/// string [FullName, Address, Phone, Mail, NIT, NIP, Occupation]
-/// </summary>
-public class DTO6_1
-{
-    public DateTime? Birthday { get; set; }
-    public string? FullName { get; set; }
-    public string? Address { get; set; }
-    public string? Phone { get; set; }
-    public string? Mail { get; set; }
-    public string? NIT { get; set; }
-    public string? NIP { get; set; }
-    public string? Occupation { get; set; }
-}
-
-/// <summary>
-/// Represents a seller for Get by Id and PUT.
-/// <code>
-/// DateTime [Birthday]
-/// string [Id, FullName, Address, Phone, Mail, NIT, NIP, Occupation]
-/// </code>
-/// </summary>
-public class DTO6_2
-{
-    public DateTime? Birthday { get; set; }
-    public string? Id { get; set; }
-    public string? FullName { get; set; }
-    public string? Address { get; set; }
-    public string? Phone { get; set; }
-    public string? Mail { get; set; }
-    public string? NIT { get; set; }
-    public string? NIP { get; set; }
-    public string? Occupation { get; set; }
+    public string? NumberFEL { get; set; }
+    public InvoiceStatus Status { get; set; }
+    public DTO9[]? Products { get; set; }
+    public ImmediatePayment[]? ImmediatePayments { get; set; }
+    public CreditPayment[]? CreditsPayments { get; set; }
 }
 #endregion

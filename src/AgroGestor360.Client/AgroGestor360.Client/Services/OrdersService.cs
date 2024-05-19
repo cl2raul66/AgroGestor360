@@ -12,10 +12,11 @@ public interface IOrdersService
     Task<IEnumerable<DTO8>> GetAllAsync(string serverURL);
     Task<DTO8?> GetByCodeAsync(string serverURL, string code);
     Task<DTO8_4?> GetDTO8_4FromQuotationAsync(string serverURL, DTO7 dTO);
+    Task<IEnumerable<string>> GetProductItemsByCodeAsync(string serverURL, string code);
     Task<string> InsertAsync(string serverURL, DTO8_1 dTO);
     Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO);
     Task<bool> UpdateAsync(string serverURL, DTO8_2 dTO);
-    Task<bool> UpdateByProductsAndStatus(string serverURL, DTO8_3 dTO);
+    Task<bool> UpdateByProductsAndStatus(string serverURL, DTO10_2 dTO);
 }
 
 public class OrdersService : IOrdersService
@@ -96,6 +97,28 @@ public class OrdersService : IOrdersService
         return null;
     }
 
+    public async Task<IEnumerable<string>> GetProductItemsByCodeAsync(string serverURL, string code)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/orders/getproductitemsbycode/{code}");
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.NotFound:
+                case HttpStatusCode.BadRequest:
+                    return [];
+                default:
+                    response.EnsureSuccessStatusCode();
+                    break;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<string>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+        }
+        return [];
+    }
+
     public async Task<string> InsertAsync(string serverURL, DTO8_1 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
@@ -144,7 +167,7 @@ public class OrdersService : IOrdersService
         return false;
     }
 
-    public async Task<bool> UpdateByProductsAndStatus(string serverURL, DTO8_3 dTO)
+    public async Task<bool> UpdateByProductsAndStatus(string serverURL, DTO10_2 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {

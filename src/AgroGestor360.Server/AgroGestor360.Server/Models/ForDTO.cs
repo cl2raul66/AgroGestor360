@@ -1,6 +1,7 @@
 ﻿// Ignore Spelling: DTO
 
 using AgroGestor360.Server.Tools.Enums;
+using System.Text.Json;
 
 namespace AgroGestor360.Server.Models;
 
@@ -28,7 +29,7 @@ public class DTO1
 /// <code>
 /// string [MerchandiseId, MerchandiseName]
 /// Presentation [Packaging]
-/// double [Quantity]
+/// double [Quantity, Reserved]
 /// </code>
 /// </summary>
 public class DTO2
@@ -37,19 +38,21 @@ public class DTO2
     public string? MerchandiseName { get; set; }
     public Presentation? Packaging { get; set; }
     public double Quantity { get; set; }
+    public double Reserved { get; set; }
 }
 
 /// <summary>
 /// Represents a article item of warehouse for PUT 
 /// <code>
 /// string [MerchandiseId]
-/// double [Quantity]
+/// double [Quantity, Reserved]
 /// </code>
 /// </summary>
 public class DTO2_1
 {
     public string? MerchandiseId { get; set; }
     public double Quantity { get; set; }
+    public double Reserved { get; set; }
 }
 #endregion
 
@@ -350,6 +353,72 @@ public class DTO9
     public double Quantity { get; set; }
     public string? ProductItemForSaleId { get; set; }
 }
+
+/// <summary>
+/// Represents a invoice of GET method for invoice with credit payment type.
+/// <code>
+/// Paid: Amount paid
+/// DaysRemaining: Days remaining to pay
+/// TotalAmount: Total amount of the invoice
+/// Date: Date of the invoice
+/// Code: Code of the invoice and key in database
+/// SellerId: Id of the seller
+/// SellerName: Name of the seller
+/// CustomerId: Id of the customer
+/// CustomerName: Name of the customer
+/// NumberFEL: Number of the invoice in FEL
+/// Status: Status of the invoice
+/// </code>
+/// </summary>
+public class DTO10
+{
+    public double Paid { get; set; }
+    public int DaysRemaining { get; set; }
+    public double TotalAmount { get; set; }
+    public DateTime Date { get; set; }
+    public string? Code { get; set; }
+    public string? SellerId { get; set; }
+    public string? SellerName { get; set; }
+    public string? CustomerId { get; set; }
+    public string? CustomerName { get; set; }
+    public string? NumberFEL { get; set; }
+    public InvoiceStatus Status { get; set; }
+}
+
+/// <summary>
+/// Represents a invoice for POST
+/// <code>
+/// Date: Date of the invoice
+/// Code: Code of the invoice and key in database
+/// SellerId: Id of the seller
+/// CustomerId: Id of the customer
+/// NumberFEL: Number of the invoice in FEL
+/// Status: Status of the invoice
+/// Products: Array of products
+/// ImmediatePayments: Array of immediate payments
+/// CreditsPayments: Array of credit payments
+/// </code>
+/// </summary>
+public class DTO10_1
+{
+    public DateTime Date { get; set; }
+    public string? Code { get; set; }
+    public string? SellerId { get; set; }
+    public string? CustomerId { get; set; }
+    public string? NumberFEL { get; set; }
+    public InvoiceStatus Status { get; set; }
+    public DTO9[]? Products { get; set; }
+    public ImmediatePayment[]? ImmediatePayments { get; set; }
+    public CreditPayment[]? CreditsPayments { get; set; }
+}
+
+public class DTO10_2
+{
+    public DateTime Date { get; set; }
+    public string? Code { get; set; }
+    public ImmediatePayment? ImmediateMethod { get; set; }
+    public CreditPayment? CreditPaymentMethod { get; set; }
+}
 #endregion
 
 #region Customer
@@ -428,7 +497,6 @@ public class DTO5_4
 /// <para>
 /// string [Id, FullName]
 /// </para>
-/// </summary>
 /// </summary>
 public class DTO6
 {

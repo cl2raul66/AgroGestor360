@@ -51,7 +51,7 @@ public class MerchandiseInLiteDbService : IMerchandiseInLiteDbService
 
     public string Insert(MerchandiseItem entity) => collection.Insert(entity).AsObjectId.ToString();
 
-    public bool Update(MerchandiseItem entity) => collection.Update(entity);
+    public bool Update(MerchandiseItem entity) => collection.Update(entity);    
 
     public bool Delete(ObjectId id) => collection.Delete(id);
 }
