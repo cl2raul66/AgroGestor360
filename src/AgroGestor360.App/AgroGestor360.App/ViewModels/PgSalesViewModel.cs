@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 
 namespace AgroGestor360.App.ViewModels;
@@ -42,7 +43,12 @@ public partial class PgSalesViewModel : ObservableRecipient
                 File.Delete(f);
             }
         });
+
+        AppInfo = $"{Assembly.GetExecutingAssembly().GetName().Name} V.{VersionTracking.Default.CurrentVersion}";
     }
+
+    [ObservableProperty]
+    string? appInfo;
 
     [ObservableProperty]
     bool isBusy;
@@ -383,16 +389,16 @@ public partial class PgSalesViewModel : ObservableRecipient
     async Task RemovedInvoice()
     {
         string[] options = ["Por rechazo del cliente.", "Por error del operador."];
-        bool deletedInInvoice;
+        bool deletedInInvoice = false;
 
         var selectedOption = await Shell.Current.DisplayActionSheet("Seleccione el motivo de la eliminación", "Cancelar", null, options);
 
         switch (selectedOption)
         {
             case "Por rechazo del cliente.":
-               
+                DTO10_3 dTO = new() { Code = SelectedInvoice!.Code, Status = InvoiceStatus.Cancelled };
+                deletedInInvoice = await invoicesServ.UpdateState(serverURL, dTO);
                 break;
-
             case "Por error del operador.":
                 string invoiceStatus = SelectedInvoice!.Status switch
                 {
@@ -421,13 +427,26 @@ public partial class PgSalesViewModel : ObservableRecipient
                     return;
                 }
 
-                var result = await invoicesServ.DeleteAsync(serverURL, SelectedInvoice!.Code!);
-                if (result)
-                {
-                    Invoices!.Remove(SelectedInvoice);
-                }
+                deletedInInvoice = await invoicesServ.DeleteAsync(serverURL, SelectedInvoice!.Code!);
                 break;
         }
+        if (deletedInInvoice)
+        {
+            Invoices!.Remove(SelectedInvoice!);
+        }
+    }
+
+    [RelayCommand]
+    async Task ShowAmortizeInvoice()
+    {
+        IsActive = true;
+
+        Dictionary<string, object> sendData = new()
+        {
+            { "currentInvoice", SelectedInvoice! }
+        };
+
+        await Shell.Current.GoToAsync(nameof(PgAmortizeInvoiceCredit), true, sendData);
     }
     #endregion
 
@@ -500,12 +519,35 @@ public partial class PgSalesViewModel : ObservableRecipient
             r.SelectedQuotation = null;
         });
 
+        WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_2, string>(this, "setdepreciation", async (r, m) =>
+        {
+            IsActive = false;
+            var result = await invoicesServ.DepreciationUpdate(serverURL, m);
+            if (result)
+            {
+                r.Invoices ??= [];
+                var invoice = await invoicesServ.GetByCodeAsync(serverURL, m.Code!);
+                if (invoice is null)
+                {
+                    r.Invoices.Remove(r.SelectedInvoice!);
+                }
+                else
+                {
+                    var idx = r.Invoices.IndexOf(r.SelectedInvoice!);
+                    r.Invoices[idx] = invoice;
+                }
+            }
+            r.SelectedOrder = null;
+            r.SelectedQuotation = null;
+        });
+
         WeakReferenceMessenger.Default.Register<PgSalesViewModel, string, string>(this, nameof(PgSalesViewModel), (r, m) =>
         {
             if (m == "cancel")
             {
                 r.SelectedOrder = null;
                 r.SelectedQuotation = null;
+                r.SelectedInvoice = null;
                 IsActive = false;
             }
             ShowAddEditOrderState = false;

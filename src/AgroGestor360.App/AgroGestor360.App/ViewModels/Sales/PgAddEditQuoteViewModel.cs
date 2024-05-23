@@ -1,5 +1,4 @@
 ﻿using AgroGestor360.App.Models;
-using AgroGestor360.App.Views.Sales;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using AgroGestor360.Client.Tools;

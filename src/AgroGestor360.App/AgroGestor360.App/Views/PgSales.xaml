@@ -594,16 +594,35 @@
                                         <HorizontalStackLayout Spacing="8">
                                             <Label
                                                 FontAttributes="Bold"
-                                                IsVisible="{Binding DaysRemaining, Converter={ctk:IntToBoolConverter}}"
                                                 Text="{Binding DaysRemaining, StringFormat='Vence en {0} días'}"
                                                 TextColor="{StaticResource White}"
-                                                TextTransform="Uppercase" />
+                                                TextTransform="Uppercase">
+                                                <Label.Triggers>
+                                                    <DataTrigger
+                                                        Binding="{Binding DaysRemaining}"
+                                                        TargetType="Label"
+                                                        Value="0">
+                                                        <Setter Property="Text" Value="PAGO AL CONTADO" />
+                                                        <Setter Property="TextColor" Value="{StaticResource White}" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
                                         </HorizontalStackLayout>
                                         <Label
                                             Grid.Column="1"
                                             FontAttributes="Bold"
-                                            Text="{Binding Paid, StringFormat='PAGADO: {0:N2}'}"
-                                            TextColor="{StaticResource White}" />
+                                            Text="{Binding Paid, StringFormat='PAGADO: {0:N2}', TargetNullValue='NO PAGADA', FallbackValue='NO PAGADA'}"
+                                            TextColor="{StaticResource White}">
+                                            <Label.Triggers>
+                                                <DataTrigger
+                                                    Binding="{Binding Paid}"
+                                                    TargetType="Label"
+                                                    Value="0">
+                                                    <Setter Property="Text" Value="NO PAGADA" />
+                                                    <Setter Property="TextColor" Value="{StaticResource Secondary}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
                                     </Grid>
                                 </Grid>
                             </Border>
@@ -613,11 +632,29 @@
             </ScrollView>
             <Frame Grid.Row="2" Padding="8">
                 <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <HorizontalStackLayout Spacing="8">
+                        <Button
+                            FontFamily="icofont"
+                            IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                            Text="{StaticResource UiNote}"
+                            ToolTipProperties.Text="Ver detalles del pedido seleccionado." />
+                    </HorizontalStackLayout>
                     <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                        <!--<BoxView
+                        <Button
+                            FontFamily="icofont"
+                            IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                            Text="{StaticResource BillAlt}"
+                            ToolTipProperties.Text="Pagar factura seleccionada" />
+                        <Button
+                            Command="{Binding ShowAmortizeInvoiceCommand}"
+                            FontFamily="icofont"
+                            IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                            Text="{StaticResource MoneyBag}"
+                            ToolTipProperties.Text="Amortizacion para credito de la factura seleccionada." />
+                        <BoxView
                             BackgroundColor="{StaticResource Gray300}"
                             CornerRadius="2"
-                            WidthRequest="2" />-->
+                            WidthRequest="2" />
                         <Button
                             Command="{Binding ShowAddEditSaleCommand}"
                             FontFamily="icofont"
@@ -628,19 +665,35 @@
                             FontFamily="icofont"
                             IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                             Text="{StaticResource UiDelete}"
-                            ToolTipProperties.Text="Eliminar" />
+                            ToolTipProperties.Text="Eliminar o cancelar factura" />
                     </HorizontalStackLayout>
                 </Grid>
             </Frame>
         </Grid>
         <!--#endregion-->
         <!--#endregion-->
-        <Label
+        <!--#region PIE DE PAGINA-->
+        <Grid
             Grid.Row="2"
-            Padding="8"
-            FontSize="11"
-            HorizontalOptions="Center"
-            Text="by RandA Media Lab, Group" />
+            Padding="8,0"
+            ColumnDefinitions="*,auto"
+            ColumnSpacing="8">
+            <HorizontalStackLayout
+                Grid.Column="1"
+                Padding="8"
+                Spacing="4">
+                <Label FontSize="11" Text="{Binding AppInfo}" />
+                <BoxView
+                    BackgroundColor="{StaticResource Tertiary}"
+                    CornerRadius="1"
+                    WidthRequest="1" />
+                <Label
+                    Grid.Column="1"
+                    FontSize="11"
+                    Text="by RandA Media Lab, Group" />
+            </HorizontalStackLayout>
+        </Grid>
+        <!--#endregion-->
     </Grid>
 
 </ContentPage>

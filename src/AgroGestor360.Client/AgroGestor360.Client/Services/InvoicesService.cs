@@ -12,7 +12,8 @@ public interface IInvoicesService
     Task<IEnumerable<DTO10>> GetAllAsync(string serverURL);
     Task<DTO10?> GetByCodeAsync(string serverURL, string code);
     Task<string> InsertAsync(string serverURL, DTO10_1 dTO);
-    Task<bool> UpdateByPaymentMethod(string serverURL, DTO10_2 dTO);
+    Task<bool> DepreciationUpdate(string serverURL, DTO10_2 dTO);
+    Task<bool> UpdateState(string serverURL, DTO10_3 dTO);
 }
 
 public class InvoicesService : IInvoicesService
@@ -92,14 +93,28 @@ public class InvoicesService : IInvoicesService
         return string.Empty;
     }
 
-    public async Task<bool> UpdateByPaymentMethod(string serverURL, DTO10_2 dTO)
+    public async Task<bool> DepreciationUpdate(string serverURL, DTO10_2 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/invoices/UpdateByPaymentMethod", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/invoices/depreciationupdate", content);
+
+            return response.IsSuccessStatusCode;
+        }
+        return false;
+    }
+
+    public async Task<bool> UpdateState(string serverURL, DTO10_3 dTO)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/invoices/updatestate", content);
 
             return response.IsSuccessStatusCode;
         }

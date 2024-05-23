@@ -2,6 +2,7 @@
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Reflection;
 
 namespace AgroGestor360.App.ViewModels;
 
@@ -15,7 +16,11 @@ public partial class PgHomeViewModel : ObservableRecipient
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         apiServ = apiService;
         CheckUrl();
+        AppInfo = $"{Assembly.GetExecutingAssembly().GetName().Name} V.{VersionTracking.Default.CurrentVersion}";
     }
+
+    [ObservableProperty]
+    string? appInfo;
 
     [ObservableProperty]
     bool serverConnected;

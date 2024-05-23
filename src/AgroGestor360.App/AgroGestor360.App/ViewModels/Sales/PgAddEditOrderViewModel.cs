@@ -368,7 +368,6 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
     }
 
     #region EXTRA
-    // todo: no se puede modificar vendedor ni cliente una vez introducido el primer producto, se debe limpiar la lista de productos para poder modificar. recordar que se debe validar que el producto no se repita en la lista y que la cantidad sea mayor a 0, ademas de agregar botones para modificar tanto el cliente como el vendedor
 
     private void UpdateTotalQuote()
     {

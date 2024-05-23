@@ -18,6 +18,8 @@ public class ReportsService : IReportsService
 {
     public ReportsService()
     {
+        QuestPDF.Settings.EnableCaching = true;
+        QuestPDF.Settings.EnableDebugging = true;
         QuestPDF.Settings.License = LicenseType.Community;
     }
 
@@ -26,8 +28,8 @@ public class ReportsService : IReportsService
         if (!string.IsNullOrWhiteSpace(serverURL) && !string.IsNullOrWhiteSpace(code))
         {
             var customerQuoteReport = await GetCustomerQuoteReport(serverURL, code);
-
             IDocument document = new QuoteDocument(customerQuoteReport!);
+
             document.GeneratePdf(path);
             //document.ShowInPreviewer();
             //document.ShowInPreviewer(12345);

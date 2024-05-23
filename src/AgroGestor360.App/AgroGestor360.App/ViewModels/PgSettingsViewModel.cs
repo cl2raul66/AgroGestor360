@@ -3,6 +3,7 @@ using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 
 namespace AgroGestor360.App.ViewModels;
@@ -17,7 +18,11 @@ public partial class PgSettingsViewModel : ObservableObject
         navigationServ = navigationService;
         organizationServ = organizationService;
         SelectedMenu = string.Empty;
+        AppInfo = $"{Assembly.GetExecutingAssembly().GetName().Name} V.{VersionTracking.Default.CurrentVersion}";
     }
+
+    [ObservableProperty]
+    string? appInfo;
 
     public IEnumerable<string> Menu =>
     [
@@ -65,7 +70,7 @@ public partial class PgSettingsViewModel : ObservableObject
                     {
                         sb.AppendLine("No hay información de la entidad");
                     }
-                    await Shell.Current.DisplayAlert("Información de la empresa", sb.ToString(), "Cerrar");                    
+                    await Shell.Current.DisplayAlert("Información de la empresa", sb.ToString(), "Cerrar");
                     break;
                 case "Capital inicial":
                     navigationServ.NavigateToView<CvSeedCapitalViewModel>(view => CurrentContent = view);

@@ -166,13 +166,15 @@ public class BankAccount
 /// <summary>
 /// Object: ImmediatePayment => Represents a payment method for immediate payment.
 /// <code>
-/// double [Amount]
-/// string [ReferenceNo]
-/// ImmediatePaymentType [Type]
+/// DateTime [Date] => Date of payment
+/// double [Amount] => Amount of payment
+/// string [ReferenceNo] => Reference number of payment
+/// ImmediatePaymentType [Type] => Type of payment
 /// </code>
 /// </summary>
 public class ImmediatePayment
 {
+    public DateTime Date { get; set; }
     public double Amount { get; set; }
     public string? ReferenceNo { get; set; }
     public ImmediatePaymentType Type { get; set; }
@@ -181,14 +183,16 @@ public class ImmediatePayment
 /// <summary>
 /// Object: CreditPayment => Represents a payment method for credit payment.
 /// <code>
-/// double [Amount]
-/// string [ReferenceNo]
-/// int [NumberOfInstallments]
-/// CreditPaymentType [Type]
+/// DateTime [Date] => Date of payment
+/// double [Amount] => Amount of payment
+/// string [ReferenceNo] => Reference number of payment
+/// int [NumberOfInstallments] => Number of installments
+/// CreditPaymentType [Type] => Type of payment
 /// </code>
 /// </summary>
 public class CreditPayment
 {
+    public DateTime Date { get; set; }
     public double Amount { get; set; }
     public string? ReferenceNo { get; set; }
     public int NumberOfInstallments { get; set; }

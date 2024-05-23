@@ -23,6 +23,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     readonly IImmediatePaymentTypeService immediatePaymentTypeServ;
     readonly ICreditPaymentTypeService creditPaymentTypeServ;
     readonly string serverURL;
+    Dictionary<string, double>? StockInWarehouse;
 
     public PgAddEditSaleViewModel(IProductsForSalesService productsForSalesService, IArticlesForWarehouseService articlesForWarehouseService, IQuotesService quotesService, IImmediatePaymentTypeService immediatePaymentTypeService, ICreditPaymentTypeService creditPaymentTypeService)
     {
@@ -84,6 +85,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     ObservableCollection<string>? paymentsTypes;
 
     [ObservableProperty]
+    [Required]
     string? selectedPaymentType;
 
     [ObservableProperty]
@@ -113,7 +115,16 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     ProductOffering? selectedOffer;
 
     [ObservableProperty]
+    double totalWithDiscount;
+
+    [ObservableProperty]
     double total;
+
+    [ObservableProperty]
+    double difference;
+
+    [ObservableProperty]
+    bool loadingStock;
 
     [RelayCommand]
     async Task SendProductItem()
@@ -147,15 +158,19 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
         ProductItems ??= [];
         ProductItems.Insert(0, new() { ProductItemQuantity = theQuantity, Product = SelectedProduct! });
 
-        UpdateTotalQuote();
+        UpdateTotal();
+        await UpdateStock(SelectedProduct!.MerchandiseId!, theQuantity);
 
         SelectedProduct = null;
         Quantity = null;
+        Stock = 0;
     }
 
     [RelayCommand]
     async Task RemoveProductitem(ProductItem productitem)
     {
+        string currentProductItem = SelectedProductItem!.Product!.MerchandiseId!;
+
         var theQuantity = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProductItem?.Product?.Id ?? string.Empty))?.Quantity ?? 0;
 
         var selectedQuantity = SelectedProductItem!.ProductOffer is null ? SelectedProductItem!.ProductItemQuantity : SelectedProductItem!.ProductOffer.Quantity;
@@ -166,8 +181,13 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
         bool result = ProductItems!.Remove(SelectedProductItem!);
         if (result)
         {
-            UpdateTotalQuote();
-            return;
+            UpdateTotal();
+            StockInWarehouse!.Remove(currentProductItem);
+            Quantity = null;
+            SelectedProduct = null;
+            SelectedProductItem = null;
+            Stock = 0;
+            //return;
         }
         ProductsPending += 1;
     }
@@ -214,7 +234,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
         }
         ProductItems[idx] = item;
         SelectedProductItem = ProductItems[idx];
-        UpdateTotalQuote();
+        UpdateTotal();
     }
 
     [RelayCommand]
@@ -274,7 +294,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
             CustomerId = SelectedCustomer!.CustomerId,
             SellerId = SelectedSeller!.Id,
             Products = [.. productItems],
-            CreditsPayments = OnCredit ? [new() { Type = creditPaymentTypeServ.GetByName(SelectedPaymentType!)! }] : null,
+            CreditsPayments = OnCredit ? [new() { Type = creditPaymentTypeServ.GetByName(SelectedPaymentType!)!, NumberOfInstallments = 1 }] : null,
             ImmediatePayments = OnCredit ? null : [new() { Type = immediatePaymentTypeServ.GetByName(SelectedPaymentType!)! }]
         };
 
@@ -356,7 +376,9 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
         {
             if (SelectedProduct is not null)
             {
-                Stock = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProduct.MerchandiseId!))?.Quantity ?? 0;
+                LoadingStock = true;
+                await UpdateStock(SelectedProduct!.MerchandiseId!);
+                LoadingStock = false;
                 //WaitPropertyChanged = false;
             }
         }
@@ -403,11 +425,10 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     }
 
     #region EXTRA
-    // todo: no se puede modificar vendedor ni cliente una vez introducido el primer producto, se debe limpiar la lista de productos para poder modificar. recordar que se debe validar que el producto no se repita en la lista y que la cantidad sea mayor a 0, ademas de agregar botones para modificar tanto el cliente como el vendedor
-
-    private void UpdateTotalQuote()
+    private void UpdateTotal()
     {
         double total = 0;
+        double total1 = 0;
         if (ProductItems != null)
         {
             foreach (var item in ProductItems)
@@ -424,10 +445,51 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
                 {
                     itemQuantity = item.ProductOffer!.Quantity;
                 }
-                total += itemQuantity * itemPrice;
+                total1 += itemQuantity * itemPrice;
+                total += itemQuantity * item.Product!.ArticlePrice;
             }
         }
         Total = total;
+        TotalWithDiscount = total1;
+        Difference = total - total1;
+    }
+
+    async Task UpdateStock(string merchandiseId, double theQuantity = 0)
+    {
+        double value = 0;
+        StockInWarehouse ??= [];
+        if (StockInWarehouse.Any())
+        {
+            if (StockInWarehouse.ContainsKey(SelectedProduct!.MerchandiseId!))
+            {
+                value = StockInWarehouse[SelectedProduct!.MerchandiseId!];
+            }
+            else
+            {
+                value = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProduct!.MerchandiseId!))?.Quantity ?? 0;
+            }
+        }
+        else if (Stock == 0)
+        {
+            value = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProduct!.MerchandiseId!))?.Quantity ?? 0;
+        }
+        else
+        {
+            value = Stock;
+        }
+
+        if (theQuantity > 0)
+        {
+            value -= theQuantity;
+            StockInWarehouse.Add(SelectedProduct!.MerchandiseId!, value);
+        }
+        if (theQuantity < 0)
+        {
+            value += theQuantity;
+            StockInWarehouse.Remove(SelectedProduct!.MerchandiseId!);
+        }
+
+        Stock = value;
     }
     #endregion
 }

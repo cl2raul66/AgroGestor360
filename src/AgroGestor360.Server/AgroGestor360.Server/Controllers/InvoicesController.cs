@@ -1,5 +1,7 @@
 ﻿using AgroGestor360.Server.Models;
 using AgroGestor360.Server.Services;
+using AgroGestor360.Server.Tools;
+using AgroGestor360.Server.Tools.Enums;
 using LiteDB;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,13 +15,15 @@ public class InvoicesController : ControllerBase
     readonly ISellersInLiteDbService sellersServ;
     readonly ICustomersInLiteDbService customersServ;
     readonly IProductsForSalesInLiteDbService productsForSalesServ;
+    readonly IWasteInvoicesInLiteDbService wasteInvoicesInLiteDbServ;
 
-    public InvoicesController(IInvoicesInLiteDbService invoicesService, ISellersInLiteDbService sellersService, ICustomersInLiteDbService customersService, IProductsForSalesInLiteDbService productsForSalesService)
+    public InvoicesController(IInvoicesInLiteDbService invoicesService, ISellersInLiteDbService sellersService, ICustomersInLiteDbService customersService, IProductsForSalesInLiteDbService productsForSalesService, IWasteInvoicesInLiteDbService wasteInvoicesInLiteDbService)
     {
         invoicesServ = invoicesService;
         sellersServ = sellersService;
         customersServ = customersService;
         productsForSalesServ = productsForSalesService;
+        wasteInvoicesInLiteDbServ = wasteInvoicesInLiteDbService;
     }
 
     [HttpGet("exist")]
@@ -80,7 +84,6 @@ public class InvoicesController : ControllerBase
                 productItems.Add(productSaleBase);
             }
 
-
             Invoice entity = new()
             {
                 Code = Guid.NewGuid(),
@@ -102,8 +105,8 @@ public class InvoicesController : ControllerBase
         return NotFound();
     }
 
-    [HttpPut("UpdateByPaymentMethod")]
-    public IActionResult UpdateByPaymentMethod(DTO10_2 dTO)
+    [HttpPut("depreciationupdate")]
+    public IActionResult DepreciationUpdate(DTO10_2 dTO)
     {
         if (dTO is null)
         {
@@ -116,13 +119,28 @@ public class InvoicesController : ControllerBase
             return NotFound();
         }
 
+        double totalAmount = GetTotalAmount.Get(found);
+
         if (dTO.ImmediateMethod is not null)
         {
             List<ImmediatePayment> immediatePayments = new(found.ImmediatePayments ?? [])
             {
                 dTO.ImmediateMethod
             };
+
             found.ImmediatePayments = [.. immediatePayments];
+
+            if (found.ImmediatePayments.Sum(x => x.Amount) == totalAmount)
+            {
+                found.Status = InvoiceStatus.Paid;
+                var resultInsert = wasteInvoicesInLiteDbServ.Insert(found);
+                if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
+                {
+                    return NotFound();
+                }
+                var resultDelete = invoicesServ.Delete(Guid.Parse(dTO.Code!));
+                return resultDelete ? Ok() : NotFound();
+            }
         }
 
         if (dTO.CreditPaymentMethod is not null)
@@ -131,12 +149,56 @@ public class InvoicesController : ControllerBase
             {
                 dTO.CreditPaymentMethod
             };
+
             found.CreditsPayments = [.. creditPayments];
+
+            if (found.CreditsPayments.Sum(x => x.Amount) == totalAmount)
+            {
+                found.Status = InvoiceStatus.Paid;
+                var resultInsert = wasteInvoicesInLiteDbServ.Insert(found);
+                if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
+                {
+                    return NotFound();
+                }
+                var resultDelete = invoicesServ.Delete(Guid.Parse(dTO.Code!));
+                return resultDelete ? Ok() : NotFound();
+            }
         }
 
         var result = invoicesServ.Update(found);
 
         return result ? Ok() : NotFound();
+    }
+
+    [HttpPut("updatestate")]
+    public IActionResult UpdateState(DTO10_3 dTO)
+    {
+        if (dTO is null)
+        {
+            return BadRequest();
+        }
+
+        if (dTO.Status is InvoiceStatus.Cancelled)
+        {
+            var found = invoicesServ.GetByCode(Guid.Parse(dTO.Code!));
+            if (found is null)
+            {
+                return NotFound();
+            }
+
+            found.Status = dTO.Status;
+
+            var resultInsert = wasteInvoicesInLiteDbServ.Insert(found);
+            if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
+            {
+                return NotFound();
+            }
+
+            var resultDelete = invoicesServ.Delete(Guid.Parse(dTO.Code!));
+
+            return resultDelete ? Ok() : NotFound();
+        }
+        return NotFound();
     }
 
     [HttpDelete("{code}")]
@@ -155,23 +217,7 @@ public class InvoicesController : ControllerBase
     #region EXTRA
     DTO10 CreateDTO10(Invoice entity)
     {
-        double totalAmount = 0;
-        foreach (var pi in entity.Products!)
-        {
-            double itemPrice = pi.Product!.ArticlePrice;
-            if (pi.HasCustomerDiscount)
-            {
-                double discount = entity.Customer!.Discount!.Value;
-                itemPrice -= itemPrice * (discount / 100);
-            }
-
-            double itemQuantity = pi.Quantity;
-            if (pi.OfferId > 0)
-            {
-                itemQuantity = pi.Product.Offering![pi.OfferId - 1].Quantity;
-            }
-            totalAmount += itemQuantity * itemPrice;
-        }
+        double totalAmount = GetTotalAmount.Get(entity);
 
         return new DTO10
         {

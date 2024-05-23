@@ -33,7 +33,7 @@ public class QuoteDocument : IDocument
             {
                 page.Margin(20);
                 page.Size(PageSizes.Letter);
-                page.DefaultTextStyle(x => x.FontSize(9).FontFamily("VERDANA").FontColor(Colors.Black));
+                page.DefaultTextStyle(x => x.FontSize(9).FontColor(Colors.Black));
 
                 page.Header().Element(ComposeHeader);
                 page.Content().Element(ComposeContent);

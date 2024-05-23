@@ -17,6 +17,7 @@ using AgroGestor360.Client.Services;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using QuestPDF.Infrastructure;
 using System.Reflection;
 
 namespace AgroGestor360.App;
@@ -95,6 +96,7 @@ public static class MauiProgram
         builder.Services.AddTransient<PgAddEditQuote, PgAddEditQuoteViewModel>();
         builder.Services.AddTransient<PgAddEditOrder, PgAddEditOrderViewModel>();
         builder.Services.AddTransient<PgAddEditSale, PgAddEditSaleViewModel>();
+        builder.Services.AddTransient<PgAmortizeInvoiceCredit, PgAmortizeInvoiceCreditViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();
@@ -103,16 +105,16 @@ public static class MauiProgram
         return builder.Build();
     }
 
-    private static void AddAppsettings(this MauiAppBuilder builder)
+private static void AddAppsettings(this MauiAppBuilder builder)
+{
+    Assembly assembly = Assembly.GetExecutingAssembly();
+    using Stream stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.appsettings.json")!;
+    if (stream is not null)
     {
-        Assembly assembly = Assembly.GetExecutingAssembly();
-        using Stream stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.appsettings.json")!;
-        if (stream is not null)
-        {
-            IConfiguration config = new ConfigurationBuilder()
-                .AddJsonStream(stream)
-                .Build();
-            builder.Configuration.AddConfiguration(config);
-        }
+        IConfiguration config = new ConfigurationBuilder()
+            .AddJsonStream(stream)
+            .Build();
+        builder.Configuration.AddConfiguration(config);
     }
+}
 }

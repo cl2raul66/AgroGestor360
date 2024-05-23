@@ -1,9 +1,130 @@
 ﻿// Ignore Spelling: DTO
 
 using AgroGestor360.Server.Tools.Enums;
-using System.Text.Json;
 
 namespace AgroGestor360.Server.Models;
+
+
+#region Customer
+/// <summary>
+/// Object: Customer for GET
+/// <para>
+/// string [CustomerId, CustomerName], CustomerDiscountClass [Discount]
+/// </para>
+/// </summary>
+public class DTO5_1
+{
+    public string? CustomerId { get; set; }
+    public string? CustomerName { get; set; }
+    public bool IsOrganization { get; set; }
+    public CustomerDiscountClass? Discount { get; set; }
+}
+
+/// <summary>
+/// Object: Customer for POST
+/// <para>
+/// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName], CustomerDiscountClass [Discount]
+/// </para>
+/// </summary>
+public class DTO5_2
+{
+    public DateTime? Birthday { get; set; }
+    public string? CustomerFullName { get; set; }
+    public string? CustomerAddress { get; set; }
+    public string? CustomerPhone { get; set; }
+    public string? CustomerMail { get; set; }
+    public string? CustomerNIT { get; set; }
+    public string? CustomerNIP { get; set; }
+    public string? CustomerOccupation { get; set; }
+    public string? CustomerOrganizationName { get; set; }
+    public CustomerDiscountClass? Discount { get; set; }
+}
+
+/// <summary>
+/// Object: Customer for PUT by customer and/or discount
+/// <code>
+/// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName] 
+/// CustomerDiscountClass [Discount]
+/// </code>
+/// </summary>
+public class DTO5_3
+{
+    public string? CustomerId { get; set; }
+    public DateTime? Birthday { get; set; }
+    public string? CustomerFullName { get; set; }
+    public string? CustomerAddress { get; set; }
+    public string? CustomerPhone { get; set; }
+    public string? CustomerMail { get; set; }
+    public string? CustomerNIT { get; set; }
+    public string? CustomerNIP { get; set; }
+    public string? CustomerOccupation { get; set; }
+    public string? CustomerOrganizationName { get; set; }
+    public CustomerDiscountClass? Discount { get; set; }
+}
+
+/// <summary>
+/// Object: Customer for PUT by discount
+/// <para>
+/// string [CustomerId], int [DiscountId]
+/// </para>
+/// </summary>
+public class DTO5_4
+{
+    public string? CustomerId { get; set; }
+    public int DiscountId { get; set; }
+}
+#endregion
+
+#region Seller
+/// <summary>
+/// Object: Seller for GET
+/// <para>
+/// string [Id, FullName]
+/// </para>
+/// </summary>
+public class DTO6
+{
+    public string? Id { get; set; }
+    public string? FullName { get; set; }
+}
+
+/// <summary>
+/// Object: Seller for POST
+/// <para>
+/// DateTime [Birthday], string [FullName, Address, Phone, Mail, NIT, NIP, Occupation], 
+/// </para>
+/// </summary>
+public class DTO6_1
+{
+    public DateTime? Birthday { get; set; }
+    public string? FullName { get; set; }
+    public string? Address { get; set; }
+    public string? Phone { get; set; }
+    public string? Mail { get; set; }
+    public string? NIT { get; set; }
+    public string? NIP { get; set; }
+    public string? Occupation { get; set; }
+}
+
+/// <summary>
+/// Object: Seller for PUT
+/// <para>
+/// DateTime [Birthday], string [Id, FullName, Address, Phone, Mail, NIT, NIP, Occupation], 
+/// </para>
+/// </summary>
+public class DTO6_2
+{
+    public DateTime? Birthday { get; set; }
+    public string? Id { get; set; }
+    public string? FullName { get; set; }
+    public string? Address { get; set; }
+    public string? Phone { get; set; }
+    public string? Mail { get; set; }
+    public string? NIT { get; set; }
+    public string? NIP { get; set; }
+    public string? Occupation { get; set; }
+}
+#endregion
 
 #region Merchandise
 /// <summary>
@@ -412,132 +533,31 @@ public class DTO10_1
     public CreditPayment[]? CreditsPayments { get; set; }
 }
 
+/// <summary>
+/// Represents a invoice for POST.
+/// <code>
+/// Code: Code of the invoice and key in database
+/// ImmediateMethod: Immediate payment method
+/// CreditPaymentMethod: Credit payment method
+/// </code>
+/// </summary>
 public class DTO10_2
 {
-    public DateTime Date { get; set; }
     public string? Code { get; set; }
     public ImmediatePayment? ImmediateMethod { get; set; }
     public CreditPayment? CreditPaymentMethod { get; set; }
 }
-#endregion
-
-#region Customer
-/// <summary>
-/// Object: Customer for GET
-/// <para>
-/// string [CustomerId, CustomerName], CustomerDiscountClass [Discount]
-/// </para>
-/// </summary>
-public class DTO5_1
-{
-    public string? CustomerId { get; set; }
-    public string? CustomerName { get; set; }
-    public bool IsOrganization { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
-}
 
 /// <summary>
-/// Object: Customer for POST
-/// <para>
-/// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName], CustomerDiscountClass [Discount]
-/// </para>
-/// </summary>
-public class DTO5_2
-{
-    public DateTime? Birthday { get; set; }
-    public string? CustomerFullName { get; set; }
-    public string? CustomerAddress { get; set; }
-    public string? CustomerPhone { get; set; }
-    public string? CustomerMail { get; set; }
-    public string? CustomerNIT { get; set; }
-    public string? CustomerNIP { get; set; }
-    public string? CustomerOccupation { get; set; }
-    public string? CustomerOrganizationName { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
-}
-
-/// <summary>
-/// Object: Customer for PUT by customer and/or discount
+/// Represents a invoice for UPDATE by status.
 /// <code>
-/// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName] 
-/// CustomerDiscountClass [Discount]
+/// Code: Code of the invoice and key in database
+/// Status: Status of the invoice
 /// </code>
 /// </summary>
-public class DTO5_3
+public class DTO10_3
 {
-    public string? CustomerId { get; set; }
-    public DateTime? Birthday { get; set; }
-    public string? CustomerFullName { get; set; }
-    public string? CustomerAddress { get; set; }
-    public string? CustomerPhone { get; set; }
-    public string? CustomerMail { get; set; }
-    public string? CustomerNIT { get; set; }
-    public string? CustomerNIP { get; set; }
-    public string? CustomerOccupation { get; set; }
-    public string? CustomerOrganizationName { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
-}
-
-/// <summary>
-/// Object: Customer for PUT by discount
-/// <para>
-/// string [CustomerId], int [DiscountId]
-/// </para>
-/// </summary>
-public class DTO5_4
-{
-    public string? CustomerId { get; set; }
-    public int DiscountId { get; set; }
-}
-#endregion
-
-#region Seller
-/// <summary>
-/// Object: Seller for GET
-/// <para>
-/// string [Id, FullName]
-/// </para>
-/// </summary>
-public class DTO6
-{
-    public string? Id { get; set; }
-    public string? FullName { get; set; }
-}
-
-/// <summary>
-/// Object: Seller for POST
-/// <para>
-/// DateTime [Birthday], string [FullName, Address, Phone, Mail, NIT, NIP, Occupation], 
-/// </para>
-/// </summary>
-public class DTO6_1
-{
-    public DateTime? Birthday { get; set; }
-    public string? FullName { get; set; }
-    public string? Address { get; set; }
-    public string? Phone { get; set; }
-    public string? Mail { get; set; }
-    public string? NIT { get; set; }
-    public string? NIP { get; set; }
-    public string? Occupation { get; set; }
-}
-
-/// <summary>
-/// Object: Seller for PUT
-/// <para>
-/// DateTime [Birthday], string [Id, FullName, Address, Phone, Mail, NIT, NIP, Occupation], 
-/// </para>
-/// </summary>
-public class DTO6_2
-{
-    public DateTime? Birthday { get; set; }
-    public string? Id { get; set; }
-    public string? FullName { get; set; }
-    public string? Address { get; set; }
-    public string? Phone { get; set; }
-    public string? Mail { get; set; }
-    public string? NIT { get; set; }
-    public string? NIP { get; set; }
-    public string? Occupation { get; set; }
+    public string? Code { get; set; }
+    public InvoiceStatus Status { get; set; }
 }
 #endregion
