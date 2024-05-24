@@ -158,7 +158,7 @@ public class ProductOffering
 public class BankAccount
 {
     public string? Number { get; set; }
-    public string? BankName{ get; set; }
+    public string? BankName { get; set; }
     public string? Alias { get; set; }
     public FinancialInstrumentType InstrumentType { get; set; }
 }
@@ -186,7 +186,6 @@ public class ImmediatePayment
 /// DateTime [Date] => Date of payment
 /// double [Amount] => Amount of payment
 /// string [ReferenceNo] => Reference number of payment
-/// int [NumberOfInstallments] => Number of installments
 /// CreditPaymentType [Type] => Type of payment
 /// </code>
 /// </summary>
@@ -195,7 +194,6 @@ public class CreditPayment
     public DateTime Date { get; set; }
     public double Amount { get; set; }
     public string? ReferenceNo { get; set; }
-    public int NumberOfInstallments { get; set; }
     public CreditPaymentType Type { get; set; }
 }
 
@@ -307,6 +305,7 @@ public class Order : SaleBase
 /// Customer [Customer]
 /// Array ProductItemForDocument [ProductItems]
 /// InvoiceStatus [Status]
+/// int [NumberOfInstallments] => Number of installments
 /// string [NumberFEL]
 /// ImmediatePayments: Array of immediate payments
 /// CreditsPayments: Array of credit payments
@@ -315,6 +314,7 @@ public class Order : SaleBase
 public class Invoice : SaleBase
 {
     public InvoiceStatus Status { get; set; }
+    public int NumberOfInstallments { get; set; }
     public string? NumberFEL { get; set; }
     public ImmediatePayment[]? ImmediatePayments { get; set; }
     public CreditPayment[]? CreditsPayments { get; set; }

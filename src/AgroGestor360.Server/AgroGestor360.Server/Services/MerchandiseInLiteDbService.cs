@@ -16,7 +16,8 @@ public interface IMerchandiseInLiteDbService
     MerchandiseItem GetById(ObjectId id);
     string Insert(MerchandiseItem entity);
     void Rollback();
-    bool Update(MerchandiseItem entity);
+    bool Update(MerchandiseItem entity); 
+    bool UpdateMany(IEnumerable<MerchandiseItem> entities);
 }
 
 public class MerchandiseInLiteDbService : IMerchandiseInLiteDbService
@@ -51,7 +52,34 @@ public class MerchandiseInLiteDbService : IMerchandiseInLiteDbService
 
     public string Insert(MerchandiseItem entity) => collection.Insert(entity).AsObjectId.ToString();
 
-    public bool Update(MerchandiseItem entity) => collection.Update(entity);    
+    public bool Update(MerchandiseItem entity) => collection.Update(entity);
+
+    public bool UpdateMany(IEnumerable<MerchandiseItem> entities)
+    {
+        try
+        {
+            db.BeginTrans();
+
+            foreach (var entity in entities)
+            {
+                var result = collection.Update(entity);
+
+                if (!result)
+                {
+                    db.Rollback();
+                    return false;
+                }
+            }
+
+            db.Commit();
+            return true;
+        }
+        catch
+        {
+            db.Rollback();
+            return false;
+        }
+    }
 
     public bool Delete(ObjectId id) => collection.Delete(id);
 }

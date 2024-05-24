@@ -15,6 +15,7 @@ namespace AgroGestor360.App.ViewModels;
 [QueryProperty(nameof(Customers), "customers")]
 [QueryProperty(nameof(Products), "products")]
 [QueryProperty(nameof(CurrentInvoice), "currentInvoice")]
+[QueryProperty(nameof(CreditTime), "creditTime")]
 public partial class PgAddEditSaleViewModel : ObservableValidator
 {
     readonly IProductsForSalesService productsForSalesServ;
@@ -47,6 +48,12 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     string? textInfo;
 
     [ObservableProperty]
+    int[]? creditTime;
+
+    [ObservableProperty]
+    int selectedCreditTime;
+
+    [ObservableProperty]
     DateTime date;
 
     [ObservableProperty]
@@ -59,21 +66,21 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     double stock;
 
     [ObservableProperty]
-    List<DTO6>? sellers;
+    DTO6[]? sellers;
 
     [ObservableProperty]
     [Required]
     DTO6? selectedSeller;
 
     [ObservableProperty]
-    List<DTO5_1>? customers;
+    DTO5_1[]? customers;
 
     [ObservableProperty]
     [Required]
     DTO5_1? selectedCustomer;
 
     [ObservableProperty]
-    List<DTO4>? products;
+    DTO4[]? products;
 
     [ObservableProperty]
     DTO4? selectedProduct;
@@ -125,6 +132,12 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
 
     [ObservableProperty]
     bool loadingStock;
+
+    [ObservableProperty]
+    string? referenceNo;
+
+    [ObservableProperty]
+    string? initialAmount;
 
     [RelayCommand]
     async Task SendProductItem()
@@ -242,7 +255,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     {
         ValidateAllProperties();
 
-        if (HasErrors)
+        if (HasErrors || string.IsNullOrEmpty(SelectedPaymentType) || (OnCredit && SelectedCreditTime == 0))
         {
             TextInfo = " Rellene toda la información los requeridos (*)";
             await Task.Delay(4000);
@@ -285,17 +298,21 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
             }
         }
 
+        double theInitialAmount = 0;
+
+        _ = double.TryParse(InitialAmount, out theInitialAmount);
+
         DTO10_1 invoice = new()
         {
             Code = CurrentInvoice is not null ? CurrentInvoice.Code : string.Empty,
             NumberFEL = NoFEL,
-            Status = InvoiceStatus.Pending,
+            Status = theInitialAmount == TotalWithDiscount ? InvoiceStatus.Paid : InvoiceStatus.Pending,
             Date = Date,
             CustomerId = SelectedCustomer!.CustomerId,
             SellerId = SelectedSeller!.Id,
             Products = [.. productItems],
-            CreditsPayments = OnCredit ? [new() { Type = creditPaymentTypeServ.GetByName(SelectedPaymentType!)!, NumberOfInstallments = 1 }] : null,
-            ImmediatePayments = OnCredit ? null : [new() { Type = immediatePaymentTypeServ.GetByName(SelectedPaymentType!)! }]
+            CreditsPayments = OnCredit ? [new() { Type = creditPaymentTypeServ.GetByName(SelectedPaymentType!)!, NumberOfInstallments = SelectedCreditTime, Date = Date, ReferenceNo = ReferenceNo, Amount = theInitialAmount }] : null,
+            ImmediatePayments = OnCredit ? null : [new() { Type = immediatePaymentTypeServ.GetByName(SelectedPaymentType!)!, Date = Date, ReferenceNo = ReferenceNo, Amount = theInitialAmount }]
         };
 
         string token = CurrentInvoice is not null ? "addorderfromquote" : "addinvoice";
@@ -327,6 +344,11 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
             PaymentsTypes = OnCredit
                 ? new(creditPaymentTypeServ.GetAll())
                 : new(immediatePaymentTypeServ.GetAll());
+            if (!OnCredit)
+            {
+                SelectedPaymentType = null;
+                SelectedCreditTime = 0;
+            }
         }
 
         if (e.PropertyName == nameof(IsProductOffer))

@@ -203,9 +203,23 @@
                                     SelectedItem="{Binding SelectedPaymentType}" />
                             </Grid>
                         </Grid>
-                        <HorizontalStackLayout IsVisible="{Binding OnCredit}" Spacing="8">
-                            <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                                <Label Text="Tiempo de crédito (días):" />
+                        <Grid ColumnDefinitions="auto,auto,*" ColumnSpacing="8">
+                            <Grid
+                                IsVisible="{Binding OnCredit}"
+                                RowDefinitions="auto,auto"
+                                RowSpacing="4">
+                                <Label Text="Tiempo de crédito: *" />
+                                <Picker
+                                    Grid.Row="1"
+                                    ItemDisplayBinding="{Binding ., StringFormat='{0} dias'}"
+                                    ItemsSource="{Binding CreditTime}"
+                                    SelectedItem="{Binding SelectedCreditTime}" />
+                            </Grid>
+                            <Grid
+                                Grid.Column="1"
+                                RowDefinitions="auto,auto"
+                                RowSpacing="4">
+                                <Label Text="Cantidad inicial: " />
                                 <Entry
                                     Grid.Row="1"
                                     ClearButtonVisibility="WhileEditing"
@@ -214,11 +228,26 @@
                                     IsSpellCheckEnabled="True"
                                     IsTextPredictionEnabled="True"
                                     Keyboard="Numeric"
-                                    Placeholder="0"
-                                    Text="{Binding Quantity}"
+                                    Placeholder="0.00"
+                                    Text="{Binding InitialAmount}"
                                     WidthRequest="100" />
                             </Grid>
-                        </HorizontalStackLayout>
+                            <Grid
+                                Grid.Column="2"
+                                IsVisible="{Binding InitialAmount, Converter={ctk:IsStringNotNullOrEmptyConverter}}"
+                                RowDefinitions="auto,auto"
+                                RowSpacing="4">
+                                <Label Text="No. Referencia: " />
+                                <Entry
+                                    Grid.Row="1"
+                                    ClearButtonVisibility="WhileEditing"
+                                    HorizontalOptions="Fill"
+                                    IsSpellCheckEnabled="True"
+                                    IsTextPredictionEnabled="True"
+                                    Keyboard="Plain"
+                                    Placeholder="Escriba aquí" />
+                            </Grid>
+                        </Grid>
                     </VerticalStackLayout>
                 </ScrollView>
                 <!--#endregion-->

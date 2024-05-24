@@ -634,6 +634,7 @@
                 <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                     <HorizontalStackLayout Spacing="8">
                         <Button
+                            Command="{Binding ShowInvoiceDetailCommand}"
                             FontFamily="icofont"
                             IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                             Text="{StaticResource UiNote}"

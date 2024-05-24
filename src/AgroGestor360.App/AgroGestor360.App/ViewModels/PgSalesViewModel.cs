@@ -368,18 +368,28 @@ public partial class PgSalesViewModel : ObservableRecipient
     DTO10? selectedInvoice;
 
     [RelayCommand]
+    async Task ShowInvoiceDetail()
+    {
+        string bodyText = await GenerateBodyTextFromInvoice();
+        await Shell.Current.DisplayAlert("Información", bodyText, "Cerrar");
+        SelectedInvoice = null;
+    }
+
+    [RelayCommand]
     async Task ShowAddEditSale()
     {
         IsActive = true;
         var sellers = await sellersServ.GetAllAsync(serverURL);
         var customers = await customersServ.GetAllAsync(serverURL);
         var products = await productsForSalesServ.GetAllAsync(serverURL);
+        var creditTime = await invoicesServ.GetCreditTimeAsync(serverURL);
 
         Dictionary<string, object> sendData = new()
         {
-            { "sellers", sellers.ToList() },
-            { "customers", customers.ToList()},
-            { "products", products.ToList() }
+            { "sellers", sellers.ToArray() },
+            { "customers", customers.ToArray()},
+            { "products", products.ToArray() },
+            { "creditTime", creditTime.ToArray() }
         };
 
         await Shell.Current.GoToAsync(nameof(PgAddEditSale), true, sendData);
@@ -400,27 +410,28 @@ public partial class PgSalesViewModel : ObservableRecipient
                 deletedInInvoice = await invoicesServ.UpdateState(serverURL, dTO);
                 break;
             case "Por error del operador.":
-                string invoiceStatus = SelectedInvoice!.Status switch
-                {
-                    InvoiceStatus.Cancelled => "Cancelada",
-                    InvoiceStatus.Paid => "Pagada",
-                    _ => "Pendiente"
-                };
-                StringBuilder sb = new();
-                sb.AppendLine($"¿Seguro que quiere eliminar la siguiente factura?");
-                sb.AppendLine("");
-                if (!string.IsNullOrEmpty(SelectedInvoice!.NumberFEL))
-                {
-                    sb.AppendLine($"Número FEL: {SelectedInvoice!.NumberFEL}");
-                }
-                sb.AppendLine($"No.: {SelectedInvoice!.Code}");
-                sb.AppendLine($"Estado de la factura: {invoiceStatus}");
-                sb.AppendLine($"Fecha de creación: {SelectedInvoice!.Date:dd MMM yyyy}");
-                sb.AppendLine($"Vendedor: {SelectedInvoice!.SellerName}");
-                sb.AppendLine($"Cliente: {SelectedInvoice!.CustomerName}");
-                sb.AppendLine($"Total: {SelectedInvoice!.TotalAmount:N2}");
-                var pwd = await Shell.Current.DisplayAlert("Eliminar factura", sb.ToString(), "Eliminar", "Cancelar");
-                if (!pwd)
+                //string invoiceStatus = SelectedInvoice!.Status switch
+                //{
+                //    InvoiceStatus.Cancelled => "Cancelada",
+                //    InvoiceStatus.Paid => "Pagada",
+                //    _ => "Pendiente"
+                //};
+                //StringBuilder sb = new();
+                //sb.AppendLine($"¿Seguro que quiere eliminar la siguiente factura?");
+                //sb.AppendLine("");
+                //if (!string.IsNullOrEmpty(SelectedInvoice!.NumberFEL))
+                //{
+                //    sb.AppendLine($"Número FEL: {SelectedInvoice!.NumberFEL}");
+                //}
+                //sb.AppendLine($"No.: {SelectedInvoice!.Code}");
+                //sb.AppendLine($"Estado de la factura: {invoiceStatus}");
+                //sb.AppendLine($"Fecha de creación: {SelectedInvoice!.Date:dd MMM yyyy}");
+                //sb.AppendLine($"Vendedor: {SelectedInvoice!.SellerName}");
+                //sb.AppendLine($"Cliente: {SelectedInvoice!.CustomerName}");
+                //sb.AppendLine($"Total: {SelectedInvoice!.TotalAmount:N2}");
+                string bodyText = await GenerateBodyTextFromInvoice();
+                bool result = await Shell.Current.DisplayAlert("Eliminar factura", bodyText, "Eliminar", "Cancelar");
+                if (!result)
                 {
                     SelectedOrder = null;
                     SelectedQuotation = null;
@@ -586,6 +597,21 @@ public partial class PgSalesViewModel : ObservableRecipient
         string file = Path.Combine(FileSystem.CacheDirectory, title + ".pdf");
 
         return file;
+    }
+
+    async Task<string> GenerateBodyTextFromInvoice()
+    {
+        var currentInvoice = await invoicesServ.GetProductsByCodeAsync(serverURL, SelectedInvoice!.Code!);
+        StringBuilder sb = new();
+        sb.AppendLine($"No.: {currentInvoice!.Code}");
+        sb.AppendLine($"Fecha de creación: {currentInvoice!.Date:dd MMM yyyy}");
+        sb.AppendLine($"Vendedor: {currentInvoice!.SellerName}");
+        sb.AppendLine($"Cliente: {currentInvoice!.CustomerName}");
+        sb.AppendLine($"Estado: Pendiente");
+        sb.AppendLine("Productos:");
+        sb.AppendLine(string.Join(Environment.NewLine, currentInvoice.Products!));
+        sb.AppendLine($"Total: {currentInvoice!.TotalAmount:N2}");
+        return sb.ToString();
     }
     #endregion
 }

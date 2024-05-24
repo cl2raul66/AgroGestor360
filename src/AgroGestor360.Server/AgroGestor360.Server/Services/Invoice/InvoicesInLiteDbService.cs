@@ -15,6 +15,7 @@ public interface IInvoicesInLiteDbService
     Invoice GetByCode(Guid code);
     IEnumerable<Invoice> GetManyByCodes(IEnumerable<Guid> codes);
     string Insert(Invoice entity);
+    bool InsertMany(IEnumerable<Invoice> entities);
     void Rollback();
     bool Update(Invoice entity);
 }
@@ -57,6 +58,27 @@ public class InvoicesInLiteDbService : IInvoicesInLiteDbService
     public IEnumerable<Invoice> GetAll() => collection.FindAll();
 
     public string Insert(Invoice entity) => collection.Insert(entity).AsGuid.ToString();
+
+    public bool InsertMany(IEnumerable<Invoice> entities)
+    {
+        try
+        {
+            db.BeginTrans();
+
+            foreach (var entity in entities)
+            {
+                collection.Insert(entity);
+            }
+
+            db.Commit();
+            return true;
+        }
+        catch
+        {
+            db.Rollback();
+            return false;
+        }
+    }
 
     public bool Update(Invoice entity) => collection.Update(entity);
 

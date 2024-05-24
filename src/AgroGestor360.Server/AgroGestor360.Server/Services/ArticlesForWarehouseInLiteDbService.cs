@@ -13,10 +13,11 @@ public interface IArticlesForWarehouseInLiteDbService
     bool Delete(ObjectId id);
     IEnumerable<ArticleItemForWarehouse> GetAll();
     ArticleItemForWarehouse GetById(ObjectId id);
+    IEnumerable<ArticleItemForWarehouse> GetManyById(IEnumerable<ObjectId> ids);
     string Insert(ArticleItemForWarehouse entity);
     void Rollback();
     bool Update(ArticleItemForWarehouse entity);
-    bool UpdateMany(ArticleItemForWarehouse[] entity);
+    bool UpdateMany(IEnumerable<ArticleItemForWarehouse> entity);
 }
 
 public class ArticlesForWarehouseInLiteDbService : IArticlesForWarehouseInLiteDbService
@@ -50,11 +51,13 @@ public class ArticlesForWarehouseInLiteDbService : IArticlesForWarehouseInLiteDb
 
     public ArticleItemForWarehouse GetById(ObjectId id) => collection.FindById(id);
 
+    public IEnumerable<ArticleItemForWarehouse> GetManyById(IEnumerable<ObjectId> ids) => collection.Find(x => ids.Contains(x.MerchandiseId));
+
     public string Insert(ArticleItemForWarehouse entity) => collection.Insert(entity).AsObjectId.ToString();
 
     public bool Update(ArticleItemForWarehouse entity) => collection.Update(entity);
 
-    public bool UpdateMany(ArticleItemForWarehouse[] entity)
+    public bool UpdateMany(IEnumerable<ArticleItemForWarehouse> entity)
     {
         db.BeginTrans();
         List<bool> changed = [];
@@ -71,7 +74,7 @@ public class ArticlesForWarehouseInLiteDbService : IArticlesForWarehouseInLiteDb
             }
         }
         db.Commit();
-        return changed.Count(x => x) == entity.Length;
+        return changed.Count(x => x) == entity.Count();
     }
 
     public bool Delete(ObjectId id) => collection.Delete(id);

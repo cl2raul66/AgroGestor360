@@ -10,8 +10,11 @@ public static class GetTotalAmount
         foreach (var p in entity.Products!)
         {
             double itemPrice = p.Product!.ArticlePrice;
-            double discount = entity.Customer!.Discount!.Value;
-            itemPrice -= itemPrice * (discount / 100);
+            if (p.HasCustomerDiscount)
+            {
+                double discount = entity.Customer!.Discount!.Value;
+                itemPrice -= itemPrice * (discount / 100);
+            }
 
             double itemQuantity = p.Quantity;
             if (p.OfferId > 0)

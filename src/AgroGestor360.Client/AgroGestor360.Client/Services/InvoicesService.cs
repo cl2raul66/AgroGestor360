@@ -9,8 +9,10 @@ public interface IInvoicesService
 {
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string code);
+    Task<IEnumerable<int>> GetCreditTimeAsync(string serverURL);
     Task<IEnumerable<DTO10>> GetAllAsync(string serverURL);
     Task<DTO10?> GetByCodeAsync(string serverURL, string code);
+    Task<DTO10_4?> GetProductsByCodeAsync(string serverURL, string code);
     Task<string> InsertAsync(string serverURL, DTO10_1 dTO);
     Task<bool> DepreciationUpdate(string serverURL, DTO10_2 dTO);
     Task<bool> UpdateState(string serverURL, DTO10_3 dTO);
@@ -18,6 +20,27 @@ public interface IInvoicesService
 
 public class InvoicesService : IInvoicesService
 {
+    public async Task<IEnumerable<int>> GetCreditTimeAsync(string serverURL)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/invoices/getcredittime");
+
+            if (response.StatusCode is HttpStatusCode.NotFound)
+            {
+                return [];
+            }
+            else
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<int>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+        }
+        return [];
+    }
+
     public async Task<bool> CheckExistence(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
@@ -72,6 +95,28 @@ public class InvoicesService : IInvoicesService
 
             var content = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<DTO10>(content, ApiServiceBase.ProviderJSONOptions);
+        }
+        return null;
+    }
+
+    public async Task<DTO10_4?> GetProductsByCodeAsync(string serverURL, string code)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/invoices/getproductsbycode/{code}");
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.NotFound:
+                case HttpStatusCode.BadRequest:
+                    return null;
+                default:
+                    response.EnsureSuccessStatusCode();
+                    break;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<DTO10_4>(content, ApiServiceBase.ProviderJSONOptions);
         }
         return null;
     }
