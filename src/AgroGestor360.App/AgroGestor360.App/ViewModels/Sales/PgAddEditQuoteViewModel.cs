@@ -17,26 +17,25 @@ namespace AgroGestor360.App.ViewModels;
 public partial class PgAddEditQuoteViewModel : ObservableValidator
 {
     readonly IProductsForSalesService productsForSalesServ;
+    readonly IArticlesForWarehouseService articlesForWarehouseServ;
     readonly string serverURL;
 
-    public PgAddEditQuoteViewModel(IProductsForSalesService productsForSalesService)
+    public PgAddEditQuoteViewModel(IProductsForSalesService productsForSalesService, IArticlesForWarehouseService articlesForWarehouseService)
     {
         productsForSalesServ = productsForSalesService;
+        articlesForWarehouseServ = articlesForWarehouseService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         Date = DateTime.Now;
     }
+
+    [ObservableProperty]
+    int productsPending;
 
     [ObservableProperty]
     string? textInfo;
 
     [ObservableProperty]
     DateTime date;
-
-    [ObservableProperty]
-    List<DTO4>? products;
-
-    [ObservableProperty]
-    DTO4? selectedProduct;
 
     [ObservableProperty]
     List<DTO6>? sellers;
@@ -51,6 +50,12 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
     [ObservableProperty]
     [Required]
     DTO5_1? selectedCustomer;
+
+    [ObservableProperty]
+    List<DTO4>? products;
+
+    [ObservableProperty]
+    DTO4? selectedProduct;
 
     [ObservableProperty]
     string? quantity;
@@ -79,7 +84,13 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
     ProductOffering? selectedOffer;
 
     [ObservableProperty]
-    double totalQuote;
+    double totalWithDiscount;
+
+    [ObservableProperty]
+    double total;
+
+    [ObservableProperty]
+    double difference;
 
     [RelayCommand]
     async Task SendProductItem()
@@ -101,17 +112,34 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
         ProductItems ??= [];
         ProductItems.Insert(0, new() { ProductItemQuantity = theQuantity, Product = SelectedProduct! });
 
-        UpdateTotalQuote();
+        UpdateTotal();
 
         SelectedProduct = null;
         Quantity = null;
     }
 
     [RelayCommand]
-    void RemoveProductitem(ProductItem productitem)
+    async Task RemoveProductitem(ProductItem productitem)
     {
-        ProductItems!.Remove(SelectedProductItem!);
-        UpdateTotalQuote();
+        string currentProductItem = SelectedProductItem!.Product!.MerchandiseId!;
+
+        var theQuantity = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProductItem?.Product?.Id ?? string.Empty))?.Quantity ?? 0;
+
+        var selectedQuantity = SelectedProductItem!.ProductOffer is null ? SelectedProductItem!.ProductItemQuantity : SelectedProductItem!.ProductOffer.Quantity;
+        if (theQuantity < selectedQuantity)
+        {
+            ProductsPending -= 1;
+        }
+        bool result = ProductItems!.Remove(SelectedProductItem!);
+        if (result)
+        {
+            UpdateTotal();
+            Quantity = null;
+            SelectedProduct = null;
+            SelectedProductItem = null;
+            //return;
+        }
+        ProductsPending += 1;
     }
 
     [RelayCommand]
@@ -156,7 +184,7 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
         }
         ProductItems[idx] = item;
         SelectedProductItem = ProductItems[idx];
-        UpdateTotalQuote();
+        UpdateTotal();
     }
 
     [RelayCommand]
@@ -275,11 +303,10 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
     }
 
     #region EXTRA
-    // todo: no se puede modificar vendedor ni cliente una vez introducido el primer producto, se debe limpiar la lista de productos para poder modificar. recordar que se debe validar que el producto no se repita en la lista y que la cantidad sea mayor a 0, ademas de agregar botones para modificar tanto el cliente como el vendedor
-
-    private void UpdateTotalQuote()
+    private void UpdateTotal()
     {
         double total = 0;
+        double total1 = 0;
         if (ProductItems != null)
         {
             foreach (var item in ProductItems)
@@ -296,10 +323,13 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
                 {
                     itemQuantity = item.ProductOffer!.Quantity;
                 }
-                total += itemQuantity * itemPrice;
+                total1 += itemQuantity * itemPrice;
+                total += itemQuantity * item.Product!.ArticlePrice;
             }
         }
-        TotalQuote = total;
+        Total = total;
+        TotalWithDiscount = total1;
+        Difference = total - total1;
     }
     #endregion
 }

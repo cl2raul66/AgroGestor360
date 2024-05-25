@@ -19,7 +19,7 @@
         BackgroundColor="{StaticResource White}"
         HorizontalOptions="Center"
         VerticalOptions="Center">
-        <Grid RowDefinitions="auto,*,auto" RowSpacing="12">
+        <Grid RowDefinitions="auto,*,auto" RowSpacing="16">
             <!--#region TITULO-->
             <VerticalStackLayout Spacing="8">
                 <Label
@@ -44,7 +44,7 @@
             </VerticalStackLayout>
             <!--#endregion-->
             <!--#region CONTENIDO-->
-            <HorizontalStackLayout Grid.Row="1" Spacing="12">
+            <HorizontalStackLayout Grid.Row="1" Spacing="16">
                 <!--#region IZQUIERDA-->
                 <ScrollView WidthRequest="400">
                     <VerticalStackLayout Spacing="8">
@@ -59,6 +59,7 @@
                             <Label Text="Vendedor: *" />
                             <Picker
                                 Grid.Row="1"
+                                IsEnabled="{Binding ProductItems, Converter={ctk:IsNullConverter}}"
                                 ItemDisplayBinding="{Binding FullName}"
                                 ItemsSource="{Binding Sellers}"
                                 SelectedItem="{Binding SelectedSeller}" />
@@ -67,6 +68,7 @@
                             <Label Text="Cliente: *" />
                             <Picker
                                 Grid.Row="1"
+                                IsEnabled="{Binding ProductItems, Converter={ctk:IsNullConverter}}"
                                 ItemDisplayBinding="{Binding CustomerName}"
                                 ItemsSource="{Binding Customers}"
                                 SelectedItem="{Binding SelectedCustomer}" />
@@ -79,7 +81,12 @@
                             <Grid RowDefinitions="auto,auto" RowSpacing="4">
                                 <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                                     <Label Text="Producto:" />
-                                    <Label Grid.Column="1">
+                                    <ActivityIndicator
+                                        Grid.Column="1"
+                                        HeightRequest="18"
+                                        IsRunning="{Binding LoadingStock}"
+                                        WidthRequest="18" />
+                                    <Label Grid.Column="1" IsVisible="{Binding LoadingStock, Converter={ctk:InvertedBoolConverter}}">
                                         <Label.FormattedText>
                                             <FormattedString>
                                                 <Span Text="Existencia en almacén: " />
@@ -94,7 +101,7 @@
                                     SelectedItem="{Binding SelectedProduct}">
                                     <Picker.ItemDisplayBinding>
                                         <MultiBinding>
-                                            <MultiBinding.StringFormat>Producto: {0} [{1}{2}] {3}</MultiBinding.StringFormat>
+                                            <MultiBinding.StringFormat>{0} [{1}{2}] {3}</MultiBinding.StringFormat>
                                             <Binding Path="ProductName" />
                                             <Binding Path="Packaging.Value" />
                                             <Binding Converter="{StaticResource UnitToAbbreviation}" Path="Packaging.Unit" />
@@ -155,107 +162,113 @@
                     WidthRequest="2" />
                 <!--#region DERECHA-->
                 <Grid
-                    RowDefinitions="auto,*,auto"
-                    RowSpacing="8"
+                    RowDefinitions="*,auto"
+                    RowSpacing="10"
                     WidthRequest="400">
-                    <Label Text="Lista de productos: *" />
-                    <ScrollView Grid.Row="1" HeightRequest="135">
-                        <CollectionView
-                            ItemsSource="{Binding ProductItems, Mode=OneWay}"
-                            SelectedItem="{Binding SelectedProductItem}"
-                            SelectionMode="Single">
-                            <CollectionView.ItemsLayout>
-                                <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
-                            </CollectionView.ItemsLayout>
-                            <CollectionView.ItemTemplate>
-                                <tool:ProductItemTemplateSelector>
-                                    <tool:ProductItemTemplateSelector.NormalPriceTemplate>
-                                        <DataTemplate x:DataType="localModel:ProductItem">
-                                            <Border Style="{StaticResource BorderItem}">
-                                                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                                                    <Label TextColor="{StaticResource White}">
-                                                        <Label.Text>
-                                                            <MultiBinding>
-                                                                <MultiBinding.StringFormat>{0} x {1} [{2}{3}]</MultiBinding.StringFormat>
-                                                                <Binding Path="ProductItemQuantity" />
-                                                                <Binding Path="Product.ProductName" />
-                                                                <Binding Path="Product.Packaging.Value" />
-                                                                <Binding Converter="{StaticResource UnitToAbbreviation}" Path="Product.Packaging.Unit" />
-                                                            </MultiBinding>
-                                                        </Label.Text>
-                                                    </Label>
-                                                    <Label
-                                                        Grid.Column="1"
-                                                        Text="{Binding Product.ArticlePrice, StringFormat='{0:F2}'}"
-                                                        TextColor="{StaticResource White}" />
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </tool:ProductItemTemplateSelector.NormalPriceTemplate>
-                                    <tool:ProductItemTemplateSelector.CustomerDiscountTemplate>
-                                        <DataTemplate x:DataType="localModel:ProductItem">
-                                            <Border Style="{StaticResource BorderItem}">
-                                                <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
-                                                    <Label
-                                                        FontFamily="icofont"
-                                                        Text="{StaticResource Tag}"
-                                                        TextColor="{StaticResource White}" />
-                                                    <Label Grid.Column="1" TextColor="{StaticResource White}">
-                                                        <Label.Text>
-                                                            <MultiBinding>
-                                                                <MultiBinding.StringFormat>{0} x {1} [{2}{3}]</MultiBinding.StringFormat>
-                                                                <Binding Path="ProductItemQuantity" />
-                                                                <Binding Path="Product.ProductName" />
-                                                                <Binding Path="Product.Packaging.Value" />
-                                                                <Binding Converter="{StaticResource UnitToAbbreviation}" Path="Product.Packaging.Unit" />
-                                                            </MultiBinding>
-                                                        </Label.Text>
-                                                    </Label>
-                                                    <Label
-                                                        Grid.Column="2"
-                                                        Text="{Binding PriceWhitDiscount, StringFormat='{0:F2}'}"
-                                                        TextColor="{StaticResource White}" />
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </tool:ProductItemTemplateSelector.CustomerDiscountTemplate>
-                                    <tool:ProductItemTemplateSelector.ProductOfferTemplate>
-                                        <DataTemplate x:DataType="localModel:ProductItem">
-                                            <Border Style="{StaticResource BorderItem}">
-                                                <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
-                                                    <Label
-                                                        FontFamily="icofont"
-                                                        Text="{StaticResource Gift}"
-                                                        TextColor="{StaticResource White}" />
-                                                    <Label Grid.Column="1" TextColor="{StaticResource White}">
-                                                        <Label.Text>
-                                                            <MultiBinding>
-                                                                <MultiBinding.StringFormat>{0}-{1} [{2} x {3}]</MultiBinding.StringFormat>
-                                                                <Binding Path="Product.ProductName" />
-                                                                <Binding Path="ProductOffer.Id" />
-                                                                <Binding Path="ProductOffer.BonusAmount" />
-                                                                <Binding Path="ProductOffer.Quantity" />
-                                                            </MultiBinding>
-                                                        </Label.Text>
-                                                    </Label>
-                                                    <Label
-                                                        Grid.Column="2"
-                                                        Text="{Binding PriceWhitDiscount, StringFormat='{0:F2}'}"
-                                                        TextColor="{StaticResource White}" />
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </tool:ProductItemTemplateSelector.ProductOfferTemplate>
-                                </tool:ProductItemTemplateSelector>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </ScrollView>
-                    <VerticalStackLayout Grid.Row="2" Spacing="8">
+                    <Grid RowDefinitions="auto,*,auto" RowSpacing="4">
+                        <Label Text="Lista de productos: *" />
+                        <ScrollView
+                            Grid.Row="1"
+                            HeightRequest="210"
+                            VerticalOptions="Start">
+                            <CollectionView
+                                ItemsSource="{Binding ProductItems, Mode=OneWay}"
+                                SelectedItem="{Binding SelectedProductItem}"
+                                SelectionMode="Single">
+                                <CollectionView.ItemsLayout>
+                                    <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
+                                </CollectionView.ItemsLayout>
+                                <CollectionView.ItemTemplate>
+                                    <tool:ProductItemTemplateSelector>
+                                        <tool:ProductItemTemplateSelector.NormalPriceTemplate>
+                                            <DataTemplate x:DataType="localModel:ProductItem">
+                                                <Border Style="{StaticResource BorderItem}">
+                                                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                                                        <Label TextColor="{StaticResource White}">
+                                                            <Label.Text>
+                                                                <MultiBinding>
+                                                                    <MultiBinding.StringFormat>{0} x {1} [{2}{3}]</MultiBinding.StringFormat>
+                                                                    <Binding Path="ProductItemQuantity" />
+                                                                    <Binding Path="Product.ProductName" />
+                                                                    <Binding Path="Product.Packaging.Value" />
+                                                                    <Binding Converter="{StaticResource UnitToAbbreviation}" Path="Product.Packaging.Unit" />
+                                                                </MultiBinding>
+                                                            </Label.Text>
+                                                        </Label>
+                                                        <Label
+                                                            Grid.Column="1"
+                                                            Text="{Binding Product.ArticlePrice, StringFormat='{0:F2}'}"
+                                                            TextColor="{StaticResource White}" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </tool:ProductItemTemplateSelector.NormalPriceTemplate>
+                                        <tool:ProductItemTemplateSelector.CustomerDiscountTemplate>
+                                            <DataTemplate x:DataType="localModel:ProductItem">
+                                                <Border Style="{StaticResource BorderItem}">
+                                                    <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
+                                                        <Label
+                                                            FontFamily="icofont"
+                                                            Text="{StaticResource Tag}"
+                                                            TextColor="{StaticResource White}" />
+                                                        <Label Grid.Column="1" TextColor="{StaticResource White}">
+                                                            <Label.Text>
+                                                                <MultiBinding>
+                                                                    <MultiBinding.StringFormat>{0} x {1} [{2}{3}]</MultiBinding.StringFormat>
+                                                                    <Binding Path="ProductItemQuantity" />
+                                                                    <Binding Path="Product.ProductName" />
+                                                                    <Binding Path="Product.Packaging.Value" />
+                                                                    <Binding Converter="{StaticResource UnitToAbbreviation}" Path="Product.Packaging.Unit" />
+                                                                </MultiBinding>
+                                                            </Label.Text>
+                                                        </Label>
+                                                        <Label
+                                                            Grid.Column="2"
+                                                            Text="{Binding PriceWhitDiscount, StringFormat='{0:F2}'}"
+                                                            TextColor="{StaticResource White}" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </tool:ProductItemTemplateSelector.CustomerDiscountTemplate>
+                                        <tool:ProductItemTemplateSelector.ProductOfferTemplate>
+                                            <DataTemplate x:DataType="localModel:ProductItem">
+                                                <Border Style="{StaticResource BorderItem}">
+                                                    <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
+                                                        <Label
+                                                            FontFamily="icofont"
+                                                            Text="{StaticResource Gift}"
+                                                            TextColor="{StaticResource White}" />
+                                                        <Label Grid.Column="1" TextColor="{StaticResource White}">
+                                                            <Label.Text>
+                                                                <MultiBinding>
+                                                                    <MultiBinding.StringFormat>{0}-{1} [{2} x {3}]</MultiBinding.StringFormat>
+                                                                    <Binding Path="Product.ProductName" />
+                                                                    <Binding Path="ProductOffer.Id" />
+                                                                    <Binding Path="ProductOffer.BonusAmount" />
+                                                                    <Binding Path="ProductOffer.Quantity" />
+                                                                </MultiBinding>
+                                                            </Label.Text>
+                                                        </Label>
+                                                        <Label
+                                                            Grid.Column="2"
+                                                            Text="{Binding PriceWhitDiscount, StringFormat='{0:F2}'}"
+                                                            TextColor="{StaticResource White}" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </tool:ProductItemTemplateSelector.ProductOfferTemplate>
+                                    </tool:ProductItemTemplateSelector>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </ScrollView>
                         <Button
+                            Grid.Row="2"
                             Command="{Binding RemoveProductitemCommand}"
                             IsEnabled="{Binding SelectedProductItem, Converter={ctk:IsNotNullConverter}}"
                             Text="Eliminar producto" />
-                        <VerticalStackLayout IsEnabled="{Binding SelectedProductItem, Converter={ctk:IsNotNullConverter}}" Spacing="4">
+                    </Grid>
+                    <VerticalStackLayout Grid.Row="1" Spacing="10">
+                        <VerticalStackLayout IsEnabled="{Binding SelectedProductItem, Converter={ctk:IsNotNullConverter}}" Spacing="6">
                             <Label Text="Descuento:" />
                             <Grid ColumnDefinitions="*, auto" ColumnSpacing="8">
                                 <HorizontalStackLayout Spacing="4">
@@ -304,11 +317,44 @@
                                 </Picker.ItemDisplayBinding>
                             </Picker>
                         </VerticalStackLayout>
-                        <Label
-                            FontAttributes="Bold"
-                            FontSize="14"
-                            Text="{Binding TotalQuote, StringFormat='Total de la cotización: {0:N2}', FallbackValue='Total de la cotización: 0.00'}"
-                            VerticalOptions="Center" />
+                        <Grid Padding="8,4" BackgroundColor="{StaticResource Secondary}">
+                            <Label
+                                FontSize="14"
+                                HorizontalOptions="Start"
+                                Text="Total sin descuento:"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontSize="14"
+                                HorizontalOptions="End"
+                                Text="{Binding Total, StringFormat='{0:N2}', FallbackValue='0.00'}"
+                                VerticalOptions="Center" />
+                        </Grid>
+                        <Grid Padding="8,4" BackgroundColor="{StaticResource Secondary}">
+                            <Label
+                                FontSize="14"
+                                HorizontalOptions="Start"
+                                Text="Diferencia:"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontSize="14"
+                                HorizontalOptions="End"
+                                Text="{Binding Difference, StringFormat='{0:N2}', FallbackValue='0.00'}"
+                                VerticalOptions="Center" />
+                        </Grid>
+                        <Grid Padding="8,4" BackgroundColor="{StaticResource Secondary}">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="14"
+                                HorizontalOptions="Start"
+                                Text="Saldo del pedido:"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="14"
+                                HorizontalOptions="End"
+                                Text="{Binding TotalWithDiscount, StringFormat='{0:N2}', FallbackValue='0.00'}"
+                                VerticalOptions="Center" />
+                        </Grid>
                     </VerticalStackLayout>
                 </Grid>
                 <!--#endregion-->
@@ -333,7 +379,7 @@
                         </FormattedString>
                     </Label.FormattedText>
                 </Label>
-                <HorizontalStackLayout Grid.Column="1" Spacing="4">
+                <HorizontalStackLayout Grid.Column="1" Spacing="8">
                     <Button
                         Command="{Binding AddCommand}"
                         Text="Agregar"

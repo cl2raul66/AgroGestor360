@@ -260,7 +260,7 @@
                     RowDefinitions="*,auto"
                     RowSpacing="10"
                     WidthRequest="400">
-                    <Grid ColumnSpacing="8" RowDefinitions="auto,*">
+                    <Grid RowDefinitions="auto,*,auto" RowSpacing="4">
                         <Label Text="Lista de productos: *" />
                         <ScrollView
                             Grid.Row="1"
@@ -356,13 +356,14 @@
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
                         </ScrollView>
-                    </Grid>
-                    <VerticalStackLayout Grid.Row="1" Spacing="10">
                         <Button
+                            Grid.Row="2"
                             Command="{Binding RemoveProductitemCommand}"
                             IsEnabled="{Binding SelectedProductItem, Converter={ctk:IsNotNullConverter}}"
                             Text="Eliminar producto" />
-                        <VerticalStackLayout IsEnabled="{Binding SelectedProductItem, Converter={ctk:IsNotNullConverter}}" Spacing="4">
+                    </Grid>
+                    <VerticalStackLayout Grid.Row="1" Spacing="10">
+                        <VerticalStackLayout IsEnabled="{Binding SelectedProductItem, Converter={ctk:IsNotNullConverter}}" Spacing="6">
                             <Label Text="Descuento:" />
                             <Grid ColumnDefinitions="*, auto" ColumnSpacing="8">
                                 <HorizontalStackLayout Spacing="4">
@@ -425,20 +426,6 @@
                         </Grid>
                         <Grid Padding="8,4" BackgroundColor="{StaticResource Secondary}">
                             <Label
-                                FontAttributes="Bold"
-                                FontSize="14"
-                                HorizontalOptions="Start"
-                                Text="Total de la venta:"
-                                VerticalOptions="Center" />
-                            <Label
-                                FontAttributes="Bold"
-                                FontSize="14"
-                                HorizontalOptions="End"
-                                Text="{Binding TotalWithDiscount, StringFormat='{0:N2}', FallbackValue='0.00'}"
-                                VerticalOptions="Center" />
-                        </Grid>
-                        <Grid Padding="8,4" BackgroundColor="{StaticResource Secondary}">
-                            <Label
                                 FontSize="14"
                                 HorizontalOptions="Start"
                                 Text="Diferencia:"
@@ -447,6 +434,20 @@
                                 FontSize="14"
                                 HorizontalOptions="End"
                                 Text="{Binding Difference, StringFormat='{0:N2}', FallbackValue='0.00'}"
+                                VerticalOptions="Center" />
+                        </Grid>
+                        <Grid Padding="8,4" BackgroundColor="{StaticResource Secondary}">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="14"
+                                HorizontalOptions="Start"
+                                Text="Saldo de la venta:"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="14"
+                                HorizontalOptions="End"
+                                Text="{Binding TotalWithDiscount, StringFormat='{0:N2}', FallbackValue='0.00'}"
                                 VerticalOptions="Center" />
                         </Grid>
                     </VerticalStackLayout>

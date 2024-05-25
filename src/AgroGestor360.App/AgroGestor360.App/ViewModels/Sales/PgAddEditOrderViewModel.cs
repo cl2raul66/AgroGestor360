@@ -21,6 +21,7 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
     readonly IArticlesForWarehouseService articlesForWarehouseServ;
     readonly IQuotesService quotesServ;
     readonly string serverURL;
+    Dictionary<string, double>? StockInWarehouse;
 
     public PgAddEditOrderViewModel(IProductsForSalesService productsForSalesService, IArticlesForWarehouseService articlesForWarehouseService, IQuotesService quotesService)
     {
@@ -44,15 +45,6 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
     DateTime date;
 
     [ObservableProperty]
-    List<DTO4>? products;
-
-    [ObservableProperty]
-    DTO4? selectedProduct;
-
-    [ObservableProperty]
-    double stock;
-
-    [ObservableProperty]
     List<DTO6>? sellers;
 
     [ObservableProperty]
@@ -65,6 +57,15 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
     [ObservableProperty]
     [Required]
     DTO5_1? selectedCustomer;
+
+    [ObservableProperty]
+    List<DTO4>? products;
+
+    [ObservableProperty]
+    DTO4? selectedProduct;
+
+    [ObservableProperty]
+    double stock;
 
     [ObservableProperty]
     string? quantity;
@@ -93,7 +94,16 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
     ProductOffering? selectedOffer;
 
     [ObservableProperty]
-    double totalQuote;
+    double totalWithDiscount;
+
+    [ObservableProperty]
+    double total;
+
+    [ObservableProperty]
+    double difference;
+
+    [ObservableProperty]
+    bool loadingStock;
 
     [RelayCommand]
     async Task SendProductItem()
@@ -127,15 +137,19 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
         ProductItems ??= [];
         ProductItems.Insert(0, new() { ProductItemQuantity = theQuantity, Product = SelectedProduct! });
 
-        UpdateTotalQuote();
+        UpdateTotal();
+        await UpdateStock(SelectedProduct!.MerchandiseId!, theQuantity);
 
         SelectedProduct = null;
         Quantity = null;
+        Stock = 0;
     }
 
     [RelayCommand]
     async Task RemoveProductitem(ProductItem productitem)
     {
+        string currentProductItem = SelectedProductItem!.Product!.MerchandiseId!;
+
         var theQuantity = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProductItem?.Product?.Id ?? string.Empty))?.Quantity ?? 0;
 
         var selectedQuantity = SelectedProductItem!.ProductOffer is null ? SelectedProductItem!.ProductItemQuantity : SelectedProductItem!.ProductOffer.Quantity;
@@ -146,8 +160,13 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
         bool result = ProductItems!.Remove(SelectedProductItem!);
         if (result)
         {
-            UpdateTotalQuote();
-            return;
+            UpdateTotal();
+            StockInWarehouse!.Remove(currentProductItem);
+            Quantity = null;
+            SelectedProduct = null;
+            SelectedProductItem = null;
+            Stock = 0;
+            //return;
         }
         ProductsPending += 1;
     }
@@ -194,7 +213,7 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
         }
         ProductItems[idx] = item;
         SelectedProductItem = ProductItems[idx];
-        UpdateTotalQuote();
+        UpdateTotal();
     }
 
     [RelayCommand]
@@ -321,7 +340,10 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
         {
             if (SelectedProduct is not null)
             {
-                Stock = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProduct.MerchandiseId!))?.Quantity ?? 0;
+                LoadingStock = true;
+                await UpdateStock(SelectedProduct!.MerchandiseId!);
+                //Stock = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProduct.MerchandiseId!))?.Quantity ?? 0;
+                LoadingStock = false;
                 WaitPropertyChanged = false;
             }
         }
@@ -368,10 +390,10 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
     }
 
     #region EXTRA
-
-    private void UpdateTotalQuote()
+    private void UpdateTotal()
     {
         double total = 0;
+        double total1 = 0;
         if (ProductItems != null)
         {
             foreach (var item in ProductItems)
@@ -388,10 +410,51 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
                 {
                     itemQuantity = item.ProductOffer!.Quantity;
                 }
-                total += itemQuantity * itemPrice;
+                total1 += itemQuantity * itemPrice;
+                total += itemQuantity * item.Product!.ArticlePrice;
             }
         }
-        TotalQuote = total;
+        Total = total;
+        TotalWithDiscount = total1;
+        Difference = total - total1;
+    }
+
+    async Task UpdateStock(string merchandiseId, double theQuantity = 0)
+    {
+        double value = 0;
+        StockInWarehouse ??= [];
+        if (StockInWarehouse.Any())
+        {
+            if (StockInWarehouse.ContainsKey(SelectedProduct!.MerchandiseId!))
+            {
+                value = StockInWarehouse[SelectedProduct!.MerchandiseId!];
+            }
+            else
+            {
+                value = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProduct!.MerchandiseId!))?.Quantity ?? 0;
+            }
+        }
+        else if (Stock == 0)
+        {
+            value = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProduct!.MerchandiseId!))?.Quantity ?? 0;
+        }
+        else
+        {
+            value = Stock;
+        }
+
+        if (theQuantity > 0)
+        {
+            value -= theQuantity;
+            StockInWarehouse.Add(SelectedProduct!.MerchandiseId!, value);
+        }
+        if (theQuantity < 0)
+        {
+            value += theQuantity;
+            StockInWarehouse.Remove(SelectedProduct!.MerchandiseId!);
+        }
+
+        Stock = value;
     }
     #endregion
 }
