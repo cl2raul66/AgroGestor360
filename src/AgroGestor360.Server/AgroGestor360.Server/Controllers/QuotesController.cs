@@ -1,5 +1,6 @@
 ﻿using AgroGestor360.Server.Models;
 using AgroGestor360.Server.Services;
+using AgroGestor360.Server.Tools;
 using AgroGestor360.Server.Tools.Enums;
 using AgroGestor360.Server.Tools.Extensions;
 using LiteDB;
@@ -50,13 +51,43 @@ public class QuotesController : ControllerBase
             return BadRequest();
         }
 
-        var found = quotesServ.GetById(new Guid(code));
+        var found = quotesServ.GetByCode(new Guid(code));
         if (found is null)
         {
             return NotFound();
         }
 
         return Ok(found.ToDTO7());
+    }
+
+    [HttpGet("getproductsbycode/{code}")]
+    public ActionResult<DTO7_4> GetProductsByCode(string code)
+    {
+        if (string.IsNullOrEmpty(code))
+        {
+            return BadRequest();
+        }
+
+        var found = quotesServ.GetByCode(new Guid(code));
+        if (found is null)
+        {
+            return NotFound();
+        }
+
+        double totalAmount = GetTotalAmount.Get(found);
+
+        DTO7_4 dTO = new()
+        {
+            Date = found.Date,
+            Code = found.Code.ToString(),
+            TotalAmount = totalAmount,
+            CustomerName = found.Customer?.Contact?.FormattedName,
+            SellerName = found.Seller?.Contact?.FormattedName,
+            Status = found.Status,
+            Products = found.Products?.Select(p => ProductItemForDocumentToString.GetText(p.Product!, p.HasCustomerDiscount, p.OfferId, found.Customer!)).ToArray()
+        };
+
+        return Ok(dTO);
     }
 
     [HttpGet("getorderbycode/{code}")]
@@ -67,7 +98,7 @@ public class QuotesController : ControllerBase
             return BadRequest();
         }
 
-        var found = quotesServ.GetById(new Guid(code));
+        var found = quotesServ.GetByCode(new Guid(code));
         if (found is null)
         {
             return NotFound();
@@ -138,7 +169,7 @@ public class QuotesController : ControllerBase
             return BadRequest();
         }
 
-        Quotation entity = quotesServ.GetById(new Guid(dTO.Code!));
+        Quotation entity = quotesServ.GetByCode(new Guid(dTO.Code!));
         if (entity is null)
         {
             return NotFound();
@@ -190,7 +221,7 @@ public class QuotesController : ControllerBase
             return BadRequest();
         }
 
-        Quotation entity = quotesServ.GetById(new Guid(dTO.Code!));
+        Quotation entity = quotesServ.GetByCode(new Guid(dTO.Code!));
         if (entity is null)
         {
             return NotFound();

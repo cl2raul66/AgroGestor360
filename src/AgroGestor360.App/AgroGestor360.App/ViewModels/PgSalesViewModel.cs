@@ -80,6 +80,15 @@ public partial class PgSalesViewModel : ObservableRecipient
     DTO7? selectedQuotation;
 
     [RelayCommand]
+    async Task ShowQuotationDetail()
+    {
+        string bodyText = await GenerateBodyTextFromQuotation();
+        await Shell.Current.DisplayAlert("Información", bodyText, "Cerrar");
+        SelectedOrder = null;
+        SelectedQuotation = null;
+    }
+
+    [RelayCommand]
     async Task ShowAddEditQuote()
     {
         IsActive = true;
@@ -339,22 +348,8 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task ShowOrderDetail()
     {
-        StringBuilder sb = new();
-        sb.AppendLine($"No.: {SelectedOrder!.Code}");
-        sb.AppendLine($"Fecha de creación: {SelectedOrder!.Date:dd MMM yyyy}");
-        sb.AppendLine($"Vendedor: {SelectedOrder!.SellerName}");
-        sb.AppendLine($"Cliente: {SelectedOrder!.CustomerName}");
-        sb.AppendLine($"Estado: " + (SelectedOrder!.IsPendingStatus ? "Pendiente" : "Procesando"));
-        sb.AppendLine("");
-        sb.AppendLine("Productos:");
-        var productos = await ordersServ.GetProductItemsByCodeAsync(serverURL, SelectedOrder!.Code!);
-        foreach (var item in productos)
-        {
-            sb.AppendLine(item);
-        }
-        sb.AppendLine("");
-        sb.AppendLine($"Total: {SelectedOrder!.TotalAmount:N2}");
-        await Shell.Current.DisplayAlert("Información", sb.ToString(), "Cerrar");
+        string bodyText = await GenerateBodyTextFromOrder();
+        await Shell.Current.DisplayAlert("Información", bodyText, "Cerrar");
         SelectedOrder = null;
         SelectedQuotation = null;
     }
@@ -597,6 +592,36 @@ public partial class PgSalesViewModel : ObservableRecipient
         string file = Path.Combine(FileSystem.CacheDirectory, title + ".pdf");
 
         return file;
+    }
+
+    async Task<string> GenerateBodyTextFromQuotation()
+    {
+        var currentQuotation = await quotationsServ.GetProductsByCodeAsync(serverURL, SelectedQuotation!.Code!);
+        StringBuilder sb = new();
+        sb.AppendLine($"No.: {currentQuotation!.Code}");
+        sb.AppendLine($"Fecha de creación: {currentQuotation!.Date:dd MMM yyyy}");
+        sb.AppendLine($"Vendedor: {currentQuotation!.SellerName}");
+        sb.AppendLine($"Cliente: {currentQuotation!.CustomerName}");
+        sb.AppendLine($"Estado: Pendiente");
+        sb.AppendLine("Productos:");
+        sb.AppendLine(string.Join(Environment.NewLine, currentQuotation.Products!));
+        sb.AppendLine($"Total: {currentQuotation!.TotalAmount:N2}");
+        return sb.ToString();
+    }
+
+    async Task<string> GenerateBodyTextFromOrder()
+    {
+        var currentOrder = await ordersServ.GetProductsByCodeAsync(serverURL, SelectedOrder!.Code!);
+        StringBuilder sb = new();
+        sb.AppendLine($"No.: {currentOrder!.Code}");
+        sb.AppendLine($"Fecha de creación: {currentOrder!.Date:dd MMM yyyy}");
+        sb.AppendLine($"Vendedor: {currentOrder!.SellerName}");
+        sb.AppendLine($"Cliente: {currentOrder!.CustomerName}");
+        sb.AppendLine($"Estado: Pendiente");
+        sb.AppendLine("Productos:");
+        sb.AppendLine(string.Join(Environment.NewLine, currentOrder.Products!));
+        sb.AppendLine($"Total: {currentOrder!.TotalAmount:N2}");
+        return sb.ToString();
     }
 
     async Task<string> GenerateBodyTextFromInvoice()

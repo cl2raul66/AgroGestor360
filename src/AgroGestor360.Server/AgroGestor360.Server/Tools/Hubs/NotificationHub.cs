@@ -33,4 +33,14 @@ public class NotificationHub : Hub
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
         await Clients.Caller.SendAsync("LeftGroup", groupName);
     }
+
+    public async Task SendExpiredQuotationMessage(string[] quotationCodes)
+    {
+        await Clients.Group("QuotationView").SendAsync("ReceiveExpiredQuotationMessage", quotationCodes);
+    }
+
+    public async Task SendExpiredOrderMessage(string[] orderCodes)
+    {
+        await Clients.Group("OrderView").SendAsync("ReceiveExpiredOrderMessage", orderCodes);
+    }
 }

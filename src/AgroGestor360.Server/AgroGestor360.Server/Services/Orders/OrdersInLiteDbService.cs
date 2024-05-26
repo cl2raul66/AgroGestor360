@@ -4,40 +4,40 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public interface IQuotesInLiteDbService
+public interface IOrdersInLiteDbService
 {
     bool Exist { get; }
 
     void BeginTrans();
     void Commit();
-    bool Delete(Guid code); 
+    bool Delete(Guid code);
     bool DeleteMany(IEnumerable<Guid> codes);
-    IEnumerable<Quotation> GetAll();
-    Quotation GetByCode(Guid code);
-    IEnumerable<Quotation> GetExpiringQuotes(int expiryDays);
-    string Insert(Quotation entity);
+    IEnumerable<Order> GetAll();
+    Order GetByCode(Guid code);
+    IEnumerable<Order> GetExpiringOrders(int expiryDays);
+    string Insert(Order entity);
     void Rollback();
-    bool Update(Quotation entity);
+    bool Update(Order entity);
 }
 
-public class QuotesInLiteDbService : IQuotesInLiteDbService
+public class OrdersInLiteDbService : IOrdersInLiteDbService
 {
     readonly LiteDatabase db;
-    readonly ILiteCollection<Quotation> collection;
+    readonly ILiteCollection<Order> collection;
 
-    public QuotesInLiteDbService()
+    public OrdersInLiteDbService()
     {
         var cnx = new ConnectionString()
         {
-            Filename = FileHelper.GetFileDbPath("Quotes")
+            Filename = FileHelper.GetFileDbPath("Orders")
         };
         var mapper = new BsonMapper();
 
-        mapper.Entity<Quotation>().Id(x => x.Code);
+        mapper.Entity<Order>().Id(x => x.Code);
 
         db = new(cnx, mapper);
 
-        collection = db.GetCollection<Quotation>();
+        collection = db.GetCollection<Order>();
         collection.EnsureIndex(x => x.Code);
     }
 
@@ -49,19 +49,19 @@ public class QuotesInLiteDbService : IQuotesInLiteDbService
 
     public bool Exist => collection.Count() > 0;
 
-    public Quotation GetByCode(Guid code) => collection.FindById(code);
+    public IEnumerable<Order> GetAll() => collection.FindAll();
 
-    public IEnumerable<Quotation> GetAll() => collection.FindAll();
+    public Order GetByCode(Guid code) => collection.FindById(code);
 
-    public string Insert(Quotation entity) => collection.Insert(entity).AsGuid.ToString();
-
-    public IEnumerable<Quotation> GetExpiringQuotes(int expiryDays)
+    public IEnumerable<Order> GetExpiringOrders(int expiryDays)
     {
         var expiryDate = DateTime.Today.AddDays(-expiryDays);
         return collection.Find(q => q.Date <= expiryDate);
     }
 
-    public bool Update(Quotation entity) => collection.Update(entity);
+    public string Insert(Order entity) => collection.Insert(entity).AsGuid.ToString();
+
+    public bool Update(Order entity) => collection.Update(entity);
 
     public bool Delete(Guid code) => collection.Delete(code);
 

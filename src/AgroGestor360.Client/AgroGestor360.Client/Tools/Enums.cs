@@ -92,10 +92,11 @@ public enum QuotationStatus { Draft, Sent, Accepted, Rejected, Cancelled }
 /// Pending: El pedido ha sido creado pero no ha sido procesado.
 /// Processing: El pedido ha sido procesado y está en proceso de ser completado.
 /// Completed: El pedido ha sido completado y entregado al cliente.
+/// Rejected: La cotización ha sido rechazada por el cliente.
 /// Cancelled: El pedido ha sido cancelado por el cliente o por el sistema.
 /// </code>
 /// </summary>
-public enum OrderStatus { Pending, Processing, Completed, Cancelled }
+public enum OrderStatus { Pending, Processing, Completed, Rejected, Cancelled }
 
 /// <summary>
 /// Representa el estado de una factura en el sistema.

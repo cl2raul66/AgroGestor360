@@ -12,7 +12,7 @@ public interface IOrdersService
     Task<IEnumerable<DTO8>> GetAllAsync(string serverURL);
     Task<DTO8?> GetByCodeAsync(string serverURL, string code);
     Task<DTO8_4?> GetDTO8_4FromQuotationAsync(string serverURL, DTO7 dTO);
-    Task<IEnumerable<string>> GetProductItemsByCodeAsync(string serverURL, string code);
+    Task<DTO8_5?> GetProductsByCodeAsync(string serverURL, string code);
     Task<string> InsertAsync(string serverURL, DTO8_1 dTO);
     Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO);
     Task<bool> UpdateAsync(string serverURL, DTO8_2 dTO);
@@ -97,26 +97,26 @@ public class OrdersService : IOrdersService
         return null;
     }
 
-    public async Task<IEnumerable<string>> GetProductItemsByCodeAsync(string serverURL, string code)
+    public async Task<DTO8_5?> GetProductsByCodeAsync(string serverURL, string code)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/orders/getproductitemsbycode/{code}");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/orders/getproductsbycode/{code}");
 
             switch (response.StatusCode)
             {
                 case HttpStatusCode.NotFound:
                 case HttpStatusCode.BadRequest:
-                    return [];
+                    return null;
                 default:
                     response.EnsureSuccessStatusCode();
                     break;
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<string>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+            return JsonSerializer.Deserialize<DTO8_5>(content, ApiServiceBase.ProviderJSONOptions);
         }
-        return [];
+        return null;
     }
 
     public async Task<string> InsertAsync(string serverURL, DTO8_1 dTO)

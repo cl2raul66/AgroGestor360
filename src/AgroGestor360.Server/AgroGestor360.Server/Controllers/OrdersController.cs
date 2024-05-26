@@ -1,5 +1,6 @@
 ﻿using AgroGestor360.Server.Models;
 using AgroGestor360.Server.Services;
+using AgroGestor360.Server.Tools;
 using AgroGestor360.Server.Tools.Enums;
 using AgroGestor360.Server.Tools.Extensions;
 using LiteDB;
@@ -83,7 +84,7 @@ public class OrdersController : ControllerBase
             return BadRequest();
         }
 
-        var found = ordersServ.GetById(new Guid(code));
+        var found = ordersServ.GetByCode(new Guid(code));
         if (found is null)
         {
             return NotFound();
@@ -94,60 +95,34 @@ public class OrdersController : ControllerBase
         return Ok(found.ToDTO8());
     }
 
-    [HttpGet("getproductitemsbycode/{code}")]
-    public ActionResult<IEnumerable<string>> GetProductItemsByCode(string code)
+    [HttpGet("getproductsbycode/{code}")]
+    public ActionResult<DTO8_5> GetProductsByCode(string code)
     {
         if (string.IsNullOrEmpty(code))
         {
             return BadRequest();
         }
 
-        var found = ordersServ.GetById(new Guid(code));
+        var found = ordersServ.GetByCode(new Guid(code));
         if (found is null)
         {
             return NotFound();
         }
 
-        UpdateOrderStatusBasedOnStock(found);
-        //todo: check if this is correct or if it should be a list of strings
-        List<string> result = [];
-        foreach (var pi in found.Products!)
+        double totalAmount = GetTotalAmount.Get(found);
+
+        DTO8_5 dTO = new()
         {
-            string texto;
+            Date = found.Date,
+            Code = found.Code.ToString(),
+            TotalAmount = totalAmount,
+            CustomerName = found.Customer?.Contact?.FormattedName,
+            SellerName = found.Seller?.Contact?.FormattedName,
+            Status = found.Status,
+            Products = found.Products?.Select(p => ProductItemForDocumentToString.GetText(p.Product!, p.HasCustomerDiscount, p.OfferId, found.Customer!)).ToArray()
+        };
 
-            if (pi.HasCustomerDiscount)
-            {
-                texto = string.Format("{0,-20} {1,-10:F2} {2,-10} (Descuento) {3,-10:N2}",
-                    pi.Product!.ProductName,
-                    pi.Product!.Packaging!.Value,
-                    pi.Product!.Packaging!.Unit,
-                    pi.Product.ArticlePrice -= pi.Product.ArticlePrice * (found.Customer!.Discount!.Value / 100.00));
-            }
-            else if (pi.OfferId > 0)
-            {
-                var o = pi.Product!.Offering![pi.OfferId - 1];
-                texto = string.Format("{0,-20}-{1,-1} {2,-10:F2} {3,-10} (Oferta {4,-20} {5,-1} extra) {6,-10:N2}",
-                    pi.Product!.ProductName,
-                    pi.OfferId,
-                    pi.Product!.Packaging!.Value,
-                    pi.Product!.Packaging!.Unit,
-                    o.BonusAmount,
-                    o.BonusAmount == 1 ? "unidad" : "unidades",
-                    pi.Product.ArticlePrice);
-            }
-            else
-            {
-                texto = string.Format("{0,-20} {1,-10:F2} {2,-10} {3,-10:N2}",
-                    pi.Product!.ProductName,
-                    pi.Product!.Packaging!.Value,
-                    pi.Product!.Packaging!.Unit,
-                    pi.Product.ArticlePrice);
-            }
-
-            result.Add(texto);
-        }
-
-        return Ok(result);
+        return Ok(dTO);
     }
 
     [HttpPost("getdto8_4fromquotation")]
@@ -173,7 +148,7 @@ public class OrdersController : ControllerBase
             Seller = dto6
         };
 
-        var quotation = quotesServ.GetById(new(dTO.Code!));
+        var quotation = quotesServ.GetByCode(new(dTO.Code!));
         var products = new List<DTO9>();
         foreach (var productItem in quotation.Products!)
         {
@@ -254,7 +229,7 @@ public class OrdersController : ControllerBase
         }
 
         Guid code = new(dTO.Code!);
-        var found = quotesServ.GetById(code);
+        var found = quotesServ.GetByCode(code);
         if (found is null)
         {
             return NotFound();
@@ -315,7 +290,7 @@ public class OrdersController : ControllerBase
             return BadRequest();
         }
 
-        Order entity = ordersServ.GetById(new Guid(dTO.Code!));
+        Order entity = ordersServ.GetByCode(new Guid(dTO.Code!));
         if (entity is null)
         {
             return NotFound();
@@ -379,7 +354,7 @@ public class OrdersController : ControllerBase
             return BadRequest();
         }
 
-        var entity = ordersServ.GetById(new Guid(dTO.Code!));
+        var entity = ordersServ.GetByCode(new Guid(dTO.Code!));
         if (entity is null)
         {
             return NotFound();

@@ -84,58 +84,6 @@
                         Text="Cotización"
                         TextTransform="Uppercase"
                         VerticalOptions="Center" />
-                    <!--<Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                        <Entry
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Placeholder="Escriba aquí" />
-                        <HorizontalStackLayout Spacing="8">
-                            <Entry
-                                ClearButtonVisibility="WhileEditing"
-                                HorizontalTextAlignment="End"
-                                IsSpellCheckEnabled="True"
-                                IsTextPredictionEnabled="True"
-                                Keyboard="Numeric"
-                                Placeholder="0.00"
-                                WidthRequest="100" />
-                            <Entry
-                                ClearButtonVisibility="WhileEditing"
-                                HorizontalTextAlignment="End"
-                                IsSpellCheckEnabled="True"
-                                IsTextPredictionEnabled="True"
-                                Keyboard="Numeric"
-                                Placeholder="0.00"
-                                WidthRequest="100" />
-                        </HorizontalStackLayout>
-                        <Button
-                            Grid.Column="1"
-                            FontFamily="icofont"
-                            Text="{StaticResource Search}"
-                            ToolTipProperties.Text="Buscar" />
-                    </Grid>
-                    <HorizontalStackLayout Spacing="8">
-                        <RadioButton>
-                            <RadioButton.Content>
-                                <Label Text="Por nombre" VerticalOptions="Center" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                        <RadioButton>
-                            <RadioButton.Content>
-                                <Label Text="Por rango de precio" VerticalOptions="Center" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                        <RadioButton>
-                            <RadioButton.Content>
-                                <Label Text="Por categoría" VerticalOptions="Center" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                        <RadioButton>
-                            <RadioButton.Content>
-                                <Label Text="Por cantidad unitaria" VerticalOptions="Center" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                    </HorizontalStackLayout>-->
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1">
                     <CollectionView
@@ -230,6 +178,7 @@
                                 CornerRadius="2"
                                 WidthRequest="2" />
                             <Button
+                                Command="{Binding ShowQuotationDetailCommand}"
                                 FontFamily="icofont"
                                 IsEnabled="{Binding SelectedQuotation, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource UiNote}"
@@ -682,7 +631,7 @@
             <HorizontalStackLayout
                 Grid.Column="1"
                 Padding="8"
-                Spacing="4">
+                Spacing="8">
                 <Label FontSize="11" Text="{Binding AppInfo}" />
                 <BoxView
                     BackgroundColor="{StaticResource Tertiary}"

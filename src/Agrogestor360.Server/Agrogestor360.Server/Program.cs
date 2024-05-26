@@ -23,9 +23,11 @@ builder.Services.AddSingleton<IProductsForSalesInLiteDbService, ProductsForSales
 builder.Services.AddSingleton<IQuotesInLiteDbService, QuotesInLiteDbService>();
 builder.Services.AddSingleton<IWasteQuotationInLiteDbService, WasteQuotationInLiteDbService>();
 builder.Services.AddSingleton<IOrdersInLiteDbService, OrdersInLiteDbService>();
+builder.Services.AddSingleton<IWasteOrdersInLiteDbService, WasteOrdersInLiteDbService>();
 builder.Services.AddSingleton<IInvoicesInLiteDbService, InvoicesInLiteDbService>();
 builder.Services.AddSingleton<IWasteInvoicesInLiteDbService, WasteInvoicesInLiteDbService>();
 
+builder.Services.AddHostedService<PeriodicTaskService>();
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

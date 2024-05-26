@@ -368,6 +368,17 @@ public class DTO7_3
     public string? Code { get; set; }
 }
 
+public class DTO7_4
+{
+    public double TotalAmount { get; set; }
+    public DateTime Date { get; set; }
+    public string? Code { get; set; }
+    public string? SellerName { get; set; }
+    public string? CustomerName { get; set; }
+    public string[]? Products { get; set; }
+    public QuotationStatus Status { get; set; }
+}
+
 /// <summary>
 /// Represents a order for GET
 /// <code>
@@ -455,6 +466,17 @@ public class DTO8_4
     public DTO5_1? Customer { get; set; }
     public DTO6? Seller { get; set; }
     public DTO9[]? Products { get; set; }
+}
+
+public class DTO8_5
+{
+    public double TotalAmount { get; set; }
+    public DateTime Date { get; set; }
+    public string? Code { get; set; }
+    public string? SellerName { get; set; }
+    public string? CustomerName { get; set; }
+    public string[]? Products { get; set; }
+    public OrderStatus Status { get; set; }
 }
 
 /// <summary>
@@ -561,6 +583,23 @@ public class DTO10_3
     public InvoiceStatus Status { get; set; }
 }
 
+/// <summary>
+/// Represents a invoice for GET method for a invoice viewer.
+/// <code>
+/// Paid: Amount paid
+/// DaysRemaining: Days remaining to pay if is credit
+/// TotalAmount: Total amount of the invoice
+/// Date: Date of the invoice
+/// Code: Code of the invoice and key in database
+/// SellerName: Name of the seller
+/// CustomerName: Name of the customer
+/// NumberFEL: Number of the invoice in FEL
+/// Status: Status of the invoice
+/// Products: Array of products
+/// ImmediatePayments: Array of immediate payments (no credit)
+/// CreditsPayments: Array of credit payments (credit)
+/// </code>
+/// </summary>
 public class DTO10_4
 {
     public double Paid { get; set; }

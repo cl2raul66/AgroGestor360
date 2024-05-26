@@ -29,7 +29,7 @@ public class ReportsController : ControllerBase
         try
         {
             var organization = config.GetSection("Organization").Get<Organization>();
-            var quotation = quotesServ.GetById(new Guid(code));
+            var quotation = quotesServ.GetByCode(new Guid(code));
 
             List<CustomerQuoteReport.Product> products = [];
             foreach (var p in quotation.Products!)

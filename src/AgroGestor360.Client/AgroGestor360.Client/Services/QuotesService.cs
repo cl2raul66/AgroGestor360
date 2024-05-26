@@ -13,6 +13,7 @@ public interface IQuotesService
     Task<IEnumerable<DTO7>> GetAllAsync(string serverURL);
     Task<DTO7?> GetByCodeAsync(string serverURL, string code);
     Task<DTO8_2?> GetOrderByCodeAsync(string serverURL, string code);
+    Task<DTO7_4?> GetProductsByCodeAsync(string serverURL, string code);
     Task<string> InsertAsync(string serverURL, DTO7_1 dTO);
     Task<bool> UpdateAsync(string serverURL, DTO7_2 dTO);
 }
@@ -73,6 +74,28 @@ public class QuotesService : IQuotesService
 
             var content = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<DTO7>(content, ApiServiceBase.ProviderJSONOptions);
+        }
+        return null;
+    }
+
+    public async Task<DTO7_4?> GetProductsByCodeAsync(string serverURL, string code)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/quotes/getproductsbycode/{code}");
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.NotFound:
+                case HttpStatusCode.BadRequest:
+                    return null;
+                default:
+                    response.EnsureSuccessStatusCode();
+                    break;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<DTO7_4>(content, ApiServiceBase.ProviderJSONOptions);
         }
         return null;
     }

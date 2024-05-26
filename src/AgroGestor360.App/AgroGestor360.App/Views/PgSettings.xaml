@@ -77,7 +77,7 @@
             Padding="8,0"
             ColumnDefinitions="*,auto"
             ColumnSpacing="8">
-            <HorizontalStackLayout Grid.Column="1" Spacing="4">
+            <HorizontalStackLayout Grid.Column="1" Spacing="8">
                 <Label FontSize="11" Text="{Binding AppInfo}" />
                 <BoxView
                     BackgroundColor="{StaticResource Tertiary}"

@@ -9,6 +9,8 @@ public interface IApiService
     Task<bool> CheckUrl(string serverURL);
     void ConnectToHttpClient();
     Task<bool> ConnectToServerHub(string serverURL);
+    Task JoinQuotationViewGroup();
+    Task LeaveQuotationViewGroup();
     void SetClientAccessToken(string accessToken);
     void SetClientDevicePlatform(string os);
 }
@@ -53,6 +55,7 @@ public class ApiService : IApiService
         return false;
     }
 
+    #region HUB
     public async Task<bool> ConnectToServerHub(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
@@ -63,7 +66,6 @@ public class ApiService : IApiService
                     .WithUrl($"{serverURL}/serverStatusHub", options =>
                     {
                         options.Headers.Add("ClientAccessToken", ApiServiceBase.ProviderHttpClient!.DefaultRequestHeaders.GetValues("ClientAccessToken").First());
-                        //options.Headers.Add("UserAgent", RuntimeInformation.OSDescription);
                         var userAgent = ApiServiceBase.ProviderHttpClient.DefaultRequestHeaders.UserAgent.ToString();
                         options.Headers.Add("UserAgent", userAgent);
                     })
@@ -73,6 +75,15 @@ public class ApiService : IApiService
                 ApiServiceBase.ProviderHubConnection.On<string>("ReceiveStatusMessage", (message) =>
                 {
                     Console.WriteLine($"Server Status: {message}");
+                });
+
+                ApiServiceBase.ProviderHubConnection.On<string[]>("ReceiveExpiredQuotationMessage", (quotationCodes) =>
+                {
+                    foreach (var code in quotationCodes)
+                    {
+                        Console.WriteLine($"Quotation expired: {code}");
+                        // Actualizar la vista aquí
+                    }
                 });
 
                 await ApiServiceBase.ProviderHubConnection.StartAsync();
@@ -87,6 +98,56 @@ public class ApiService : IApiService
         return false;
     }
 
+    public async Task JoinQuotationViewGroup()
+    {
+        if (ApiServiceBase.ProviderHubConnection is not null)
+        {
+            await ApiServiceBase.ProviderHubConnection.InvokeAsync("JoinGroup", "QuotationView");
+        }
+        else
+        {
+            // Manejar el caso en que ProviderHubConnection es null
+        }
+    }
+
+    public async Task LeaveQuotationViewGroup()
+    {
+        if (ApiServiceBase.ProviderHubConnection is not null)
+        {
+            await ApiServiceBase.ProviderHubConnection.InvokeAsync("LeaveGroup", "QuotationView");
+        }
+        else
+        {
+            // Manejar el caso en que ProviderHubConnection es null
+        }
+    }
+
+    public async Task JoinOrderViewGroup()
+    {
+        if (ApiServiceBase.ProviderHubConnection is not null)
+        {
+            await ApiServiceBase.ProviderHubConnection.InvokeAsync("JoinGroup", "OrderView");
+        }
+        else
+        {
+            // Manejar el caso en que ProviderHubConnection es null
+        }
+    }
+
+    public async Task LeaveOrderViewGroup()
+    {
+        if (ApiServiceBase.ProviderHubConnection is not null)
+        {
+            await ApiServiceBase.ProviderHubConnection.InvokeAsync("LeaveGroup", "OrderView");
+        }
+        else
+        {
+            // Manejar el caso en que ProviderHubConnection es null
+        }
+    }
+    #endregion
+
+    #region EXTRA
     class RetryPolicy : IRetryPolicy
     {
         public TimeSpan? NextRetryDelay(RetryContext retryContext)
@@ -94,4 +155,5 @@ public class ApiService : IApiService
             return TimeSpan.FromSeconds(Math.Pow(2, retryContext.PreviousRetryCount));
         }
     }
+    #endregion
 }

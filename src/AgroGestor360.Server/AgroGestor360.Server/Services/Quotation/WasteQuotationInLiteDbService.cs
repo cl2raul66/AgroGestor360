@@ -6,10 +6,14 @@ namespace AgroGestor360.Server.Services;
 
 public interface IWasteQuotationInLiteDbService
 {
+    void BeginTrans();
+    void Commit();
     bool Delete(Guid code);
     IEnumerable<Quotation> GetAll();
-    Quotation GetById(Guid code);
+    Quotation GetByCode(Guid code);
     string Insert(Quotation entity);
+    bool InsertMany(IEnumerable<Quotation> entities);
+    void Rollback();
 }
 
 public class WasteQuotationInLiteDbService : IWasteQuotationInLiteDbService
@@ -33,11 +37,19 @@ public class WasteQuotationInLiteDbService : IWasteQuotationInLiteDbService
         collection.EnsureIndex(x => x.Code);
     }
 
-    public Quotation GetById(Guid code) => collection.FindById(code);
+    public void BeginTrans() => db.BeginTrans();
+
+    public void Commit() => db.Commit();
+
+    public void Rollback() => db.Rollback();
+
+    public Quotation GetByCode(Guid code) => collection.FindById(code);
 
     public IEnumerable<Quotation> GetAll() => collection.FindAll();
 
     public string Insert(Quotation entity) => collection.Insert(entity).AsGuid.ToString();
+
+    public bool InsertMany(IEnumerable<Quotation> entities) => collection.InsertBulk(entities) == entities.Count();
 
     public bool Delete(Guid code) => collection.Delete(code);
 }

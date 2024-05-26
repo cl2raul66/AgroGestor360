@@ -4,27 +4,31 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public interface IOrdersInLiteDbService
+public interface IWasteOrdersInLiteDbService
 {
     bool Exist { get; }
 
+    void BeginTrans();
+    void Commit();
     bool Delete(Guid code);
     IEnumerable<Order> GetAll();
-    Order GetById(Guid code);
+    Order GetByCode(Guid code);
     string Insert(Order entity);
+    bool InsertMany(IEnumerable<Order> entities);
+    void Rollback();
     bool Update(Order entity);
 }
 
-public class OrdersInLiteDbService : IOrdersInLiteDbService
+public class WasteOrdersInLiteDbService : IWasteOrdersInLiteDbService
 {
     readonly LiteDatabase db;
     readonly ILiteCollection<Order> collection;
 
-    public OrdersInLiteDbService()
+    public WasteOrdersInLiteDbService()
     {
         var cnx = new ConnectionString()
         {
-            Filename = FileHelper.GetFileDbPath("Orders")
+            Filename = FileHelper.GetFileDbPath("Orders_Waste")
         };
         var mapper = new BsonMapper();
 
@@ -36,13 +40,21 @@ public class OrdersInLiteDbService : IOrdersInLiteDbService
         collection.EnsureIndex(x => x.Code);
     }
 
+    public void BeginTrans() => db.BeginTrans();
+
+    public void Commit() => db.Commit();
+
+    public void Rollback() => db.Rollback();
+
     public bool Exist => collection.Count() > 0;
 
-    public Order GetById(Guid code) => collection.FindById(code);
+    public Order GetByCode(Guid code) => collection.FindById(code);
 
     public IEnumerable<Order> GetAll() => collection.FindAll();
 
     public string Insert(Order entity) => collection.Insert(entity).AsGuid.ToString();
+
+    public bool InsertMany(IEnumerable<Order> entities) => collection.InsertBulk(entities) == entities.Count();
 
     public bool Update(Order entity) => collection.Update(entity);
 
