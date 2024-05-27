@@ -10,9 +10,9 @@ public interface IWasteOrdersInLiteDbService
 
     void BeginTrans();
     void Commit();
-    bool Delete(Guid code);
+    bool Delete(string code);
     IEnumerable<Order> GetAll();
-    Order GetByCode(Guid code);
+    Order GetByCode(string code);
     string Insert(Order entity);
     bool InsertMany(IEnumerable<Order> entities);
     void Rollback();
@@ -48,15 +48,15 @@ public class WasteOrdersInLiteDbService : IWasteOrdersInLiteDbService
 
     public bool Exist => collection.Count() > 0;
 
-    public Order GetByCode(Guid code) => collection.FindById(code);
+    public Order GetByCode(string code) => collection.FindById(code);
 
     public IEnumerable<Order> GetAll() => collection.FindAll();
 
-    public string Insert(Order entity) => collection.Insert(entity).AsGuid.ToString();
+    public string Insert(Order entity) => collection.Insert(entity).AsString;
 
     public bool InsertMany(IEnumerable<Order> entities) => collection.InsertBulk(entities) == entities.Count();
 
     public bool Update(Order entity) => collection.Update(entity);
 
-    public bool Delete(Guid code) => collection.Delete(code);
+    public bool Delete(string code) => collection.Delete(code);
 }

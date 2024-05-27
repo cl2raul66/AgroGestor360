@@ -17,7 +17,6 @@ using AgroGestor360.Client.Services;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using QuestPDF.Infrastructure;
 using System.Reflection;
 
 namespace AgroGestor360.App;

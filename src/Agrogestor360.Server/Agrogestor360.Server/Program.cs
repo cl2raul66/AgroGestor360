@@ -1,8 +1,10 @@
 using AgroGestor360.Server.Services;
 using AgroGestor360.Server.Tools.Configurations;
+using AgroGestor360.Server.Tools.Enums;
 using AgroGestor360.Server.Tools.Hubs;
 using AgroGestor360.Server.Tools.Middleware;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +37,33 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
+var hubContext = app.Services.GetService<IHubContext<NotificationHub>>();
+if (hubContext is not null)
+{
+    NotificationHub.Status = ServerStatus.Running;
+    await hubContext.Clients.All.SendAsync("ReceiveStatusMessage", NotificationHub.Status);
+}
+
+//// Get the IHostApplicationLifetime service
+//var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+
+//// Get the IHubContext service
+//var hubContext = app.Services.GetRequiredService<IHubContext<NotificationHub>>();
+
+//// Register the ApplicationStarted event
+//lifetime.ApplicationStarted.Register(() =>
+//{
+//    // The application has started, send a status notification
+//    hubContext.Clients.All.SendAsync("ReceiveStatusMessage", ServerStatus.Running);
+//});
+
+//// Register the ApplicationStopping event
+//lifetime.ApplicationStopping.Register(() =>
+//{
+//    // The application is stopping, send a status notification
+//    hubContext.Clients.All.SendAsync("ReceiveStatusMessage", ServerStatus.Stopped);
+//});
+
 app.UseRouting();
 
 // Add the middle-ware here
@@ -57,5 +86,15 @@ app.UseEndpoints(endpoints =>
 });
 
 app.MapControllers();
+
+var applicationLifetime = app.Services.GetService<IHostApplicationLifetime>();
+applicationLifetime?.ApplicationStopping.Register(async () =>
+{
+    if (hubContext is not null)
+    {
+        NotificationHub.Status = ServerStatus.Stopped;
+        await hubContext.Clients.All.SendAsync("ReceiveStatusMessage", NotificationHub.Status);
+    }
+});
 
 app.Run();

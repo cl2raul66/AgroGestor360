@@ -2,6 +2,7 @@
 using AgroGestor360.Server.Services;
 using AgroGestor360.Server.Tools;
 using AgroGestor360.Server.Tools.Enums;
+using AgroGestor360.Server.Tools.Helpers;
 using LiteDB;
 using Microsoft.AspNetCore.Mvc;
 using UnitsNet;
@@ -64,7 +65,7 @@ public class InvoicesController : ControllerBase
             return BadRequest();
         }
 
-        var found = invoicesServ.GetByCode(Guid.Parse(code));
+        var found = invoicesServ.GetByCode(code);
         if (found is null)
         {
             return NotFound();
@@ -83,7 +84,7 @@ public class InvoicesController : ControllerBase
             return BadRequest();
         }
 
-        var found = invoicesServ.GetByCode(new Guid(code));
+        var found = invoicesServ.GetByCode(code);
         if (found is null)
         {
             return NotFound();
@@ -94,7 +95,7 @@ public class InvoicesController : ControllerBase
         DTO10_4 dTO = new()
         {
             Date = found.Date,
-            Code = found.Code.ToString(),
+            Code = found.Code,
             TotalAmount = totalAmount,
             Paid = found.Status switch
             {
@@ -139,7 +140,7 @@ public class InvoicesController : ControllerBase
 
             Invoice entity = new()
             {
-                Code = Guid.NewGuid(),
+                Code = ShortGuidHelper.Generate(),
                 Date = dTO.Date,
                 Seller = seller,
                 Customer = customer,
@@ -225,7 +226,7 @@ public class InvoicesController : ControllerBase
 
     //        Invoice entity = new()
     //        {
-    //            Code = Guid.NewGuid(),
+    //            Code = ShortGuidHelper.Generate(),
     //            Date = dTO.Date,
     //            Seller = seller,
     //            Customer = customer,
@@ -252,7 +253,7 @@ public class InvoicesController : ControllerBase
             return BadRequest();
         }
 
-        var found = invoicesServ.GetByCode(Guid.Parse(dTO.Code!));
+        var found = invoicesServ.GetByCode(dTO.Code!);
         if (found is null)
         {
             return NotFound();
@@ -277,7 +278,7 @@ public class InvoicesController : ControllerBase
                 {
                     return NotFound();
                 }
-                var resultDelete = invoicesServ.Delete(Guid.Parse(dTO.Code!));
+                var resultDelete = invoicesServ.Delete(dTO.Code!);
                 return resultDelete ? Ok() : NotFound();
             }
         }
@@ -299,7 +300,7 @@ public class InvoicesController : ControllerBase
                 {
                     return NotFound();
                 }
-                var resultDelete = invoicesServ.Delete(Guid.Parse(dTO.Code!));
+                var resultDelete = invoicesServ.Delete(dTO.Code!);
                 return resultDelete ? Ok() : NotFound();
             }
         }
@@ -319,7 +320,7 @@ public class InvoicesController : ControllerBase
 
         if (dTO.Status is InvoiceStatus.Cancelled)
         {
-            var found = invoicesServ.GetByCode(Guid.Parse(dTO.Code!));
+            var found = invoicesServ.GetByCode(dTO.Code!);
             if (found is null)
             {
                 return NotFound();
@@ -377,7 +378,7 @@ public class InvoicesController : ControllerBase
                 return NotFound();
             }
 
-            var resultDelete = invoicesServ.Delete(Guid.Parse(dTO.Code!));
+            var resultDelete = invoicesServ.Delete(dTO.Code!);
             if (!resultDelete)
             {
                 // Revertir transacción si la eliminación falla
@@ -407,7 +408,7 @@ public class InvoicesController : ControllerBase
 
     //    if (dTO.Status is InvoiceStatus.Cancelled)
     //    {
-    //        var found = invoicesServ.GetByCode(Guid.Parse(dTO.Code!));
+    //        var found = invoicesServ.GetByCode(dTO.Code!);
     //        if (found is null)
     //        {
     //            return NotFound();
@@ -421,7 +422,7 @@ public class InvoicesController : ControllerBase
     //            return NotFound();
     //        }
 
-    //        var resultDelete = invoicesServ.Delete(Guid.Parse(dTO.Code!));
+    //        var resultDelete = invoicesServ.Delete(dTO.Code!);
 
     //        return resultDelete ? Ok() : NotFound();
     //    }
@@ -436,7 +437,7 @@ public class InvoicesController : ControllerBase
             return BadRequest();
         }
 
-        var result = invoicesServ.Delete(new Guid(code));
+        var result = invoicesServ.Delete(code);
 
         return !result ? NotFound() : Ok();
     }
@@ -453,7 +454,7 @@ public class InvoicesController : ControllerBase
 
         var result = new DTO10
         {
-            Code = entity.Code.ToString(),
+            Code = entity.Code,
             Date = entity.Date,
             SellerId = entity.Seller?.Id?.ToString(),
             SellerName = entity.Seller?.Contact?.FormattedName,

@@ -10,10 +10,10 @@ public interface IInvoicesInLiteDbService
 
     void BeginTrans();
     void Commit();
-    bool Delete(Guid code);
+    bool Delete(string code);
     IEnumerable<Invoice> GetAll();
-    Invoice GetByCode(Guid code);
-    IEnumerable<Invoice> GetManyByCodes(IEnumerable<Guid> codes);
+    Invoice GetByCode(string code);
+    IEnumerable<Invoice> GetManyByCodes(IEnumerable<string> codes);
     string Insert(Invoice entity);
     bool InsertMany(IEnumerable<Invoice> entities);
     void Rollback();
@@ -49,15 +49,15 @@ public class InvoicesInLiteDbService : IInvoicesInLiteDbService
 
     public bool Exist => collection.Count() > 0;
 
-    public Invoice GetByCode(Guid code) => collection.FindById(code);
+    public Invoice GetByCode(string code) => collection.FindById(code);
 
-    public IEnumerable<Invoice> GetManyByCodes(IEnumerable<Guid> codes) => codes.Any() 
-        ? collection.Find(x => codes.Contains(x.Code)) 
+    public IEnumerable<Invoice> GetManyByCodes(IEnumerable<string> codes) => codes.Any()
+        ? collection.Find(x => codes.Contains(x.Code))
         : [];
 
     public IEnumerable<Invoice> GetAll() => collection.FindAll();
 
-    public string Insert(Invoice entity) => collection.Insert(entity).AsGuid.ToString();
+    public string Insert(Invoice entity) => collection.Insert(entity).AsString;
 
     public bool InsertMany(IEnumerable<Invoice> entities)
     {
@@ -82,5 +82,5 @@ public class InvoicesInLiteDbService : IInvoicesInLiteDbService
 
     public bool Update(Invoice entity) => collection.Update(entity);
 
-    public bool Delete(Guid code) => collection.Delete(code);
+    public bool Delete(string code) => collection.Delete(code);
 }

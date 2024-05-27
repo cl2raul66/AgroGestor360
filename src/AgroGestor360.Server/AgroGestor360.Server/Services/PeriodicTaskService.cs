@@ -45,6 +45,7 @@ public class PeriodicTaskService : IHostedService, IDisposable
     public void Dispose()
     {
         _timer?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     void CheckDateExpirableInQuotation()
@@ -69,7 +70,7 @@ public class PeriodicTaskService : IHostedService, IDisposable
             cancelledQuotations.Add(cancelledQuotation);
         }
 
-        var codesToDelete = quotations.Select(x => x.Code);
+        var codesToDelete = quotations.Select(x => x.Code!);
 
         quotesServ.BeginTrans();
         wasteQuotationServ.BeginTrans();
@@ -126,7 +127,7 @@ public class PeriodicTaskService : IHostedService, IDisposable
             cancelledOrders.Add(cancelledOrder);
         }
 
-        var codesToDelete = orders.Select(x => x.Code);
+        var codesToDelete = orders.Select(x => x.Code!);
 
         ordersServ.BeginTrans();
         wasteOrdersServ.BeginTrans();

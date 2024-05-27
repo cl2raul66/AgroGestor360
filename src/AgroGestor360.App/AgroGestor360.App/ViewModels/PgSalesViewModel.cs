@@ -23,8 +23,9 @@ public partial class PgSalesViewModel : ObservableRecipient
     readonly IOrdersService ordersServ;
     readonly IAuthService authServ;
     readonly IInvoicesService invoicesServ;
+    readonly IApiService apiServ;
 
-    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, IAuthService authService, IInvoicesService invoicesService)
+    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, IAuthService authService, IInvoicesService invoicesService, IApiService apiService)
     {
         quotationsServ = quotesService;
         sellersServ = sellersService;
@@ -34,7 +35,10 @@ public partial class PgSalesViewModel : ObservableRecipient
         ordersServ = ordersService;
         authServ = authService;
         invoicesServ = invoicesService;
+        apiServ = apiService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
+
+        apiServ.OnReceiveStatusMessage += ApiServ_OnReceiveStatusMessage;
 
         Task.Run(() =>
         {
@@ -46,6 +50,9 @@ public partial class PgSalesViewModel : ObservableRecipient
 
         AppInfo = $"{Assembly.GetExecutingAssembly().GetName().Name} V.{VersionTracking.Default.CurrentVersion}";
     }
+
+    [ObservableProperty]
+    bool haveConnection;
 
     [ObservableProperty]
     string? appInfo;
@@ -456,6 +463,11 @@ public partial class PgSalesViewModel : ObservableRecipient
     }
     #endregion
 
+    void ApiServ_OnReceiveStatusMessage(ServerStatus status)
+    {
+        HaveConnection = status is ServerStatus.Running;
+    }
+
     protected override void OnActivated()
     {
         base.OnActivated();
@@ -571,13 +583,20 @@ public partial class PgSalesViewModel : ObservableRecipient
             }
         }
     }
-
+    //todo: separar metodos de inicializacion de colecciones dependiendo de haveConnection
     #region EXTRA
     public async void Initialize()
-    {
+    {        
+        HaveConnection = await apiServ.ConnectToServerHub(serverURL);
+
         IsBusy = true;
-        Quotations = new(await quotationsServ.GetAllAsync(serverURL));
-        Orders = new(await ordersServ.GetAllAsync(serverURL));
+        var getAllQuotationsTask = quotationsServ.GetAllAsync(serverURL);
+        var getAllOrdersTask = ordersServ.GetAllAsync(serverURL);
+
+        await Task.WhenAll(getAllQuotationsTask, getAllOrdersTask);
+        Quotations = new ObservableCollection<DTO7>(getAllQuotationsTask.Result);
+        Orders = new ObservableCollection<DTO8>(getAllOrdersTask.Result);
+
         if (IsBillsVisible)
         {
             Invoices = new(await invoicesServ.GetAllAsync(serverURL));

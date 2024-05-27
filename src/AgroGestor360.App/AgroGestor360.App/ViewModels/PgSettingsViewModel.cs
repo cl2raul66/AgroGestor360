@@ -1,5 +1,6 @@
 ﻿using AgroGestor360.App.Services;
 using AgroGestor360.Client.Services;
+using AgroGestor360.Client.Tools;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.ComponentModel;
@@ -12,14 +13,25 @@ public partial class PgSettingsViewModel : ObservableObject
 {
     readonly INavigationService navigationServ;
     readonly IOrganizationService organizationServ;
+    readonly IApiService apiServ;
+    readonly string serverURL;
 
-    public PgSettingsViewModel(INavigationService navigationService, IOrganizationService organizationService)
+    public PgSettingsViewModel(INavigationService navigationService, IOrganizationService organizationService, IApiService apiService)
     {
         navigationServ = navigationService;
         organizationServ = organizationService;
+        apiServ = apiService;
         SelectedMenu = string.Empty;
+        serverURL = Preferences.Default.Get("serverurl", string.Empty);
+
+        apiServ.OnReceiveStatusMessage += ApiServ_OnReceiveStatusMessage;
+
         AppInfo = $"{Assembly.GetExecutingAssembly().GetName().Name} V.{VersionTracking.Default.CurrentVersion}";
+        Inizialice();
     }
+
+    [ObservableProperty]
+    bool haveConnection;
 
     [ObservableProperty]
     string? appInfo;
@@ -43,6 +55,11 @@ public partial class PgSettingsViewModel : ObservableObject
 
     [RelayCommand]
     async Task GoToBack() => await Shell.Current.GoToAsync("..", true);
+
+    void ApiServ_OnReceiveStatusMessage(ServerStatus status)
+    {
+        HaveConnection = status is ServerStatus.Running;
+    }
 
     protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
     {
@@ -98,5 +115,10 @@ public partial class PgSettingsViewModel : ObservableObject
                     break;
             }
         }
+    }
+
+    async void Inizialice()
+    {
+        HaveConnection = await apiServ.ConnectToServerHub(serverURL);
     }
 }

@@ -8,9 +8,9 @@ public interface IWasteQuotationInLiteDbService
 {
     void BeginTrans();
     void Commit();
-    bool Delete(Guid code);
+    bool Delete(string code);
     IEnumerable<Quotation> GetAll();
-    Quotation GetByCode(Guid code);
+    Quotation GetByCode(string code);
     string Insert(Quotation entity);
     bool InsertMany(IEnumerable<Quotation> entities);
     void Rollback();
@@ -43,13 +43,13 @@ public class WasteQuotationInLiteDbService : IWasteQuotationInLiteDbService
 
     public void Rollback() => db.Rollback();
 
-    public Quotation GetByCode(Guid code) => collection.FindById(code);
+    public Quotation GetByCode(string code) => collection.FindById(code);
 
     public IEnumerable<Quotation> GetAll() => collection.FindAll();
 
-    public string Insert(Quotation entity) => collection.Insert(entity).AsGuid.ToString();
+    public string Insert(Quotation entity) => collection.Insert(entity).AsString;
 
     public bool InsertMany(IEnumerable<Quotation> entities) => collection.InsertBulk(entities) == entities.Count();
 
-    public bool Delete(Guid code) => collection.Delete(code);
+    public bool Delete(string code) => collection.Delete(code);
 }

@@ -10,9 +10,9 @@ public interface IWasteInvoicesInLiteDbService
 
     void BeginTrans();
     void Commit();
-    bool Delete(Guid code);
+    bool Delete(string code);
     IEnumerable<Invoice> GetAll();
-    Invoice GetById(Guid code);
+    Invoice GetById(string code);
     string Insert(Invoice entity);
     void Rollback();
     bool Update(Invoice entity);
@@ -47,13 +47,13 @@ public class WasteInvoicesInLiteDbService : IWasteInvoicesInLiteDbService
 
     public bool Exist => collection.Count() > 0;
 
-    public Invoice GetById(Guid code) => collection.FindById(code);
+    public Invoice GetById(string code) => collection.FindById(code);
 
     public IEnumerable<Invoice> GetAll() => collection.FindAll();
 
-    public string Insert(Invoice entity) => collection.Insert(entity).AsGuid.ToString();
+    public string Insert(Invoice entity) => collection.Insert(entity).AsString;
 
     public bool Update(Invoice entity) => collection.Update(entity);
 
-    public bool Delete(Guid code) => collection.Delete(code);
+    public bool Delete(string code) => collection.Delete(code);
 }

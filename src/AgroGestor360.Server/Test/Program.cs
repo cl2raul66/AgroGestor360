@@ -1,7 +1,9 @@
 ﻿using AgroGestor360.Client.Services;
+using Microsoft.AspNetCore.SignalR.Client;
 
 IApiService apiServ = new ApiService();
 apiServ.ConnectToHttpClient();
+apiServ.SetClientDevicePlatform(Environment.OSVersion.ToString());
 apiServ.SetClientAccessToken("38D941C88617485496B07AF837C5E64E");
 
 IOrganizationService organizationServ = new OrganizationService();
@@ -33,6 +35,21 @@ else
     {
         Console.WriteLine("No se pudo obtener la información de la organización.");
     }
+}
+
+// Conectar al hub del servidor
+var connected = await apiServ.ConnectToServerHub(url);
+
+if (connected)
+{
+    apiServ.OnReceiveStatusMessage += status =>
+    {
+        Console.WriteLine($"Received status message: {status}");
+    };
+}
+else
+{
+    Console.WriteLine("No se pudo conectar al hub del servidor.");
 }
 
 //Console.Write("Ingrese su contraseña: ");

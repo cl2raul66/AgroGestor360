@@ -10,10 +10,10 @@ public interface IOrdersInLiteDbService
 
     void BeginTrans();
     void Commit();
-    bool Delete(Guid code);
-    bool DeleteMany(IEnumerable<Guid> codes);
+    bool Delete(string code);
+    bool DeleteMany(IEnumerable<string> codes);
     IEnumerable<Order> GetAll();
-    Order GetByCode(Guid code);
+    Order GetByCode(string code);
     IEnumerable<Order> GetExpiringOrders(int expiryDays);
     string Insert(Order entity);
     void Rollback();
@@ -51,7 +51,7 @@ public class OrdersInLiteDbService : IOrdersInLiteDbService
 
     public IEnumerable<Order> GetAll() => collection.FindAll();
 
-    public Order GetByCode(Guid code) => collection.FindById(code);
+    public Order GetByCode(string code) => collection.FindById(code);
 
     public IEnumerable<Order> GetExpiringOrders(int expiryDays)
     {
@@ -59,13 +59,13 @@ public class OrdersInLiteDbService : IOrdersInLiteDbService
         return collection.Find(q => q.Date <= expiryDate);
     }
 
-    public string Insert(Order entity) => collection.Insert(entity).AsGuid.ToString();
+    public string Insert(Order entity) => collection.Insert(entity).AsString;
 
     public bool Update(Order entity) => collection.Update(entity);
 
-    public bool Delete(Guid code) => collection.Delete(code);
+    public bool Delete(string code) => collection.Delete(code);
 
-    public bool DeleteMany(IEnumerable<Guid> codes)
+    public bool DeleteMany(IEnumerable<string> codes)
     {
         var count = 0;
         foreach (var code in codes)

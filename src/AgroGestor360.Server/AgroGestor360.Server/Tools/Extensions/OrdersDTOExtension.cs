@@ -10,7 +10,7 @@ public static class OrdersDTOExtension
         DTO8 dTO = new()
         {
             IsPendingStatus = entity.Status is OrderStatus.Pending,
-            Code = entity.Code.ToString(),
+            Code = entity.Code,
             Date = entity.Date,
             SellerName = entity.Seller?.Contact?.FormattedName,
             SellerId = entity.Seller?.Id?.ToString(),

@@ -77,7 +77,33 @@
             Padding="8,0"
             ColumnDefinitions="*,auto"
             ColumnSpacing="8">
-            <HorizontalStackLayout Grid.Column="1" Spacing="8">
+            <HorizontalStackLayout Spacing="8">
+                <Label
+                    Padding="2"
+                    FontFamily="icofont"
+                    FontSize="11">
+                    <Label.Triggers>
+                        <DataTrigger
+                            Binding="{Binding HaveConnection}"
+                            TargetType="Label"
+                            Value="true">
+                            <Setter Property="ToolTipProperties.Text" Value="Conectado al servidor" />
+                            <Setter Property="Text" Value="{StaticResource UiNetwork}" />
+                        </DataTrigger>
+                        <DataTrigger
+                            Binding="{Binding HaveConnection}"
+                            TargetType="Label"
+                            Value="false">
+                            <Setter Property="ToolTipProperties.Text" Value="Desconectado del servidor" />
+                            <Setter Property="Text" Value="{StaticResource Broken}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout
+                Grid.Column="1"
+                Spacing="8"
+                VerticalOptions="Center">
                 <Label FontSize="11" Text="{Binding AppInfo}" />
                 <BoxView
                     BackgroundColor="{StaticResource Tertiary}"

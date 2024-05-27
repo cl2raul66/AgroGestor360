@@ -7,18 +7,15 @@ public class NotificationHub : Hub
 {
     public static ServerStatus Status = ServerStatus.Running;
 
-    public async Task SendStatusMessage(string statusMessage)
+    public async Task SendStatusMessage(ServerStatus status)
     {
-        if (Enum.TryParse(statusMessage, out ServerStatus status))
-        {
-            Status = status;
-            await Clients.All.SendAsync("ReceiveStatusMessage", statusMessage);
-        }
+        Status = status;
+        await Clients.All.SendAsync("ReceiveStatusMessage", status);
     }
 
     public override async Task OnConnectedAsync()
     {
-        await Clients.Caller.SendAsync("ReceiveStatusMessage", Status.ToString());
+        await Clients.Caller.SendAsync("ReceiveStatusMessage", Status);
         await base.OnConnectedAsync();
     }
 
@@ -39,8 +36,8 @@ public class NotificationHub : Hub
         await Clients.Group("QuotationView").SendAsync("ReceiveExpiredQuotationMessage", quotationCodes);
     }
 
-    public async Task SendExpiredOrderMessage(string[] orderCodes)
+    public async Task SendExpiredOrderMessage(string[] ordersCodes)
     {
-        await Clients.Group("OrderView").SendAsync("ReceiveExpiredOrderMessage", orderCodes);
+        await Clients.Group("OrderView").SendAsync("ReceiveExpiredOrderMessage", ordersCodes);
     }
 }

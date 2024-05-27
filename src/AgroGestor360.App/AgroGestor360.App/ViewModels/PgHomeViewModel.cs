@@ -1,5 +1,6 @@
 ﻿using AgroGestor360.App.Views;
 using AgroGestor360.Client.Services;
+using AgroGestor360.Client.Tools;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Reflection;
@@ -16,8 +17,12 @@ public partial class PgHomeViewModel : ObservableRecipient
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         apiServ = apiService;
         CheckUrl();
+        apiServ.OnReceiveStatusMessage += ApiServ_OnReceiveStatusMessage;           
         AppInfo = $"{Assembly.GetExecutingAssembly().GetName().Name} V.{VersionTracking.Default.CurrentVersion}";
     }
+
+    [ObservableProperty]
+    bool haveConnection;
 
     [ObservableProperty]
     string? appInfo;
@@ -31,10 +36,16 @@ public partial class PgHomeViewModel : ObservableRecipient
     [RelayCommand]
     async Task GoToSales() => await Shell.Current.GoToAsync(nameof(PgSales), true);
 
+    void ApiServ_OnReceiveStatusMessage(ServerStatus status)
+    {
+        HaveConnection = status is ServerStatus.Running;
+    }
+
     #region EXTRA
     async void CheckUrl()
     {
         ServerConnected = await apiServ.CheckUrl(serverURL);
-    }
+        HaveConnection = await apiServ.ConnectToServerHub(serverURL);
+    }    
     #endregion
 }

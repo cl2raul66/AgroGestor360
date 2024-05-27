@@ -10,10 +10,10 @@ public interface IQuotesInLiteDbService
 
     void BeginTrans();
     void Commit();
-    bool Delete(Guid code); 
-    bool DeleteMany(IEnumerable<Guid> codes);
+    bool Delete(string code);
+    bool DeleteMany(IEnumerable<string> codes);
     IEnumerable<Quotation> GetAll();
-    Quotation GetByCode(Guid code);
+    Quotation GetByCode(string code);
     IEnumerable<Quotation> GetExpiringQuotes(int expiryDays);
     string Insert(Quotation entity);
     void Rollback();
@@ -49,11 +49,11 @@ public class QuotesInLiteDbService : IQuotesInLiteDbService
 
     public bool Exist => collection.Count() > 0;
 
-    public Quotation GetByCode(Guid code) => collection.FindById(code);
+    public Quotation GetByCode(string code) => collection.FindById(code);
 
     public IEnumerable<Quotation> GetAll() => collection.FindAll();
 
-    public string Insert(Quotation entity) => collection.Insert(entity).AsGuid.ToString();
+    public string Insert(Quotation entity) => collection.Insert(entity).AsString;
 
     public IEnumerable<Quotation> GetExpiringQuotes(int expiryDays)
     {
@@ -63,9 +63,9 @@ public class QuotesInLiteDbService : IQuotesInLiteDbService
 
     public bool Update(Quotation entity) => collection.Update(entity);
 
-    public bool Delete(Guid code) => collection.Delete(code);
+    public bool Delete(string code) => collection.Delete(code);
 
-    public bool DeleteMany(IEnumerable<Guid> codes)
+    public bool DeleteMany(IEnumerable<string> codes)
     {
         var count = 0;
         foreach (var code in codes)

@@ -233,7 +233,7 @@ public class BankTransaction
 /// Object: SaleBase => Represents a base class of sale for Quotation, Order and Invoice.
 /// <code>
 /// DateTime [Date]
-/// Guid [Code]
+/// string [Code]
 /// Seller [Seller]
 /// Customer [Customer]
 /// Array ProductSaleBase [Products]
@@ -242,7 +242,7 @@ public class BankTransaction
 public abstract class SaleBase
 {
     public DateTime Date { get; set; }
-    public Guid Code { get; set; }
+    public string? Code { get; set; }
     public Seller? Seller { get; set; }
     public Customer? Customer { get; set; }
     public ProductSaleBase[]? Products { get; set; }
@@ -269,7 +269,7 @@ public class ProductSaleBase
 /// Object: Quotation => Represent a quotation.
 /// <code>
 /// DateTime [Date]
-/// Guid [Code]
+/// string [Code]
 /// Seller [Seller]
 /// Customer [Customer]
 /// Array ProductSaleBase [Products]
@@ -285,7 +285,7 @@ public class Quotation : SaleBase
 /// Object: Order => Represent an order.
 /// <code>
 /// DateTime [QuotationDate]
-/// Guid [Code]
+/// string [Code]
 /// Seller [Seller]
 /// Customer [Customer]
 /// Array ProductItemForDocument [ProductItems]
@@ -301,7 +301,7 @@ public class Order : SaleBase
 /// Object: Invoice => Represent an invoice for a sale.
 /// <code>
 /// DateTime [QuotationDate]
-/// Guid [Code]
+/// string [Code]
 /// Seller [Seller]
 /// Customer [Customer]
 /// Array ProductItemForDocument [ProductItems]

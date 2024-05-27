@@ -3,6 +3,7 @@ using AgroGestor360.Server.Services;
 using AgroGestor360.Server.Tools;
 using AgroGestor360.Server.Tools.Enums;
 using AgroGestor360.Server.Tools.Extensions;
+using AgroGestor360.Server.Tools.Helpers;
 using LiteDB;
 using Microsoft.AspNetCore.Mvc;
 
@@ -51,7 +52,7 @@ public class QuotesController : ControllerBase
             return BadRequest();
         }
 
-        var found = quotesServ.GetByCode(new Guid(code));
+        var found = quotesServ.GetByCode(code);
         if (found is null)
         {
             return NotFound();
@@ -68,7 +69,7 @@ public class QuotesController : ControllerBase
             return BadRequest();
         }
 
-        var found = quotesServ.GetByCode(new Guid(code));
+        var found = quotesServ.GetByCode(code);
         if (found is null)
         {
             return NotFound();
@@ -79,7 +80,7 @@ public class QuotesController : ControllerBase
         DTO7_4 dTO = new()
         {
             Date = found.Date,
-            Code = found.Code.ToString(),
+            Code = found.Code,
             TotalAmount = totalAmount,
             CustomerName = found.Customer?.Contact?.FormattedName,
             SellerName = found.Seller?.Contact?.FormattedName,
@@ -98,7 +99,7 @@ public class QuotesController : ControllerBase
             return BadRequest();
         }
 
-        var found = quotesServ.GetByCode(new Guid(code));
+        var found = quotesServ.GetByCode(code);
         if (found is null)
         {
             return NotFound();
@@ -106,7 +107,7 @@ public class QuotesController : ControllerBase
 
         DTO8_2 dTO = new()
         {
-            Code = found.Code.ToString(),
+            Code = found.Code,
             CustomerId = found.Customer!.Id!.ToString(),
             SellerId = found.Seller!.Id!.ToString(),
             ProductItems = found.Products!.Select(x => new DTO9()
@@ -150,7 +151,7 @@ public class QuotesController : ControllerBase
         Quotation entity = new()
         {
             Status = dTO.Status,
-            Code = Guid.NewGuid(),
+            Code = ShortGuidHelper.Generate(),
             Date = dTO.Date,
             Seller = seller,
             Customer = customer,
@@ -169,7 +170,7 @@ public class QuotesController : ControllerBase
             return BadRequest();
         }
 
-        Quotation entity = quotesServ.GetByCode(new Guid(dTO.Code!));
+        Quotation entity = quotesServ.GetByCode(dTO.Code!);
         if (entity is null)
         {
             return NotFound();
@@ -221,7 +222,7 @@ public class QuotesController : ControllerBase
             return BadRequest();
         }
 
-        Quotation entity = quotesServ.GetByCode(new Guid(dTO.Code!));
+        Quotation entity = quotesServ.GetByCode(dTO.Code!);
         if (entity is null)
         {
             return NotFound();
@@ -233,7 +234,7 @@ public class QuotesController : ControllerBase
             case QuotationStatus.Rejected:
             case QuotationStatus.Cancelled:
                 quotesServ.BeginTrans();
-                var wasDelete = quotesServ.Delete(entity.Code);
+                var wasDelete = quotesServ.Delete(entity.Code!);
                 if (!wasDelete)
                 {
                     return NotFound();
@@ -261,7 +262,7 @@ public class QuotesController : ControllerBase
             return BadRequest();
         }
 
-        var result = quotesServ.Delete(new Guid(code));
+        var result = quotesServ.Delete(code);
 
         return !result ? NotFound() : Ok();
     }

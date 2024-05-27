@@ -3,6 +3,7 @@ using AgroGestor360.Server.Services;
 using AgroGestor360.Server.Tools;
 using AgroGestor360.Server.Tools.Enums;
 using AgroGestor360.Server.Tools.Extensions;
+using AgroGestor360.Server.Tools.Helpers;
 using LiteDB;
 using Microsoft.AspNetCore.Mvc;
 
@@ -84,7 +85,7 @@ public class OrdersController : ControllerBase
             return BadRequest();
         }
 
-        var found = ordersServ.GetByCode(new Guid(code));
+        var found = ordersServ.GetByCode(code);
         if (found is null)
         {
             return NotFound();
@@ -103,7 +104,7 @@ public class OrdersController : ControllerBase
             return BadRequest();
         }
 
-        var found = ordersServ.GetByCode(new Guid(code));
+        var found = ordersServ.GetByCode(code);
         if (found is null)
         {
             return NotFound();
@@ -114,7 +115,7 @@ public class OrdersController : ControllerBase
         DTO8_5 dTO = new()
         {
             Date = found.Date,
-            Code = found.Code.ToString(),
+            Code = found.Code,
             TotalAmount = totalAmount,
             CustomerName = found.Customer?.Contact?.FormattedName,
             SellerName = found.Seller?.Contact?.FormattedName,
@@ -126,7 +127,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPost("getdto8_4fromquotation")]
-    public ActionResult<DTO8_4> GetDTO8_4FromQuotation([FromBody] DTO7 dTO)
+    public ActionResult<DTO8_4> GetDTO8_4FromQuotation(DTO7 dTO)
     {
         if (dTO is null)
         {
@@ -203,7 +204,7 @@ public class OrdersController : ControllerBase
         Order entity = new()
         {
             Status = dTO.Status,
-            Code = string.IsNullOrEmpty(dTO.Code) ? Guid.NewGuid() : new(dTO.Code),
+            Code = string.IsNullOrEmpty(dTO.Code) ? ShortGuidHelper.Generate() : dTO.Code,
             Date = dTO.Date,
             Seller = seller,
             Customer = customer,
@@ -228,18 +229,15 @@ public class OrdersController : ControllerBase
             return BadRequest();
         }
 
-        Guid code = new(dTO.Code!);
-        var found = quotesServ.GetByCode(code);
+        var found = quotesServ.GetByCode(dTO.Code!);
         if (found is null)
         {
             return NotFound();
         }
 
-        var customer = customersServ.GetById(new ObjectId(dTO.CustomerId));
-        var seller = sellersServ.GetById(new ObjectId(dTO.SellerId));
-
         List<ProductSaleBase> productItems = [];
         List<ArticleItemForWarehouse> articleItems = [];
+        bool isPending = false;
 
         foreach (var item in found.Products!)
         {
@@ -258,15 +256,20 @@ public class OrdersController : ControllerBase
 
             productItems.Add(productItemForOrder);
             articleItems.Add(articleItemForWarehouse);
+
+            if (!isPending)
+            {
+                isPending = articleItemForWarehouse.Reserved > articleItemForWarehouse.Quantity;
+            }
         }
 
         Order entity = new()
         {
-            Status = OrderStatus.Processing,
-            Code = code,
+            Status = isPending ? OrderStatus.Pending : OrderStatus.Processing,
+            Code = dTO.Code!,
             Date = DateTime.Now,
-            Seller = seller,
-            Customer = customer,
+            Seller = found.Seller,
+            Customer = found.Customer,
             Products = [.. productItems]
         };
 
@@ -290,7 +293,7 @@ public class OrdersController : ControllerBase
             return BadRequest();
         }
 
-        Order entity = ordersServ.GetByCode(new Guid(dTO.Code!));
+        Order entity = ordersServ.GetByCode(dTO.Code!);
         if (entity is null)
         {
             return NotFound();
@@ -354,7 +357,7 @@ public class OrdersController : ControllerBase
             return BadRequest();
         }
 
-        var entity = ordersServ.GetByCode(new Guid(dTO.Code!));
+        var entity = ordersServ.GetByCode(dTO.Code!);
         if (entity is null)
         {
             return NotFound();
@@ -404,7 +407,7 @@ public class OrdersController : ControllerBase
             return BadRequest();
         }
 
-        var result = ordersServ.Delete(new Guid(code));
+        var result = ordersServ.Delete(code);
 
         return !result ? NotFound() : Ok();
     }

@@ -9,7 +9,7 @@ public static class QuotationDTOExtension
         DTO7 dTO = new()
         {
             IsDraftStatus = entity.Status is Enums.QuotationStatus.Draft,
-            Code = entity.Code.ToString().Trim('-').ToUpper(),
+            Code = entity.Code,
             Date = entity.Date,
             SellerName = entity.Seller?.Contact?.FormattedName,
             SellerId = entity.Seller?.Id?.ToString(),
