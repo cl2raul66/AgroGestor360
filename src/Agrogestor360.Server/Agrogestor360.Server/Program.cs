@@ -28,6 +28,8 @@ builder.Services.AddSingleton<IOrdersInLiteDbService, OrdersInLiteDbService>();
 builder.Services.AddSingleton<IWasteOrdersInLiteDbService, WasteOrdersInLiteDbService>();
 builder.Services.AddSingleton<IInvoicesInLiteDbService, InvoicesInLiteDbService>();
 builder.Services.AddSingleton<IWasteInvoicesInLiteDbService, WasteInvoicesInLiteDbService>();
+builder.Services.AddSingleton<ILineCreditsInLiteDbService, LineCreditsInLiteDbService>();
+builder.Services.AddSingleton<IDiscountsInLiteDbService, DiscountsInLiteDbService>();
 
 builder.Services.AddHostedService<PeriodicTaskService>();
 builder.Services.AddSignalR();
@@ -43,26 +45,6 @@ if (hubContext is not null)
     NotificationHub.Status = ServerStatus.Running;
     await hubContext.Clients.All.SendAsync("ReceiveStatusMessage", NotificationHub.Status);
 }
-
-//// Get the IHostApplicationLifetime service
-//var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
-
-//// Get the IHubContext service
-//var hubContext = app.Services.GetRequiredService<IHubContext<NotificationHub>>();
-
-//// Register the ApplicationStarted event
-//lifetime.ApplicationStarted.Register(() =>
-//{
-//    // The application has started, send a status notification
-//    hubContext.Clients.All.SendAsync("ReceiveStatusMessage", ServerStatus.Running);
-//});
-
-//// Register the ApplicationStopping event
-//lifetime.ApplicationStopping.Register(() =>
-//{
-//    // The application is stopping, send a status notification
-//    hubContext.Clients.All.SendAsync("ReceiveStatusMessage", ServerStatus.Stopped);
-//});
 
 app.UseRouting();
 

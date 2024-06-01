@@ -7,14 +7,15 @@ namespace AgroGestor360.Server.Services;
 public interface ICustomersInLiteDbService
 {
     bool Exist { get; }
-    bool ExistById(ObjectId id);
 
-    bool Delete(ObjectId id); 
+    bool Delete(ObjectId id);
+    bool ExistById(ObjectId id);
     IEnumerable<Customer> GetAll();
+    IEnumerable<DiscountForCustomer> GetAllDiscount();
     IEnumerable<Customer> GetAllWithDiscount();
     IEnumerable<Customer> GetAllWithoutDiscount();
     Customer GetById(ObjectId id);
-    CustomerDiscountClass? GetDiscountById(int discountId);
+    DiscountForCustomer? GetDiscountById(int discountId);
     string Insert(Customer entity);
     bool Update(Customer entity);
 }
@@ -51,7 +52,9 @@ public class CustomersInLiteDbService : ICustomersInLiteDbService
 
     public IEnumerable<Customer> GetAllWithoutDiscount() => collection.Find(Query.All()).Where(x => x.Discount is null);
 
-    public CustomerDiscountClass? GetDiscountById(int discountId) => collection.FindOne(x => x.Discount != null && x.Discount.Id == discountId)?.Discount;
+    public IEnumerable<DiscountForCustomer> GetAllDiscount() => collection.Find(x => x.Discount != null).Select(x => x.Discount!);
+
+    public DiscountForCustomer? GetDiscountById(int discountId) => collection.FindOne(x => x.Discount != null && x.Discount.Id == discountId)?.Discount;
 
     public bool Delete(ObjectId id) => collection.Delete(id);
 }

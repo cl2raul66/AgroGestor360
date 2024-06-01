@@ -1,4 +1,4 @@
-﻿using AgroGestor360.App.Views.Settings.Products;
+﻿using AgroGestor360.App.Views.Settings;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;

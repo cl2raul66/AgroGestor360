@@ -44,7 +44,7 @@ public class ReportsController : ControllerBase
                 if (p.HasCustomerDiscount)
                 {
                     productItem.ProductName = $"{p.Product!.ProductName} {p.Product!.Packaging!.Value:F2} {p.Product!.Packaging!.Unit} (Descuento)";
-                    productItem.ArticlePrice -= productItem.ArticlePrice * (quotation.Customer!.Discount!.Value / 100);
+                    productItem.ArticlePrice -= productItem.ArticlePrice * (quotation.Customer!.Discount!.Discount / 100);
                 }
 
                 if (p.OfferId > 0)

@@ -4,12 +4,13 @@ using CommunityToolkit.Mvvm.Messaging;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using AgroGestor360.Client.Models;
-using AgroGestor360.App.Views.Settings.Customers;
+using AgroGestor360.App.Views.Settings;
 
 namespace AgroGestor360.App.ViewModels;
 
 [QueryProperty(nameof(Discounts), nameof(Discounts))]
 [QueryProperty(nameof(CurrentCustomer), "CurrentCustomer")]
+[QueryProperty(nameof(Credits), "credits")]
 public partial class PgAddEditCustomerViewModel : ObservableValidator
 {
     public PgAddEditCustomerViewModel()
@@ -19,16 +20,22 @@ public partial class PgAddEditCustomerViewModel : ObservableValidator
     }
 
     [ObservableProperty]
-    CustomerDiscountClass[]? discounts;
+    LineCredit[]? credits;
 
     [ObservableProperty]
-    CustomerDiscountClass? selectedDiscount;
+    LineCredit? selectedCredit;
+
+    [ObservableProperty]
+    DiscountForCustomer[]? discounts;
+
+    [ObservableProperty]
+    DiscountForCustomer? selectedDiscount;
 
     [ObservableProperty]
     DTO5_3? currentCustomer;
 
     [ObservableProperty]
-    DateTime date;
+    DateTime date;                                                                      
 
     [ObservableProperty]
     DateTime birthday;

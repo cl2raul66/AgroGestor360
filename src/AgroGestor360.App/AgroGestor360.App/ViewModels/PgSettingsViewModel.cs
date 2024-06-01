@@ -41,6 +41,8 @@ public partial class PgSettingsViewModel : ObservableObject
         "Conexión",
         "Entidad",
         "Bancos",
+        "Descuentos",
+        "Linea de créditos",
         "Vendedores",
         "Clientes",
         "Almacén",
@@ -95,8 +97,11 @@ public partial class PgSettingsViewModel : ObservableObject
                 case "Bancos":
                     navigationServ.NavigateToView<CvBankAccountsViewModel>(view => CurrentContent = view);
                     break;
-                case "Accionistas":
-                    navigationServ.NavigateToView<CvShareholdersViewModel>(view => CurrentContent = view);
+                case "Descuentos":
+                    navigationServ.NavigateToView<CvDiscountsViewModel>(view => CurrentContent = view);
+                    break;
+                case "Linea de créditos":
+                    navigationServ.NavigateToView<CvLineCreditsViewModel>(view => CurrentContent = view);
                     break;
                 case "Almacén":
                     navigationServ.NavigateToView<CvWarehouseViewModel>(view => CurrentContent = view);

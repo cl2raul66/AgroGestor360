@@ -1,6 +1,6 @@
 using AgroGestor360.App.ViewModels;
 
-namespace AgroGestor360.App.Views.Settings.Connection;
+namespace AgroGestor360.App.Views.Settings;
 
 public partial class PgSetURL : ContentPage
 {

@@ -11,12 +11,14 @@ namespace AgroGestor360.Server.Controllers;
 public class CustomersController : ControllerBase
 {
     readonly ICustomersInLiteDbService customersServ;
-    readonly IEnumerable<CustomerDiscountClass> AllDiscount;
+    readonly IDiscountsInLiteDbService discountsServ;
+    readonly ILineCreditsInLiteDbService lineCreditsServ;
 
-    public CustomersController(ICustomersInLiteDbService customersService, IConfiguration configuration)
+    public CustomersController(ICustomersInLiteDbService customersService, IDiscountsInLiteDbService discountsService, ILineCreditsInLiteDbService lineCreditsService)
     {
         customersServ = customersService;
-        AllDiscount = configuration.GetSection("DefaultClientClasses")?.GetSection("Types").Get<IEnumerable<CustomerDiscountClass>>() ?? [];
+        discountsServ = discountsService;
+        lineCreditsServ = lineCreditsService;
     }
 
     [HttpGet("exist")]
@@ -28,14 +30,18 @@ public class CustomersController : ControllerBase
     }
 
     [HttpGet("getalldiscount")]
-    public ActionResult<IEnumerable<CustomerDiscountClass>> GetAllDiscount() => !AllDiscount?.Any() ?? true ? NotFound() : Ok(AllDiscount);
+    public ActionResult<IEnumerable<DiscountForCustomer>> GetAllDiscount()
+    {
+        var all = customersServ.GetAllDiscount();
+        return all is not null && all.Any() ? Ok(all) : NotFound();
+    }
 
     [HttpGet]
     public ActionResult<IEnumerable<DTO5_1>> GetAll()
     {
-        var customers = customersServ.GetAll()?.Select(x => x.ToDTO5_1()) ?? [];
+        var all = customersServ.GetAll()?.Select(x => x.ToDTO5_1()) ?? [];
 
-        return !customers?.Any() ?? true ? NotFound() : Ok(customers);
+        return all is not null && all.Any() ? Ok(all) : NotFound();
     }
 
     [HttpGet("getallwithdiscount")]
@@ -63,7 +69,7 @@ public class CustomersController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<string> Post([FromBody] DTO5_2 dTO)
+    public ActionResult<string> Post(DTO5_2 dTO)
     {
         var entity = dTO.FromDTO5_2();
         entity.Id = ObjectId.NewObjectId();
@@ -74,7 +80,7 @@ public class CustomersController : ControllerBase
     }
 
     [HttpPut]
-    public ActionResult<bool> Update([FromBody] DTO5_3 dTO)
+    public ActionResult<bool> Update(DTO5_3 dTO)
     {
         var entity = dTO.FromDTO5_3();
         if (entity is null)
@@ -85,9 +91,29 @@ public class CustomersController : ControllerBase
 
         return Ok(result);
     }
+    
+    [HttpPut("updatecredit")]
+    public ActionResult<bool> UpdateCredit(DTO5_5 dTO)
+    {
+        if (dTO is null)
+        {
+            return NoContent();
+        }
+
+        var entity = customersServ.GetById(new ObjectId(dTO.CustomerId));
+        if (entity is null)
+        {
+            return NotFound();
+        }
+        entity.Credit = dTO.Credit;
+
+        var result = customersServ.Update(entity);
+
+        return Ok(result);
+    }
 
     [HttpPut("updatediscount")]
-    public ActionResult<bool> UpdateDiscount([FromBody] DTO5_4 dTO)
+    public ActionResult<bool> UpdateDiscount(DTO5_4 dTO)
     {
         var entity = customersServ.GetById(new ObjectId(dTO.CustomerId));
         if (entity is null)
@@ -96,7 +122,7 @@ public class CustomersController : ControllerBase
         }
         if (dTO.DiscountId > 0)
         {
-            entity.Discount = AllDiscount.FirstOrDefault(x => x.Id == dTO.DiscountId);
+            entity.Discount = discountsServ.GetById(dTO.DiscountId);
             if (entity.Discount is null)
             {
                 return NotFound();
@@ -110,8 +136,6 @@ public class CustomersController : ControllerBase
 
         return Ok(result);
     }
-
-
 
     [HttpDelete("{id}")]
     public ActionResult<bool> Delete(string id)

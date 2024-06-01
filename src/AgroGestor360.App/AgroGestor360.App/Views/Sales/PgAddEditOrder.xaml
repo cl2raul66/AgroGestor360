@@ -75,7 +75,7 @@
                         </Grid>
                         <Label
                             FontAttributes="Bold"
-                            Text="{Binding SelectedCustomer.Discount.Value, TargetNullValue='El cliente no tiene descuento', FallbackValue='El cliente no tiene descuento', StringFormat='Descuento aprobado para el cliente: {0}%'}"
+                            Text="{Binding SelectedCustomer.Discount.Discount, TargetNullValue='El cliente no tiene descuento', FallbackValue='El cliente no tiene descuento', StringFormat='Descuento aprobado para el cliente: {0}%'}"
                             VerticalOptions="Center" />
                         <VerticalStackLayout Spacing="4">
                             <Grid RowDefinitions="auto,auto" RowSpacing="4">

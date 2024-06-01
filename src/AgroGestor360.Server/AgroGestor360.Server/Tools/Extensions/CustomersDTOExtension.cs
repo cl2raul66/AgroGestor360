@@ -15,6 +15,7 @@ public static class CustomersDTOExtension
             CustomerName = string.IsNullOrEmpty(entity.Contact?.Organization?.Name)
                 ? entity.Contact?.FormattedName
                 : entity.Contact?.Organization?.Name,
+            Credit = entity.Credit,
             Discount = entity.Discount
         };
     }
@@ -41,6 +42,7 @@ public static class CustomersDTOExtension
                     ? null
                     : new vCardLib.Models.Organization(dTO.CustomerOrganizationName!, null, null)
             },
+            Credit = dTO.Credit,
             Discount = dTO.Discount
         };
     }
@@ -68,6 +70,7 @@ public static class CustomersDTOExtension
                     ? null
                     : new vCardLib.Models.Organization(dTO.CustomerOrganizationName!, null, null)
             },
+            Credit = dTO.Credit,
             Discount = dTO.Discount
         };
     }
@@ -86,6 +89,7 @@ public static class CustomersDTOExtension
             CustomerNIP = entity.Contact?.CustomFields.FirstOrDefault(x => x.Key == "NIP").Value,
             CustomerNIT = entity.Contact?.CustomFields.FirstOrDefault(x => x.Key == "NIT").Value,
             CustomerAddress = entity.Contact?.CustomFields.FirstOrDefault(x => x.Key == "ADDRESS").Value,
+            Credit = entity.Credit,
             Discount = entity.Discount
         };
     }

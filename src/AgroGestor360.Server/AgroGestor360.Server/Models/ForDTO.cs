@@ -7,23 +7,26 @@ namespace AgroGestor360.Server.Models;
 #region Customer
 /// <summary>
 /// Object: Customer for GET
-/// <para>
-/// string [CustomerId, CustomerName], CustomerDiscountClass [Discount]
-/// </para>
+/// <code>
+/// string [CustomerId, CustomerName] 
+/// CustomerDiscountClass [Discount]
+/// </code>
 /// </summary>
 public class DTO5_1
 {
     public string? CustomerId { get; set; }
     public string? CustomerName { get; set; }
     public bool IsOrganization { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
+    public DiscountForCustomer? Discount { get; set; }
+    public LineCredit? Credit { get; set; }
 }
 
 /// <summary>
 /// Object: Customer for POST
-/// <para>
-/// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName], CustomerDiscountClass [Discount]
-/// </para>
+/// <code>
+/// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName]
+/// CustomerDiscountClass [Discount]
+/// </code>
 /// </summary>
 public class DTO5_2
 {
@@ -36,7 +39,8 @@ public class DTO5_2
     public string? CustomerNIP { get; set; }
     public string? CustomerOccupation { get; set; }
     public string? CustomerOrganizationName { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
+    public DiscountForCustomer? Discount { get; set; }
+    public LineCredit? Credit { get; set; }
 }
 
 /// <summary>
@@ -58,19 +62,34 @@ public class DTO5_3
     public string? CustomerNIP { get; set; }
     public string? CustomerOccupation { get; set; }
     public string? CustomerOrganizationName { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
+    public DiscountForCustomer? Discount { get; set; }
+    public LineCredit? Credit { get; set; }
 }
 
 /// <summary>
 /// Object: Customer for PUT by discount
-/// <para>
-/// string [CustomerId], int [DiscountId]
-/// </para>
+/// <code>
+/// string [CustomerId]
+/// int [DiscountId]
+/// </code>
 /// </summary>
 public class DTO5_4
 {
     public string? CustomerId { get; set; }
     public int DiscountId { get; set; }
+}
+
+/// <summary>
+/// Object: Customer for PUT by credit
+/// <code>
+/// string [CustomerId]
+/// LineCredit [Credit]
+/// </code>
+/// </summary>
+public class DTO5_5
+{
+    public string? CustomerId { get; set; }
+    public LineCredit? Credit { get; set; }
 }
 #endregion
 

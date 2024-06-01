@@ -12,7 +12,7 @@ public static class GetTotalAmount
             double itemPrice = p.Product!.ArticlePrice;
             if (p.HasCustomerDiscount)
             {
-                double discount = entity.Customer!.Discount!.Value;
+                double discount = entity.Customer!.Discount!.Discount;
                 itemPrice -= itemPrice * (discount / 100);
             }
 

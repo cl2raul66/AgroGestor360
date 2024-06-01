@@ -1,6 +1,6 @@
 ﻿using AgroGestor360.App.Models;
 using AgroGestor360.App.Services;
-using AgroGestor360.App.Views.Settings.Warehouse;
+using AgroGestor360.App.Views.Settings;
 using AgroGestor360.Client.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;

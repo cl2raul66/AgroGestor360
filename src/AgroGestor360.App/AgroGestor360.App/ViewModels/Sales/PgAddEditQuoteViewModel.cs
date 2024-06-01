@@ -164,7 +164,7 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
             item = new()
             {
                 ProductItemQuantity = SelectedProductItem!.ProductItemQuantity,
-                PriceWhitDiscount = SelectedProductItem!.Product!.ArticlePrice - (SelectedCustomer!.Discount!.Value / 100.00 * SelectedProductItem!.Product!.ArticlePrice),
+                PriceWhitDiscount = SelectedProductItem!.Product!.ArticlePrice - (SelectedCustomer!.Discount!.Discount / 100.00 * SelectedProductItem!.Product!.ArticlePrice),
                 Product = SelectedProductItem!.Product,
                 ProductOffer = null,
                 CustomerDiscountClass = SelectedCustomer!.Discount
@@ -314,7 +314,7 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
                 double itemPrice = item.Product!.ArticlePrice;
                 if (item.CustomerDiscountClass is not null)
                 {
-                    double discount = item.CustomerDiscountClass.Value;
+                    double discount = item.CustomerDiscountClass.Discount;
                     itemPrice -= itemPrice * (discount / 100);
                 }
 

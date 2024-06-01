@@ -1,4 +1,4 @@
-﻿using AgroGestor360.App.Views.Settings.Customers;
+﻿using AgroGestor360.App.Views.Settings;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -13,12 +13,18 @@ namespace AgroGestor360.App.ViewModels;
 public partial class CvCustomersViewModel : ObservableRecipient
 {
     readonly ICustomersService customersServ;
+    readonly ILineCreditsService lineCreditsServ;
+    readonly ITimeLimitsCreditsService timeLimitsCreditsServ;
+    readonly IDiscountsCustomersService discountsCustomersServ;
     readonly IAuthService authServ;
     readonly string serverURL;
 
-    public CvCustomersViewModel(ICustomersService customersService, IAuthService authService)
+    public CvCustomersViewModel(ICustomersService customersService, ILineCreditsService lineCreditsService, ITimeLimitsCreditsService timeLimitsCreditsService, IDiscountsCustomersService discountsCustomersService, IAuthService authService)
     {
         customersServ = customersService;
+        lineCreditsServ = lineCreditsService;
+        timeLimitsCreditsServ = timeLimitsCreditsService;
+        discountsCustomersServ = discountsCustomersService;
         authServ = authService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
     }
@@ -39,6 +45,38 @@ public partial class CvCustomersViewModel : ObservableRecipient
     void ChangeEnableGetByDiscount()
     {
         EnableGetByDiscount = !EnableGetByDiscount;
+    }
+
+    [RelayCommand]
+    async Task ShowSetCredit()
+    {
+        IsActive = true;
+        var credits = await lineCreditsServ.GetAllAsync(serverURL);
+        var timeLimits = await timeLimitsCreditsServ.GetAllAsync(serverURL);
+        var defaulttimelimits = await timeLimitsCreditsServ.GetDefaultAsync(serverURL);
+        Dictionary<string, object> sendObjects = new()
+        {
+            { "canceltoken", nameof(PgAddEditCustomer) },
+            { "currentcustomer", SelectedCustomer! },
+            {"credits", credits.ToArray() },
+            {"timelimits", timeLimits.ToArray() },
+            {"defaulttimelimits", defaulttimelimits! }
+        };
+        await Shell.Current.GoToAsync(nameof(PgSetCreditForCustomer), true, sendObjects);
+    }
+
+    [RelayCommand]
+    async Task ClearCredit()
+    {
+        DTO5_5 dTO = new() { CustomerId = SelectedCustomer!.CustomerId, Credit = null };
+        var result = await customersServ.UpdateCreditAsync(serverURL, dTO);
+        if (result)
+        {
+            int idx = Customers!.IndexOf(SelectedCustomer!);
+            var currentCustomer = Customers![idx];
+            currentCustomer.Credit = null;
+            Customers[idx] = currentCustomer;
+        }
     }
 
     [RelayCommand]
@@ -66,12 +104,12 @@ public partial class CvCustomersViewModel : ObservableRecipient
             }
         }
 
-        var options = await customersServ.GetAllDiscountAsync(serverURL);
+        var options = await discountsCustomersServ.GetAllAsync(serverURL);
         if (options is not null)
         {
-            var selectedOpt = await Shell.Current.DisplayActionSheet("Seleccione un descuento", "Cancelar", null, options.Select(x => $"{x.Name} - {x.Value}%").ToArray());
+            var selectedOpt = await Shell.Current.DisplayActionSheet("Seleccione un descuento", "Cancelar", null, options.Select(x => $"{x.Name} - {x.Discount}%").ToArray());
             if (!string.IsNullOrEmpty(selectedOpt) && selectedOpt != "Cancelar")
-             {
+            {
                 var seccion = selectedOpt.Split('-');
                 var discount = options.FirstOrDefault(x => x.Name == seccion[0].Trim());
 
@@ -138,8 +176,11 @@ public partial class CvCustomersViewModel : ObservableRecipient
     async Task ShowAddCustomer()
     {
         IsActive = true;
-        CustomerDiscountClass[] discounts = (await customersServ.GetAllDiscountAsync(serverURL)).ToArray();
-        var sendObject = new Dictionary<string, object>() { { "Discounts", discounts } };
+        DiscountForCustomer[] discounts = (await discountsCustomersServ.GetAllAsync(serverURL)).ToArray();
+        LineCreditItem[] credits = (await lineCreditsServ.GetAllAsync(serverURL)).ToArray();
+        var sendObject = new Dictionary<string, object>() {
+            { "Discounts", discounts },
+            { "credits", credits } };
         await Shell.Current.GoToAsync(nameof(PgAddEditCustomer), true, sendObject);
     }
 
@@ -147,7 +188,7 @@ public partial class CvCustomersViewModel : ObservableRecipient
     async Task ShowEditCustomer()
     {
         IsActive = true;
-        CustomerDiscountClass[] discounts = (await customersServ.GetAllDiscountAsync(serverURL)).ToArray();
+        DiscountForCustomer[] discounts = (await discountsCustomersServ.GetAllAsync(serverURL)).ToArray();
         var currentCustomer = await customersServ.GetByIdAsync(serverURL, SelectedCustomer!.CustomerId!);
         var sendObject = new Dictionary<string, object>() {
             { "Discounts", discounts },
@@ -215,6 +256,22 @@ public partial class CvCustomersViewModel : ObservableRecipient
             {
                 int idx = r.Customers!.IndexOf(SelectedCustomer!);
                 r.Customers[idx] = new DTO5_1() { CustomerId = m.CustomerId, CustomerName = m.CustomerFullName, Discount = m.Discount };
+            }
+
+            r.SelectedCustomer = null;
+            IsActive = false;
+        });
+
+        WeakReferenceMessenger.Default.Register<CvCustomersViewModel, LineCredit, string>(this, "setcreditforcustomer", async (r, m) =>
+        {
+            DTO5_5 dTO = new() { CustomerId = SelectedCustomer!.CustomerId, Credit = m };
+            bool result = await customersServ.UpdateCreditAsync(serverURL, dTO);
+            if (result)
+            {
+                int idx = Customers!.IndexOf(SelectedCustomer!);
+                var currentCustomer = Customers![idx];
+                currentCustomer.Credit = m;
+                Customers[idx] = currentCustomer;
             }
 
             r.SelectedCustomer = null;

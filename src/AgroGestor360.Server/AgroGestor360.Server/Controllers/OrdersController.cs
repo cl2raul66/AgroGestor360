@@ -235,6 +235,9 @@ public class OrdersController : ControllerBase
             return NotFound();
         }
 
+        var productsIds = found.Products?.Select(x => new ObjectId(x.Product!.Id)) ?? [];
+        var products = productsForSalesServ.GetManyById(productsIds);
+
         List<ProductSaleBase> productItems = [];
         List<ArticleItemForWarehouse> articleItems = [];
         bool isPending = false;

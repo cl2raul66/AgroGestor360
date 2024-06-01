@@ -47,12 +47,15 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="x:String">
                             <Border Style="{StaticResource BorderItem}">
-                                <Label FontAttributes="Bold" FontSize="Body">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="Body"
+                                    VerticalOptions="Center">
                                     <Label.FormattedText>
                                         <FormattedString>
                                             <Span
                                                 FontFamily="icofont"
-                                                Text="{StaticResource ArrowRight}"
+                                                Text="{StaticResource SimpleRight}"
                                                 TextColor="{StaticResource White}" />
                                             <Span Text=" " />
                                             <Span Text="{Binding .}" TextColor="{StaticResource White}" />

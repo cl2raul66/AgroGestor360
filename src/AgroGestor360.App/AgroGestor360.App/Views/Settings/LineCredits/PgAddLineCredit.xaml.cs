@@ -2,9 +2,9 @@ using AgroGestor360.App.ViewModels;
 
 namespace AgroGestor360.App.Views.Settings;
 
-public partial class CvShareholders : ContentView
+public partial class PgAddLineCredit : ContentPage
 {
-	public CvShareholders(CvShareholdersViewModel vm)
+	public PgAddLineCredit(PgAddLineCreditViewModel vm)
 	{
 		InitializeComponent();
 

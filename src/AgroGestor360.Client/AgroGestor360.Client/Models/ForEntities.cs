@@ -39,14 +39,29 @@ public class ProductOffering
     public double BonusAmount { get; set; }
 }
 
-/// <summary>
-/// Represents a customer discount class.
-/// </summary>
-public class CustomerDiscountClass
+public class DiscountForCustomer
 {
     public int Id { get; set; }
     public string? Name { get; set; }
-    public double Value { get; set; }
+    public double Discount { get; set; }
+}
+
+public class LineCredit : LineCreditItem
+{
+    public int TimeLimit { get; set; }
+}
+
+public class LineCreditItem
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public double Amount { get; set; }
+}
+
+public class TimeLimitForCredit
+{
+    public int Id { get; set; }
+    public int TimeLimit { get; set; }
 }
 
 /// <summary>
@@ -103,23 +118,26 @@ public class CreditPayment
 #region Customer
 /// <summary>
 /// Object: Customer for GET
-/// <para>
-/// string [CustomerId, CustomerName], CustomerDiscountClass [Discount]
-/// </para>
+/// <code>
+/// string [CustomerId, CustomerName] 
+/// CustomerDiscountClass [Discount]
+/// </code>
 /// </summary>
 public class DTO5_1
 {
     public string? CustomerId { get; set; }
     public string? CustomerName { get; set; }
     public bool IsOrganization { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
+    public DiscountForCustomer? Discount { get; set; }
+    public LineCredit? Credit { get; set; }
 }
 
 /// <summary>
 /// Object: Customer for POST
-/// <para>
-/// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName], CustomerDiscountClass [Discount]
-/// </para>
+/// <code>
+/// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName]
+/// CustomerDiscountClass [Discount]
+/// </code>
 /// </summary>
 public class DTO5_2
 {
@@ -132,7 +150,8 @@ public class DTO5_2
     public string? CustomerNIP { get; set; }
     public string? CustomerOccupation { get; set; }
     public string? CustomerOrganizationName { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
+    public DiscountForCustomer? Discount { get; set; }
+    public LineCredit? Credit { get; set; }
 }
 
 /// <summary>
@@ -154,19 +173,33 @@ public class DTO5_3
     public string? CustomerNIP { get; set; }
     public string? CustomerOccupation { get; set; }
     public string? CustomerOrganizationName { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
+    public DiscountForCustomer? Discount { get; set; }
+    public LineCredit? Credit { get; set; }
 }
 
 /// <summary>
 /// Object: Customer for PUT by discount
-/// <para>
+/// <code>
 /// string [CustomerId], int [DiscountId]
-/// </para>
+/// </code>
 /// </summary>
 public class DTO5_4
 {
     public string? CustomerId { get; set; }
     public int DiscountId { get; set; }
+}
+
+/// <summary>
+/// Object: Customer for PUT by credit
+/// <code>
+/// string [CustomerId]
+/// LineCredit [Credit]
+/// </code>
+/// </summary>
+public class DTO5_5
+{
+    public string? CustomerId { get; set; }
+    public LineCredit? Credit { get; set; }
 }
 #endregion
 

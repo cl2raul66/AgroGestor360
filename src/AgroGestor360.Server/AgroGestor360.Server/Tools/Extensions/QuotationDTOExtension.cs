@@ -25,7 +25,7 @@ public static class QuotationDTOExtension
             double itemPrice = pi.Product!.ArticlePrice;
             if (pi.HasCustomerDiscount)
             {
-                double discount = entity.Customer!.Discount!.Value;
+                double discount = entity.Customer!.Discount!.Discount;
                 itemPrice -= itemPrice * (discount / 100);
             }
 

@@ -10,12 +10,13 @@ public interface ICustomersService
     Task<bool> DeleteAsync(string serverURL, string id);
     Task<bool> ExistAsync(string serverURL);
     Task<IEnumerable<DTO5_1>> GetAllAsync(string serverURL);
-    Task<IEnumerable<CustomerDiscountClass>> GetAllDiscountAsync(string serverURL);
+    Task<IEnumerable<DiscountForCustomer>> GetAllDiscountAsync(string serverURL);
     Task<IEnumerable<DTO5_1>> GetAllWithDiscountAsync(string serverURL);
     Task<IEnumerable<DTO5_1>> GetAllWithoutDiscountAsync(string serverURL);
     Task<DTO5_3?> GetByIdAsync(string serverURL, string id);
     Task<string> InsertAsync(string serverURL, DTO5_2 dTO);
     Task<bool> UpdateAsync(string serverURL, DTO5_3 dTO);
+    Task<bool> UpdateCreditAsync(string serverURL, DTO5_5 dTO);
     Task<bool> UpdateDiscountAsync(string serverURL, DTO5_4 dTO);
 }
 
@@ -34,12 +35,12 @@ public class CustomersService : ICustomersService
         return false;
     }
 
-    public async Task<IEnumerable<CustomerDiscountClass>> GetAllDiscountAsync(string serverURL)
+    public async Task<IEnumerable<DiscountForCustomer>> GetAllDiscountAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers/getalldiscount");
-            if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
+            if (response.StatusCode is HttpStatusCode.NotFound)
             {
                 return [];
             }
@@ -47,7 +48,7 @@ public class CustomersService : ICustomersService
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<CustomerDiscountClass>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+            return JsonSerializer.Deserialize<IEnumerable<DiscountForCustomer>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
         }
         return [];
     }
@@ -140,6 +141,20 @@ public class CustomersService : ICustomersService
         {
             var content = new StringContent(JsonSerializer.Serialize(dTO), Encoding.UTF8, "application/json");
             var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/customers", content);
+            if (response.IsSuccessStatusCode)
+            {
+                return bool.Parse(await response.Content.ReadAsStringAsync());
+            }
+        }
+        return false;
+    }
+
+    public async Task<bool> UpdateCreditAsync(string serverURL, DTO5_5 dTO)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var content = new StringContent(JsonSerializer.Serialize(dTO), Encoding.UTF8, "application/json");
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/customers/updatecredit", content);
             if (response.IsSuccessStatusCode)
             {
                 return bool.Parse(await response.Content.ReadAsStringAsync());

@@ -15,7 +15,7 @@ public static class ProductItemForDocumentToString
                 product.ProductName,
                 product.Packaging!.Value,
                 product.Packaging!.Unit,
-                product.ArticlePrice -= product.ArticlePrice * (customer!.Discount!.Value / 100.00));
+                product.ArticlePrice -= product.ArticlePrice * (customer!.Discount!.Discount / 100.00));
         }
         else if (offerId > 0)
         {

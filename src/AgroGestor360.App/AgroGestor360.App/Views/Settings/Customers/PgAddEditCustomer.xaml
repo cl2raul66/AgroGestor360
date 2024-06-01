@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
-    x:Class="AgroGestor360.App.Views.Settings.Customers.PgAddEditCustomer"
+    x:Class="AgroGestor360.App.Views.Settings.PgAddEditCustomer"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -170,6 +170,32 @@
                                             <MultiBinding.StringFormat>{0} - {1}%</MultiBinding.StringFormat>
                                             <Binding Path="Name" />
                                             <Binding Path="Value" />
+                                        </MultiBinding>
+                                    </Picker.ItemDisplayBinding>
+                                </Picker>
+                            </Grid>
+                        </ctk:Expander.Content>
+                    </ctk:Expander>
+                    <ctk:Expander x:Name="expander1" IsVisible="{Binding CurrentCustomer, Mode=OneWay, Converter={ctk:IsNullConverter}}">
+                        <ctk:Expander.Header>
+                            <StackLayout Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding IsExpanded, Source={x:Reference expander1}, Mode=TwoWay}" />
+                                <Label Text="Aplicar línea de crédito" VerticalOptions="Center" />
+                            </StackLayout>
+                        </ctk:Expander.Header>
+                        <ctk:Expander.Content>
+                            <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                                <Label Text="Seleccione un crédito: *" />
+                                <Picker
+                                    Grid.Row="1"
+                                    ItemsSource="{Binding Credits}"
+                                    SelectedItem="{Binding SelectedCredit}">
+                                    <Picker.ItemDisplayBinding>
+                                        <MultiBinding>
+                                            <MultiBinding.StringFormat>Crédito {0} de {1} por {2} días</MultiBinding.StringFormat>
+                                            <Binding Path="Name" />
+                                            <Binding Path="Amount" />
+                                            <Binding Path="TimeLimit" />
                                         </MultiBinding>
                                     </Picker.ItemDisplayBinding>
                                 </Picker>

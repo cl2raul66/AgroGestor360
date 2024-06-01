@@ -1,6 +1,6 @@
 using AgroGestor360.App.ViewModels;
 
-namespace AgroGestor360.App.Views.Settings.Products;
+namespace AgroGestor360.App.Views.Settings;
 
 public partial class PgCreateOffer : ContentPage
 {

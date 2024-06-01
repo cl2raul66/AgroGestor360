@@ -51,14 +51,33 @@ public class Customer
 {
     public ObjectId? Id { get; set; }
     public vCard? Contact { get; set; }
-    public CustomerDiscountClass? Discount { get; set; }
+    public DiscountForCustomer? Discount { get; set; }
+    public LineCredit? Credit { get; set; }
 }
 
-public class CustomerDiscountClass
+public class DiscountForCustomer
 {
     public int Id { get; set; }
     public string? Name { get; set; }
-    public double Value { get; set; }
+    public double Discount { get; set; }
+}
+
+public class LineCreditItem
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public double Amount { get; set; }
+}
+
+public class LineCredit : LineCreditItem
+{
+    public int TimeLimit { get; set; }
+}
+
+public class TimeLimitForCredit
+{
+    public int Id { get; set; }
+    public int TimeLimit { get; set; }
 }
 
 ///<summary>

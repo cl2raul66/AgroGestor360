@@ -412,25 +412,6 @@ public partial class PgSalesViewModel : ObservableRecipient
                 deletedInInvoice = await invoicesServ.UpdateState(serverURL, dTO);
                 break;
             case "Por error del operador.":
-                //string invoiceStatus = SelectedInvoice!.Status switch
-                //{
-                //    InvoiceStatus.Cancelled => "Cancelada",
-                //    InvoiceStatus.Paid => "Pagada",
-                //    _ => "Pendiente"
-                //};
-                //StringBuilder sb = new();
-                //sb.AppendLine($"¿Seguro que quiere eliminar la siguiente factura?");
-                //sb.AppendLine("");
-                //if (!string.IsNullOrEmpty(SelectedInvoice!.NumberFEL))
-                //{
-                //    sb.AppendLine($"Número FEL: {SelectedInvoice!.NumberFEL}");
-                //}
-                //sb.AppendLine($"No.: {SelectedInvoice!.Code}");
-                //sb.AppendLine($"Estado de la factura: {invoiceStatus}");
-                //sb.AppendLine($"Fecha de creación: {SelectedInvoice!.Date:dd MMM yyyy}");
-                //sb.AppendLine($"Vendedor: {SelectedInvoice!.SellerName}");
-                //sb.AppendLine($"Cliente: {SelectedInvoice!.CustomerName}");
-                //sb.AppendLine($"Total: {SelectedInvoice!.TotalAmount:N2}");
                 string bodyText = await GenerateBodyTextFromInvoice();
                 bool result = await Shell.Current.DisplayAlert("Eliminar factura", bodyText, "Eliminar", "Cancelar");
                 if (!result)

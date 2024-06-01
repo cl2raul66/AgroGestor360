@@ -1,6 +1,5 @@
 ﻿using AgroGestor360.App.Models;
-using AgroGestor360.App.Views;
-using AgroGestor360.App.Views.Settings.Warehouse;
+using AgroGestor360.App.Views.Settings;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -68,6 +67,7 @@ public partial class CvWarehouseViewModel : ObservableRecipient
             SelectedWarehouse.Quantity += theQuantity;
             Warehouses[idx] = SelectedWarehouse;
         }
+        SelectedWarehouse = null;
     }
 
     [RelayCommand]

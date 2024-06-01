@@ -1,5 +1,4 @@
-﻿using AgroGestor360.App.View.Settings;
-using AgroGestor360.App.ViewModels;
+﻿using AgroGestor360.App.ViewModels;
 using AgroGestor360.App.Views;
 using AgroGestor360.App.Views.Settings;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -44,11 +43,14 @@ public class NavigationService : INavigationService
             case CvProductsViewModel vm:
                 updateViewAction(new CvProducts(vm));
                 break;
-            case CvShareholdersViewModel vm:
-                updateViewAction(new CvShareholders(vm));
-                break;
             case CvBankAccountsViewModel vm:
                 updateViewAction(new CvBankAccounts(vm));
+                break;
+            case CvDiscountsViewModel vm:
+                updateViewAction(new CvDiscounts(vm));
+                break;
+            case CvLineCreditsViewModel vm:
+                updateViewAction(new CvLineCredits(vm));
                 break;
             case CvCustomersViewModel vm:
                 updateViewAction(new CvCustomers(vm));
