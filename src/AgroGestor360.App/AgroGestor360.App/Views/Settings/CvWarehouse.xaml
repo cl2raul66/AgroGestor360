@@ -76,12 +76,21 @@
                     <DataTemplate x:DataType="model:DTO2">
                         <Border Style="{StaticResource BorderItem}">
                             <VerticalStackLayout Spacing="0">
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Title"
-                                    HorizontalOptions="Center"
-                                    Text="{Binding Quantity, Mode=OneWay}"
-                                    TextColor="{StaticResource White}" />
+                                <Grid>
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="Title"
+                                        HorizontalOptions="Center"
+                                        Text="{Binding Quantity, Mode=OneWay}"
+                                        TextColor="{StaticResource White}" 
+                                        ToolTipProperties.Text="Artículos existente"/>
+                                    <Label
+                                        HorizontalOptions="End"
+                                        Text="{Binding Reserved, Mode=OneWay}"
+                                        TextColor="{StaticResource White}"
+                                        ToolTipProperties.Text="Cantidad de artículos reservado" />
+                                </Grid>
+
                                 <Label
                                     FontAttributes="Bold"
                                     HorizontalTextAlignment="Center"
