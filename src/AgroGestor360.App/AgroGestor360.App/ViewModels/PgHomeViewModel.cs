@@ -16,7 +16,6 @@ public partial class PgHomeViewModel : ObservableRecipient
     {
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         apiServ = apiService;
-        CheckUrl();
         apiServ.OnReceiveStatusMessage += ApiServ_OnReceiveStatusMessage;           
         AppInfo = $"{Assembly.GetExecutingAssembly().GetName().Name} V.{VersionTracking.Default.CurrentVersion}";
     }
@@ -42,7 +41,7 @@ public partial class PgHomeViewModel : ObservableRecipient
     }
 
     #region EXTRA
-    async void CheckUrl()
+    public async void Initialize()
     {
         ServerConnected = await apiServ.CheckUrl(serverURL);
         HaveConnection = await apiServ.ConnectToServerHub(serverURL);

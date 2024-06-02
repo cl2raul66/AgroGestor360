@@ -8,6 +8,7 @@ public partial class PgHome : ContentPage
 	{
 		InitializeComponent();
 
+		vm.Initialize();
 		BindingContext = vm;
 	}
 }

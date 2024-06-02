@@ -1,106 +1,43 @@
 ﻿using AgroGestor360.Client.Services;
-using Microsoft.AspNetCore.SignalR.Client;
+using AgroGestor360.Client.Tools;
 
 IApiService apiServ = new ApiService();
+apiServ.OnReceiveStatusMessage += HandleServerStatus;
+
 apiServ.ConnectToHttpClient();
 apiServ.SetClientDevicePlatform(Environment.OSVersion.ToString());
 apiServ.SetClientAccessToken("38D941C88617485496B07AF837C5E64E");
 
-IOrganizationService organizationServ = new OrganizationService();
-IAuthService authServ = new AuthService();
-
 string url = "http://localhost:5010";
 
-Console.WriteLine("Hola root");
-var checkurl = await apiServ.CheckUrl(url);
+var resultCheckUrl = await apiServ.CheckUrl(url);
+Console.WriteLine($"{nameof(resultCheckUrl)}: {resultCheckUrl}");
 
-if (!checkurl)
+var ConnectToServerHub = await apiServ.ConnectToServerHub(url);
+Console.WriteLine($"{nameof(ConnectToServerHub)}: {ConnectToServerHub}");
+
+var cts = new CancellationTokenSource();
+
+// Iniciar una tarea que escucha las teclas del usuario
+_ = Task.Run(() =>
 {
-    Console.WriteLine("El servidor no está disponible en este momento. Por favor, inténtalo más tarde.");
-    return;
-}
-else
-{
-    var org = await organizationServ.GetOrganization(url);
-    if (org is not null)
+    while (!cts.Token.IsCancellationRequested)
     {
-        Console.WriteLine("Información de la organización:");
-        Console.WriteLine(org.Id);
-        Console.WriteLine(org.Name);
-        Console.WriteLine(org.Address);
-        Console.WriteLine(org.Phone);
-        Console.WriteLine(org.Email);
+        if (Console.KeyAvailable)
+        {
+            cts.Cancel();
+        }
     }
-    else
-    {
-        Console.WriteLine("No se pudo obtener la información de la organización.");
-    }
-}
+});
 
-// Conectar al hub del servidor
-var connected = await apiServ.ConnectToServerHub(url);
-
-if (connected)
+// Esperar hasta que el usuario presione una tecla
+while (!cts.Token.IsCancellationRequested)
 {
-    apiServ.OnReceiveStatusMessage += status =>
-    {
-        Console.WriteLine($"Received status message: {status}");
-    };
+    await Task.Delay(1000);
 }
-else
+
+
+void HandleServerStatus(ServerStatus status)
 {
-    Console.WriteLine("No se pudo conectar al hub del servidor.");
+    Console.WriteLine($"El estado del servidor es: {status}");
 }
-
-//Console.Write("Ingrese su contraseña: ");
-//string? password = Console.ReadLine();
-
-//if (!string.IsNullOrEmpty(password))
-//{
-//    var resultAuth = await authServ.AuthRoot(url, password);
-
-//    if (resultAuth)
-//    {
-//        Console.WriteLine("Autenticación exitosa.");
-//    }
-//    else
-//    {
-//        Console.WriteLine("Autenticación fallida.");
-//    }
-//}
-
-//var service = new MeasurementService();
-//while (true)
-//{
-//    Console.WriteLine("Seleccione una medida:");
-//    var measurements = service.GetMeasurementNames().ToList();
-//    for (int i = 0; i < measurements.Count; i++)
-//    {
-//        Console.WriteLine($"{i + 1}. {measurements[i]}");
-//    }
-
-//    if (int.TryParse(Console.ReadLine(), out int selectedMeasurement) && selectedMeasurement > 0 && selectedMeasurement <= measurements.Count)
-//    {
-//        var units = service.GetNamesAndUnitsMeasurement(measurements[selectedMeasurement - 1]);
-//        Console.WriteLine($"Unidades para {measurements[selectedMeasurement - 1]}:");
-//        //for (int i = 0; i < units.Count; i++)
-//        //{
-//        //    Console.WriteLine($"{i + 1}. {units[i]}");
-//        //}
-//        foreach (var item in units)
-//        {
-//            Console.WriteLine(item);
-//        }
-//    }
-//    else
-//    {
-//        Console.WriteLine("Entrada inválida. Por favor, intente de nuevo.");
-//    }
-
-//    Console.WriteLine("¿Desea continuar? (s/n)");
-//    var r = Console.ReadLine();
-//    if (r?.ToLower() != "s")
-//    {
-//        break;
-//    }
-//}

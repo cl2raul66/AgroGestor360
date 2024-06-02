@@ -13,9 +13,6 @@ public class DeviceTypeRestrictionMiddleware(RequestDelegate next, IConfiguratio
         var userAgent = context.Request.Headers.UserAgent.ToString();
         var token = context.Request.Headers["ClientAccessToken"].ToString();
 
-
-
-
         if (token != clientAccessToken)
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
