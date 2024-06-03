@@ -1,19 +1,36 @@
 ﻿using AgroGestor360.Client.Services;
 using AgroGestor360.Client.Tools;
+using Microsoft.Extensions.Configuration;
+
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json"))
+    .Build();
+
+var clientAccessToken = configuration["License:ClientAccessToken"];
+if (string.IsNullOrEmpty(clientAccessToken))
+{
+    Console.WriteLine($"{nameof(clientAccessToken)} es nulo o vacío");
+    return;
+}
 
 IApiService apiServ = new ApiService();
 apiServ.OnReceiveStatusMessage += HandleServerStatus;
 
 apiServ.ConnectToHttpClient();
 apiServ.SetClientDevicePlatform(Environment.OSVersion.ToString());
-apiServ.SetClientAccessToken("38D941C88617485496B07AF837C5E64E");
+apiServ.SetClientAccessToken(clientAccessToken!);
 
-string url = "http://localhost:5010";
+var url = configuration["Server:Url"];
+if (string.IsNullOrEmpty(url))
+{
+    Console.WriteLine($"{nameof(url)} es nulo o vacío");
+    return;
+}
 
-var resultCheckUrl = await apiServ.CheckUrl(url);
+var resultCheckUrl = await apiServ.CheckUrl(url!);
 Console.WriteLine($"{nameof(resultCheckUrl)}: {resultCheckUrl}");
 
-var ConnectToServerHub = await apiServ.ConnectToServerHub(url);
+var ConnectToServerHub = await apiServ.ConnectToServerHub(url!);
 Console.WriteLine($"{nameof(ConnectToServerHub)}: {ConnectToServerHub}");
 
 var cts = new CancellationTokenSource();
@@ -35,7 +52,6 @@ while (!cts.Token.IsCancellationRequested)
 {
     await Task.Delay(1000);
 }
-
 
 void HandleServerStatus(ServerStatus status)
 {

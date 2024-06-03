@@ -119,13 +119,6 @@ public partial class CvProductsViewModel : ObservableRecipient
                     var foundProducts = Products!.Where(x => x.MerchandiseId == merchandiseId);
                     if (foundProducts.Any())
                     {
-                        //foreach (var item in foundProducts)
-                        //{
-                        //    int idx2 = Products!.IndexOf(item);
-                        //    item.ArticlePrice = item.ProductQuantity * thePrice;
-                        //    Products[idx2] = item;
-                        //    await Task.CompletedTask;
-                        //}
                         Products = new(await productsForSalesServ.GetAllAsync(serverURL));
                     }
                 });
@@ -157,7 +150,7 @@ public partial class CvProductsViewModel : ObservableRecipient
         sb.AppendLine($"Seguro que quiere eliminar el siguiente producto:");
         sb.AppendLine($"Nombre: {SelectedProduct!.ProductName}");
         sb.AppendLine($"Presentación: {SelectedProduct!.Packaging?.Value} {SelectedProduct!.Packaging?.Unit}");
-        sb.AppendLine($"Precio: {SelectedProduct!.ArticlePrice.ToString("0.00")}");
+        sb.AppendLine($"Precio: {SelectedProduct!.ArticlePrice.ToString("C")}");
         sb.AppendLine("");
         sb.AppendLine("Inserte la contraseña:");
         var pwd = await Shell.Current.DisplayPromptAsync("Eliminar producto", sb.ToString().Trim(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
@@ -196,7 +189,7 @@ public partial class CvProductsViewModel : ObservableRecipient
         IsActive = true;
         Dictionary<string, object> sendObject = new() {
             { "CurrentProduct", SelectedProduct! },
-            { "OfferId", Offers is null || !Offers.Any() ? 1 : Offers.Max(x => x.Id)}
+            { "OfferId", Offers is not null && Offers.Any() ? Offers.Max(x => x.Id) + 1 : 1}
         };
         await Shell.Current.GoToAsync(nameof(PgCreateOffer), true, sendObject);
     }
@@ -207,7 +200,7 @@ public partial class CvProductsViewModel : ObservableRecipient
         StringBuilder sb = new();
         sb.AppendLine($"Seguro que quiere eliminar la siguiente oferta:");
         sb.AppendLine($"Nombre:{SelectedProduct!.ProductName}-{SelectedOffert!.Id}");
-        sb.AppendLine($"Precio: {(SelectedProduct!.ArticlePrice * SelectedOffert!.Quantity).ToString("0.00")}");
+        sb.AppendLine($"Precio: {(SelectedProduct!.ArticlePrice * SelectedOffert!.Quantity).ToString("C")}");
         sb.AppendLine("");
         sb.AppendLine("Inserte la contraseña:");
         var pwd = await Shell.Current.DisplayPromptAsync("Eliminar oferta", sb.ToString().Trim(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
@@ -261,18 +254,18 @@ public partial class CvProductsViewModel : ObservableRecipient
 
         WeakReferenceMessenger.Default.Register<CvProductsViewModel, DTO4_3, string>(this, "NewProductOffering", async (r, m) =>
         {
-            var lastSelectedProductId = r.SelectedProduct!.Id;
+            int idx = r.Products!.IndexOf(SelectedProduct!);
             bool result = await productsForSalesServ.UpdateAsync(serverURL, m);
             if (result)
             {
-                int idx = r.Products!.IndexOf(SelectedProduct!);
-                SelectedProduct!.HasOffers = true;
-                r.Products![idx] = SelectedProduct!;
+                var currentProduct = r.Products![idx];
+                currentProduct.HasOffers = true;
+                r.Products![idx] = currentProduct!;
             }
 
             IsActive = false;
             AllSelectedAsNull();
-            r.SelectedProduct = r.Products!.First(x => x.Id == lastSelectedProductId);
+            r.SelectedProduct = r.Products![idx];
         });
 
         WeakReferenceMessenger.Default.Register<CvProductsViewModel, string, string>(this, nameof(CvProductsViewModel), (r, m) =>

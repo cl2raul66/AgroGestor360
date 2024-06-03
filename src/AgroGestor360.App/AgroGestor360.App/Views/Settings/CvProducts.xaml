@@ -372,30 +372,6 @@
                         Text="Ofertas del producto"
                         TextTransform="Uppercase"
                         VerticalOptions="Center" />
-                    <!--<Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                        <Entry
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Placeholder="Escriba aquí" />
-                        <Button
-                            Grid.Column="1"
-                            FontFamily="icofont"
-                            Text="{StaticResource Search}"
-                            ToolTipProperties.Text="Buscar" />
-                    </Grid>
-                    <HorizontalStackLayout Spacing="8">
-                        <RadioButton>
-                            <RadioButton.Content>
-                                <Label Text="Por nombre" VerticalOptions="Center" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                        <RadioButton>
-                            <RadioButton.Content>
-                                <Label Text="Por bonificación" VerticalOptions="Center" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                    </HorizontalStackLayout>-->
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1">
                     <CollectionView
@@ -414,13 +390,12 @@
                                         <Label
                                             Grid.Column="1"
                                             FontAttributes="Bold"
-                                            HorizontalOptions="Center">
+                                            HorizontalOptions="End">
                                             <Label.FormattedText>
                                                 <FormattedString>
-                                                    <Span Text="Cantidad " TextColor="{StaticResource White}" />
-                                                    <Span Text="{Binding BonusAmount, Mode=OneWay}" TextColor="{StaticResource White}" />
-                                                    <Span Text=" x " TextColor="{StaticResource White}" />
-                                                    <Span Text="{Binding Quantity, Mode=OneWay}" TextColor="{StaticResource White}" />
+                                                    <Span Text="{Binding Quantity, Mode=OneWay, StringFormat='Copras {0}'}" TextColor="{StaticResource White}" />
+                                                    <Span Text=" + " TextColor="{StaticResource White}" />
+                                                    <Span Text="{Binding BonusAmount, Mode=OneWay, StringFormat='{0} extra'}" TextColor="{StaticResource White}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
                                         </Label>
@@ -433,10 +408,6 @@
                 <Frame Grid.Row="2" Padding="8">
                     <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                         <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                            <!--<BoxView
-                            BackgroundColor="{StaticResource Gray300}"
-                            CornerRadius="2"
-                            WidthRequest="2" />-->
                             <Button
                                 Command="{Binding DeleteOfferCommand}"
                                 FontFamily="icofont"

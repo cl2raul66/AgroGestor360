@@ -119,7 +119,7 @@ public class ProductsForSalesController : ControllerBase
     [HttpPut("send3")]
     public IActionResult ChangeOffering([FromBody] DTO4_3 dTO)
     {
-        if (string.IsNullOrEmpty(dTO.Id) || dTO.Offer is null)
+        if (dTO is null)
         {
             return BadRequest();
         }
@@ -130,13 +130,15 @@ public class ProductsForSalesController : ControllerBase
             return NotFound();
         }
 
-        if (found.Offering is null)
+        if (found.Offering is null || found.Offering.Length == 0)
         {
             found.Offering = [dTO.Offer!];
         }
-        else if (!found.Offering.Any(x => x.Id == dTO.Offer!.Id))
+        else
         {
-            found.Offering = [.. found.Offering, dTO.Offer!];
+            var list = found.Offering.ToList();
+            list.Add(dTO.Offer!);
+            found.Offering = list.ToArray();
         }
 
         var result = productsForSalesServ.Update(found);
