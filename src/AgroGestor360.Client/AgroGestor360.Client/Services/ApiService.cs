@@ -1,5 +1,6 @@
 ﻿using AgroGestor360.Client.Tools;
 using AgroGestor360.Client.Tools.Helpers;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Net;
 
@@ -79,6 +80,8 @@ public class ApiService : IApiService
                         options.Headers.Add("ClientAccessToken", ApiServiceBase.ProviderHttpClient!.DefaultRequestHeaders.GetValues("ClientAccessToken").First());
                         var userAgent = ApiServiceBase.ProviderHttpClient.DefaultRequestHeaders.UserAgent.ToString();
                         options.Headers.Add("UserAgent", userAgent);
+
+                        var op = options;
                     })
                     .WithAutomaticReconnect(new RetryPolicy())
                     .Build();
@@ -103,7 +106,7 @@ public class ApiService : IApiService
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al intentar conectar al hub del servidor: {ex.Message}");
+                Console.WriteLine($"Error al intentar iniciar la conexión con el hub: {ex.Message}");
                 return false;
             }
         }

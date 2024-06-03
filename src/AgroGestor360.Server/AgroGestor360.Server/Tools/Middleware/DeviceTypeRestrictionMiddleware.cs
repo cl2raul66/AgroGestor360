@@ -2,10 +2,18 @@
 
 namespace AgroGestor360.Server.Tools.Middleware;
 
-public class DeviceTypeRestrictionMiddleware(RequestDelegate next, IConfiguration configuration)
+public class DeviceTypeRestrictionMiddleware
 {
-    private readonly RequestDelegate _next = next;
-    private readonly string clientAccessToken = HashHelper.GenerateHash(configuration["License:ClientAccessToken"]!);
+    private readonly RequestDelegate _next;
+    private readonly ILogger<DeviceTypeRestrictionMiddleware> _logger;
+    private readonly string clientAccessToken;
+
+    public DeviceTypeRestrictionMiddleware(RequestDelegate next, IConfiguration configuration, ILogger<DeviceTypeRestrictionMiddleware> logger)
+    {
+        _next = next;
+        _logger = logger;
+        clientAccessToken = HashHelper.GenerateHash(configuration["License:ClientAccessToken"]!);
+    }
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -13,16 +21,18 @@ public class DeviceTypeRestrictionMiddleware(RequestDelegate next, IConfiguratio
         var userAgent = context.Request.Headers.UserAgent.ToString();
         var token = context.Request.Headers["ClientAccessToken"].ToString();
 
+        // Ignore SignalR requests
+        if (context.Request.Path.Value?.StartsWith("/serverStatusHub") ?? false)
+        {
+            await _next(context);
+            return;
+        }
+
         if (token != clientAccessToken)
         {
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            await context.Response.WriteAsync("Token de acceso a clientes inválido.");
-            Console.WriteLine("ERROR: Solo se permite un cliente PC local.");
-            Console.WriteLine($"Dirección IP: {connection.RemoteIpAddress}");
-            Console.WriteLine($"Sistema operativo: {
-                (userAgent.Contains("Windows") 
-                ? "Windows" 
-                : (userAgent.Contains("Android") ? "Android" : "Desconocido"))}");
+            _logger.LogError("Token de acceso a clientes inválido. Solo se permite un cliente PC local. Dirección IP: {0}, Sistema operativo: {1}",
+                connection.RemoteIpAddress,
+                userAgent.Contains("Windows") ? "Windows" : (userAgent.Contains("Android") ? "Android" : "Desconocido"));
             return;
         }
 
@@ -30,20 +40,15 @@ public class DeviceTypeRestrictionMiddleware(RequestDelegate next, IConfiguratio
         {
             if (!userAgent.Contains("Windows"))
             {
-                context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                await context.Response.WriteAsync("Solo se permite un cliente PC local.");
-                Console.WriteLine("ERROR: Solo se permiten clientes Android no locales.");
-                Console.WriteLine($"Dirección IP: {connection.RemoteIpAddress}");
-                Console.WriteLine($"Sistema operativo: {(userAgent.Contains("Windows")
-                    ? "Windows"
-                    : (userAgent.Contains("Android") ? "Android" : "Desconocido"))}");
+                _logger.LogError("Solo se permite un cliente PC local. Solo se permiten clientes Android no locales. Dirección IP: {0}, Sistema operativo: {1}",
+                    connection.RemoteIpAddress,
+                    userAgent.Contains("Windows") ? "Windows" : (userAgent.Contains("Android") ? "Android" : "Desconocido"));
                 return;
             }
         }
         else if (!userAgent.Contains("Android"))
         {
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            await context.Response.WriteAsync("Solo se permiten clientes Android no locales.");
+            _logger.LogError("Solo se permiten clientes Android no locales.");
             return;
         }
 
