@@ -119,20 +119,29 @@ public partial class PgSalesViewModel : ObservableRecipient
 
         var selectedOption = await Shell.Current.DisplayActionSheet("Seleccione el motivo de la eliminación", "Cancelar", null, options);
 
+        StringBuilder sb = new();
+        sb.AppendLine($"¿Seguro que quiere eliminar la siguiente cotización?");
+        sb.AppendLine("");
+        sb.AppendLine($"No.: {SelectedQuotation!.Code}");
+        sb.AppendLine($"Fecha de creación: {SelectedQuotation!.Date:dd MMM yyyy}");
+        sb.AppendLine($"Vendedor: {SelectedQuotation!.SellerName}");
+        sb.AppendLine($"Cliente: {SelectedQuotation!.CustomerName}");
+        sb.AppendLine($"Total: {SelectedQuotation!.TotalAmount:C}");
+
         switch (selectedOption)
         {
             case "Por rechazo del cliente.":
+                var resultAlert = await Shell.Current.DisplayAlert("Eliminar cotización", sb.ToString(), "Eliminar", "Cancelar");
+                if (!resultAlert)
+                {
+                    SelectedQuotation = null;
+                    SelectedOrder = null;
+                    return;
+                }
                 deletedInQuotations = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = SelectedQuotation!.Code!, Status = QuotationStatus.Rejected });
                 break;
             case "Por error del operador.":
-                StringBuilder sb = new();
-                sb.AppendLine($"¿Seguro que quiere eliminar la siguiente cotización?");
-                sb.AppendLine("");
-                sb.AppendLine($"No.: {SelectedQuotation!.Code}");
-                sb.AppendLine($"Fecha de creación: {SelectedQuotation!.Date:dd MMM yyyy}");
-                sb.AppendLine($"Vendedor: {SelectedQuotation!.SellerName}");
-                sb.AppendLine($"Cliente: {SelectedQuotation!.CustomerName}");
-                sb.AppendLine($"Total: {SelectedQuotation!.TotalAmount:N2}");
+                
                 sb.AppendLine("");
                 sb.AppendLine("Inserte la contraseña:");
                 var pwd = await Shell.Current.DisplayPromptAsync("Eliminar cotización", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
@@ -261,11 +270,11 @@ public partial class PgSalesViewModel : ObservableRecipient
 
         var selectedOption = await Shell.Current.DisplayActionSheet("Crear pedido desde la cotización", "Cancelar", null, [.. options]);
 
+        string code = SelectedQuotation!.Code!;
         switch (selectedOption)
         {
             case "Con cambios":
                 ShowAddEditOrderState = true;
-                string code = SelectedQuotation!.Code!;
                 await ShowAddEditOrder();
                 while (ShowAddEditOrderState)
                 {
@@ -307,9 +316,16 @@ public partial class PgSalesViewModel : ObservableRecipient
     async Task ShowAddEditOrder()
     {
         IsActive = true;
-        var sellers = await sellersServ.GetAllAsync(serverURL);
-        var customers = await customersServ.GetAllAsync(serverURL);
-        var products = await productsForSalesServ.GetAllAsync(serverURL);
+
+        var sellersTask = sellersServ.GetAllAsync(serverURL);
+        var customersTask = customersServ.GetAllAsync(serverURL);
+        var productsTask = productsForSalesServ.GetAllAsync(serverURL);
+
+        await Task.WhenAll(sellersTask, customersTask, productsTask);
+
+        DTO6[] sellers = [..sellersTask.Result];
+        DTO5_1[] customers = [..customersTask.Result];
+        DTO4[] products = [..productsTask.Result];
 
         Dictionary<string, object> sendData = new()
         {
@@ -337,7 +353,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         sb.AppendLine($"Fecha de creación: {SelectedOrder!.Date:dd MMM yyyy}");
         sb.AppendLine($"Vendedor: {SelectedOrder!.SellerName}");
         sb.AppendLine($"Cliente: {SelectedOrder!.CustomerName}");
-        sb.AppendLine($"Total: {SelectedOrder!.TotalAmount:N2}");
+        sb.AppendLine($"Total: {SelectedOrder!.TotalAmount:C}");
         var pwd = await Shell.Current.DisplayAlert("Eliminar pedido", sb.ToString(), "Eliminar", "Cancelar");
         if (!pwd)
         {
@@ -567,7 +583,7 @@ public partial class PgSalesViewModel : ObservableRecipient
     //todo: separar metodos de inicializacion de colecciones dependiendo de haveConnection
     #region EXTRA
     public async void Initialize()
-    {        
+    {
         HaveConnection = await apiServ.ConnectToServerHub(serverURL);
 
         IsBusy = true;
@@ -605,7 +621,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         sb.AppendLine($"Estado: Pendiente");
         sb.AppendLine("Productos:");
         sb.AppendLine(string.Join(Environment.NewLine, currentQuotation.Products!));
-        sb.AppendLine($"Total: {currentQuotation!.TotalAmount:N2}");
+        sb.AppendLine($"Total: {currentQuotation!.TotalAmount:C}");
         return sb.ToString();
     }
 
@@ -620,7 +636,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         sb.AppendLine($"Estado: Pendiente");
         sb.AppendLine("Productos:");
         sb.AppendLine(string.Join(Environment.NewLine, currentOrder.Products!));
-        sb.AppendLine($"Total: {currentOrder!.TotalAmount:N2}");
+        sb.AppendLine($"Total: {currentOrder!.TotalAmount:C}");
         return sb.ToString();
     }
 
@@ -635,7 +651,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         sb.AppendLine($"Estado: Pendiente");
         sb.AppendLine("Productos:");
         sb.AppendLine(string.Join(Environment.NewLine, currentInvoice.Products!));
-        sb.AppendLine($"Total: {currentInvoice!.TotalAmount:N2}");
+        sb.AppendLine($"Total: {currentInvoice!.TotalAmount:C}");
         return sb.ToString();
     }
     #endregion

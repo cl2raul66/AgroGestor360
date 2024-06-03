@@ -138,7 +138,7 @@ public class ProductsForSalesController : ControllerBase
         {
             var list = found.Offering.ToList();
             list.Add(dTO.Offer!);
-            found.Offering = list.ToArray();
+            found.Offering = [..list];
         }
 
         var result = productsForSalesServ.Update(found);

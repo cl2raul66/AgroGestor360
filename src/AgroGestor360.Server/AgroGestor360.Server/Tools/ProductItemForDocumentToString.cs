@@ -4,14 +4,14 @@ namespace AgroGestor360.Server.Tools;
 
 public static class ProductItemForDocumentToString
 {
-    public static string GetText(ProductItemForSale product, bool hasCustomerDiscount, int offerId, Customer customer)
+    public static string GetText(double productQuantity, ProductItemForSale product, bool hasCustomerDiscount, int offerId, Customer customer)
     {
         string texto;
 
         if (hasCustomerDiscount)
         {
-            texto = string.Format("{0,0:F2} {1,-20:F2} {2,0:F2} {3,0} (Descuento) {4,-10:N2}",
-                product.ProductQuantity,
+            texto = string.Format("{0} x {1} [{2:F2} {3}] (Descuento) precio: {4:C}",
+                productQuantity,
                 product.ProductName,
                 product.Packaging!.Value,
                 product.Packaging!.Unit,
@@ -20,8 +20,8 @@ public static class ProductItemForDocumentToString
         else if (offerId > 0)
         {
             var o = product.Offering![offerId - 1];
-            texto = string.Format("{0,0:F2}-{1,0} {2,0:F2} {3,0} (Oferta {4,-2} y {5,-2} extra) {6,-10:N2}",
-                product.ProductQuantity,
+            texto = string.Format("{0} x {1} [{2:F2} {3}] (Oferta: {0} + {4} {5} extra) precio: {6:C}",
+                o.Quantity,
                 product.ProductName,
                 product.Packaging!.Value,
                 product.Packaging!.Unit,
@@ -31,8 +31,8 @@ public static class ProductItemForDocumentToString
         }
         else
         {
-            texto = string.Format("{0,0:F2} {1,-20:F2} {2,0:F2} {3,0} {4,-10:N2}",
-                product.ProductQuantity,
+            texto = string.Format("{0} x {1} [{2:F2} {3}] precio: {4:C}",
+                productQuantity,
                 product.ProductName,
                 product.Packaging!.Value,
                 product.Packaging!.Unit,

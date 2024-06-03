@@ -107,7 +107,7 @@ public class InvoicesController : ControllerBase
             SellerName = found.Seller?.Contact?.FormattedName,
             NumberFEL = found.NumberFEL,
             Status = found.Status,
-            Products = found.Products?.Select(p => ProductItemForDocumentToString.GetText(p.Product!, p.HasCustomerDiscount, p.OfferId, found.Customer!)).ToArray(),
+            Products = found.Products?.Select(p => ProductItemForDocumentToString.GetText(p.Quantity, p.Product!, p.HasCustomerDiscount, p.OfferId, found.Customer!)).ToArray(),
             ImmediatePayments = found.ImmediatePayments,
             CreditsPayments = found.CreditsPayments
         };

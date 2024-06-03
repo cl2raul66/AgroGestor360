@@ -85,7 +85,7 @@ public class QuotesController : ControllerBase
             CustomerName = found.Customer?.Contact?.FormattedName,
             SellerName = found.Seller?.Contact?.FormattedName,
             Status = found.Status,
-            Products = found.Products?.Select(p => ProductItemForDocumentToString.GetText(p.Product!, p.HasCustomerDiscount, p.OfferId, found.Customer!)).ToArray()
+            Products = found.Products?.Select(p => ProductItemForDocumentToString.GetText(p.Quantity, p.Product!, p.HasCustomerDiscount, p.OfferId, found.Customer!)).ToArray()
         };
 
         return Ok(dTO);

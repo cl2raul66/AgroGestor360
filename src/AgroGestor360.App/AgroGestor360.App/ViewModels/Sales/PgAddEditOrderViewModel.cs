@@ -21,6 +21,7 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
     readonly IArticlesForWarehouseService articlesForWarehouseServ;
     readonly IQuotesService quotesServ;
     readonly string serverURL;
+    readonly SemaphoreSlim semaphore = new(0, 4);
     Dictionary<string, double>? StockInWarehouse;
 
     public PgAddEditOrderViewModel(IProductsForSalesService productsForSalesService, IArticlesForWarehouseService articlesForWarehouseService, IQuotesService quotesService)
@@ -129,16 +130,17 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
             TextInfo = null;
             return;
         }
-        if (Stock < theQuantity)
-        {
-            ProductsPending += 1;
-        }
 
         ProductItems ??= [];
         ProductItems.Insert(0, new() { ProductItemQuantity = theQuantity, Product = SelectedProduct! });
 
         UpdateTotal();
         await UpdateStock(SelectedProduct!.MerchandiseId!, theQuantity);
+
+        if (Stock < theQuantity)
+        {
+            ProductsPending += 1;
+        }
 
         SelectedProduct = null;
         Quantity = null;
@@ -157,6 +159,10 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
         {
             ProductsPending -= 1;
         }
+        else
+        {
+            ProductsPending += 1;
+        }
         bool result = ProductItems!.Remove(SelectedProductItem!);
         if (result)
         {
@@ -166,9 +172,7 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
             SelectedProduct = null;
             SelectedProductItem = null;
             Stock = 0;
-            //return;
         }
-        ProductsPending += 1;
     }
 
     [RelayCommand]
@@ -288,8 +292,6 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
         await Shell.Current.GoToAsync("..");
     }
 
-    bool WaitPropertyChanged;
-
     protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
@@ -299,6 +301,7 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
             {
                 Offers = null;
                 SelectedOffer = null;
+                semaphore.Release();
                 return;
             }
 
@@ -306,12 +309,14 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
             if (SelectedProductItem!.ProductOffer is null)
             {
                 SelectedOffer = Offers![0];
+                semaphore.Release();
                 return;
             }
 
             var offer = Offers!.FirstOrDefault(x => x.Id == SelectedProductItem!.ProductOffer!.Id);
             int idx = Offers!.IndexOf(offer!);
             SelectedOffer = Offers[idx];
+            semaphore.Release();
         }
 
         if (e.PropertyName == nameof(SelectedProductItem))
@@ -332,7 +337,6 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
                 {
                     IsNormalPrice = true;
                 }
-                WaitPropertyChanged = false;
             }
         }
 
@@ -342,34 +346,40 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
             {
                 LoadingStock = true;
                 await UpdateStock(SelectedProduct!.MerchandiseId!);
-                //Stock = (await articlesForWarehouseServ.GetByIdAsync(serverURL, SelectedProduct.MerchandiseId!))?.Quantity ?? 0;
                 LoadingStock = false;
-                WaitPropertyChanged = false;
             }
+        }
+
+        if (e.PropertyName == nameof(Sellers))
+        {
+            semaphore.Release();
+        }
+
+        if (e.PropertyName == nameof(Customers))
+        {
+            semaphore.Release();
+        }
+
+        if (e.PropertyName == nameof(Products))
+        {
+            semaphore.Release();
         }
 
         if (e.PropertyName == nameof(CurrentOrder))
         {
             if (CurrentOrder is not null)
             {
+                semaphore.Wait();
+                semaphore.Wait();
+                semaphore.Wait();
                 SelectedSeller = Sellers?.FirstOrDefault(x => x.Id == CurrentOrder.Seller!.Id);
                 SelectedCustomer = Customers?.FirstOrDefault(x => x.CustomerId == CurrentOrder.Customer!.CustomerId);
                 foreach (var item in CurrentOrder.Products!)
                 {
-                    Quantity = item.Quantity.ToString("F2");
+                    Quantity = (item.Quantity == 0 ? 1 : item.Quantity).ToString("F2");
                     SelectedProduct = Products?.FirstOrDefault(x => x.Id == item!.ProductItemForSaleId);
-                    WaitPropertyChanged = true;
-                    while (WaitPropertyChanged)
-                    {
-                        await Task.Delay(1000);
-                    }
                     await SendProductItem();
-                    SelectedProductItem = ProductItems?.FirstOrDefault(x => x.Product!.Id == item.ProductItemForSaleId);
-                    WaitPropertyChanged = true;
-                    while (WaitPropertyChanged)
-                    {
-                        await Task.Delay(1000);
-                    }
+                    SelectedProductItem = ProductItems?.FirstOrDefault(x => x.Product!.Id == item.ProductItemForSaleId); 
                     if (item.HasCustomerDiscount)
                     {
                         IsCustomerDiscount = true;
@@ -377,6 +387,7 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
                     else if (item.OfferId > 0)
                     {
                         IsProductOffer = true;
+                        await semaphore.WaitAsync();
                         SelectedOffer = Offers?.FirstOrDefault(x => x.Id == item.OfferId);
                     }
                     else
