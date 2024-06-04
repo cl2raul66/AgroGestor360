@@ -161,7 +161,7 @@ public class InvoicesController : ControllerBase
                 return NotFound();
             }
 
-            var articlesForWarehouse = articlesForWarehouseServ.GetManyById(productItems.Select(p => p.Product!.MerchandiseId!).ToArray());
+            var articlesForWarehouse = articlesForWarehouseServ.GetManyByIds(productItems.Select(p => p.Product!.MerchandiseId!).ToArray());
 
             var productQuantities = productItems.ToDictionary(p => p.Product!.MerchandiseId!, p => p.Quantity);
 
@@ -344,7 +344,7 @@ public class InvoicesController : ControllerBase
             }
 
             // Restaurar las cantidades de los productos en el almacén
-            var articlesForWarehouse = articlesForWarehouseServ.GetManyById(found.Products!.Select(p => p.Product!.MerchandiseId!).ToArray());
+            var articlesForWarehouse = articlesForWarehouseServ.GetManyByIds(found.Products!.Select(p => p.Product!.MerchandiseId!).ToArray());
 
             var productQuantities = found.Products!.ToDictionary(p => p.Product!.MerchandiseId!, p => p.Quantity);
 

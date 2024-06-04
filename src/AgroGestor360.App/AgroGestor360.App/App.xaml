@@ -30,7 +30,7 @@
                                 <VisualState.Setters>
                                     <Setter Property="Margin" Value="0" />
                                     <Setter Property="Padding" Value="8,4" />
-                                    <Setter Property="BackgroundColor" Value="{StaticResource Tertiary}" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource SelectedPrimary}" />
                                     <Setter Property="Stroke" Value="{StaticResource Primary}" />
                                 </VisualState.Setters>
                             </VisualState>
@@ -54,7 +54,7 @@
                                 <VisualState.Setters>
                                     <Setter Property="Margin" Value="0" />
                                     <Setter Property="Padding" Value="0" />
-                                    <Setter Property="BackgroundColor" Value="{StaticResource Tertiary}" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource SelectedPrimary}" />
                                     <Setter Property="Stroke" Value="{StaticResource Primary}" />
                                 </VisualState.Setters>
                             </VisualState>
@@ -62,7 +62,10 @@
                     </VisualStateGroupList>
                 </Setter>
             </Style>
-
+            <Style x:Key="LabelItem" TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource Tertiary}" />
+                <Setter Property="Margin" Value="0" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

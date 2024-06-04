@@ -19,8 +19,9 @@ public class OrdersController : ControllerBase
     readonly IProductsForSalesInLiteDbService productsForSalesServ;
     readonly IQuotesInLiteDbService quotesServ;
     readonly IArticlesForWarehouseInLiteDbService articlesForWarehouseServ;
+    readonly IWasteOrdersInLiteDbService wasteOrdersServ;
 
-    public OrdersController(IOrdersInLiteDbService ordersService, ICustomersInLiteDbService customersService, ISellersInLiteDbService sellersService, IProductsForSalesInLiteDbService productsForSalesService, IQuotesInLiteDbService quotesService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService)
+    public OrdersController(IOrdersInLiteDbService ordersService, ICustomersInLiteDbService customersService, ISellersInLiteDbService sellersService, IProductsForSalesInLiteDbService productsForSalesService, IQuotesInLiteDbService quotesService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService, IWasteOrdersInLiteDbService wasteOrdersService)
     {
         ordersServ = ordersService;
         customersServ = customersService;
@@ -28,6 +29,7 @@ public class OrdersController : ControllerBase
         productsForSalesServ = productsForSalesService;
         quotesServ = quotesService;
         articlesForWarehouseServ = articlesForWarehouseService;
+        wasteOrdersServ = wasteOrdersService;
     }
 
     [HttpGet("exist")]
@@ -183,7 +185,7 @@ public class OrdersController : ControllerBase
         List<ArticleItemForWarehouse> articleItems = [];
 
         foreach (var item in dTO.ProductItems!)
-        {            
+        {
             ProductItemForSale product = productsForSalesServ.GetById(new ObjectId(item.ProductItemForSaleId));
             ProductSaleBase productItemForOrder = new()
             {
@@ -194,7 +196,7 @@ public class OrdersController : ControllerBase
             };
 
             ArticleItemForWarehouse articleItemForWarehouse = articlesForWarehouseServ.GetById(product.MerchandiseId!);
-            articleItemForWarehouse.Reserved = item.Quantity;
+            articleItemForWarehouse.Reserved += item.Quantity;
             articleItemForWarehouse.Quantity -= item.Quantity;
 
             productItems.Add(productItemForOrder);
@@ -235,34 +237,23 @@ public class OrdersController : ControllerBase
             return NotFound();
         }
 
-        var productsIds = found.Products?.Select(x => new ObjectId(x.Product!.Id)) ?? [];
-        var products = productsForSalesServ.GetManyById(productsIds);
+        var productItemsDTO = found.Products!.Select(p => new DTO9
+        {
+            ProductItemForSaleId = p.Product!.Id!.ToString(),
+            Quantity = p.Quantity,
+            OfferId = p.OfferId,
+            HasCustomerDiscount = p.HasCustomerDiscount
+        });
 
-        List<ProductSaleBase> productItems = [];
-        List<ArticleItemForWarehouse> articleItems = [];
+        var (productItems, articleItems) = ProcessProductItems(productItemsDTO);
+
         bool isPending = false;
 
-        foreach (var item in found.Products!)
+        foreach (var item in articleItems)
         {
-            ProductItemForSale product = productsForSalesServ.GetById(new ObjectId(item.Product!.Id));
-            ProductSaleBase productItemForOrder = new()
-            {
-                HasCustomerDiscount = item.HasCustomerDiscount,
-                OfferId = item.OfferId,
-                Quantity = item.Quantity,
-                Product = product
-            };
-
-            ArticleItemForWarehouse articleItemForWarehouse = articlesForWarehouseServ.GetById(product.MerchandiseId!);
-            articleItemForWarehouse.Reserved = item.Quantity;
-            articleItemForWarehouse.Quantity -= item.Quantity;
-
-            productItems.Add(productItemForOrder);
-            articleItems.Add(articleItemForWarehouse);
-
             if (!isPending)
             {
-                isPending = articleItemForWarehouse.Reserved > articleItemForWarehouse.Quantity;
+                isPending = item.Reserved > item.Quantity;
             }
         }
 
@@ -273,7 +264,7 @@ public class OrdersController : ControllerBase
             Date = DateTime.Now,
             Seller = found.Seller,
             Customer = found.Customer,
-            Products = [.. productItems]
+            Products = [..productItems]
         };
 
         UpdateOrderStatusBasedOnStock(entity);
@@ -283,13 +274,13 @@ public class OrdersController : ControllerBase
         {
             return NotFound();
         }
-        var resultUpdateManyInWarehouse = articlesForWarehouseServ.UpdateMany([.. articleItems]);
+        var resultUpdateManyInWarehouse = articlesForWarehouseServ.UpdateMany(articleItems);
 
         return resultUpdateManyInWarehouse ? Ok(resultInsert) : NotFound();
     }
 
     [HttpPut]
-    public IActionResult Update([FromBody] DTO8_2 dTO)
+    public IActionResult Update(DTO8_2 dTO)
     {
         if (dTO is null)
         {
@@ -317,29 +308,9 @@ public class OrdersController : ControllerBase
             entity.Seller = seller;
         }
 
-        List<ProductSaleBase> productItems = [];
-        List<ArticleItemForWarehouse> articleItems = [];
+        var (productItems, articleItems) = ProcessProductItems(dTO.ProductItems!);
 
-        foreach (var item in dTO.ProductItems!)
-        {
-            ProductItemForSale product = productsForSalesServ.GetById(new ObjectId(item.ProductItemForSaleId));
-            ProductSaleBase productItemForOrder = new()
-            {
-                HasCustomerDiscount = item.HasCustomerDiscount,
-                OfferId = item.OfferId,
-                Quantity = item.Quantity,
-                Product = product
-            };
-
-            ArticleItemForWarehouse articleItemForWarehouse = articlesForWarehouseServ.GetById(product.MerchandiseId!);
-            articleItemForWarehouse.Reserved = item.Quantity;
-            articleItemForWarehouse.Quantity -= item.Quantity;
-
-            productItems.Add(productItemForOrder);
-            articleItems.Add(articleItemForWarehouse);
-        }
-
-        entity.Products = [.. productItems];
+        entity.Products = [..productItems];
 
         var resultUpdate = ordersServ.Update(entity);
 
@@ -347,7 +318,7 @@ public class OrdersController : ControllerBase
         {
             return NotFound();
         }
-        var resultUpdateManyInWarehouse = articlesForWarehouseServ.UpdateMany([.. articleItems]);
+        var resultUpdateManyInWarehouse = articlesForWarehouseServ.UpdateMany(articleItems);
 
         return resultUpdateManyInWarehouse ? Ok() : NotFound();
     }
@@ -366,29 +337,9 @@ public class OrdersController : ControllerBase
             return NotFound();
         }
 
-        List<ProductSaleBase> productItems = [];
-        List<ArticleItemForWarehouse> articleItems = [];
+        var (productItems, articleItems) = ProcessProductItems(dTO.ProductItems!);
 
-        foreach (var item in dTO.ProductItems!)
-        {
-            ProductItemForSale product = productsForSalesServ.GetById(new ObjectId(item.ProductItemForSaleId));
-            ProductSaleBase productItemForOrder = new()
-            {
-                HasCustomerDiscount = item.HasCustomerDiscount,
-                OfferId = item.OfferId,
-                Quantity = item.Quantity,
-                Product = product
-            };
-
-            ArticleItemForWarehouse articleItemForWarehouse = articlesForWarehouseServ.GetById(product.MerchandiseId!);
-            articleItemForWarehouse.Reserved = item.Quantity;
-            articleItemForWarehouse.Quantity -= item.Quantity;
-
-            productItems.Add(productItemForOrder);
-            articleItems.Add(articleItemForWarehouse);
-        }
-
-        entity.Products = [.. productItems];
+        entity.Products = [..productItems];
         entity.Status = dTO.Status;
 
         var resultUpdate = ordersServ.Update(entity);
@@ -397,9 +348,91 @@ public class OrdersController : ControllerBase
         {
             return NotFound();
         }
-        var resultUpdateManyInWarehouse = articlesForWarehouseServ.UpdateMany([.. articleItems]);
+        var resultUpdateManyInWarehouse = articlesForWarehouseServ.UpdateMany(articleItems);
 
         return resultUpdateManyInWarehouse ? Ok() : NotFound();
+    }
+
+    [HttpPut("changestatus")]
+    public IActionResult ChangeStatus(DTO8_3 dTO)
+    {
+        if (dTO is null)
+        {
+            return BadRequest();
+        }
+
+        var entity = ordersServ.GetByCode(dTO.Code!);
+        if (entity is null)
+        {
+            return NotFound();
+        }
+
+        entity.Status = dTO.Status;
+
+        if (dTO.Status is OrderStatus.Completed || dTO.Status is OrderStatus.Rejected)
+        {
+            ordersServ.BeginTrans();
+            try
+            {
+                var wasteInsertResult = wasteOrdersServ.Insert(entity);
+                if (string.IsNullOrEmpty(wasteInsertResult))
+                {
+                    ordersServ.Rollback();
+                    return NotFound();
+                }
+
+                var deleteResult = ordersServ.Delete(entity.Code!);
+                if (!deleteResult)
+                {
+                    ordersServ.Rollback();
+                    return NotFound();
+                }
+
+                ordersServ.Commit();
+            }
+            catch
+            {
+                ordersServ.Rollback();
+                return NotFound();
+            }
+        }
+
+        if (dTO.Status is OrderStatus.Rejected || dTO.Status is OrderStatus.Cancelled)
+        {
+            ordersServ.BeginTrans();
+            try
+            {
+                var deleteResult = ordersServ.Delete(entity.Code!);
+                if (!deleteResult)
+                {
+                    ordersServ.Rollback();
+                    return NotFound();
+                }
+
+                var warehouseUpdated = UpdateWarehouseAfterDeletion(entity);
+                if (!warehouseUpdated)
+                {
+                    ordersServ.Rollback();
+                    return NotFound();
+                }
+
+                ordersServ.Commit();
+            }
+            catch
+            {
+                ordersServ.Rollback();
+                return NotFound();
+            }
+        }
+
+        var resultUpdate = ordersServ.Update(entity);
+
+        if (!resultUpdate)
+        {
+            return NotFound();
+        }
+
+        return Ok();
     }
 
     [HttpDelete("{code}")]
@@ -410,13 +443,71 @@ public class OrdersController : ControllerBase
             return BadRequest();
         }
 
-        var result = ordersServ.Delete(code);
+        var CurrentOrder = ordersServ.GetByCode(code);
+        if (CurrentOrder is null)
+        {
+            return NotFound();
+        }
 
-        return !result ? NotFound() : Ok();
+        ordersServ.BeginTrans();
+
+        var resultDelete = ordersServ.Delete(code);
+        if (!resultDelete)
+        {
+            ordersServ.Rollback();
+            return NotFound();
+        }
+
+        var warehouseUpdated = UpdateWarehouseAfterDeletion(CurrentOrder);
+        if (!warehouseUpdated)
+        {
+            ordersServ.Rollback();
+            return NotFound();
+        }
+
+        ordersServ.Commit();
+
+        return Ok();
     }
 
     #region Extra
-    private void UpdateOrderStatusBasedOnStock(Order order)
+    (List<ProductSaleBase>, List<ArticleItemForWarehouse>) ProcessProductItems(IEnumerable<DTO9> productItemsDTO)
+    {
+        List<ProductSaleBase> productItems = [];
+        List<ArticleItemForWarehouse> articleItems = [];
+
+        var productIds = productItemsDTO.Select(item => new ObjectId(item.ProductItemForSaleId)).ToList();
+
+        var products = productsForSalesServ.GetManyById(productIds).ToDictionary(item => item.Id!, item => item);
+
+        var merchandiseIds = products.Values.Select(product => product.MerchandiseId!).ToList();
+
+        var warehouseItems = articlesForWarehouseServ.GetManyByIds(merchandiseIds).ToDictionary(item => item.MerchandiseId!, item => item);
+
+        foreach (var item in productItemsDTO)
+        {
+            ProductItemForSale product = products[new ObjectId(item.ProductItemForSaleId)];
+            ArticleItemForWarehouse articleItemForWarehouse = warehouseItems[product.MerchandiseId!];
+
+            ProductSaleBase productItemForOrder = new()
+            {
+                HasCustomerDiscount = item.HasCustomerDiscount,
+                OfferId = item.OfferId,
+                Quantity = item.Quantity,
+                Product = product
+            };
+
+            articleItemForWarehouse.Reserved += item.Quantity;
+            articleItemForWarehouse.Quantity -= item.Quantity;
+
+            productItems.Add(productItemForOrder);
+            articleItems.Add(articleItemForWarehouse);
+        }
+
+        return (productItems, articleItems);
+    }
+
+    void UpdateOrderStatusBasedOnStock(Order order)
     {
         var quantityByArticle = articlesForWarehouseServ.GetAll().Select(x => (x.MerchandiseId, x.Quantity));
 
@@ -439,6 +530,47 @@ public class OrdersController : ControllerBase
                 }
             }
         }
+    }
+
+    bool UpdateWarehouseAfterDeletion(Order entity)
+    {
+        try
+        {
+            var merchandiseQuantities = entity.Products!.ToDictionary(p => p.Product!.MerchandiseId!, p => FindQuantity(p.Quantity, p.Product!, p.OfferId));
+
+            var warehouseItems = articlesForWarehouseServ.GetManyByIds(merchandiseQuantities.Keys);
+            List<ArticleItemForWarehouse> saveArticleItemForWarehouses = [];
+
+            foreach (var item in warehouseItems)
+            {
+                item.Quantity += merchandiseQuantities[item.MerchandiseId!];
+                item.Reserved -= merchandiseQuantities[item.MerchandiseId!];
+
+                if (item.Quantity < 0)
+                {
+                    item.Quantity = 0;
+                }
+
+                saveArticleItemForWarehouses.Add(item);
+            }
+
+            return articlesForWarehouseServ.UpdateMany(saveArticleItemForWarehouses);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    double FindQuantity(double productQuantity, ProductItemForSale product, int offerId)
+    {
+        double quantity = productQuantity;
+        if (offerId > 0)
+        {
+            var o = product.Offering![offerId - 1];
+            quantity = o.Quantity + o.BonusAmount;
+        }
+        return quantity;
     }
     #endregion
 }

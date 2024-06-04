@@ -13,7 +13,7 @@ public interface IArticlesForWarehouseInLiteDbService
     bool Delete(ObjectId id);
     IEnumerable<ArticleItemForWarehouse> GetAll();
     ArticleItemForWarehouse GetById(ObjectId id);
-    IEnumerable<ArticleItemForWarehouse> GetManyById(IEnumerable<ObjectId> ids);
+    IEnumerable<ArticleItemForWarehouse> GetManyByIds(IEnumerable<ObjectId> ids);
     string Insert(ArticleItemForWarehouse entity);
     void Rollback();
     bool Update(ArticleItemForWarehouse entity);
@@ -51,7 +51,7 @@ public class ArticlesForWarehouseInLiteDbService : IArticlesForWarehouseInLiteDb
 
     public ArticleItemForWarehouse GetById(ObjectId id) => collection.FindById(id);
 
-    public IEnumerable<ArticleItemForWarehouse> GetManyById(IEnumerable<ObjectId> ids) => collection.Find(x => ids.Contains(x.MerchandiseId));
+    public IEnumerable<ArticleItemForWarehouse> GetManyByIds(IEnumerable<ObjectId> ids) => collection.Find(x => ids.Contains(x.MerchandiseId));
 
     public string Insert(ArticleItemForWarehouse entity) => collection.Insert(entity).AsObjectId.ToString();
 

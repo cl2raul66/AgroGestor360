@@ -114,62 +114,43 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task RemovedQuote()
     {
-        string[] options = ["Por rechazo del cliente.", "Por error del operador."];
-        bool deletedInQuotations;
+        if (SelectedQuotation == null)
+        {
+            return;
+        }
 
-        var selectedOption = await Shell.Current.DisplayActionSheet("Seleccione el motivo de la eliminación", "Cancelar", null, options);
+        var selectedOption = await DisplayActionSheetForRemoval();
+        if (string.IsNullOrEmpty(selectedOption))
+        {
+            return;
+        }
 
-        StringBuilder sb = new();
-        sb.AppendLine($"¿Seguro que quiere eliminar la siguiente cotización?");
-        sb.AppendLine("");
-        sb.AppendLine($"No.: {SelectedQuotation!.Code}");
-        sb.AppendLine($"Fecha de creación: {SelectedQuotation!.Date:dd MMM yyyy}");
-        sb.AppendLine($"Vendedor: {SelectedQuotation!.SellerName}");
-        sb.AppendLine($"Cliente: {SelectedQuotation!.CustomerName}");
-        sb.AppendLine($"Total: {SelectedQuotation!.TotalAmount:C}");
+        var confirmationMessage = GenerateConfirmationMessageForQuote();
+        var isConfirmed = await ConfirmRemoval(confirmationMessage);
+        if (!isConfirmed)
+        {
+            return;
+        }
 
+        bool deletedInQuotes;
         switch (selectedOption)
         {
             case "Por rechazo del cliente.":
-                var resultAlert = await Shell.Current.DisplayAlert("Eliminar cotización", sb.ToString(), "Eliminar", "Cancelar");
-                if (!resultAlert)
-                {
-                    SelectedQuotation = null;
-                    SelectedOrder = null;
-                    return;
-                }
-                deletedInQuotations = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = SelectedQuotation!.Code!, Status = QuotationStatus.Rejected });
+                deletedInQuotes = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = SelectedQuotation!.Code!, Status = QuotationStatus.Rejected });
                 break;
             case "Por error del operador.":
-                
-                sb.AppendLine("");
-                sb.AppendLine("Inserte la contraseña:");
-                var pwd = await Shell.Current.DisplayPromptAsync("Eliminar cotización", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
-                if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
+                var isAuthorized = await AuthorizeRemoval();
+                if (!isAuthorized)
                 {
-                    SelectedQuotation = null;
-                    SelectedOrder = null;
                     return;
                 }
-
-                var approved = await authServ.AuthRoot(serverURL, pwd);
-                if (!approved)
-                {
-                    await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-                    SelectedQuotation = null;
-                    SelectedOrder = null;
-                    return;
-                }
-
-                deletedInQuotations = await quotationsServ.DeleteAsync(serverURL, SelectedQuotation!.Code!);
+                deletedInQuotes = await quotationsServ.DeleteAsync(serverURL, SelectedQuotation!.Code!);
                 break;
             default:
-                SelectedQuotation = null;
-                SelectedOrder = null;
                 return;
         }
 
-        if (deletedInQuotations)
+        if (deletedInQuotes)
         {
             Quotations!.Remove(SelectedQuotation);
         }
@@ -346,23 +327,43 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task RemovedOrder()
     {
-        StringBuilder sb = new();
-        sb.AppendLine($"¿Seguro que quiere eliminar el siguiente pedido?");
-        sb.AppendLine("");
-        sb.AppendLine($"No.: {SelectedOrder!.Code}");
-        sb.AppendLine($"Fecha de creación: {SelectedOrder!.Date:dd MMM yyyy}");
-        sb.AppendLine($"Vendedor: {SelectedOrder!.SellerName}");
-        sb.AppendLine($"Cliente: {SelectedOrder!.CustomerName}");
-        sb.AppendLine($"Total: {SelectedOrder!.TotalAmount:C}");
-        var pwd = await Shell.Current.DisplayAlert("Eliminar pedido", sb.ToString(), "Eliminar", "Cancelar");
-        if (!pwd)
+        if (SelectedOrder == null)
         {
-            SelectedOrder = null;
-            SelectedQuotation = null;
             return;
         }
-        var result = await ordersServ.DeleteAsync(serverURL, SelectedOrder!.Code!);
-        if (result)
+
+        var selectedOption = await DisplayActionSheetForRemoval();
+        if (string.IsNullOrEmpty(selectedOption))
+        {
+            return;
+        }
+
+        var confirmationMessage = GenerateConfirmationMessageForOrder();
+        var isConfirmed = await ConfirmRemoval(confirmationMessage);
+        if (!isConfirmed)
+        {
+            return;
+        }
+
+        bool deletedInOrders;
+        switch (selectedOption)
+        {
+            case "Por rechazo del cliente.":
+                deletedInOrders = await ordersServ.ChangeStatusAsync(serverURL, new() { Code = SelectedOrder!.Code!, Status = OrderStatus.Rejected });
+                break;
+            case "Por error del operador.":
+                var isAuthorized = await AuthorizeRemoval();
+                if (!isAuthorized)
+                {
+                    return;
+                }
+                deletedInOrders = await ordersServ.DeleteAsync(serverURL, SelectedOrder!.Code!);
+                break;
+            default:
+                return;
+        }
+
+        if (deletedInOrders)
         {
             Orders!.Remove(SelectedOrder);
         }
@@ -653,6 +654,63 @@ public partial class PgSalesViewModel : ObservableRecipient
         sb.AppendLine(string.Join(Environment.NewLine, currentInvoice.Products!));
         sb.AppendLine($"Total: {currentInvoice!.TotalAmount:C}");
         return sb.ToString();
+    }
+
+    private async Task<string> DisplayActionSheetForRemoval()
+    {
+        string[] options = ["Por rechazo del cliente.", "Por error del operador."];
+        var selectedOption = await Shell.Current.DisplayActionSheet("Seleccione el motivo de la eliminación", "Cancelar", null, options);
+        return selectedOption;
+    }
+
+    private string GenerateConfirmationMessageForQuote()
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"¿Seguro que quiere eliminar la siguiente cotización?");
+        sb.AppendLine("");
+        sb.AppendLine($"No.: {SelectedQuotation!.Code}");
+        sb.AppendLine($"Fecha de creación: {SelectedQuotation!.Date:dd MMM yyyy}");
+        sb.AppendLine($"Vendedor: {SelectedQuotation!.SellerName}");
+        sb.AppendLine($"Cliente: {SelectedQuotation!.CustomerName}");
+        sb.AppendLine($"Total: {SelectedQuotation!.TotalAmount:C}");
+        return sb.ToString();
+    }
+
+    private string GenerateConfirmationMessageForOrder()
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"¿Seguro que quiere eliminar el siguiente pedido?");
+        sb.AppendLine("");
+        sb.AppendLine($"No.: {SelectedOrder!.Code}");
+        sb.AppendLine($"Fecha de creación: {SelectedOrder!.Date:dd MMM yyyy}");
+        sb.AppendLine($"Vendedor: {SelectedOrder!.SellerName}");
+        sb.AppendLine($"Cliente: {SelectedOrder!.CustomerName}");
+        sb.AppendLine($"Total: {SelectedOrder!.TotalAmount:C}");
+        return sb.ToString();
+    }
+
+    private async Task<bool> ConfirmRemoval(string message)
+    {
+        var resultAlert = await Shell.Current.DisplayAlert("Eliminar", message, "Eliminar", "Cancelar");
+        return resultAlert;
+    }
+
+    private async Task<bool> AuthorizeRemoval()
+    {
+        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar", "Inserte la contraseña:", "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
+        {
+            return false;
+        }
+
+        var approved = await authServ.AuthRoot(serverURL, pwd);
+        if (!approved)
+        {
+            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+            return false;
+        }
+
+        return true;
     }
     #endregion
 }

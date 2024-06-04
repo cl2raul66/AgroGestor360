@@ -7,6 +7,7 @@ namespace AgroGestor360.Client.Services;
 
 public interface IOrdersService
 {
+    Task<bool> ChangeStatusAsync(string serverURL, DTO8_2 dTO);
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string code);
     Task<IEnumerable<DTO8>> GetAllAsync(string serverURL);
@@ -15,7 +16,7 @@ public interface IOrdersService
     Task<DTO8_5?> GetProductsByCodeAsync(string serverURL, string code);
     Task<string> InsertAsync(string serverURL, DTO8_1 dTO);
     Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO);
-    Task<bool> UpdateAsync(string serverURL, DTO8_2 dTO);
+    Task<bool> UpdateAsync(string serverURL, DTO8_3 dTO);
     Task<bool> UpdateByProductsAndStatus(string serverURL, DTO10_2 dTO);
 }
 
@@ -153,7 +154,21 @@ public class OrdersService : IOrdersService
         return string.Empty;
     }
 
-    public async Task<bool> UpdateAsync(string serverURL, DTO8_2 dTO)
+    public async Task<bool> UpdateAsync(string serverURL, DTO8_3 dTO)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/orders/changestatus", content);
+
+            return response.IsSuccessStatusCode;
+        }
+        return false;
+    }
+
+    public async Task<bool> ChangeStatusAsync(string serverURL, DTO8_2 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {

@@ -4,15 +4,22 @@
 
     <!--  Note: For Android please see also Platforms\Android\Resources\values\colors.xml  -->
 
+    <Color x:Key="Primary">#f4684d</Color>
+    <Color x:Key="Secondary">#3ebe6b</Color>
+    <Color x:Key="Tertiary">#e9eef2</Color>
+
+    <Color x:Key="SelectedPrimary">#A94532</Color>
+
+    <!--<Color x:Key="White">#F2F2F2</Color>
     <Color x:Key="Primary">#B76533</Color>
     <Color x:Key="PrimaryDark">#ac99ea</Color>
     <Color x:Key="PrimaryDarkText">#242424</Color>
     <Color x:Key="Secondary">#FAF0B2</Color>
     <Color x:Key="SecondaryDarkText">#9880e5</Color>
-    <Color x:Key="Tertiary">#634833</Color>
+    <Color x:Key="Tertiary">#634833</Color>-->
 
-    <Color x:Key="White">#F2F2F2</Color>
-    <Color x:Key="Black">Black</Color>
+    <Color x:Key="White">#fafbfd</Color>
+    <Color x:Key="Black">#1c2230</Color>
     <Color x:Key="Magenta">#D600AA</Color>
     <Color x:Key="MidnightBlue">#190649</Color>
     <Color x:Key="OffBlack">#1f1f1f</Color>

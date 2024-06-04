@@ -18,14 +18,16 @@ public class QuotesController : ControllerBase
     readonly ICustomersInLiteDbService customersServ;
     readonly ISellersInLiteDbService sellersServ;
     readonly IProductsForSalesInLiteDbService productsForSalesServ;
+    readonly IArticlesForWarehouseInLiteDbService articlesForWarehouseServ;
 
-    public QuotesController(IQuotesInLiteDbService quotesService, IWasteQuotationInLiteDbService wasteQuotationService, ICustomersInLiteDbService customersService, ISellersInLiteDbService sellersService, IProductsForSalesInLiteDbService productsForSalesService)
+    public QuotesController(IQuotesInLiteDbService quotesService, IWasteQuotationInLiteDbService wasteQuotationService, ICustomersInLiteDbService customersService, ISellersInLiteDbService sellersService, IProductsForSalesInLiteDbService productsForSalesService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService)
     {
         quotesServ = quotesService;
         wasteQuotationServ = wasteQuotationService;
         customersServ = customersService;
         sellersServ = sellersService;
         productsForSalesServ = productsForSalesService;
+        articlesForWarehouseServ = articlesForWarehouseService;
     }
 
     [HttpGet("exist")]
@@ -230,13 +232,18 @@ public class QuotesController : ControllerBase
 
         switch (dTO.Status)
         {
+            case QuotationStatus.Draft:
+            case QuotationStatus.Sent:
+                entity.Status = dTO.Status;
+                var resultUpdate = quotesServ.Update(entity);
+                return !resultUpdate ? NotFound() : Ok();
             case QuotationStatus.Accepted:
             case QuotationStatus.Rejected:
-            case QuotationStatus.Cancelled:
                 quotesServ.BeginTrans();
                 var wasDelete = quotesServ.Delete(entity.Code!);
                 if (!wasDelete)
                 {
+                    quotesServ.Rollback();
                     return NotFound();
                 }
                 var resultInsert = wasteQuotationServ.Insert(entity);
@@ -245,14 +252,38 @@ public class QuotesController : ControllerBase
                     quotesServ.Rollback();
                     return NotFound();
                 }
+                if (dTO.Status == QuotationStatus.Rejected)
+                {
+                    var warehouseUpdated = UpdateWarehouseAfterDeletion(entity);
+                    if (!warehouseUpdated)
+                    {
+                        quotesServ.Rollback();
+                        return NotFound();
+                    }
+                }
+                quotesServ.Commit();
+                return Ok();
+            case QuotationStatus.Cancelled:
+                quotesServ.BeginTrans();
+                var resultDelete = quotesServ.Delete(entity.Code!);
+                if (!resultDelete)
+                {
+                    quotesServ.Rollback();
+                    return NotFound();
+                }
+                var warehouseUpdatedCancelled = UpdateWarehouseAfterDeletion(entity);
+                if (!warehouseUpdatedCancelled)
+                {
+                    quotesServ.Rollback();
+                    return NotFound();
+                }
                 quotesServ.Commit();
                 return Ok();
             default:
-                entity.Status = dTO.Status;
-                var resultUpdate = quotesServ.Update(entity);
-                return !resultUpdate ? NotFound() : Ok();
+                return BadRequest();
         }
     }
+
 
     [HttpDelete("{code}")]
     public IActionResult Delete(string code)
@@ -262,8 +293,73 @@ public class QuotesController : ControllerBase
             return BadRequest();
         }
 
-        var result = quotesServ.Delete(code);
+        var CurrentQuotation = quotesServ.GetByCode(code);
+        if (CurrentQuotation is null)
+        {
+            return NotFound();
+        }
 
-        return !result ? NotFound() : Ok();
+        quotesServ.BeginTrans();
+
+        var resultDelete = quotesServ.Delete(code);
+        if (!resultDelete)
+        {
+            quotesServ.Rollback();
+            return NotFound();
+        }
+
+        var warehouseUpdated = UpdateWarehouseAfterDeletion(CurrentQuotation);
+        if (!warehouseUpdated)
+        {
+            quotesServ.Rollback();
+            return NotFound();
+        }
+
+        quotesServ.Commit();
+
+        return Ok();
     }
+
+    #region EXTRA
+    bool UpdateWarehouseAfterDeletion(Quotation entity)
+    {
+        try
+        {
+            var merchandiseQuantities = entity.Products!.ToDictionary(p => p.Product!.MerchandiseId!, p => FindQuantity(p.Quantity, p.Product!, p.OfferId));
+
+            var warehouseItems = articlesForWarehouseServ.GetManyByIds(merchandiseQuantities.Keys);
+            List<ArticleItemForWarehouse> saveArticleItemForWarehouses = [];
+
+            foreach (var item in warehouseItems)
+            {
+                item.Quantity += merchandiseQuantities[item.MerchandiseId!];
+                item.Reserved -= merchandiseQuantities[item.MerchandiseId!];
+
+                if (item.Reserved < 0)
+                {
+                    item.Reserved = 0;
+                }
+
+                saveArticleItemForWarehouses.Add(item);
+            }
+
+            return articlesForWarehouseServ.UpdateMany(saveArticleItemForWarehouses);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    double FindQuantity(double productQuantity, ProductItemForSale product, int offerId)
+    {
+        double quantity = productQuantity;
+        if (offerId > 0)
+        {
+            var o = product.Offering![offerId - 1];
+            quantity = o.Quantity + o.BonusAmount;
+        }    
+        return quantity;
+    }
+    #endregion
 }
