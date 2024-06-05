@@ -19,9 +19,11 @@ public class InvoicesController : ControllerBase
     readonly IProductsForSalesInLiteDbService productsForSalesServ;
     readonly IWasteInvoicesInLiteDbService wasteInvoicesServ;
     readonly IArticlesForWarehouseInLiteDbService articlesForWarehouseServ;
+    readonly IQuotesInLiteDbService quotesServ;
+    readonly IOrdersInLiteDbService ordersServ;
     readonly IConfiguration configurationServ;
 
-    public InvoicesController(IInvoicesInLiteDbService invoicesService, ISellersInLiteDbService sellersService, ICustomersInLiteDbService customersService, IProductsForSalesInLiteDbService productsForSalesService, IWasteInvoicesInLiteDbService wasteInvoicesService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService, IConfiguration configuration)
+    public InvoicesController(IInvoicesInLiteDbService invoicesService, ISellersInLiteDbService sellersService, ICustomersInLiteDbService customersService, IProductsForSalesInLiteDbService productsForSalesService, IWasteInvoicesInLiteDbService wasteInvoicesService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService, IQuotesInLiteDbService quotesService, IOrdersInLiteDbService ordersService, IConfiguration configuration)
     {
         invoicesServ = invoicesService;
         sellersServ = sellersService;
@@ -29,6 +31,8 @@ public class InvoicesController : ControllerBase
         productsForSalesServ = productsForSalesService;
         wasteInvoicesServ = wasteInvoicesService;
         articlesForWarehouseServ = articlesForWarehouseService;
+        quotesServ = quotesService;
+        ordersServ = ordersService;
         configurationServ = configuration;
     }
 
@@ -152,98 +156,155 @@ public class InvoicesController : ControllerBase
             };
 
             invoicesServ.BeginTrans();
+            var resultInsert = invoicesServ.Insert(entity);
 
-            var result = invoicesServ.Insert(entity);
-
-            if (string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty(resultInsert))
             {
                 invoicesServ.Rollback();
                 return NotFound();
             }
 
-            var articlesForWarehouse = articlesForWarehouseServ.GetManyByIds(productItems.Select(p => p.Product!.MerchandiseId!).ToArray());
-
-            var productQuantities = productItems.ToDictionary(p => p.Product!.MerchandiseId!, p => p.Quantity);
-
-            List<ArticleItemForWarehouse> updateArticles = [];
-
-            foreach (var article in articlesForWarehouse)
-            {
-                if (productQuantities.TryGetValue(article.MerchandiseId!, out double value))
-                {
-                    var updateArticle = new ArticleItemForWarehouse
-                    {
-                        Quantity = article.Quantity - value,
-                        Reserved = value,
-                        MerchandiseName = article.MerchandiseName,
-                        MerchandiseId = article.MerchandiseId,
-                        Packaging = article.Packaging
-                    };
-
-                    updateArticles.Add(updateArticle);
-                }
-            }
-
-            var updateResult = articlesForWarehouseServ.UpdateMany(updateArticles);
-
-            if (!updateResult)
+            var warehouseUpdated = UpdateWarehouseAfterInsert(entity);
+            if (!warehouseUpdated)
             {
                 invoicesServ.Rollback();
                 return NotFound();
             }
 
             invoicesServ.Commit();
-
-            return Ok(result);
+            return Ok(resultInsert);
         }
 
         return NotFound();
     }
+    
+    [HttpPost("insertfromquote")]
+    public ActionResult<string> InsertFromQuote(DTO7 dTO)
+    {
+        if (dTO is null)
+        {
+            return BadRequest();
+        }
 
+        var found = quotesServ.GetByCode(dTO.Code!);
+        if (found is null)
+        {
+            return NotFound();
+        }
 
-    //[HttpPost]
-    //public ActionResult<string> Insert(DTO10_1 dTO)
-    //{
-    //    if (dTO is null)
-    //    {
-    //        return BadRequest();
-    //    }
+        var productItemsDTO = found.Products!.Select(p => new DTO9
+        {
+            ProductItemForSaleId = p.Product!.Id!.ToString(),
+            Quantity = p.Quantity,
+            OfferId = p.OfferId,
+            HasCustomerDiscount = p.HasCustomerDiscount
+        });
 
-    //    var customer = customersServ.GetById(new ObjectId(dTO.CustomerId));
-    //    var seller = sellersServ.GetById(new ObjectId(dTO.SellerId));
+        var (productItems, articleItems) = ProcessProductItems(productItemsDTO);
 
-    //    var productsIds = dTO.Products?.Select(x => new ObjectId(x.ProductItemForSaleId)) ?? [];
-    //    var products = productsForSalesServ.GetManyById(productsIds);
-    //    if (products is not null || products!.Any())
-    //    {
-    //        List<ProductSaleBase> productItems = [];
-    //        foreach (var ele in products!)
-    //        {
-    //            var dTO9 = dTO.Products!.First(x => x.ProductItemForSaleId == ele.Id!.ToString());
-    //            var productSaleBase = CreateProductSaleBase(dTO9, ele);
-    //            productItems.Add(productSaleBase);
-    //        }
+        bool isPending = false;
 
-    //        Invoice entity = new()
-    //        {
-    //            Code = ShortGuidHelper.Generate(),
-    //            Date = dTO.Date,
-    //            Seller = seller,
-    //            Customer = customer,
-    //            Products = [.. productItems],
-    //            NumberFEL = dTO.NumberFEL,
-    //            ImmediatePayments = dTO.ImmediatePayments,
-    //            CreditsPayments = dTO.CreditsPayments,
-    //            Status = dTO.Status
-    //        };
+        foreach (var item in articleItems)
+        {
+            if (!isPending)
+            {
+                isPending = item.Reserved > item.Quantity;
+                break;
+            }
+        }
 
-    //        var result = invoicesServ.Insert(entity);
+        Invoice entity = new()
+        {
+            Status = InvoiceStatus.Pending,
+            Code = dTO.Code!,
+            Date = DateTime.Now,
+            Seller = found.Seller,
+            Customer = found.Customer,
+            Products = [.. productItems]
+        };
 
-    //        return string.IsNullOrEmpty(result) ? NotFound() : Ok(result);
-    //    }
+        invoicesServ.BeginTrans();
+        var resultInsert = invoicesServ.Insert(entity);
+        if (string.IsNullOrEmpty(resultInsert))
+        {
+            invoicesServ.Rollback();
+            return NotFound();
+        }
 
-    //    return NotFound();
-    //}
+        var warehouseUpdated = UpdateWarehouseAfterInsert(entity);
+        if (!warehouseUpdated)
+        {
+            invoicesServ.Rollback();
+            return NotFound();
+        }
+
+        invoicesServ.Commit();
+        return Ok(resultInsert);
+    }
+    
+    [HttpPost("insertfromorder")]
+    public ActionResult<string> InsertFromOrder(DTO8 dTO)
+    {
+        if (dTO is null)
+        {
+            return BadRequest();
+        }
+
+        var found = ordersServ.GetByCode(dTO.Code!);
+        if (found is null)
+        {
+            return NotFound();
+        }
+
+        var productItemsDTO = found.Products!.Select(p => new DTO9
+        {
+            ProductItemForSaleId = p.Product!.Id!.ToString(),
+            Quantity = p.Quantity,
+            OfferId = p.OfferId,
+            HasCustomerDiscount = p.HasCustomerDiscount
+        });
+
+        var (productItems, articleItems) = ProcessProductItems(productItemsDTO);
+
+        bool isPending = false;
+
+        foreach (var item in articleItems)
+        {
+            if (!isPending)
+            {
+                isPending = item.Reserved > item.Quantity;
+                break;
+            }
+        }
+
+        Invoice entity = new()
+        {
+            Status = InvoiceStatus.Pending,
+            Code = dTO.Code!,
+            Date = DateTime.Now,
+            Seller = found.Seller,
+            Customer = found.Customer,
+            Products = [.. productItems]
+        };
+
+        invoicesServ.BeginTrans();
+        var resultInsert = invoicesServ.Insert(entity);
+        if (string.IsNullOrEmpty(resultInsert))
+        {
+            invoicesServ.Rollback();
+            return NotFound();
+        }
+
+        var warehouseUpdated = UpdateWarehouseAfterInsert(entity);
+        if (!warehouseUpdated)
+        {
+            invoicesServ.Rollback();
+            return NotFound();
+        }
+
+        invoicesServ.Commit();
+        return Ok(resultInsert);
+    }
 
     [HttpPut("depreciationupdate")]
     public IActionResult DepreciationUpdate(DTO10_2 dTO)
@@ -398,37 +459,6 @@ public class InvoicesController : ControllerBase
         return NotFound();
     }
 
-    //[HttpPut("updatestate")]
-    //public IActionResult UpdateState(DTO10_3 dTO)
-    //{
-    //    if (dTO is null)
-    //    {
-    //        return BadRequest();
-    //    }
-
-    //    if (dTO.Status is InvoiceStatus.Cancelled)
-    //    {
-    //        var found = invoicesServ.GetByCode(dTO.Code!);
-    //        if (found is null)
-    //        {
-    //            return NotFound();
-    //        }
-
-    //        found.Status = dTO.Status;
-
-    //        var resultInsert = wasteInvoicesInLiteDbServ.Insert(found);
-    //        if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
-    //        {
-    //            return NotFound();
-    //        }
-
-    //        var resultDelete = invoicesServ.Delete(dTO.Code!);
-
-    //        return resultDelete ? Ok() : NotFound();
-    //    }
-    //    return NotFound();
-    //}
-
     [HttpDelete("{code}")]
     public IActionResult Delete(string code)
     {
@@ -443,6 +473,42 @@ public class InvoicesController : ControllerBase
     }
 
     #region EXTRA
+    (List<ProductSaleBase>, List<ArticleItemForWarehouse>) ProcessProductItems(IEnumerable<DTO9> productItemsDTO)
+    {
+        List<ProductSaleBase> productItems = [];
+        List<ArticleItemForWarehouse> articleItems = [];
+
+        var productIds = productItemsDTO.Select(item => new ObjectId(item.ProductItemForSaleId)).ToList();
+
+        var products = productsForSalesServ.GetManyById(productIds).ToDictionary(item => item.Id!, item => item);
+
+        var merchandiseIds = products.Values.Select(product => product.MerchandiseId!).ToList();
+
+        var warehouseItems = articlesForWarehouseServ.GetManyByIds(merchandiseIds).ToDictionary(item => item.MerchandiseId!, item => item);
+
+        foreach (var item in productItemsDTO)
+        {
+            ProductItemForSale product = products[new ObjectId(item.ProductItemForSaleId)];
+            ArticleItemForWarehouse articleItemForWarehouse = warehouseItems[product.MerchandiseId!];
+
+            ProductSaleBase productItemForOrder = new()
+            {
+                HasCustomerDiscount = item.HasCustomerDiscount,
+                OfferId = item.OfferId,
+                Quantity = item.Quantity,
+                Product = product
+            };
+
+            articleItemForWarehouse.Reserved += item.Quantity;
+            articleItemForWarehouse.Quantity -= item.Quantity;
+
+            productItems.Add(productItemForOrder);
+            articleItems.Add(articleItemForWarehouse);
+        }
+
+        return (productItems, articleItems);
+    }
+
     DTO10 CreateDTO10(Invoice entity)
     {
         double totalAmount = GetTotalAmount.Get(entity);
@@ -489,6 +555,42 @@ public class InvoicesController : ControllerBase
             Quantity = dTO.Quantity,
             Product = product
         };
+    }
+
+    bool UpdateWarehouseAfterInsert(SaleBase entity)
+    {
+        try
+        {
+            var merchandiseQuantities = entity.Products!.ToDictionary(p => p.Product!.MerchandiseId!, p => FindQuantity(p.Quantity, p.Product!, p.OfferId));
+
+            var warehouseItems = articlesForWarehouseServ.GetManyByIds(merchandiseQuantities.Keys);
+            List<ArticleItemForWarehouse> saveArticleItemForWarehouses = [];
+
+            foreach (var item in warehouseItems)
+            {
+                item.Quantity -= merchandiseQuantities[item.MerchandiseId!];
+                item.Reserved += merchandiseQuantities[item.MerchandiseId!];
+
+                saveArticleItemForWarehouses.Add(item);
+            }
+
+            return articlesForWarehouseServ.UpdateMany(saveArticleItemForWarehouses);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    double FindQuantity(double productQuantity, ProductItemForSale product, int offerId)
+    {
+        double quantity = productQuantity;
+        if (offerId > 0)
+        {
+            var o = product.Offering![offerId - 1];
+            quantity = o.Quantity + o.BonusAmount;
+        }
+        return quantity;
     }
     #endregion
 }

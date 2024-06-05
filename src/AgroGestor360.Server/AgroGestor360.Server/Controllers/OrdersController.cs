@@ -48,35 +48,35 @@ public class OrdersController : ControllerBase
         {
             return NotFound();
         }
-        OrderStatus orderStatus = OrderStatus.Processing;
-        var quantityByArticle = articlesForWarehouseServ.GetAll().Select(x => (x.MerchandiseId, x.Quantity));
-        List<DTO8> result = [];
-        foreach (var item in all)
-        {
-            if (orderStatus is not OrderStatus.Pending)
-            {
-                foreach (var pi in item.Products!)
-                {
-                    var stock = quantityByArticle.FirstOrDefault(x => x.MerchandiseId == pi.Product!.MerchandiseId).Quantity;
-                    if (pi.OfferId > 0)
-                    {
-                        var isMayor = pi.Product!.Offering![pi.OfferId - 1].Quantity > stock;
-                        if (isMayor)
-                        {
-                            orderStatus = OrderStatus.Pending;
-                        }
-                    }
-                    if (pi.Quantity > stock)
-                    {
-                        orderStatus = OrderStatus.Pending;
-                    }
-                }
-            }
+        //OrderStatus orderStatus = OrderStatus.Processing;
+        //var quantityByArticle = articlesForWarehouseServ.GetAll().Select(x => (x.MerchandiseId, x.Quantity));
+        //List<DTO8> result = [];
+        //foreach (var item in all)
+        //{
+        //    if (orderStatus is not OrderStatus.Pending)
+        //    {
+        //        foreach (var pi in item.Products!)
+        //        {
+        //            var stock = quantityByArticle.FirstOrDefault(x => x.MerchandiseId == pi.Product!.MerchandiseId).Quantity;
+        //            if (pi.OfferId > 0)
+        //            {
+        //                var isMayor = pi.Product!.Offering![pi.OfferId - 1].Quantity > stock;
+        //                if (isMayor)
+        //                {
+        //                    orderStatus = OrderStatus.Pending;
+        //                }
+        //            }
+        //            if (pi.Quantity > stock)
+        //            {
+        //                orderStatus = OrderStatus.Pending;
+        //            }
+        //        }
+        //    }
 
-            result.Add(item.ToDTO8());
-        }
+        //    result.Add(item.ToDTO8());
+        //}
 
-        return Ok(result);
+        return Ok(all.Select(x => x.ToDTO8()));
     }
 
     [HttpGet("{code}")]
@@ -93,7 +93,7 @@ public class OrdersController : ControllerBase
             return NotFound();
         }
 
-        UpdateOrderStatusBasedOnStock(found);
+        //UpdateOrderStatusBasedOnStock(ref found);
 
         return Ok(found.ToDTO8());
     }
@@ -181,46 +181,46 @@ public class OrdersController : ControllerBase
 
         var customer = customersServ.GetById(new ObjectId(dTO.CustomerId));
         var seller = sellersServ.GetById(new ObjectId(dTO.SellerId));
-        List<ProductSaleBase> productItems = [];
-        List<ArticleItemForWarehouse> articleItems = [];
 
-        foreach (var item in dTO.ProductItems!)
+        var (productItems, articleItems) = ProcessProductItems(dTO.ProductItems!);
+
+        bool isPending = false;
+
+        foreach (var item in articleItems)
         {
-            ProductItemForSale product = productsForSalesServ.GetById(new ObjectId(item.ProductItemForSaleId));
-            ProductSaleBase productItemForOrder = new()
+            if (!isPending)
             {
-                HasCustomerDiscount = item.HasCustomerDiscount,
-                OfferId = item.OfferId,
-                Quantity = item.Quantity,
-                Product = product
-            };
-
-            ArticleItemForWarehouse articleItemForWarehouse = articlesForWarehouseServ.GetById(product.MerchandiseId!);
-            articleItemForWarehouse.Reserved += item.Quantity;
-            articleItemForWarehouse.Quantity -= item.Quantity;
-
-            productItems.Add(productItemForOrder);
-            articleItems.Add(articleItemForWarehouse);
+                isPending = item.Reserved > item.Quantity;
+            }
         }
 
         Order entity = new()
         {
-            Status = dTO.Status,
+            Status = isPending ? OrderStatus.Pending : OrderStatus.Processing,
             Code = string.IsNullOrEmpty(dTO.Code) ? ShortGuidHelper.Generate() : dTO.Code,
-            Date = dTO.Date,
+            Date = DateTime.Now,
             Seller = seller,
             Customer = customer,
             Products = [.. productItems]
         };
 
+        ordersServ.BeginTrans();
         var resultInsert = ordersServ.Insert(entity);
         if (string.IsNullOrEmpty(resultInsert))
         {
+            ordersServ.Rollback();
             return NotFound();
         }
-        var resultUpdateManyInWarehouse = articlesForWarehouseServ.UpdateMany([.. articleItems]);
 
-        return resultUpdateManyInWarehouse ? Ok(resultInsert) : NotFound();
+        var warehouseUpdated = UpdateWarehouseAfterInsert(entity);
+        if (!warehouseUpdated)
+        {
+            ordersServ.Rollback();
+            return NotFound();
+        }
+
+        ordersServ.Commit();
+        return Ok(resultInsert);
     }
 
     [HttpPost("insertfromquote")]
@@ -264,19 +264,28 @@ public class OrdersController : ControllerBase
             Date = DateTime.Now,
             Seller = found.Seller,
             Customer = found.Customer,
-            Products = [..productItems]
+            Products = [.. productItems]
         };
 
-        UpdateOrderStatusBasedOnStock(entity);
+        //UpdateOrderStatusBasedOnStock(ref entity);
 
+        ordersServ.BeginTrans();
         var resultInsert = ordersServ.Insert(entity);
         if (string.IsNullOrEmpty(resultInsert))
         {
+            ordersServ.Rollback();
             return NotFound();
         }
-        var resultUpdateManyInWarehouse = articlesForWarehouseServ.UpdateMany(articleItems);
 
-        return resultUpdateManyInWarehouse ? Ok(resultInsert) : NotFound();
+        var warehouseUpdated = UpdateWarehouseAfterInsert(entity);
+        if (!warehouseUpdated)
+        {
+            ordersServ.Rollback();
+            return NotFound();
+        }
+
+        ordersServ.Commit();
+        return Ok(resultInsert);
     }
 
     [HttpPut]
@@ -310,7 +319,7 @@ public class OrdersController : ControllerBase
 
         var (productItems, articleItems) = ProcessProductItems(dTO.ProductItems!);
 
-        entity.Products = [..productItems];
+        entity.Products = [.. productItems];
 
         var resultUpdate = ordersServ.Update(entity);
 
@@ -339,7 +348,7 @@ public class OrdersController : ControllerBase
 
         var (productItems, articleItems) = ProcessProductItems(dTO.ProductItems!);
 
-        entity.Products = [..productItems];
+        entity.Products = [.. productItems];
         entity.Status = dTO.Status;
 
         var resultUpdate = ordersServ.Update(entity);
@@ -369,42 +378,57 @@ public class OrdersController : ControllerBase
 
         entity.Status = dTO.Status;
 
-        if (dTO.Status is OrderStatus.Completed || dTO.Status is OrderStatus.Rejected)
+        if (dTO.Status is OrderStatus.Completed)
         {
-            ordersServ.BeginTrans();
+            wasteOrdersServ.BeginTrans();
             try
             {
                 var wasteInsertResult = wasteOrdersServ.Insert(entity);
                 if (string.IsNullOrEmpty(wasteInsertResult))
                 {
-                    ordersServ.Rollback();
+                    wasteOrdersServ.Rollback();
                     return NotFound();
                 }
 
+                ordersServ.BeginTrans();
                 var deleteResult = ordersServ.Delete(entity.Code!);
                 if (!deleteResult)
                 {
+                    wasteOrdersServ.Rollback();
                     ordersServ.Rollback();
                     return NotFound();
                 }
 
+                wasteOrdersServ.Commit();
                 ordersServ.Commit();
             }
             catch
             {
+                wasteOrdersServ.Rollback();
                 ordersServ.Rollback();
                 return NotFound();
             }
+
+            return Ok();
         }
 
         if (dTO.Status is OrderStatus.Rejected || dTO.Status is OrderStatus.Cancelled)
         {
-            ordersServ.BeginTrans();
             try
             {
+                wasteOrdersServ.BeginTrans();
+                var wasteInsertResult = wasteOrdersServ.Insert(entity);
+                if (string.IsNullOrEmpty(wasteInsertResult))
+                {
+                    wasteOrdersServ.Rollback();
+                    return NotFound();
+                }
+
+                ordersServ.BeginTrans();
                 var deleteResult = ordersServ.Delete(entity.Code!);
                 if (!deleteResult)
                 {
+                    wasteOrdersServ.Rollback();
                     ordersServ.Rollback();
                     return NotFound();
                 }
@@ -412,17 +436,22 @@ public class OrdersController : ControllerBase
                 var warehouseUpdated = UpdateWarehouseAfterDeletion(entity);
                 if (!warehouseUpdated)
                 {
+                    wasteOrdersServ.Rollback();
                     ordersServ.Rollback();
                     return NotFound();
                 }
 
+                wasteOrdersServ.Commit();
                 ordersServ.Commit();
             }
             catch
             {
+                wasteOrdersServ.Rollback();
                 ordersServ.Rollback();
                 return NotFound();
             }
+
+            return Ok();
         }
 
         var resultUpdate = ordersServ.Update(entity);
@@ -507,9 +536,10 @@ public class OrdersController : ControllerBase
         return (productItems, articleItems);
     }
 
-    void UpdateOrderStatusBasedOnStock(Order order)
+    void UpdateOrderStatusBasedOnStock(ref Order order)
     {
-        var quantityByArticle = articlesForWarehouseServ.GetAll().Select(x => (x.MerchandiseId, x.Quantity));
+        var merchandiseIds = order.Products!.Select(x => x.Product!.MerchandiseId!);
+        var quantityByArticle = articlesForWarehouseServ.GetManyByIds(merchandiseIds).Select(x => (x.MerchandiseId, x.Quantity));
 
         foreach (var pi in order.Products!)
         {
@@ -532,7 +562,32 @@ public class OrdersController : ControllerBase
         }
     }
 
-    bool UpdateWarehouseAfterDeletion(Order entity)
+    bool UpdateWarehouseAfterInsert(SaleBase entity)
+    {
+        try
+        {
+            var merchandiseQuantities = entity.Products!.ToDictionary(p => p.Product!.MerchandiseId!, p => FindQuantity(p.Quantity, p.Product!, p.OfferId));
+
+            var warehouseItems = articlesForWarehouseServ.GetManyByIds(merchandiseQuantities.Keys);
+            List<ArticleItemForWarehouse> saveArticleItemForWarehouses = [];
+
+            foreach (var item in warehouseItems)
+            {
+                item.Quantity -= merchandiseQuantities[item.MerchandiseId!];
+                item.Reserved += merchandiseQuantities[item.MerchandiseId!];
+
+                saveArticleItemForWarehouses.Add(item);
+            }
+
+            return articlesForWarehouseServ.UpdateMany(saveArticleItemForWarehouses);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    bool UpdateWarehouseAfterDeletion(SaleBase entity)
     {
         try
         {
@@ -545,11 +600,6 @@ public class OrdersController : ControllerBase
             {
                 item.Quantity += merchandiseQuantities[item.MerchandiseId!];
                 item.Reserved -= merchandiseQuantities[item.MerchandiseId!];
-
-                if (item.Quantity < 0)
-                {
-                    item.Quantity = 0;
-                }
 
                 saveArticleItemForWarehouses.Add(item);
             }

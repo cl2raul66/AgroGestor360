@@ -9,12 +9,14 @@ public interface IInvoicesService
 {
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string code);
-    Task<IEnumerable<int>> GetCreditTimeAsync(string serverURL);
+    Task<bool> DepreciationUpdate(string serverURL, DTO10_2 dTO);
     Task<IEnumerable<DTO10>> GetAllAsync(string serverURL);
     Task<DTO10?> GetByCodeAsync(string serverURL, string code);
+    Task<IEnumerable<int>> GetCreditTimeAsync(string serverURL);
     Task<DTO10_4?> GetProductsByCodeAsync(string serverURL, string code);
     Task<string> InsertAsync(string serverURL, DTO10_1 dTO);
-    Task<bool> DepreciationUpdate(string serverURL, DTO10_2 dTO);
+    Task<string> InsertFromOrderAsync(string serverURL, DTO8 dTO);
+    Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO);
     Task<bool> UpdateState(string serverURL, DTO10_3 dTO);
 }
 
@@ -129,6 +131,40 @@ public class InvoicesService : IInvoicesService
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/invoices", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+        }
+        return string.Empty;
+    }
+
+    public async Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/invoices/insertfromquote", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+        }
+        return string.Empty;
+    }
+
+    public async Task<string> InsertFromOrderAsync(string serverURL, DTO8 dTO)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/invoices/insertfromorder", content);
 
             if (response.IsSuccessStatusCode)
             {

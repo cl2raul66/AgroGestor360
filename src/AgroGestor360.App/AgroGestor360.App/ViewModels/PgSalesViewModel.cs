@@ -114,39 +114,45 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task RemovedQuote()
     {
-        if (SelectedQuotation == null)
-        {
-            return;
-        }
-
         var selectedOption = await DisplayActionSheetForRemoval();
-        if (string.IsNullOrEmpty(selectedOption))
+        if (selectedOption == "Cancelar")
         {
+            SelectedQuotation = null;
+            SelectedOrder = null;
             return;
         }
 
         var confirmationMessage = GenerateConfirmationMessageForQuote();
-        var isConfirmed = await ConfirmRemoval(confirmationMessage);
-        if (!isConfirmed)
-        {
-            return;
-        }
+        bool isConfirmed = false;
 
         bool deletedInQuotes;
         switch (selectedOption)
         {
             case "Por rechazo del cliente.":
-                deletedInQuotes = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = SelectedQuotation!.Code!, Status = QuotationStatus.Rejected });
+                isConfirmed = await ConfirmRemoval(confirmationMessage);
+                if (!isConfirmed)
+                {
+                    SelectedQuotation = null;
+                    SelectedOrder = null;
+                    return;
+                }
+                deletedInQuotes = await quotationsServ.ChangesByStatusAsync(serverURL,
+                    new() { Code = SelectedQuotation!.Code!, Status = QuotationStatus.Rejected }
+                );
                 break;
             case "Por error del operador.":
-                var isAuthorized = await AuthorizeRemoval();
-                if (!isAuthorized)
+                isConfirmed = await ConfirmRemoval(confirmationMessage, true);
+                if (!isConfirmed)
                 {
+                    SelectedQuotation = null;
+                    SelectedOrder = null;
                     return;
                 }
                 deletedInQuotes = await quotationsServ.DeleteAsync(serverURL, SelectedQuotation!.Code!);
                 break;
             default:
+                SelectedQuotation = null;
+                SelectedOrder = null;
                 return;
         }
 
@@ -154,6 +160,8 @@ public partial class PgSalesViewModel : ObservableRecipient
         {
             Quotations!.Remove(SelectedQuotation);
         }
+        SelectedQuotation = null;
+        SelectedOrder = null;
     }
 
     [RelayCommand]
@@ -304,9 +312,9 @@ public partial class PgSalesViewModel : ObservableRecipient
 
         await Task.WhenAll(sellersTask, customersTask, productsTask);
 
-        DTO6[] sellers = [..sellersTask.Result];
-        DTO5_1[] customers = [..customersTask.Result];
-        DTO4[] products = [..productsTask.Result];
+        DTO6[] sellers = [.. sellersTask.Result];
+        DTO5_1[] customers = [.. customersTask.Result];
+        DTO4[] products = [.. productsTask.Result];
 
         Dictionary<string, object> sendData = new()
         {
@@ -327,39 +335,43 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task RemovedOrder()
     {
-        if (SelectedOrder == null)
-        {
-            return;
-        }
-
         var selectedOption = await DisplayActionSheetForRemoval();
-        if (string.IsNullOrEmpty(selectedOption))
+        if (selectedOption == "Cancelar")
         {
+            SelectedQuotation = null;
+            SelectedOrder = null;
             return;
         }
 
         var confirmationMessage = GenerateConfirmationMessageForOrder();
-        var isConfirmed = await ConfirmRemoval(confirmationMessage);
-        if (!isConfirmed)
-        {
-            return;
-        }
+        bool isConfirmed = false;
 
         bool deletedInOrders;
         switch (selectedOption)
         {
             case "Por rechazo del cliente.":
+                isConfirmed = await ConfirmRemoval(confirmationMessage);
+                if (!isConfirmed)
+                {
+                    SelectedQuotation = null;
+                    SelectedOrder = null;
+                    return;
+                }
                 deletedInOrders = await ordersServ.ChangeStatusAsync(serverURL, new() { Code = SelectedOrder!.Code!, Status = OrderStatus.Rejected });
                 break;
             case "Por error del operador.":
-                var isAuthorized = await AuthorizeRemoval();
-                if (!isAuthorized)
+                isConfirmed = await ConfirmRemoval(confirmationMessage, true);
+                if (!isConfirmed)
                 {
+                    SelectedQuotation = null;
+                    SelectedOrder = null;
                     return;
                 }
                 deletedInOrders = await ordersServ.DeleteAsync(serverURL, SelectedOrder!.Code!);
                 break;
             default:
+                SelectedQuotation = null;
+                SelectedOrder = null;
                 return;
         }
 
@@ -367,6 +379,8 @@ public partial class PgSalesViewModel : ObservableRecipient
         {
             Orders!.Remove(SelectedOrder);
         }
+        SelectedQuotation = null;
+        SelectedOrder = null;
     }
 
     [RelayCommand]
@@ -458,6 +472,38 @@ public partial class PgSalesViewModel : ObservableRecipient
         };
 
         await Shell.Current.GoToAsync(nameof(PgAmortizeInvoiceCredit), true, sendData);
+    }
+
+    [RelayCommand]
+    async Task CreateInvoiceFromQuote()
+    {
+        var result2 = await ordersServ.InsertFromQuoteAsync(serverURL, SelectedQuotation!);
+        if (!string.IsNullOrEmpty(result2))
+        {
+            bool resultChanges = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = SelectedQuotation!.Code!, Status = QuotationStatus.Accepted });
+            if (resultChanges)
+            {
+                _ = Quotations!.Remove(SelectedQuotation!);
+                Orders ??= [];
+                var orderGet = await ordersServ.GetByCodeAsync(serverURL, result2);
+                Orders.Insert(0, orderGet!);
+            }
+        }
+        else
+        {
+            SelectedOrder = null;
+            SelectedQuotation = null;
+        }
+        SelectedOrder = null;
+        SelectedQuotation = null;
+        await ViewBills();
+    }
+
+    [RelayCommand]
+    async Task CreateInvoiceFromOrder()
+    {
+        await ViewBills();
+        await ShowAddEditSale();
     }
     #endregion
 
@@ -689,28 +735,27 @@ public partial class PgSalesViewModel : ObservableRecipient
         return sb.ToString();
     }
 
-    private async Task<bool> ConfirmRemoval(string message)
+    async Task<bool> ConfirmRemoval(string message, bool withAuthorize = false)
     {
-        var resultAlert = await Shell.Current.DisplayAlert("Eliminar", message, "Eliminar", "Cancelar");
-        return resultAlert;
-    }
-
-    private async Task<bool> AuthorizeRemoval()
-    {
-        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar", "Inserte la contraseña:", "Autenticar y eliminar", "Cancelar", "Escriba aquí");
-        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
+        if (withAuthorize)
         {
-            return false;
+            var pwd = await Shell.Current.DisplayPromptAsync("Eliminar", "Inserte la contraseña:", "Autenticar y eliminar", "Cancelar", "Escriba aquí");
+            if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
+            {
+                return false;
+            }
+
+            var approved = await authServ.AuthRoot(serverURL, pwd);
+            if (!approved)
+            {
+                await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+                return false;
+            }
+
+            return true;
         }
 
-        var approved = await authServ.AuthRoot(serverURL, pwd);
-        if (!approved)
-        {
-            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-            return false;
-        }
-
-        return true;
+        return await Shell.Current.DisplayAlert("Eliminar", message, "Eliminar", "Cancelar");
     }
     #endregion
 }

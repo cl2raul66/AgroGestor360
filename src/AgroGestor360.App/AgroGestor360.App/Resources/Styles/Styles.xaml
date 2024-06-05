@@ -48,7 +48,7 @@
     </Style>
 
     <Style TargetType="CheckBox">
-        <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}" />
+        <!--<Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}" />-->
         <Setter Property="MinimumHeightRequest" Value="32" />
         <Setter Property="MinimumWidthRequest" Value="32" />
         <Setter Property="VisualStateManager.VisualStateGroups">
@@ -242,7 +242,7 @@
 
     <Style TargetType="RadioButton">
         <Setter Property="BackgroundColor" Value="Transparent" />
-        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Tertiary}}" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}" />
         <Setter Property="FontFamily" Value="OpenSansRegular" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="MinimumHeightRequest" Value="32" />
@@ -253,7 +253,7 @@
                     <VisualState x:Name="Normal" />
                     <VisualState x:Name="Disabled">
                         <VisualState.Setters>
-                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}" />
+                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray100}}" />
                         </VisualState.Setters>
                     </VisualState>
                 </VisualStateGroup>

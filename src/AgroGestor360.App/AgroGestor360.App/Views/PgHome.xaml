@@ -28,32 +28,13 @@
                     TextTransform="Uppercase"
                     ToolTipProperties.Text="Ir a reportes"
                     WidthRequest="110" />
-                <!--<BoxView
-                    BackgroundColor="{StaticResource Gray300}"
-                    CornerRadius="2"
-                    WidthRequest="2" />
-                <Button
-                    Command="{Binding GoToLoansCommand}"
-                    Text="Prestamos"
-                    TextTransform="Uppercase"
-                    ToolTipProperties.Text="Ir a prestamos"
-                    WidthRequest="110" />
-                <Button
-                    Command="{Binding GoToExpenseCommand}"
-                    Text="Gastos"
-                    TextTransform="Uppercase"
-                    ToolTipProperties.Text="Ir a gastos"
-                    WidthRequest="110" />-->
                 <Button
                     Command="{Binding GoToSalesCommand}"
                     Text="Ventas"
                     TextTransform="Uppercase"
                     ToolTipProperties.Text="Ir a ventas"
                     WidthRequest="110" />
-                <BoxView
-                    BackgroundColor="{StaticResource Gray300}"
-                    CornerRadius="2"
-                    WidthRequest="2" />
+                <BoxView Style="{StaticResource ElementSeparator}" />
                 <Button
                     Command="{Binding GoToSettingsCommand}"
                     FontFamily="icofont"
@@ -114,10 +95,7 @@
                 Spacing="8"
                 VerticalOptions="Center">
                 <Label FontSize="11" Text="{Binding AppInfo}" />
-                <BoxView
-                    BackgroundColor="{StaticResource Tertiary}"
-                    CornerRadius="1"
-                    WidthRequest="1" />
+                <BoxView Style="{StaticResource ElementSeparator}" />
                 <Label
                     Grid.Column="1"
                     FontSize="11"

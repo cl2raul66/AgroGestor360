@@ -634,4 +634,18 @@ public class DTO10_4
     public ImmediatePayment[]? ImmediatePayments { get; set; }
     public CreditPayment[]? CreditsPayments { get; set; }
 }
+
+public class DTO11
+{
+    public double Paid { get; set; }
+    public int DaysRemaining { get; set; }
+    public double TotalAmount { get; set; }
+    public DateTime Date { get; set; }
+    public string? Code { get; set; }
+    public string? SellerId { get; set; }
+    public string? SellerName { get; set; }
+    public string? CustomerId { get; set; }
+    public string? CustomerName { get; set; }
+    public InvoiceStatus Status { get; set; }
+}
 #endregion

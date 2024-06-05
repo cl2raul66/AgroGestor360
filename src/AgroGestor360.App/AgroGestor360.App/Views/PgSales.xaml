@@ -34,10 +34,7 @@
                     VerticalOptions="Center" />
             </HorizontalStackLayout>
             <HorizontalStackLayout Grid.Column="2" Spacing="8">
-                <!--<BoxView
-                    BackgroundColor="{StaticResource Gray300}"
-                    CornerRadius="2"
-                    WidthRequest="2" />-->
+                <!--<BoxView Style="{StaticResource ElementSeparator}"  />-->
                 <Button
                     Command="{Binding ViewPresaleCommand}"
                     FontFamily="icofont"
@@ -51,7 +48,7 @@
                     IsEnabled="{Binding IsBillsVisible, Mode=OneWay, Converter={ctk:InvertedBoolConverter}}"
                     Text="{StaticResource Ticket}"
                     TextTransform="Uppercase"
-                    ToolTipProperties.Text="Facturas" />
+                    ToolTipProperties.Text="Ventas" />
             </HorizontalStackLayout>
         </Grid>
         <!--#endregion-->
@@ -112,9 +109,9 @@
                                             ColumnSpacing="8">
                                             <HorizontalStackLayout Spacing="8">
                                                 <Label
+                                                    Style="{StaticResource LabelItem}"
                                                     FontFamily="icofont"
-                                                    FontSize="16"
-                                                    TextColor="{StaticResource White}">
+                                                    FontSize="16">
                                                     <Label.Triggers>
                                                         <DataTrigger
                                                             Binding="{Binding IsDraftStatus}"
@@ -133,27 +130,27 @@
                                                     </Label.Triggers>
                                                 </Label>
                                                 <Label
+                                                    Style="{StaticResource LabelItem}"
                                                     FontAttributes="Bold"
                                                     Text="{Binding Date, StringFormat='{0:dd} {0:MMMM} {0:yyyy}'}"
-                                                    TextColor="{StaticResource White}"
                                                     TextTransform="Uppercase" />
                                             </HorizontalStackLayout>
                                             <Label
+                                                Style="{StaticResource LabelItem}"
                                                 Grid.Column="1"
                                                 FontAttributes="Bold"
-                                                Text="{Binding TotalAmount, StringFormat='TOTAL: {0:N2}'}"
-                                                TextColor="{StaticResource White}" />
+                                                Text="{Binding TotalAmount, StringFormat='TOTAL: {0:C}'}" />
                                         </Grid>
                                         <VerticalStackLayout
                                             Grid.Row="1"
                                             Padding="8,4"
                                             Spacing="2">
                                             <Label
+                                                Style="{StaticResource LabelItem}"
                                                 Text="{Binding Code, StringFormat='No.: {0}'}"
-                                                TextColor="{StaticResource White}"
                                                 TextTransform="Uppercase" />
                                             <Label Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" TextColor="{StaticResource White}" />
-                                            <Label Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" TextColor="{StaticResource White}" />
+                                            <Label Style="{StaticResource LabelItem}" Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" />
                                         </VerticalStackLayout>
                                     </Grid>
                                 </Border>
@@ -176,10 +173,7 @@
                                 IsEnabled="{Binding SelectedQuotation, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                                 Text="{StaticResource FilePdf}"
                                 ToolTipProperties.Text="Ver como PDF, la cotización seleccionada." />
-                            <BoxView
-                                BackgroundColor="{StaticResource Gray300}"
-                                CornerRadius="2"
-                                WidthRequest="2" />
+                            <BoxView Style="{StaticResource ElementSeparator}" />
                             <Button
                                 Command="{Binding ShowQuotationDetailCommand}"
                                 FontFamily="icofont"
@@ -189,9 +183,10 @@
                         </HorizontalStackLayout>
                         <HorizontalStackLayout Grid.Column="1" Spacing="8">
                             <Button
+                                Command="{Binding CreateInvoiceFromQuoteCommand}"
                                 FontFamily="icofont"
                                 Text="{StaticResource Ticket}"
-                                ToolTipProperties.Text="Facturación de la cotización seleccionada.">
+                                ToolTipProperties.Text="Crear venta de la cotización seleccionada.">
                                 <Button.IsEnabled>
                                     <MultiBinding Converter="{ctk:VariableMultiValueConverter ConditionType=Exact, Count=2}">
                                         <Binding Converter="{ctk:IsNotNullConverter}" Path="SelectedQuotation" />
@@ -217,10 +212,7 @@
                                     </MultiBinding>
                                 </Button.IsEnabled>
                             </Button>
-                            <BoxView
-                                BackgroundColor="{StaticResource Gray300}"
-                                CornerRadius="2"
-                                WidthRequest="2" />
+                            <BoxView Style="{StaticResource ElementSeparator}" />
                             <Button
                                 Command="{Binding ShowAddEditQuoteCommand}"
                                 FontFamily="icofont"
@@ -238,11 +230,9 @@
             </Grid>
             <!--#endregion-->
             <BoxView
+                Style="{StaticResource ElementSeparator}"
                 Grid.RowSpan="3"
-                Grid.Column="1"
-                BackgroundColor="{StaticResource Gray300}"
-                CornerRadius="2"
-                WidthRequest="2" />
+                Grid.Column="1" />
             <!--#region PANEL DERECHA-->
             <Grid
                 Grid.Column="2"
@@ -254,58 +244,6 @@
                         Text="Pedidos"
                         TextTransform="Uppercase"
                         VerticalOptions="Center" />
-                    <!--<Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                        <Entry
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Placeholder="Escriba aquí" />
-                        <HorizontalStackLayout Spacing="8">
-                            <Entry
-                                ClearButtonVisibility="WhileEditing"
-                                HorizontalTextAlignment="End"
-                                IsSpellCheckEnabled="True"
-                                IsTextPredictionEnabled="True"
-                                Keyboard="Numeric"
-                                Placeholder="0.00"
-                                WidthRequest="100" />
-                            <Entry
-                                ClearButtonVisibility="WhileEditing"
-                                HorizontalTextAlignment="End"
-                                IsSpellCheckEnabled="True"
-                                IsTextPredictionEnabled="True"
-                                Keyboard="Numeric"
-                                Placeholder="0.00"
-                                WidthRequest="100" />
-                        </HorizontalStackLayout>
-                        <Button
-                            Grid.Column="1"
-                            FontFamily="icofont"
-                            Text="{StaticResource Search}"
-                            ToolTipProperties.Text="Buscar" />
-                    </Grid>
-                    <HorizontalStackLayout Spacing="8">
-                        <RadioButton>
-                            <RadioButton.Content>
-                                <Label Text="Por nombre" VerticalOptions="Center" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                        <RadioButton>
-                            <RadioButton.Content>
-                                <Label Text="Por rango de precio" VerticalOptions="Center" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                        <RadioButton>
-                            <RadioButton.Content>
-                                <Label Text="Por categoría" VerticalOptions="Center" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                        <RadioButton>
-                            <RadioButton.Content>
-                                <Label Text="Por cantidad unitaria" VerticalOptions="Center" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                    </HorizontalStackLayout>-->
                 </VerticalStackLayout>
                 <ScrollView Grid.Row="1" Grid.Column="2">
                     <CollectionView
@@ -334,11 +272,11 @@
                                             ColumnSpacing="8">
                                             <HorizontalStackLayout Spacing="8">
                                                 <Label
+                                                    Style="{StaticResource LabelItem}"
                                                     FontFamily="icofont"
                                                     FontSize="16"
                                                     IsVisible="{Binding IsPendingStatus}"
-                                                    Text="{StaticResource UiClock}"
-                                                    TextColor="{StaticResource White}">
+                                                    Text="{StaticResource UiClock}">
                                                     <Label.Triggers>
                                                         <DataTrigger
                                                             Binding="{Binding IsPendingStatus}"
@@ -349,17 +287,17 @@
                                                     </Label.Triggers>
                                                 </Label>
                                                 <Label
+                                                    Style="{StaticResource LabelItem}"
                                                     FontAttributes="Bold"
                                                     Text="{Binding Date, StringFormat='{0:dd} {0:MMMM} {0:yyyy}'}"
-                                                    TextColor="{StaticResource White}"
                                                     TextTransform="Uppercase"
                                                     VerticalOptions="CenterAndExpand" />
                                             </HorizontalStackLayout>
                                             <Label
+                                                Style="{StaticResource LabelItem}"
                                                 Grid.Column="1"
                                                 FontAttributes="Bold"
-                                                Text="{Binding TotalAmount, StringFormat='TOTAL: {0:N2}'}"
-                                                TextColor="{StaticResource White}"
+                                                Text="{Binding TotalAmount, StringFormat='TOTAL: {0:C}'}"
                                                 VerticalOptions="CenterAndExpand" />
                                         </Grid>
                                         <VerticalStackLayout
@@ -367,14 +305,13 @@
                                             Padding="8,4"
                                             Spacing="2">
                                             <Label
+                                                Style="{StaticResource LabelItem}"
                                                 Text="{Binding Code, StringFormat='No.: {0}'}"
-                                                TextColor="{StaticResource White}"
                                                 TextTransform="Uppercase" />
-                                            <Label Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" TextColor="{StaticResource White}" />
-                                            <Label Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" TextColor="{StaticResource White}" />
+                                            <Label Style="{StaticResource LabelItem}" Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" />
+                                            <Label Style="{StaticResource LabelItem}" Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" />
                                         </VerticalStackLayout>
                                     </Grid>
-
                                 </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
@@ -395,13 +332,12 @@
                         </HorizontalStackLayout>
                         <HorizontalStackLayout Grid.Column="1" Spacing="8">
                             <Button
+                                Command="{Binding CreateInvoiceFromOrderCommand}"
                                 FontFamily="icofont"
-                                Text="{StaticResource Pay}"
-                                ToolTipProperties.Text="Facturación del pedido seleccionado." />
-                            <BoxView
-                                BackgroundColor="{StaticResource Gray300}"
-                                CornerRadius="2"
-                                WidthRequest="2" />
+                                IsEnabled="{Binding SelectedOrder, Converter={ctk:IsNotNullConverter}}"
+                                Text="{StaticResource Ticket}"
+                                ToolTipProperties.Text="Crear venta del pedido seleccionado." />
+                            <BoxView Style="{StaticResource ElementSeparator}" />
                             <Button
                                 Command="{Binding ShowAddEditOrderCommand}"
                                 FontFamily="icofont"
@@ -420,7 +356,7 @@
             <!--#endregion-->
         </Grid>
         <!--#endregion-->
-        <!--#region VISTA DE FACTURAS-->
+        <!--#region VISTA DE REGISTROS DE VENTAS-->
         <Grid
             Grid.Row="1"
             Padding="8"
@@ -431,61 +367,9 @@
                 <Label
                     Grid.Column="1"
                     FontSize="18"
-                    Text="Facturas"
+                    Text="Registros de ventas"
                     TextTransform="Uppercase"
                     VerticalOptions="Center" />
-                <!--<Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
-                    <Entry
-                        ClearButtonVisibility="WhileEditing"
-                        IsSpellCheckEnabled="True"
-                        IsTextPredictionEnabled="True"
-                        Placeholder="Escriba aquí" />
-                    <HorizontalStackLayout Spacing="8">
-                        <Entry
-                            ClearButtonVisibility="WhileEditing"
-                            HorizontalTextAlignment="End"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Keyboard="Numeric"
-                            Placeholder="0.00"
-                            WidthRequest="100" />
-                        <Entry
-                            ClearButtonVisibility="WhileEditing"
-                            HorizontalTextAlignment="End"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Keyboard="Numeric"
-                            Placeholder="0.00"
-                            WidthRequest="100" />
-                    </HorizontalStackLayout>
-                    <Button
-                        Grid.Column="1"
-                        FontFamily="icofont"
-                        Text="{StaticResource Search}"
-                        ToolTipProperties.Text="Buscar" />
-                </Grid>
-                <HorizontalStackLayout Spacing="8">
-                    <RadioButton>
-                        <RadioButton.Content>
-                            <Label Text="Por nombre" VerticalOptions="Center" />
-                        </RadioButton.Content>
-                    </RadioButton>
-                    <RadioButton>
-                        <RadioButton.Content>
-                            <Label Text="Por rango de precio" VerticalOptions="Center" />
-                        </RadioButton.Content>
-                    </RadioButton>
-                    <RadioButton>
-                        <RadioButton.Content>
-                            <Label Text="Por categoría" VerticalOptions="Center" />
-                        </RadioButton.Content>
-                    </RadioButton>
-                    <RadioButton>
-                        <RadioButton.Content>
-                            <Label Text="Por cantidad unitaria" VerticalOptions="Center" />
-                        </RadioButton.Content>
-                    </RadioButton>
-                </HorizontalStackLayout>-->
             </VerticalStackLayout>
             <ScrollView Grid.Row="1">
                 <CollectionView
@@ -514,24 +398,24 @@
                                         ColumnSpacing="8">
                                         <HorizontalStackLayout Spacing="8">
                                             <Label
+                                                Style="{StaticResource LabelItem}"
                                                 FontAttributes="Bold"
                                                 Text="{Binding Date, StringFormat='{0:dd} {0:MMMM} {0:yyyy}'}"
-                                                TextColor="{StaticResource White}"
                                                 TextTransform="Uppercase" />
                                         </HorizontalStackLayout>
                                         <Label
+                                            Style="{StaticResource LabelItem}"
                                             Grid.Column="1"
                                             FontAttributes="Bold"
-                                            Text="{Binding TotalAmount, StringFormat='TOTAL: {0:N2}'}"
-                                            TextColor="{StaticResource White}" />
+                                            Text="{Binding TotalAmount, StringFormat='TOTAL: {0:N2}'}" />
                                     </Grid>
                                     <VerticalStackLayout
                                         Grid.Row="1"
                                         Padding="8,4"
                                         Spacing="2">
-                                        <Label Text="{Binding Code, StringFormat='No.: {0}'}" TextColor="{StaticResource White}" />
-                                        <Label Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" TextColor="{StaticResource White}" />
-                                        <Label Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" TextColor="{StaticResource White}" />
+                                        <Label Style="{StaticResource LabelItem}" Text="{Binding Code, StringFormat='No.: {0}'}" />
+                                        <Label Style="{StaticResource LabelItem}" Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" />
+                                        <Label Style="{StaticResource LabelItem}" Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" />
                                     </VerticalStackLayout>
                                     <Border
                                         Grid.Row="2"
@@ -545,9 +429,9 @@
                                         ColumnSpacing="8">
                                         <HorizontalStackLayout Spacing="8">
                                             <Label
+                                                Style="{StaticResource LabelItem}"
                                                 FontAttributes="Bold"
                                                 Text="{Binding DaysRemaining, StringFormat='Vence en {0} días'}"
-                                                TextColor="{StaticResource White}"
                                                 TextTransform="Uppercase">
                                                 <Label.Triggers>
                                                     <DataTrigger
@@ -561,10 +445,10 @@
                                             </Label>
                                         </HorizontalStackLayout>
                                         <Label
+                                            Style="{StaticResource LabelItem}"
                                             Grid.Column="1"
                                             FontAttributes="Bold"
-                                            Text="{Binding Paid, StringFormat='PAGADO: {0:N2}', TargetNullValue='NO PAGADA', FallbackValue='NO PAGADA'}"
-                                            TextColor="{StaticResource White}">
+                                            Text="{Binding Paid, StringFormat='PAGADO: {0:C}', TargetNullValue='NO PAGADA', FallbackValue='NO PAGADA'}">
                                             <Label.Triggers>
                                                 <DataTrigger
                                                     Binding="{Binding Paid}"
@@ -604,10 +488,7 @@
                             IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                             Text="{StaticResource MoneyBag}"
                             ToolTipProperties.Text="Amortizacion para credito de la factura seleccionada." />
-                        <BoxView
-                            BackgroundColor="{StaticResource Gray300}"
-                            CornerRadius="2"
-                            WidthRequest="2" />
+                        <BoxView Style="{StaticResource ElementSeparator}" />
                         <Button
                             Command="{Binding ShowAddEditSaleCommand}"
                             FontFamily="icofont"
@@ -659,10 +540,7 @@
                 Padding="8"
                 Spacing="8">
                 <Label FontSize="11" Text="{Binding AppInfo}" />
-                <BoxView
-                    BackgroundColor="{StaticResource Tertiary}"
-                    CornerRadius="1"
-                    WidthRequest="1" />
+                <BoxView Style="{StaticResource ElementSeparator}" />
                 <Label
                     Grid.Column="1"
                     FontSize="11"

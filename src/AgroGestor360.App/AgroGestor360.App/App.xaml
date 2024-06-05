@@ -63,8 +63,13 @@
                 </Setter>
             </Style>
             <Style x:Key="LabelItem" TargetType="Label">
-                <Setter Property="TextColor" Value="{StaticResource Tertiary}" />
+                <Setter Property="TextColor" Value="{StaticResource White}" />
                 <Setter Property="Margin" Value="0" />
+            </Style>
+            <Style x:Key="ElementSeparator" TargetType="BoxView">
+                <Setter Property="BackgroundColor" Value="{StaticResource Black}" />
+                <Setter Property="CornerRadius" Value="1" />
+                <Setter Property="WidthRequest" Value="1" />
             </Style>
         </ResourceDictionary>
     </Application.Resources>

@@ -246,22 +246,18 @@ public class QuotesController : ControllerBase
                     quotesServ.Rollback();
                     return NotFound();
                 }
+
+                entity.Status = dTO.Status;
+                wasteQuotationServ.BeginTrans();
                 var resultInsert = wasteQuotationServ.Insert(entity);
                 if (string.IsNullOrEmpty(resultInsert))
                 {
                     quotesServ.Rollback();
+                    wasteQuotationServ.Rollback();
                     return NotFound();
                 }
-                if (dTO.Status == QuotationStatus.Rejected)
-                {
-                    var warehouseUpdated = UpdateWarehouseAfterDeletion(entity);
-                    if (!warehouseUpdated)
-                    {
-                        quotesServ.Rollback();
-                        return NotFound();
-                    }
-                }
                 quotesServ.Commit();
+                wasteQuotationServ.Commit();
                 return Ok();
             case QuotationStatus.Cancelled:
                 quotesServ.BeginTrans();
@@ -271,19 +267,23 @@ public class QuotesController : ControllerBase
                     quotesServ.Rollback();
                     return NotFound();
                 }
-                var warehouseUpdatedCancelled = UpdateWarehouseAfterDeletion(entity);
-                if (!warehouseUpdatedCancelled)
+
+                entity.Status = dTO.Status;
+                wasteQuotationServ.BeginTrans();
+                var resultInsert1 = wasteQuotationServ.Insert(entity);
+                if (string.IsNullOrEmpty(resultInsert1))
                 {
                     quotesServ.Rollback();
+                    wasteQuotationServ.Rollback();
                     return NotFound();
                 }
                 quotesServ.Commit();
+                wasteQuotationServ.Commit();
                 return Ok();
             default:
                 return BadRequest();
         }
     }
-
 
     [HttpDelete("{code}")]
     public IActionResult Delete(string code)
@@ -299,67 +299,16 @@ public class QuotesController : ControllerBase
             return NotFound();
         }
 
-        quotesServ.BeginTrans();
-
         var resultDelete = quotesServ.Delete(code);
         if (!resultDelete)
         {
-            quotesServ.Rollback();
             return NotFound();
         }
-
-        var warehouseUpdated = UpdateWarehouseAfterDeletion(CurrentQuotation);
-        if (!warehouseUpdated)
-        {
-            quotesServ.Rollback();
-            return NotFound();
-        }
-
-        quotesServ.Commit();
 
         return Ok();
     }
 
     #region EXTRA
-    bool UpdateWarehouseAfterDeletion(Quotation entity)
-    {
-        try
-        {
-            var merchandiseQuantities = entity.Products!.ToDictionary(p => p.Product!.MerchandiseId!, p => FindQuantity(p.Quantity, p.Product!, p.OfferId));
-
-            var warehouseItems = articlesForWarehouseServ.GetManyByIds(merchandiseQuantities.Keys);
-            List<ArticleItemForWarehouse> saveArticleItemForWarehouses = [];
-
-            foreach (var item in warehouseItems)
-            {
-                item.Quantity += merchandiseQuantities[item.MerchandiseId!];
-                item.Reserved -= merchandiseQuantities[item.MerchandiseId!];
-
-                if (item.Reserved < 0)
-                {
-                    item.Reserved = 0;
-                }
-
-                saveArticleItemForWarehouses.Add(item);
-            }
-
-            return articlesForWarehouseServ.UpdateMany(saveArticleItemForWarehouses);
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    double FindQuantity(double productQuantity, ProductItemForSale product, int offerId)
-    {
-        double quantity = productQuantity;
-        if (offerId > 0)
-        {
-            var o = product.Offering![offerId - 1];
-            quantity = o.Quantity + o.BonusAmount;
-        }    
-        return quantity;
-    }
+    
     #endregion
 }

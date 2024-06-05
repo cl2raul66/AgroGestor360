@@ -108,10 +108,7 @@
                 Spacing="8"
                 VerticalOptions="Center">
                 <Label FontSize="11" Text="{Binding AppInfo}" />
-                <BoxView
-                    BackgroundColor="{StaticResource Tertiary}"
-                    CornerRadius="1"
-                    WidthRequest="1" />
+                <BoxView Style="{StaticResource ElementSeparator}" />
                 <Label
                     Grid.Column="1"
                     FontSize="11"

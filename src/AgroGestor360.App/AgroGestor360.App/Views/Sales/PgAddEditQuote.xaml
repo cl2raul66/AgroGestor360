@@ -62,6 +62,7 @@
                         <Label
                             FontAttributes="Bold"
                             Text="{Binding SelectedCustomer.Discount.Discount, TargetNullValue='El cliente no tiene descuento', FallbackValue='El cliente no tiene descuento', StringFormat='Descuento aprobado para el cliente: {0}%'}"
+                            TextColor="{StaticResource Secondary}"
                             VerticalOptions="Center" />
                         <VerticalStackLayout Spacing="4">
                             <Grid RowDefinitions="auto,auto" RowSpacing="4">
@@ -246,19 +247,16 @@
                                     <RadioButton
                                         Content="Precio normal"
                                         IsChecked="{Binding IsNormalPrice}"
-                                        TextColor="{StaticResource Tertiary}"
                                         ToolTipProperties.Text="Sin descuento" />
                                     <RadioButton
                                         Content="Por cliente"
                                         IsChecked="{Binding IsCustomerDiscount}"
                                         IsEnabled="{Binding SelectedCustomer.Discount, Converter={ctk:IsNotNullConverter}}"
-                                        TextColor="{StaticResource Tertiary}"
                                         ToolTipProperties.Text="Descuento por cliente" />
                                     <RadioButton
                                         Content="Por oferta"
                                         IsChecked="{Binding IsProductOffer}"
                                         IsEnabled="{Binding SelectedProductItem.Product.HasOffers}"
-                                        TextColor="{StaticResource Tertiary}"
                                         ToolTipProperties.Text="Descuento por seleccion de oferta" />
                                 </HorizontalStackLayout>
                                 <Button
@@ -288,7 +286,7 @@
                                 </Picker.ItemDisplayBinding>
                             </Picker>
                         </VerticalStackLayout>
-                        <Grid Padding="8,4" BackgroundColor="{StaticResource Secondary}">
+                        <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
                             <Label
                                 FontSize="14"
                                 HorizontalOptions="Start"
@@ -297,10 +295,11 @@
                             <Label
                                 FontSize="14"
                                 HorizontalOptions="End"
-                                Text="{Binding Total, StringFormat='{0:N2}', FallbackValue='0.00'}"
+                                Text="{Binding Total, StringFormat='{0:C}', FallbackValue='0.00'}"
+                                TextColor="{StaticResource Secondary}"
                                 VerticalOptions="Center" />
                         </Grid>
-                        <Grid Padding="8,4" BackgroundColor="{StaticResource Secondary}">
+                        <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
                             <Label
                                 FontSize="14"
                                 HorizontalOptions="Start"
@@ -309,10 +308,11 @@
                             <Label
                                 FontSize="14"
                                 HorizontalOptions="End"
-                                Text="{Binding Difference, StringFormat='{0:N2}', FallbackValue='0.00'}"
+                                Text="{Binding Difference, StringFormat='{0:C}', FallbackValue='0.00'}"
+                                TextColor="{StaticResource Secondary}"
                                 VerticalOptions="Center" />
                         </Grid>
-                        <Grid Padding="8,4" BackgroundColor="{StaticResource Secondary}">
+                        <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
                             <Label
                                 FontAttributes="Bold"
                                 FontSize="14"
@@ -323,7 +323,8 @@
                                 FontAttributes="Bold"
                                 FontSize="14"
                                 HorizontalOptions="End"
-                                Text="{Binding TotalWithDiscount, StringFormat='{0:N2}', FallbackValue='0.00'}"
+                                Text="{Binding TotalWithDiscount, StringFormat='{0:C}', FallbackValue='0.00'}"
+                                TextColor="{StaticResource Secondary}"
                                 VerticalOptions="Center" />
                         </Grid>
                     </VerticalStackLayout>

@@ -339,3 +339,21 @@ public class Invoice : SaleBase
     public ImmediatePayment[]? ImmediatePayments { get; set; }
     public CreditPayment[]? CreditsPayments { get; set; }
 }
+
+/// <summary>
+/// Object: SaleItem => Represent a sale item.
+/// <code>
+/// DateTime [QuotationDate]
+/// string [Code]
+/// Seller [Seller]
+/// Customer [Customer]
+/// Array ProductItemForDocument [ProductItems]
+/// InvoiceStatus [Status]
+/// int [NumberOfInstallments] => Number of installments
+/// </code>
+/// </summary>
+public class SaleItem : SaleBase
+{
+    public InvoiceStatus Status { get; set; }
+    public int NumberOfInstallments { get; set; }
+}

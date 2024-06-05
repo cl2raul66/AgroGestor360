@@ -175,7 +175,7 @@ public class OrdersService : IOrdersService
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/orders", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/orders/changestatus", content);
 
             return response.IsSuccessStatusCode;
         }
