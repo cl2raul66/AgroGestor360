@@ -325,7 +325,6 @@ public class Order : SaleBase
 /// Customer [Customer]
 /// Array ProductItemForDocument [ProductItems]
 /// InvoiceStatus [Status]
-/// int [NumberOfInstallments] => Number of installments
 /// string [NumberFEL]
 /// ImmediatePayments: Array of immediate payments
 /// CreditsPayments: Array of credit payments
@@ -334,26 +333,42 @@ public class Order : SaleBase
 public class Invoice : SaleBase
 {
     public InvoiceStatus Status { get; set; }
-    public int NumberOfInstallments { get; set; }
     public string? NumberFEL { get; set; }
     public ImmediatePayment[]? ImmediatePayments { get; set; }
     public CreditPayment[]? CreditsPayments { get; set; }
 }
 
 /// <summary>
-/// Object: SaleItem => Represent a sale item.
+/// Object: Invoice => Represent an invoice for a sale.
 /// <code>
 /// DateTime [QuotationDate]
-/// string [Code]
+/// string [Code, Notes]
 /// Seller [Seller]
 /// Customer [Customer]
 /// Array ProductItemForDocument [ProductItems]
 /// InvoiceStatus [Status]
-/// int [NumberOfInstallments] => Number of installments
+/// string [NumberFEL]
+/// ImmediatePayments: Array of immediate payments
+/// CreditsPayments: Array of credit payments
 /// </code>
 /// </summary>
-public class SaleItem : SaleBase
+public class WasteInvoice : SaleBase
 {
     public InvoiceStatus Status { get; set; }
-    public int NumberOfInstallments { get; set; }
+    public string? NumberFEL { get; set; }
+    public ImmediatePayment[]? ImmediatePayments { get; set; }
+    public CreditPayment[]? CreditsPayments { get; set; }
+    public string? Notes { get; set; }
+}
+
+/// <summary>
+/// Object: ConceptForDeletedInvoice => Represent a concept for a deleted invoice.
+/// <code>
+/// string [Id, Concept]
+/// </code>
+/// </summary>
+public class ConceptForDeletedInvoice
+{
+    public int Id { get; set; }
+    public string? Concept { get; set; }
 }

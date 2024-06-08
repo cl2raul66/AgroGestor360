@@ -1,4 +1,5 @@
-﻿using AgroGestor360.App.Views.Sales;
+﻿using AgroGestor360.App.Tools.Messages;
+using AgroGestor360.App.Views.Sales;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using AgroGestor360.Client.Tools;
@@ -24,8 +25,9 @@ public partial class PgSalesViewModel : ObservableRecipient
     readonly IAuthService authServ;
     readonly IInvoicesService invoicesServ;
     readonly IApiService apiServ;
+    readonly ITimeLimitsCreditsService timeLimitsCreditsServ;
 
-    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, IAuthService authService, IInvoicesService invoicesService, IApiService apiService)
+    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, IAuthService authService, IInvoicesService invoicesService, IApiService apiService, ITimeLimitsCreditsService timeLimitsCreditsService)
     {
         quotationsServ = quotesService;
         sellersServ = sellersService;
@@ -36,6 +38,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         authServ = authService;
         invoicesServ = invoicesService;
         apiServ = apiService;
+        timeLimitsCreditsServ = timeLimitsCreditsService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
 
         apiServ.OnReceiveStatusMessage += ApiServ_OnReceiveStatusMessage;
@@ -114,54 +117,12 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task RemovedQuote()
     {
-        var selectedOption = await DisplayActionSheetForRemoval();
-        if (selectedOption == "Cancelar")
+        IsActive = true;
+        Dictionary<string, object> sendData = new()
         {
-            SelectedQuotation = null;
-            SelectedOrder = null;
-            return;
-        }
-
-        var confirmationMessage = GenerateConfirmationMessageForQuote();
-        bool isConfirmed = false;
-
-        bool deletedInQuotes;
-        switch (selectedOption)
-        {
-            case "Por rechazo del cliente.":
-                isConfirmed = await ConfirmRemoval(confirmationMessage);
-                if (!isConfirmed)
-                {
-                    SelectedQuotation = null;
-                    SelectedOrder = null;
-                    return;
-                }
-                deletedInQuotes = await quotationsServ.ChangesByStatusAsync(serverURL,
-                    new() { Code = SelectedQuotation!.Code!, Status = QuotationStatus.Rejected }
-                );
-                break;
-            case "Por error del operador.":
-                isConfirmed = await ConfirmRemoval(confirmationMessage, true);
-                if (!isConfirmed)
-                {
-                    SelectedQuotation = null;
-                    SelectedOrder = null;
-                    return;
-                }
-                deletedInQuotes = await quotationsServ.DeleteAsync(serverURL, SelectedQuotation!.Code!);
-                break;
-            default:
-                SelectedQuotation = null;
-                SelectedOrder = null;
-                return;
-        }
-
-        if (deletedInQuotes)
-        {
-            Quotations!.Remove(SelectedQuotation);
-        }
-        SelectedQuotation = null;
-        SelectedOrder = null;
+            { "dialog", "deletedquote" }
+        };
+        await Shell.Current.GoToAsync(nameof(PgDeletedInSale), true, sendData);
     }
 
     [RelayCommand]
@@ -335,52 +296,58 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task RemovedOrder()
     {
-        var selectedOption = await DisplayActionSheetForRemoval();
-        if (selectedOption == "Cancelar")
+        IsActive = true;
+        Dictionary<string, object> sendData = new()
         {
-            SelectedQuotation = null;
-            SelectedOrder = null;
-            return;
-        }
+            { "dialog", "deletedorder" }
+        };
+        await Shell.Current.GoToAsync(nameof(PgDeletedInSale), true, sendData);
+        //var selectedOption = await DisplayActionSheetForRemoval();
+        //if (selectedOption == "Cancelar")
+        //{
+        //    SelectedQuotation = null;
+        //    SelectedOrder = null;
+        //    return;
+        //}
 
-        var confirmationMessage = GenerateConfirmationMessageForOrder();
-        bool isConfirmed = false;
+        //var confirmationMessage = GenerateConfirmationMessageForOrder();
+        //bool isConfirmed = false;
 
-        bool deletedInOrders;
-        switch (selectedOption)
-        {
-            case "Por rechazo del cliente.":
-                isConfirmed = await ConfirmRemoval(confirmationMessage);
-                if (!isConfirmed)
-                {
-                    SelectedQuotation = null;
-                    SelectedOrder = null;
-                    return;
-                }
-                deletedInOrders = await ordersServ.ChangeStatusAsync(serverURL, new() { Code = SelectedOrder!.Code!, Status = OrderStatus.Rejected });
-                break;
-            case "Por error del operador.":
-                isConfirmed = await ConfirmRemoval(confirmationMessage, true);
-                if (!isConfirmed)
-                {
-                    SelectedQuotation = null;
-                    SelectedOrder = null;
-                    return;
-                }
-                deletedInOrders = await ordersServ.DeleteAsync(serverURL, SelectedOrder!.Code!);
-                break;
-            default:
-                SelectedQuotation = null;
-                SelectedOrder = null;
-                return;
-        }
+        //bool deletedInOrders;
+        //switch (selectedOption)
+        //{
+        //    case "Por rechazo del cliente.":
+        //        isConfirmed = await ConfirmRemoval(confirmationMessage);
+        //        if (!isConfirmed)
+        //        {
+        //            SelectedQuotation = null;
+        //            SelectedOrder = null;
+        //            return;
+        //        }
+        //        deletedInOrders = await ordersServ.ChangeStatusAsync(serverURL, new() { Code = SelectedOrder!.Code!, Status = OrderStatus.Rejected });
+        //        break;
+        //    case "Por error del operador.":
+        //        isConfirmed = await ConfirmRemoval(confirmationMessage, true);
+        //        if (!isConfirmed)
+        //        {
+        //            SelectedQuotation = null;
+        //            SelectedOrder = null;
+        //            return;
+        //        }
+        //        deletedInOrders = await ordersServ.DeleteAsync(serverURL, SelectedOrder!.Code!);
+        //        break;
+        //    default:
+        //        SelectedQuotation = null;
+        //        SelectedOrder = null;
+        //        return;
+        //}
 
-        if (deletedInOrders)
-        {
-            Orders!.Remove(SelectedOrder);
-        }
-        SelectedQuotation = null;
-        SelectedOrder = null;
+        //if (deletedInOrders)
+        //{
+        //    Orders!.Remove(SelectedOrder);
+        //}
+        //SelectedQuotation = null;
+        //SelectedOrder = null;
     }
 
     [RelayCommand]
@@ -412,17 +379,28 @@ public partial class PgSalesViewModel : ObservableRecipient
     async Task ShowAddEditSale()
     {
         IsActive = true;
-        var sellers = await sellersServ.GetAllAsync(serverURL);
-        var customers = await customersServ.GetAllAsync(serverURL);
-        var products = await productsForSalesServ.GetAllAsync(serverURL);
-        var creditTime = await invoicesServ.GetCreditTimeAsync(serverURL);
+
+        var sellersTask = sellersServ.GetAllAsync(serverURL);
+        var customersTask = customersServ.GetAllAsync(serverURL);
+        var productsTask = productsForSalesServ.GetAllAsync(serverURL);
+        var creditTimeTask = timeLimitsCreditsServ.GetAllAsync(serverURL);
+        var defaultCreditTimeTask = timeLimitsCreditsServ.GetDefaultAsync(serverURL);
+
+        await Task.WhenAll(sellersTask, customersTask, productsTask, creditTimeTask, defaultCreditTimeTask);
+
+        var sellers = sellersTask.Result;
+        var customers = customersTask.Result;
+        var products = productsTask.Result;
+        var creditTime = creditTimeTask.Result;
+        var defaultCreditTime = defaultCreditTimeTask.Result;
 
         Dictionary<string, object> sendData = new()
         {
             { "sellers", sellers.ToArray() },
             { "customers", customers.ToArray()},
             { "products", products.ToArray() },
-            { "creditTime", creditTime.ToArray() }
+            { "creditTime", creditTime.ToArray() },
+            { "defaultcredittime", defaultCreditTime! }
         };
 
         await Shell.Current.GoToAsync(nameof(PgAddEditSale), true, sendData);
@@ -431,34 +409,13 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task RemovedInvoice()
     {
-        string[] options = ["Por rechazo del cliente.", "Por error del operador."];
-        bool deletedInInvoice = false;
-
-        var selectedOption = await Shell.Current.DisplayActionSheet("Seleccione el motivo de la eliminación", "Cancelar", null, options);
-
-        switch (selectedOption)
+        IsActive = true;
+        var concepts = await invoicesServ.GetConceptsAsync(serverURL);
+        Dictionary<string, object> sendData = new()
         {
-            case "Por rechazo del cliente.":
-                DTO10_3 dTO = new() { Code = SelectedInvoice!.Code, Status = InvoiceStatus.Cancelled };
-                deletedInInvoice = await invoicesServ.UpdateState(serverURL, dTO);
-                break;
-            case "Por error del operador.":
-                string bodyText = await GenerateBodyTextFromInvoice();
-                bool result = await Shell.Current.DisplayAlert("Eliminar factura", bodyText, "Eliminar", "Cancelar");
-                if (!result)
-                {
-                    SelectedOrder = null;
-                    SelectedQuotation = null;
-                    return;
-                }
-
-                deletedInInvoice = await invoicesServ.DeleteAsync(serverURL, SelectedInvoice!.Code!);
-                break;
-        }
-        if (deletedInInvoice)
-        {
-            Invoices!.Remove(SelectedInvoice!);
-        }
+            { "concepts", concepts.ToArray() }
+        };
+        await Shell.Current.GoToAsync(nameof(PgDeletedInvoice), true, sendData);
     }
 
     [RelayCommand]
@@ -505,6 +462,20 @@ public partial class PgSalesViewModel : ObservableRecipient
         await ViewBills();
         await ShowAddEditSale();
     }
+    #endregion
+
+    #region DELETE DIALOG
+    [ObservableProperty]
+    bool isVisibleDeletedDialog;
+
+    [ObservableProperty]
+    bool isVisibleDeletedQuotationDialog;
+
+    [ObservableProperty]
+    bool isVisibleDeletedOrderDialog;
+
+    [ObservableProperty]
+    bool isVisibleDeletedSaleDialog;
     #endregion
 
     void ApiServ_OnReceiveStatusMessage(ServerStatus status)
@@ -577,8 +548,7 @@ public partial class PgSalesViewModel : ObservableRecipient
                 var invoice = await invoicesServ.GetByCodeAsync(serverURL, result);
                 r.Invoices.Insert(0, invoice!);
             }
-            r.SelectedOrder = null;
-            r.SelectedQuotation = null;
+            r.SelectedInvoice = null;
         });
 
         WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_2, string>(this, "setdepreciation", async (r, m) =>
@@ -602,17 +572,91 @@ public partial class PgSalesViewModel : ObservableRecipient
             r.SelectedOrder = null;
             r.SelectedQuotation = null;
         });
-
-        WeakReferenceMessenger.Default.Register<PgSalesViewModel, string, string>(this, nameof(PgSalesViewModel), (r, m) =>
+        
+        WeakReferenceMessenger.Default.Register<PgSalesViewModel, string, string>(this, "deletedquote", async (r, m) =>
         {
-            if (m == "cancel")
+            IsActive = false;
+            bool deletedQuote = false;
+            DTO7 currentQuote = Quotations!.First(x => x.Code == SelectedQuotation!.Code);
+
+            if (bool.Parse(m))
             {
-                r.SelectedOrder = null;
-                r.SelectedQuotation = null;
-                r.SelectedInvoice = null;
-                IsActive = false;
+                deletedQuote = await quotationsServ.DeleteAsync(serverURL, currentQuote.Code!);
             }
-            ShowAddEditOrderState = false;
+            else
+            {
+                DTO7_3 dTO = new() { Code = currentQuote.Code, Status = QuotationStatus.Rejected };
+                deletedQuote = await quotationsServ.ChangesByStatusAsync(serverURL, dTO);
+            }
+
+            if (deletedQuote)
+            {
+                Quotations!.Remove(currentQuote);
+            }
+
+            SelectedOrder = null;
+            SelectedQuotation = null;
+        });
+        
+        WeakReferenceMessenger.Default.Register<PgSalesViewModel, string, string>(this, "deletedorder", async (r, m) =>
+        {
+            IsActive = false;
+            bool deletedOrder = false;
+            DTO8 currentOrder = Orders!.First(x => x.Code == SelectedOrder!.Code);
+
+            if (bool.Parse(m))
+            {
+                deletedOrder = await ordersServ.DeleteAsync(serverURL, currentOrder.Code!);
+            }
+            else
+            {
+                DTO8_6 dTO = new() { Code = currentOrder.Code, Status = OrderStatus.Rejected };
+                deletedOrder = await ordersServ.ChangeStatusAsync(serverURL, dTO);
+            }
+
+            if (deletedOrder)
+            {
+                Orders!.Remove(currentOrder);
+            }
+
+            SelectedOrder = null;
+            SelectedQuotation = null;
+        });
+
+        WeakReferenceMessenger.Default.Register<PgSalesViewModel, ConceptForDeletedInvoice, string>(this, "deletedinvoice", async (r, m) =>
+        {
+            IsActive = false;
+            bool isEmpty = ConceptForDeletedInvoiceIsEmpty(m);
+            bool deletedInInvoice = false;
+            DTO10 currentInvoice = Invoices!.First(x => x.Code == SelectedInvoice!.Code);
+
+            if (isEmpty)
+            {
+                deletedInInvoice = await invoicesServ.DeleteAsync(serverURL, currentInvoice.Code!);
+            }
+            else
+            {
+                DTO10_3 dTO = new() { Code = currentInvoice.Code, Status = InvoiceStatus.Cancelled, Notes = m.Concept };
+                deletedInInvoice = await invoicesServ.UpdateState(serverURL, dTO);
+            }
+
+            if (deletedInInvoice)
+            {
+                Invoices!.Remove(currentInvoice);
+            }
+
+            SelectedInvoice = null;
+        });
+
+        WeakReferenceMessenger.Default.Register<CancelDialogForPgSalesRequestMessage>(this, (r, m) =>
+        {
+            IsActive = false;
+            if (m.Value)
+            {
+                SelectedQuotation = null;
+                SelectedOrder = null;
+                SelectedInvoice = null;
+            }
         });
     }
 
@@ -756,6 +800,11 @@ public partial class PgSalesViewModel : ObservableRecipient
         }
 
         return await Shell.Current.DisplayAlert("Eliminar", message, "Eliminar", "Cancelar");
+    }
+
+    bool ConceptForDeletedInvoiceIsEmpty(ConceptForDeletedInvoice obj)
+    {
+        return obj is null || (obj.Id < 1 && (string.IsNullOrEmpty(obj.Concept) || string.IsNullOrWhiteSpace(obj.Concept)));
     }
     #endregion
 }

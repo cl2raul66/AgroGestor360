@@ -11,17 +11,17 @@ public interface IWasteInvoicesInLiteDbService
     void BeginTrans();
     void Commit();
     bool Delete(string code);
-    IEnumerable<Invoice> GetAll();
-    Invoice GetById(string code);
-    string Insert(Invoice entity);
+    IEnumerable<WasteInvoice> GetAll();
+    WasteInvoice GetById(string code);
+    string Insert(WasteInvoice entity);
     void Rollback();
-    bool Update(Invoice entity);
+    bool Update(WasteInvoice entity);
 }
 
 public class WasteInvoicesInLiteDbService : IWasteInvoicesInLiteDbService
 {
     readonly LiteDatabase db;
-    readonly ILiteCollection<Invoice> collection;
+    readonly ILiteCollection<WasteInvoice> collection;
 
     public WasteInvoicesInLiteDbService()
     {
@@ -31,11 +31,11 @@ public class WasteInvoicesInLiteDbService : IWasteInvoicesInLiteDbService
         };
         var mapper = new BsonMapper();
 
-        mapper.Entity<Invoice>().Id(x => x.Code);
+        mapper.Entity<WasteInvoice>().Id(x => x.Code);
 
         db = new(cnx, mapper);
 
-        collection = db.GetCollection<Invoice>();
+        collection = db.GetCollection<WasteInvoice>();
         collection.EnsureIndex(x => x.Code);
     }
 
@@ -47,13 +47,13 @@ public class WasteInvoicesInLiteDbService : IWasteInvoicesInLiteDbService
 
     public bool Exist => collection.Count() > 0;
 
-    public Invoice GetById(string code) => collection.FindById(code);
+    public WasteInvoice GetById(string code) => collection.FindById(code);
 
-    public IEnumerable<Invoice> GetAll() => collection.FindAll();
+    public IEnumerable<WasteInvoice> GetAll() => collection.FindAll();
 
-    public string Insert(Invoice entity) => collection.Insert(entity).AsString;
+    public string Insert(WasteInvoice entity) => collection.Insert(entity).AsString;
 
-    public bool Update(Invoice entity) => collection.Update(entity);
+    public bool Update(WasteInvoice entity) => collection.Update(entity);
 
     public bool Delete(string code) => collection.Delete(code);
 }

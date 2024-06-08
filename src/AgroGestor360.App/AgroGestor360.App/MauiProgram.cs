@@ -96,6 +96,8 @@ public static class MauiProgram
         builder.Services.AddTransient<PgAddEditQuote, PgAddEditQuoteViewModel>();
         builder.Services.AddTransient<PgAddEditOrder, PgAddEditOrderViewModel>();
         builder.Services.AddTransient<PgAddEditSale, PgAddEditSaleViewModel>();
+        builder.Services.AddTransient<PgDeletedInvoice, PgDeletedInvoiceViewModel>();
+        builder.Services.AddTransient<PgDeletedInSale, PgDeletedInSaleViewModel>();
         builder.Services.AddTransient<PgAmortizeInvoiceCredit, PgAmortizeInvoiceCreditViewModel>();
 
 #if DEBUG

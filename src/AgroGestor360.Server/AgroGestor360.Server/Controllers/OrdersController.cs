@@ -363,27 +363,27 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPut("changestatus")]
-    public IActionResult ChangeStatus(DTO8_3 dTO)
+    public IActionResult ChangeStatus(DTO8_6 dTO)
     {
         if (dTO is null)
         {
             return BadRequest();
         }
 
-        var entity = ordersServ.GetByCode(dTO.Code!);
-        if (entity is null)
+        var found = ordersServ.GetByCode(dTO.Code!);
+        if (found is null)
         {
             return NotFound();
         }
 
-        entity.Status = dTO.Status;
+        found.Status = dTO.Status;
 
         if (dTO.Status is OrderStatus.Completed)
         {
             wasteOrdersServ.BeginTrans();
             try
             {
-                var wasteInsertResult = wasteOrdersServ.Insert(entity);
+                var wasteInsertResult = wasteOrdersServ.Insert(found);
                 if (string.IsNullOrEmpty(wasteInsertResult))
                 {
                     wasteOrdersServ.Rollback();
@@ -391,7 +391,7 @@ public class OrdersController : ControllerBase
                 }
 
                 ordersServ.BeginTrans();
-                var deleteResult = ordersServ.Delete(entity.Code!);
+                var deleteResult = ordersServ.Delete(found.Code!);
                 if (!deleteResult)
                 {
                     wasteOrdersServ.Rollback();
@@ -417,7 +417,7 @@ public class OrdersController : ControllerBase
             try
             {
                 wasteOrdersServ.BeginTrans();
-                var wasteInsertResult = wasteOrdersServ.Insert(entity);
+                var wasteInsertResult = wasteOrdersServ.Insert(found);
                 if (string.IsNullOrEmpty(wasteInsertResult))
                 {
                     wasteOrdersServ.Rollback();
@@ -425,7 +425,7 @@ public class OrdersController : ControllerBase
                 }
 
                 ordersServ.BeginTrans();
-                var deleteResult = ordersServ.Delete(entity.Code!);
+                var deleteResult = ordersServ.Delete(found.Code!);
                 if (!deleteResult)
                 {
                     wasteOrdersServ.Rollback();
@@ -433,7 +433,7 @@ public class OrdersController : ControllerBase
                     return NotFound();
                 }
 
-                var warehouseUpdated = UpdateWarehouseAfterDeletion(entity);
+                var warehouseUpdated = UpdateWarehouseAfterDeletion(found);
                 if (!warehouseUpdated)
                 {
                     wasteOrdersServ.Rollback();
@@ -454,7 +454,7 @@ public class OrdersController : ControllerBase
             return Ok();
         }
 
-        var resultUpdate = ordersServ.Update(entity);
+        var resultUpdate = ordersServ.Update(found);
 
         if (!resultUpdate)
         {

@@ -1,4 +1,5 @@
-﻿using AgroGestor360.Client.Models;
+﻿using AgroGestor360.App.Tools.Messages;
+using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -97,7 +98,7 @@ public partial class PgAmortizeInvoiceCreditViewModel : ObservableValidator
     [RelayCommand]
     async Task Cancel()
     {
-        _ = WeakReferenceMessenger.Default.Send("cancel", nameof(PgSalesViewModel));
+        _ = WeakReferenceMessenger.Default.Send(new CancelDialogForPgSalesRequestMessage(true));
         await Shell.Current.GoToAsync("..");
     }
 }

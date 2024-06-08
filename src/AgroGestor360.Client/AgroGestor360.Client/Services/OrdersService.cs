@@ -7,7 +7,7 @@ namespace AgroGestor360.Client.Services;
 
 public interface IOrdersService
 {
-    Task<bool> ChangeStatusAsync(string serverURL, DTO8_2 dTO);
+    Task<bool> ChangeStatusAsync(string serverURL, DTO8_6 dTO);
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string code);
     Task<IEnumerable<DTO8>> GetAllAsync(string serverURL);
@@ -168,7 +168,7 @@ public class OrdersService : IOrdersService
         return false;
     }
 
-    public async Task<bool> ChangeStatusAsync(string serverURL, DTO8_2 dTO)
+    public async Task<bool> ChangeStatusAsync(string serverURL, DTO8_6 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {

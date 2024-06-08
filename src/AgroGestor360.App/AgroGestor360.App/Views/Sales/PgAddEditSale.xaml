@@ -59,24 +59,6 @@
                                     Date="{Binding Date}"
                                     Format="dd/MM/yyyy" />
                             </Grid>
-                            <Grid
-                                Grid.Column="1"
-                                RowDefinitions="auto,auto"
-                                RowSpacing="2">
-                                <HorizontalStackLayout>
-                                    <CheckBox Grid.Column="1" IsChecked="{Binding HasNoFEL}" />
-                                    <Label Text="La venta aplica a FEL" VerticalOptions="Center" />
-                                </HorizontalStackLayout>
-                                <Entry
-                                    Grid.Row="1"
-                                    ClearButtonVisibility="WhileEditing"
-                                    IsSpellCheckEnabled="True"
-                                    IsTextPredictionEnabled="True"
-                                    IsVisible="{Binding NoFEL, Converter={ctk:IsNotNullConverter}}"
-                                    Keyboard="Plain"
-                                    Placeholder="Escriba aquí el número FEL"
-                                    Text="{Binding NoFEL}" />
-                            </Grid>
                         </Grid>
                         <Grid RowDefinitions="auto,auto" RowSpacing="4">
                             <Label Text="Vendedor: *" />
@@ -96,11 +78,36 @@
                                 ItemsSource="{Binding Customers}"
                                 SelectedItem="{Binding SelectedCustomer}" />
                         </Grid>
-                        <Label
-                            FontAttributes="Bold"
-                            Text="{Binding SelectedCustomer.Discount.Discount, TargetNullValue='El cliente no tiene descuento', FallbackValue='El cliente no tiene descuento', StringFormat='Descuento aprobado para el cliente: {0}%'}"
-                            TextColor="{StaticResource Secondary}"
-                            VerticalOptions="Center" />
+                        <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                HorizontalOptions="Start"
+                                Text="DESCUENTO:"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                HorizontalOptions="End"
+                                Text="{Binding SelectedCustomer.Discount.Discount, StringFormat='{0}%', FallbackValue='NO TIENE'}"
+                                TextColor="{StaticResource Secondary}"
+                                VerticalOptions="Center" />
+                        </Grid>
+                        <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                HorizontalOptions="Start"
+                                Text="CRÉDITO:"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                HorizontalOptions="End"
+                                Text="{Binding SelectedCustomer.Credit.Amount, StringFormat='{0:C}', FallbackValue='0.00'}"
+                                TextColor="{StaticResource Secondary}"
+                                VerticalOptions="Center" />
+                        </Grid>
                         <VerticalStackLayout Spacing="4">
                             <Grid RowDefinitions="auto,auto" RowSpacing="4">
                                 <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
@@ -116,7 +123,7 @@
                                                 <Span Text="Existencia en almacén: " TextColor="{StaticResource Secondary}" />
                                                 <Span
                                                     FontAttributes="Bold"
-                                                    Text="{Binding Stock, StringFormat='{0:F2}'}"
+                                                    Text="{Binding Stock, StringFormat='{0}'}"
                                                     TextColor="{StaticResource Secondary}" />
                                             </FormattedString>
                                         </Label.FormattedText>
@@ -187,69 +194,24 @@
                                     <RadioButton
                                         Content="Al contado"
                                         IsChecked="True"
-                                        TextColor="{StaticResource Tertiary}"
                                         ToolTipProperties.Text="Pago al contado" />
                                     <RadioButton
                                         Content="A crédito"
                                         IsChecked="{Binding OnCredit}"
-                                        TextColor="{StaticResource Tertiary}"
                                         ToolTipProperties.Text="Pago a crédito" />
                                 </HorizontalStackLayout>
                             </Grid>
                             <Grid
                                 Grid.Column="1"
-                                RowDefinitions="auto,auto"
-                                RowSpacing="4">
-                                <Label Text="Forma de pago: *" />
-                                <Picker
-                                    Grid.Row="1"
-                                    ItemsSource="{Binding PaymentsTypes}"
-                                    SelectedItem="{Binding SelectedPaymentType}" />
-                            </Grid>
-                        </Grid>
-                        <Grid ColumnDefinitions="auto,auto,*" ColumnSpacing="8">
-                            <Grid
                                 IsVisible="{Binding OnCredit}"
                                 RowDefinitions="auto,auto"
                                 RowSpacing="4">
                                 <Label Text="Tiempo de crédito: *" />
                                 <Picker
                                     Grid.Row="1"
-                                    ItemDisplayBinding="{Binding ., StringFormat='{0} dias'}"
+                                    ItemDisplayBinding="{Binding TimeLimit, StringFormat='{0} dias'}"
                                     ItemsSource="{Binding CreditTime}"
                                     SelectedItem="{Binding SelectedCreditTime}" />
-                            </Grid>
-                            <Grid
-                                Grid.Column="1"
-                                RowDefinitions="auto,auto"
-                                RowSpacing="4">
-                                <Label Text="Cantidad inicial: " />
-                                <Entry
-                                    Grid.Row="1"
-                                    ClearButtonVisibility="WhileEditing"
-                                    HorizontalOptions="Start"
-                                    HorizontalTextAlignment="End"
-                                    IsSpellCheckEnabled="True"
-                                    IsTextPredictionEnabled="True"
-                                    Keyboard="Numeric"
-                                    Placeholder="0.00"
-                                    Text="{Binding InitialAmount}"
-                                    WidthRequest="100" />
-                            </Grid>
-                            <Grid
-                                Grid.Column="2"
-                                IsVisible="{Binding InitialAmount, Converter={ctk:IsStringNotNullOrEmptyConverter}}"
-                                RowDefinitions="auto,auto"
-                                RowSpacing="4">
-                                <Label Text="No. Referencia: " />
-                                <Entry
-                                    Grid.Row="1"
-                                    ClearButtonVisibility="WhileEditing"
-                                    HorizontalOptions="Fill"
-                                    IsSpellCheckEnabled="True"
-                                    IsTextPredictionEnabled="True"
-                                    Keyboard="Plain"
-                                    Placeholder="Escriba aquí" />
                             </Grid>
                         </Grid>
                     </VerticalStackLayout>

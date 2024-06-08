@@ -9,12 +9,15 @@ public interface IInvoicesService
 {
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string code);
+    Task<bool> DeleteConceptAsync(string serverURL, int id);
     Task<bool> DepreciationUpdate(string serverURL, DTO10_2 dTO);
     Task<IEnumerable<DTO10>> GetAllAsync(string serverURL);
     Task<DTO10?> GetByCodeAsync(string serverURL, string code);
+    Task<IEnumerable<ConceptForDeletedInvoice>> GetConceptsAsync(string serverURL);
     Task<IEnumerable<int>> GetCreditTimeAsync(string serverURL);
     Task<DTO10_4?> GetProductsByCodeAsync(string serverURL, string code);
     Task<string> InsertAsync(string serverURL, DTO10_1 dTO);
+    Task<int> InsertConceptAsync(string serverURL, ConceptForDeletedInvoice entity);
     Task<string> InsertFromOrderAsync(string serverURL, DTO8 dTO);
     Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO);
     Task<bool> UpdateState(string serverURL, DTO10_3 dTO);
@@ -207,6 +210,55 @@ public class InvoicesService : IInvoicesService
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/invoices/{code}");
+
+            return response.IsSuccessStatusCode;
+        }
+        return false;
+    }
+
+
+    public async Task<IEnumerable<ConceptForDeletedInvoice>> GetConceptsAsync(string serverURL)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/invoices/concepts");
+
+            if (response.StatusCode is not HttpStatusCode.OK)
+            {
+                return [];
+            }
+
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<ConceptForDeletedInvoice>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+        }
+        return [];
+    }
+
+    public async Task<int> InsertConceptAsync(string serverURL, ConceptForDeletedInvoice entity)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var json = JsonSerializer.Serialize(entity, ApiServiceBase.ProviderJSONOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/invoices/concepts", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                return int.Parse(result);
+            }
+        }
+        return 0;
+    }
+
+    public async Task<bool> DeleteConceptAsync(string serverURL, int id)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/invoices/concepts/{id}");
 
             return response.IsSuccessStatusCode;
         }

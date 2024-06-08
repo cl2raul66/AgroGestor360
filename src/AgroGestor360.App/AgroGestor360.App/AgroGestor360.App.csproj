@@ -132,6 +132,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\Sales\PgDeletedInSale.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Sales\PgDeletedInvoice.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\CvDiscounts.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -252,6 +258,12 @@
 	  </Compile>
 	  <Compile Update="Views\Sales\PgAddEditOrder.xaml.cs">
 	    <DependentUpon>PgAddEditOrder.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Sales\PgDeletedInSale.xaml.cs">
+	    <DependentUpon>PgDeletedInSale.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Sales\PgDeletedInvoice.xaml.cs">
+	    <DependentUpon>PgDeletedInvoice.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 

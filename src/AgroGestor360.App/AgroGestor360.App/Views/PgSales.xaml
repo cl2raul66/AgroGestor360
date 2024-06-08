@@ -379,19 +379,16 @@
                     SelectionMode="Single">
                     <CollectionView.ItemsLayout>
                         <GridItemsLayout
-                            HorizontalItemSpacing="2"
+                            HorizontalItemSpacing="4"
                             Orientation="Vertical"
                             Span="4"
-                            VerticalItemSpacing="2" />
+                            VerticalItemSpacing="4" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:DTO10">
                             <Border Style="{StaticResource BorderItemForSales}">
                                 <Grid RowDefinitions="auto,auto,auto">
-                                    <Border
-                                        BackgroundColor="#45111111"
-                                        StrokeShape="RoundRectangle 4"
-                                        StrokeThickness="0" />
+                                    <Border BackgroundColor="#45111111" StrokeThickness="0" />
                                     <Grid
                                         Padding="8"
                                         ColumnDefinitions="*,auto"
@@ -407,7 +404,7 @@
                                             Style="{StaticResource LabelItem}"
                                             Grid.Column="1"
                                             FontAttributes="Bold"
-                                            Text="{Binding TotalAmount, StringFormat='TOTAL: {0:N2}'}" />
+                                            Text="{Binding TotalAmount, StringFormat='TOTAL: {0:C}'}" />
                                     </Grid>
                                     <VerticalStackLayout
                                         Grid.Row="1"
@@ -420,7 +417,6 @@
                                     <Border
                                         Grid.Row="2"
                                         BackgroundColor="#45111111"
-                                        StrokeShape="RoundRectangle 4"
                                         StrokeThickness="0" />
                                     <Grid
                                         Grid.Row="2"
@@ -481,13 +477,13 @@
                             FontFamily="icofont"
                             IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                             Text="{StaticResource BillAlt}"
-                            ToolTipProperties.Text="Pagar factura seleccionada" />
+                            ToolTipProperties.Text="Pagar saldo pendiente o liquidar deuda" />
                         <Button
                             Command="{Binding ShowAmortizeInvoiceCommand}"
                             FontFamily="icofont"
                             IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                             Text="{StaticResource MoneyBag}"
-                            ToolTipProperties.Text="Amortizacion para credito de la factura seleccionada." />
+                            ToolTipProperties.Text="Abonar a deuda." />
                         <BoxView Style="{StaticResource ElementSeparator}" />
                         <Button
                             Command="{Binding ShowAddEditSaleCommand}"
@@ -547,7 +543,7 @@
                     Text="by RandA Media Lab, Group" />
             </HorizontalStackLayout>
         </Grid>
-        <!--#endregion-->
+        <!--#endregion-->        
     </Grid>
 
 </ContentPage>

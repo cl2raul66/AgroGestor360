@@ -217,7 +217,7 @@ public class QuotesController : ControllerBase
     }
 
     [HttpPut("changerbystatus")]
-    public IActionResult ChangesByStatus([FromBody] DTO7_3 dTO)
+    public IActionResult ChangesByStatus(DTO7_3 dTO)
     {
         if (dTO is null)
         {

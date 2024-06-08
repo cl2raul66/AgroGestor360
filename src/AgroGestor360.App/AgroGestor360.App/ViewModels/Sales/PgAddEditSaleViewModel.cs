@@ -7,35 +7,30 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using AgroGestor360.App.Models;
-using AgroGestor360.Client.Tools;
 
 namespace AgroGestor360.App.ViewModels;
 
 [QueryProperty(nameof(Sellers), "sellers")]
 [QueryProperty(nameof(Customers), "customers")]
 [QueryProperty(nameof(Products), "products")]
-[QueryProperty(nameof(CurrentInvoice), "currentInvoice")]
 [QueryProperty(nameof(CreditTime), "creditTime")]
+[QueryProperty(nameof(DefaultCreditTime), "defaultcredittime")]
+[QueryProperty(nameof(CurrentInvoice), "currentInvoice")]
 public partial class PgAddEditSaleViewModel : ObservableValidator
 {
     readonly IProductsForSalesService productsForSalesServ;
     readonly IArticlesForWarehouseService articlesForWarehouseServ;
     readonly IQuotesService quotesServ;
-    readonly IImmediatePaymentTypeService immediatePaymentTypeServ;
-    readonly ICreditPaymentTypeService creditPaymentTypeServ;
     readonly string serverURL;
     Dictionary<string, double>? StockInWarehouse;
 
-    public PgAddEditSaleViewModel(IProductsForSalesService productsForSalesService, IArticlesForWarehouseService articlesForWarehouseService, IQuotesService quotesService, IImmediatePaymentTypeService immediatePaymentTypeService, ICreditPaymentTypeService creditPaymentTypeService)
+    public PgAddEditSaleViewModel(IProductsForSalesService productsForSalesService, IArticlesForWarehouseService articlesForWarehouseService, IQuotesService quotesService)
     {
         productsForSalesServ = productsForSalesService;
         articlesForWarehouseServ = articlesForWarehouseService;
         quotesServ = quotesService;
-        immediatePaymentTypeServ = immediatePaymentTypeService;
-        creditPaymentTypeServ = creditPaymentTypeService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
         Date = DateTime.Now;
-        PaymentsTypes = new(immediatePaymentTypeServ.GetAll());
     }
 
     [ObservableProperty]
@@ -48,19 +43,16 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     string? textInfo;
 
     [ObservableProperty]
-    int[]? creditTime;
+    TimeLimitForCredit[]? creditTime;
 
     [ObservableProperty]
-    int selectedCreditTime;
+    TimeLimitForCredit? selectedCreditTime;
+
+    [ObservableProperty]
+    TimeLimitForCredit? defaultCreditTime;
 
     [ObservableProperty]
     DateTime date;
-
-    [ObservableProperty]
-    string? noFEL;
-
-    [ObservableProperty]
-    bool hasNoFEL;
 
     [ObservableProperty]
     double stock;
@@ -87,13 +79,6 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
 
     [ObservableProperty]
     string? quantity;
-
-    [ObservableProperty]
-    ObservableCollection<string>? paymentsTypes;
-
-    [ObservableProperty]
-    [Required]
-    string? selectedPaymentType;
 
     [ObservableProperty]
     bool onCredit;
@@ -132,12 +117,6 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
 
     [ObservableProperty]
     bool loadingStock;
-
-    [ObservableProperty]
-    string? referenceNo;
-
-    [ObservableProperty]
-    string? initialAmount;
 
     [RelayCommand]
     async Task SendProductItem()
@@ -255,7 +234,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     {
         ValidateAllProperties();
 
-        if (HasErrors || string.IsNullOrEmpty(SelectedPaymentType) || (OnCredit && SelectedCreditTime == 0))
+        if (HasErrors)
         {
             TextInfo = " Rellene toda la información los requeridos (*)";
             await Task.Delay(4000);
@@ -268,56 +247,50 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
         {
             if (x.CustomerDiscountClass is null && x.ProductOffer is null)
             {
-                DTO9 dto = new()
+                DTO9 dTO9 = new()
                 {
                     Quantity = x.ProductItemQuantity,
                     ProductItemForSaleId = x.Product!.Id
                 };
-                productItems.Add(dto);
+                productItems.Add(dTO9);
             }
 
             if (x.CustomerDiscountClass is not null)
             {
-                DTO9 dto = new()
+                DTO9 dTO9 = new()
                 {
                     Quantity = x.ProductItemQuantity,
                     ProductItemForSaleId = x.Product!.Id,
                     HasCustomerDiscount = true
                 };
-                productItems.Add(dto);
+                productItems.Add(dTO9);
             }
 
             if (x.ProductOffer is not null)
             {
-                DTO9 dto = new()
+                DTO9 dTO9 = new()
                 {
                     ProductItemForSaleId = x.Product!.Id,
                     OfferId = x.ProductOffer!.Id
                 };
-                productItems.Add(dto);
+                productItems.Add(dTO9);
             }
         }
 
-        double theInitialAmount = 0;
-
-        _ = double.TryParse(InitialAmount, out theInitialAmount);
-
-        DTO10_1 invoice = new()
+        DTO10_1 dTO = new()
         {
-            Code = CurrentInvoice is not null ? CurrentInvoice.Code : string.Empty,
-            NumberFEL = NoFEL,
-            Status = theInitialAmount == TotalWithDiscount ? InvoiceStatus.Paid : InvoiceStatus.Pending,
+            Code = CurrentInvoice is null ? string.Empty : CurrentInvoice.Code,
             Date = Date,
+            TimeCredit = SelectedCreditTime,
             CustomerId = SelectedCustomer!.CustomerId,
             SellerId = SelectedSeller!.Id,
-            Products = [.. productItems],
-            CreditsPayments = OnCredit ? [new() { Type = creditPaymentTypeServ.GetByName(SelectedPaymentType!)!, NumberOfInstallments = SelectedCreditTime, Date = Date, ReferenceNo = ReferenceNo, Amount = theInitialAmount }] : null,
-            ImmediatePayments = OnCredit ? null : [new() { Type = immediatePaymentTypeServ.GetByName(SelectedPaymentType!)!, Date = Date, ReferenceNo = ReferenceNo, Amount = theInitialAmount }]
+            Status = Client.Tools.InvoiceStatus.Pending,
+            Products = [.. productItems]
         };
 
         string token = CurrentInvoice is not null ? "addorderfromquote" : "addinvoice";
 
-        _ = WeakReferenceMessenger.Default.Send(invoice, token);
+        _ = WeakReferenceMessenger.Default.Send(dTO, token);
 
         await Shell.Current.GoToAsync("..");
     }
@@ -329,28 +302,14 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
         await Shell.Current.GoToAsync("..");
     }
 
-    //bool WaitPropertyChanged;
-
     protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
-        if (e.PropertyName == nameof(HasNoFEL))
-        {
-            NoFEL = HasNoFEL ? string.Empty : null;
-        }
-
         if (e.PropertyName == nameof(OnCredit))
         {
-            PaymentsTypes = OnCredit
-                ? new(creditPaymentTypeServ.GetAll())
-                : new(immediatePaymentTypeServ.GetAll());
-            if (!OnCredit)
-            {
-                SelectedPaymentType = null;
-                SelectedCreditTime = 0;
-            }
+            SelectedCreditTime = OnCredit ? CreditTime!.First(x => x.Id == DefaultCreditTime!.Id) : null;
         }
-
+         
         if (e.PropertyName == nameof(IsProductOffer))
         {
             if (!IsProductOffer)
@@ -390,7 +349,6 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
                 {
                     IsNormalPrice = true;
                 }
-                //WaitPropertyChanged = false;
             }
         }
 
@@ -401,49 +359,8 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
                 LoadingStock = true;
                 await UpdateStock(SelectedProduct!.MerchandiseId!);
                 LoadingStock = false;
-                //WaitPropertyChanged = false;
             }
         }
-
-        //if (e.PropertyName == nameof(CurrentInvoice))
-        //{
-        //    if (CurrentInvoice is not null)
-        //    {
-        //        SelectedSeller = Sellers?.FirstOrDefault(x => x.Id == CurrentInvoice.Seller!.Id);
-        //        SelectedCustomer = Customers?.FirstOrDefault(x => x.CustomerId == CurrentInvoice.Customer!.CustomerId);
-        //        foreach (var item in CurrentInvoice.Products!)
-        //        {
-        //            Quantity = item.Quantity.ToString("F2");
-        //            SelectedProduct = Products?.FirstOrDefault(x => x.Id == item!.ProductItemForSaleId);
-        //            WaitPropertyChanged = true;
-        //            while (WaitPropertyChanged)
-        //            {
-        //                await Task.Delay(1000);
-        //            }
-        //            await SendProductItem();
-        //            SelectedProductItem = ProductItems?.FirstOrDefault(x => x.Product!.Id == item.ProductItemForSaleId);
-        //            WaitPropertyChanged = true;
-        //            while (WaitPropertyChanged)
-        //            {
-        //                await Task.Delay(1000);
-        //            }
-        //            if (item.HasCustomerDiscount)
-        //            {
-        //                IsCustomerDiscount = true;
-        //            }
-        //            else if (item.OfferId > 0)
-        //            {
-        //                IsProductOffer = true;
-        //                SelectedOffer = Offers?.FirstOrDefault(x => x.Id == item.OfferId);
-        //            }
-        //            else
-        //            {
-        //                IsNormalPrice = true;
-        //            }
-        //            SetDiscount();
-        //        }
-        //    }
-        //}
     }
 
     #region EXTRA

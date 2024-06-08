@@ -44,7 +44,6 @@ public class InvoicesController : ControllerBase
         return days is null ? NotFound() : Ok(days);
     }
 
-
     [HttpGet("exist")]
     public IActionResult CheckExistence()
     {
@@ -106,7 +105,7 @@ public class InvoicesController : ControllerBase
                 InvoiceStatus.Paid => totalAmount,
                 _ => found.ImmediatePayments is null || found.ImmediatePayments.Length == 0 ? found.CreditsPayments?.Sum(x => x.Amount) ?? 0 : found.ImmediatePayments!.Sum(x => x.Amount)
             },
-            DaysRemaining = DaysRemaining(found.NumberOfInstallments, found.Date),
+            DaysRemaining = DaysRemaining(found.Customer!.Credit!.TimeLimit, found.Date),
             CustomerName = found.Customer?.Contact?.FormattedName,
             SellerName = found.Seller?.Contact?.FormattedName,
             NumberFEL = found.NumberFEL,
@@ -127,8 +126,13 @@ public class InvoicesController : ControllerBase
             return BadRequest();
         }
 
-        var customer = customersServ.GetById(new ObjectId(dTO.CustomerId));
         var seller = sellersServ.GetById(new ObjectId(dTO.SellerId));
+        var customer = customersServ.GetById(new ObjectId(dTO.CustomerId));
+        customer.Credit!.TimeLimit = 0;
+        if (dTO.TimeCredit is not null)
+        {
+            customer.Credit!.TimeLimit = dTO.TimeCredit.TimeLimit;
+        }
 
         var productsIds = dTO.Products?.Select(x => new ObjectId(x.ProductItemForSaleId)) ?? [];
         var products = productsForSalesServ.GetManyById(productsIds);
@@ -148,10 +152,8 @@ public class InvoicesController : ControllerBase
                 Date = dTO.Date,
                 Seller = seller,
                 Customer = customer,
+                CreditsPayments = [],
                 Products = [.. productItems],
-                NumberFEL = dTO.NumberFEL,
-                ImmediatePayments = dTO.ImmediatePayments,
-                CreditsPayments = dTO.CreditsPayments,
                 Status = dTO.Status
             };
 
@@ -177,7 +179,7 @@ public class InvoicesController : ControllerBase
 
         return NotFound();
     }
-    
+
     [HttpPost("insertfromquote")]
     public ActionResult<string> InsertFromQuote(DTO7 dTO)
     {
@@ -241,7 +243,7 @@ public class InvoicesController : ControllerBase
         invoicesServ.Commit();
         return Ok(resultInsert);
     }
-    
+
     [HttpPost("insertfromorder")]
     public ActionResult<string> InsertFromOrder(DTO8 dTO)
     {
@@ -334,7 +336,8 @@ public class InvoicesController : ControllerBase
             if (found.ImmediatePayments.Sum(x => x.Amount) == totalAmount)
             {
                 found.Status = InvoiceStatus.Paid;
-                var resultInsert = wasteInvoicesServ.Insert(found);
+                WasteInvoice wasteInvoice = WasteInvoiceFabric(found);
+                var resultInsert = wasteInvoicesServ.Insert(wasteInvoice);
                 if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
                 {
                     return NotFound();
@@ -356,7 +359,8 @@ public class InvoicesController : ControllerBase
             if (found.CreditsPayments.Sum(x => x.Amount) == totalAmount)
             {
                 found.Status = InvoiceStatus.Paid;
-                var resultInsert = wasteInvoicesServ.Insert(found);
+                WasteInvoice wasteInvoice = WasteInvoiceFabric(found);
+                var resultInsert = wasteInvoicesServ.Insert(wasteInvoice);
                 if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
                 {
                     return NotFound();
@@ -379,83 +383,158 @@ public class InvoicesController : ControllerBase
             return BadRequest();
         }
 
-        if (dTO.Status is InvoiceStatus.Cancelled)
+        var found = invoicesServ.GetByCode(dTO.Code!);
+        if (found is null)
         {
-            var found = invoicesServ.GetByCode(dTO.Code!);
-            if (found is null)
-            {
-                return NotFound();
-            }
+            return NotFound();
+        }
 
-            found.Status = dTO.Status;
+        found.Status = dTO.Status;
 
-            // Iniciar transacción
+        if (dTO.Status is InvoiceStatus.Paid)
+        {
             wasteInvoicesServ.BeginTrans();
-            invoicesServ.BeginTrans();
-            articlesForWarehouseServ.BeginTrans();
-
-            var resultInsert = wasteInvoicesServ.Insert(found);
+            WasteInvoice wasteInvoice = WasteInvoiceFabric(found);
+            var resultInsert = wasteInvoicesServ.Insert(wasteInvoice);
             if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
             {
-                // Revertir transacción si la inserción falla
                 wasteInvoicesServ.Rollback();
-                invoicesServ.Rollback();
-                articlesForWarehouseServ.Rollback();
                 return NotFound();
             }
 
-            // Restaurar las cantidades de los productos en el almacén
-            var articlesForWarehouse = articlesForWarehouseServ.GetManyByIds(found.Products!.Select(p => p.Product!.MerchandiseId!).ToArray());
-
-            var productQuantities = found.Products!.ToDictionary(p => p.Product!.MerchandiseId!, p => p.Quantity);
-
-            List<ArticleItemForWarehouse> updateArticles = [];
-
-            foreach (var article in articlesForWarehouse)
-            {
-                if (productQuantities.TryGetValue(article.MerchandiseId!, out double value))
-                {
-                    var updateArticle = new ArticleItemForWarehouse
-                    {
-                        Quantity = article.Quantity + value,
-                        Reserved = article.Reserved - value,
-                        MerchandiseName = article.MerchandiseName,
-                        MerchandiseId = article.MerchandiseId,
-                        Packaging = article.Packaging
-                    };
-
-                    updateArticles.Add(updateArticle);
-                }
-            }
-
-            var updateResult = articlesForWarehouseServ.UpdateMany(updateArticles);
-
-            if (!updateResult)
-            {
-                // Revertir transacción si la actualización falla
-                wasteInvoicesServ.Rollback();
-                invoicesServ.Rollback();
-                articlesForWarehouseServ.Rollback();
-                return NotFound();
-            }
-
+            invoicesServ.BeginTrans();
             var resultDelete = invoicesServ.Delete(dTO.Code!);
             if (!resultDelete)
             {
-                // Revertir transacción si la eliminación falla
                 wasteInvoicesServ.Rollback();
                 invoicesServ.Rollback();
-                articlesForWarehouseServ.Rollback();
                 return NotFound();
             }
 
-            // Confirmar transacción si todas las operaciones son exitosas
             wasteInvoicesServ.Commit();
             invoicesServ.Commit();
-            articlesForWarehouseServ.Commit();
-
             return Ok();
         }
+
+        if (dTO.Status is InvoiceStatus.Cancelled)
+        {
+            string concept = string.Empty;
+            if (!string.IsNullOrEmpty(dTO.Notes))
+            {
+                concept = dTO.Notes!.Trim().ToUpper();
+                var foundConcept = invoicesServ.GetConceptByNote(concept);
+                if (foundConcept is null)
+                {
+                    var newConcept = new ConceptForDeletedInvoice
+                    {
+                        Concept = concept
+                    };
+                    var insertResult = invoicesServ.InsertConcept(newConcept);
+                    if (insertResult < 1)
+                    {
+                        return NotFound();
+                    }
+                }
+            }
+
+            try
+            {
+                wasteInvoicesServ.BeginTrans();
+                WasteInvoice wasteInvoice = WasteInvoiceFabric(found, concept);
+                var wasteInsertResult = wasteInvoicesServ.Insert(wasteInvoice);
+                if (string.IsNullOrEmpty(wasteInsertResult))
+                {
+                    wasteInvoicesServ.Rollback();
+                    return NotFound();
+                }
+
+                invoicesServ.BeginTrans();
+                var deleteResult = invoicesServ.Delete(found.Code!);
+                if (!deleteResult)
+                {
+                    wasteInvoicesServ.Rollback();
+                    invoicesServ.Rollback();
+                    return NotFound();
+                }
+
+                var warehouseUpdated = UpdateWarehouseAfterDeletion(found);
+                if (!warehouseUpdated)
+                {
+                    wasteInvoicesServ.Rollback();
+                    invoicesServ.Rollback();
+                    return NotFound();
+                }
+
+                wasteInvoicesServ.Commit();
+                invoicesServ.Commit();
+            }
+            catch
+            {
+                wasteInvoicesServ.Rollback();
+                ordersServ.Rollback();
+                return NotFound();
+            }
+
+            return Ok();
+
+            //wasteInvoicesServ.BeginTrans();
+            //WasteInvoice wasteInvoice = WasteInvoiceFabric(found, concept);
+            //var resultInsert = wasteInvoicesServ.Insert(wasteInvoice);
+            //if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
+            //{
+            //    wasteInvoicesServ.Rollback();
+            //    return NotFound();
+            //}
+
+            //var articlesForWarehouse = articlesForWarehouseServ.GetManyByIds(found.Products!.Select(p => p.Product!.MerchandiseId!).ToArray());
+
+            //var productQuantities = found.Products!.ToDictionary(p => p.Product!.MerchandiseId!, p => p.Quantity);
+
+            //List<ArticleItemForWarehouse> updateArticles = [];
+
+            //foreach (var article in articlesForWarehouse)
+            //{
+            //    if (productQuantities.TryGetValue(article.MerchandiseId!, out double value))
+            //    {
+            //        var updateArticle = new ArticleItemForWarehouse
+            //        {
+            //            Quantity = article.Quantity + value,
+            //            Reserved = article.Reserved - value,
+            //            MerchandiseName = article.MerchandiseName,
+            //            MerchandiseId = article.MerchandiseId,
+            //            Packaging = article.Packaging
+            //        };
+
+            //        updateArticles.Add(updateArticle);
+            //    }
+            //}
+
+            //articlesForWarehouseServ.BeginTrans();
+            //var updateResult = articlesForWarehouseServ.UpdateMany(updateArticles);
+            //if (!updateResult)
+            //{
+            //    wasteInvoicesServ.Rollback();
+            //    articlesForWarehouseServ.Rollback();
+            //    return NotFound();
+            //}
+
+            //invoicesServ.BeginTrans();
+            //var resultDelete = invoicesServ.Delete(dTO.Code!);
+            //if (!resultDelete)
+            //{
+            //    wasteInvoicesServ.Rollback();
+            //    invoicesServ.Rollback();
+            //    articlesForWarehouseServ.Rollback();
+            //    return NotFound();
+            //}
+
+            //wasteInvoicesServ.Commit();
+            //invoicesServ.Commit();
+            //articlesForWarehouseServ.Commit();
+
+            //return Ok();
+        }
+
         return NotFound();
     }
 
@@ -467,7 +546,92 @@ public class InvoicesController : ControllerBase
             return BadRequest();
         }
 
-        var result = invoicesServ.Delete(code);
+        var found = invoicesServ.GetByCode(code);
+        if (found is null)
+        {
+            return NotFound();
+        }
+
+        var articlesForWarehouse = articlesForWarehouseServ.GetManyByIds(found.Products!.Select(p => p.Product!.MerchandiseId!).ToArray());
+
+        var productQuantities = found.Products!.ToDictionary(p => p.Product!.MerchandiseId!, p => p.Quantity);
+
+        List<ArticleItemForWarehouse> updateArticles = [];
+
+        foreach (var article in articlesForWarehouse)
+        {
+            if (productQuantities.TryGetValue(article.MerchandiseId!, out double value))
+            {
+                var updateArticle = new ArticleItemForWarehouse
+                {
+                    Quantity = article.Quantity + value,
+                    Reserved = article.Reserved - value,
+                    MerchandiseName = article.MerchandiseName,
+                    MerchandiseId = article.MerchandiseId,
+                    Packaging = article.Packaging
+                };
+
+                updateArticles.Add(updateArticle);
+            }
+        }
+
+        articlesForWarehouseServ.BeginTrans();
+        var updateResult = articlesForWarehouseServ.UpdateMany(updateArticles);
+        if (!updateResult)
+        {
+            wasteInvoicesServ.Rollback();
+            articlesForWarehouseServ.Rollback();
+            return NotFound();
+        }
+
+        invoicesServ.BeginTrans();
+        var resultDelete = invoicesServ.Delete(code);
+        if (!resultDelete)
+        {
+            wasteInvoicesServ.Rollback();
+            invoicesServ.Rollback();
+            articlesForWarehouseServ.Rollback();
+            return NotFound();
+        }
+
+        wasteInvoicesServ.Commit();
+        invoicesServ.Commit();
+        articlesForWarehouseServ.Commit();
+
+        return Ok();
+    }
+
+
+    [HttpGet("concepts")]
+    public ActionResult<IEnumerable<ConceptForDeletedInvoice>> GetConcepts()
+    {
+        var result = invoicesServ.GetConcepts();
+
+        return result is not null && result.Any() ? Ok(result) : NotFound();
+    }
+
+    [HttpPost("concepts")]
+    public ActionResult<int> InsertConcept(ConceptForDeletedInvoice entity)
+    {
+        if (entity is null)
+        {
+            return BadRequest();
+        }
+
+        var result = invoicesServ.InsertConcept(entity);
+
+        return result > 0 ? Ok(result) : NotFound();
+    }
+
+    [HttpDelete("concepts/{id}")]
+    public IActionResult DeleteConcept(int id)
+    {
+        if (id < 1)
+        {
+            return BadRequest();
+        }
+
+        var result = invoicesServ.DeleteConcept(id);
 
         return !result ? NotFound() : Ok();
     }
@@ -528,11 +692,34 @@ public class InvoicesController : ControllerBase
             CustomerName = entity.Customer?.Contact?.FormattedName,
             TotalAmount = totalAmount,
             Paid = paid,
-            DaysRemaining = DaysRemaining(entity.NumberOfInstallments, entity.Date),
+            DaysRemaining = entity.CreditsPayments is null ? 0 : DaysRemaining(entity.Customer!.Credit!.TimeLimit, entity.Date),
             NumberFEL = entity.NumberFEL,
             Status = entity.Status
         };
 
+        return result;
+    }
+
+    WasteInvoice WasteInvoiceFabric(Invoice invoice)
+    {
+        return new WasteInvoice
+        {
+            Date = invoice.Date,
+            Code = invoice.Code,
+            Seller = invoice.Seller,
+            Customer = invoice.Customer,
+            Products = invoice.Products,
+            Status = invoice.Status,
+            NumberFEL = invoice.NumberFEL,
+            ImmediatePayments = invoice.ImmediatePayments,
+            CreditsPayments = invoice.CreditsPayments
+        };
+    }
+
+    WasteInvoice WasteInvoiceFabric(Invoice invoice, string notes)
+    {
+        var result = WasteInvoiceFabric(invoice);
+        result.Notes = notes;
         return result;
     }
 
@@ -570,6 +757,31 @@ public class InvoicesController : ControllerBase
             {
                 item.Quantity -= merchandiseQuantities[item.MerchandiseId!];
                 item.Reserved += merchandiseQuantities[item.MerchandiseId!];
+
+                saveArticleItemForWarehouses.Add(item);
+            }
+
+            return articlesForWarehouseServ.UpdateMany(saveArticleItemForWarehouses);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    bool UpdateWarehouseAfterDeletion(SaleBase entity)
+    {
+        try
+        {
+            var merchandiseQuantities = entity.Products!.ToDictionary(p => p.Product!.MerchandiseId!, p => FindQuantity(p.Quantity, p.Product!, p.OfferId));
+
+            var warehouseItems = articlesForWarehouseServ.GetManyByIds(merchandiseQuantities.Keys);
+            List<ArticleItemForWarehouse> saveArticleItemForWarehouses = [];
+
+            foreach (var item in warehouseItems)
+            {
+                item.Quantity += merchandiseQuantities[item.MerchandiseId!];
+                item.Reserved -= merchandiseQuantities[item.MerchandiseId!];
 
                 saveArticleItemForWarehouses.Add(item);
             }
