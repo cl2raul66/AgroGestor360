@@ -3,11 +3,13 @@ using AgroGestor360.App.Views.Sales;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using AgroGestor360.Client.Tools;
+using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text;
 
@@ -301,53 +303,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         {
             { "dialog", "deletedorder" }
         };
-        await Shell.Current.GoToAsync(nameof(PgDeletedInSale), true, sendData);
-        //var selectedOption = await DisplayActionSheetForRemoval();
-        //if (selectedOption == "Cancelar")
-        //{
-        //    SelectedQuotation = null;
-        //    SelectedOrder = null;
-        //    return;
-        //}
-
-        //var confirmationMessage = GenerateConfirmationMessageForOrder();
-        //bool isConfirmed = false;
-
-        //bool deletedInOrders;
-        //switch (selectedOption)
-        //{
-        //    case "Por rechazo del cliente.":
-        //        isConfirmed = await ConfirmRemoval(confirmationMessage);
-        //        if (!isConfirmed)
-        //        {
-        //            SelectedQuotation = null;
-        //            SelectedOrder = null;
-        //            return;
-        //        }
-        //        deletedInOrders = await ordersServ.ChangeStatusAsync(serverURL, new() { Code = SelectedOrder!.Code!, Status = OrderStatus.Rejected });
-        //        break;
-        //    case "Por error del operador.":
-        //        isConfirmed = await ConfirmRemoval(confirmationMessage, true);
-        //        if (!isConfirmed)
-        //        {
-        //            SelectedQuotation = null;
-        //            SelectedOrder = null;
-        //            return;
-        //        }
-        //        deletedInOrders = await ordersServ.DeleteAsync(serverURL, SelectedOrder!.Code!);
-        //        break;
-        //    default:
-        //        SelectedQuotation = null;
-        //        SelectedOrder = null;
-        //        return;
-        //}
-
-        //if (deletedInOrders)
-        //{
-        //    Orders!.Remove(SelectedOrder);
-        //}
-        //SelectedQuotation = null;
-        //SelectedOrder = null;
+        await Shell.Current.GoToAsync(nameof(PgDeletedInSale), true, sendData);        
     }
 
     [RelayCommand]
@@ -464,18 +420,32 @@ public partial class PgSalesViewModel : ObservableRecipient
     }
     #endregion
 
-    #region DELETE DIALOG
+    #region PASSWORD DIALOG
     [ObservableProperty]
-    bool isVisibleDeletedDialog;
+    bool isVisiblePwdDialog;
 
     [ObservableProperty]
-    bool isVisibleDeletedQuotationDialog;
+    bool resultPWD;
 
     [ObservableProperty]
-    bool isVisibleDeletedOrderDialog;
+    string? pwd;
 
     [ObservableProperty]
-    bool isVisibleDeletedSaleDialog;
+    bool isVisibleInfo;
+
+    [RelayCommand]
+    async Task SetPassword()
+    {
+        ResultPWD = await authServ.AuthRoot(serverURL, Pwd!);
+        Pwd = null;
+        IsVisiblePwdDialog = false;
+    }
+
+    [RelayCommand]
+    void Cancel()
+    {
+        IsVisiblePwdDialog = false;
+    }
     #endregion
 
     void ApiServ_OnReceiveStatusMessage(ServerStatus status)
@@ -572,16 +542,21 @@ public partial class PgSalesViewModel : ObservableRecipient
             r.SelectedOrder = null;
             r.SelectedQuotation = null;
         });
-        
+
         WeakReferenceMessenger.Default.Register<PgSalesViewModel, string, string>(this, "deletedquote", async (r, m) =>
         {
             IsActive = false;
-            bool deletedQuote = false;
             DTO7 currentQuote = Quotations!.First(x => x.Code == SelectedQuotation!.Code);
+            bool deletedQuote = false;            
 
             if (bool.Parse(m))
             {
-                deletedQuote = await quotationsServ.DeleteAsync(serverURL, currentQuote.Code!);
+                IsVisiblePwdDialog = true;
+                while (IsVisiblePwdDialog)
+                {
+                    await Task.Delay(100);
+                }
+                deletedQuote = ResultPWD && await quotationsServ.DeleteAsync(serverURL, currentQuote.Code!);
             }
             else
             {
@@ -597,7 +572,7 @@ public partial class PgSalesViewModel : ObservableRecipient
             SelectedOrder = null;
             SelectedQuotation = null;
         });
-        
+
         WeakReferenceMessenger.Default.Register<PgSalesViewModel, string, string>(this, "deletedorder", async (r, m) =>
         {
             IsActive = false;
@@ -606,7 +581,12 @@ public partial class PgSalesViewModel : ObservableRecipient
 
             if (bool.Parse(m))
             {
-                deletedOrder = await ordersServ.DeleteAsync(serverURL, currentOrder.Code!);
+                IsVisiblePwdDialog = true;
+                while (IsVisiblePwdDialog)
+                {
+                    await Task.Delay(100);
+                }
+                deletedOrder = ResultPWD && await ordersServ.DeleteAsync(serverURL, currentOrder.Code!);
             }
             else
             {
@@ -632,7 +612,12 @@ public partial class PgSalesViewModel : ObservableRecipient
 
             if (isEmpty)
             {
-                deletedInInvoice = await invoicesServ.DeleteAsync(serverURL, currentInvoice.Code!);
+                IsVisiblePwdDialog = true;
+                while (IsVisiblePwdDialog)
+                {
+                    await Task.Delay(100);
+                }
+                deletedInInvoice = ResultPWD && await invoicesServ.DeleteAsync(serverURL, currentInvoice.Code!);
             }
             else
             {
