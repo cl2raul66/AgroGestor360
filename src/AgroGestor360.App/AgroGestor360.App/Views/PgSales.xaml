@@ -189,11 +189,13 @@
                                 ToolTipProperties.Text="Crear venta de la cotización seleccionada.">
                                 <Button.IsEnabled>
                                     <MultiBinding Converter="{ctk:VariableMultiValueConverter ConditionType=Exact, Count=2}">
-                                        <Binding Converter="{ctk:IsNotNullConverter}" Path="SelectedQuotation" />
+                                        <Binding
+                                            Converter="{ctk:IsNotNullConverter}"
+                                            Mode="OneWay"
+                                            Path="SelectedQuotation" />
                                         <Binding
                                             Converter="{ctk:InvertedBoolConverter}"
-                                            Path="SelectedQuotation.IsDraftStatus"
-                                            TargetNullValue="false" />
+                                            Path="SelectedQuotation.IsDraftStatus" />
                                     </MultiBinding>
                                 </Button.IsEnabled>
                             </Button>
@@ -544,6 +546,8 @@
             </HorizontalStackLayout>
         </Grid>
         <!--#endregion-->
+        <!--#region EXTRA-->
+        <!--#region PASSWORD DIALOG-->
         <Border
             Grid.RowSpan="3"
             BackgroundColor="#99634833"
@@ -589,7 +593,7 @@
                                 Text="Confirmar"
                                 TextTransform="Uppercase" />
                             <Button
-                                Command="{Binding CancelCommand}"
+                                Command="{Binding CancelPwdDialogCommand}"
                                 Text="Cancelar"
                                 TextTransform="Uppercase" />
                         </HorizontalStackLayout>
@@ -598,6 +602,56 @@
                 </Grid>
             </Frame>
         </Border>
+        <!--#endregion-->
+        <!--#region DIALOGUE FOR TRANSITION CONFIRMATION WITHIN SALES-->
+        <Border
+            Grid.RowSpan="3"
+            BackgroundColor="#99634833"
+            IsVisible="{Binding IsVisibleSalesConfirmationDialog}">
+            <Frame
+                Margin="16"
+                BackgroundColor="{StaticResource White}"
+                HorizontalOptions="Center"
+                MinimumWidthRequest="400"
+                VerticalOptions="Center">
+                <Grid RowDefinitions="auto,*,auto" RowSpacing="12">
+                    <!--#region TITULO-->
+                    <Label
+                        Grid.ColumnSpan="3"
+                        FontSize="18"
+                        HorizontalOptions="Center"
+                        Text="{Binding TitleSalesConfirmationDialog}"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                    <!--#endregion-->
+                    <!--#region CONTENIDO-->
+                    <VerticalStackLayout Grid.Row="1" Spacing="16">
+                        <RadioButton Content="Sin cambios" IsChecked="{Binding OptionSalesConfirmationDialog}" />
+                        <RadioButton Content="Con cambios" />
+                    </VerticalStackLayout>
+                    <!--#endregion-->
+                    <!--#region PIE-->
+                    <Grid
+                        Grid.Row="2"
+                        ColumnDefinitions="*,auto"
+                        ColumnSpacing="8">
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                            <Button
+                                Command="{Binding SetSalesConfirmationDialogCommand}"
+                                Text="Confirmar"
+                                TextTransform="Uppercase" />
+                            <Button
+                                Command="{Binding CancelSalesConfirmationDialogCommand}"
+                                Text="Cancelar"
+                                TextTransform="Uppercase" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                    <!--#endregion-->
+                </Grid>
+            </Frame>
+        </Border>
+        <!--#endregion-->
+        <!--#endregion-->
     </Grid>
 
 </ContentPage>

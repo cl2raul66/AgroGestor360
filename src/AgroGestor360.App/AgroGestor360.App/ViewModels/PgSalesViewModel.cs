@@ -3,13 +3,11 @@ using AgroGestor360.App.Views.Sales;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using AgroGestor360.Client.Tools;
-using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text;
 
@@ -218,14 +216,33 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task CreateOrderFomQuote()
     {
-        var options = new List<string> { "Con cambios", "Sin cambios" };
+        await ShowSalesConfirmationDialog("Crear un pedido desde la cotización");
 
-        var selectedOption = await Shell.Current.DisplayActionSheet("Crear pedido desde la cotización", "Cancelar", null, [.. options]);
-
-        string code = SelectedQuotation!.Code!;
-        switch (selectedOption)
+        if (ResultSalesConfirmationDialog)
         {
-            case "Con cambios":
+            if (OptionSalesConfirmationDialog)
+            {
+                DTO7 currentQuote = Quotations!.First(x => x.Code == SelectedQuotation!.Code);
+                var result2 = await ordersServ.InsertFromQuoteAsync(serverURL, currentQuote);
+                if (!string.IsNullOrEmpty(result2))
+                {
+                    bool resultChanges = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = currentQuote.Code!, Status = QuotationStatus.Accepted });
+                    if (resultChanges)
+                    {
+                        _ = Quotations!.Remove(currentQuote);
+                        Orders ??= [];
+                        var orderGet = await ordersServ.GetByCodeAsync(serverURL, result2);
+                        Orders.Insert(0, orderGet!);
+                    }
+                }
+                else
+                {
+                    SelectedOrder = null;
+                    SelectedQuotation = null;
+                }
+            }
+            else
+            {
                 ShowAddEditOrderState = true;
                 await ShowAddEditOrder();
                 while (ShowAddEditOrderState)
@@ -237,31 +254,11 @@ public partial class PgSalesViewModel : ObservableRecipient
                 {
                     await Task.Delay(1000);
                 }
-                break;
-            case "Sin cambios":
-                var result2 = await ordersServ.InsertFromQuoteAsync(serverURL, SelectedQuotation!);
-                if (!string.IsNullOrEmpty(result2))
-                {
-                    bool resultChanges = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = SelectedQuotation!.Code!, Status = QuotationStatus.Accepted });
-                    if (resultChanges)
-                    {
-                        _ = Quotations!.Remove(SelectedQuotation!);
-                        Orders ??= [];
-                        var orderGet = await ordersServ.GetByCodeAsync(serverURL, result2);
-                        Orders.Insert(0, orderGet!);
-                    }
-                }
-                else
-                {
-                    SelectedOrder = null;
-                    SelectedQuotation = null;
-                }
-                break;
-            default:
-                SelectedOrder = null;
-                SelectedQuotation = null;
-                break;
+            }
         }
+
+        SelectedOrder = null;
+        SelectedQuotation = null;
     }
 
     [RelayCommand]
@@ -303,7 +300,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         {
             { "dialog", "deletedorder" }
         };
-        await Shell.Current.GoToAsync(nameof(PgDeletedInSale), true, sendData);        
+        await Shell.Current.GoToAsync(nameof(PgDeletedInSale), true, sendData);
     }
 
     [RelayCommand]
@@ -390,15 +387,15 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task CreateInvoiceFromQuote()
     {
-        var result2 = await ordersServ.InsertFromQuoteAsync(serverURL, SelectedQuotation!);
-        if (!string.IsNullOrEmpty(result2))
+        var resultInsert = await ordersServ.InsertFromQuoteAsync(serverURL, SelectedQuotation!);
+        if (!string.IsNullOrEmpty(resultInsert))
         {
             bool resultChanges = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = SelectedQuotation!.Code!, Status = QuotationStatus.Accepted });
             if (resultChanges)
             {
                 _ = Quotations!.Remove(SelectedQuotation!);
                 Orders ??= [];
-                var orderGet = await ordersServ.GetByCodeAsync(serverURL, result2);
+                var orderGet = await ordersServ.GetByCodeAsync(serverURL, resultInsert);
                 Orders.Insert(0, orderGet!);
             }
         }
@@ -430,21 +427,77 @@ public partial class PgSalesViewModel : ObservableRecipient
     [ObservableProperty]
     string? pwd;
 
-    [ObservableProperty]
-    bool isVisibleInfo;
-
     [RelayCommand]
     async Task SetPassword()
     {
         ResultPWD = await authServ.AuthRoot(serverURL, Pwd!);
-        Pwd = null;
-        IsVisiblePwdDialog = false;
+        CancelPwdDialog();
     }
 
     [RelayCommand]
-    void Cancel()
+    void CancelPwdDialog()
     {
+        Pwd = null;
         IsVisiblePwdDialog = false;
+    }
+    #endregion
+
+    #region DIALOGUE FOR TRANSITION CONFIRMATION WITHIN SALES
+    [ObservableProperty]
+    bool isVisibleSalesConfirmationDialog;
+
+    [ObservableProperty]
+    string? titleSalesConfirmationDialog;
+
+    /// <summary>
+    /// Se usa para registrar la opción seleccionada.
+    /// <code>
+    /// True = Sin cambios
+    /// False = Con cambios
+    /// </code>
+    /// </summary>
+    [ObservableProperty]
+    bool optionSalesConfirmationDialog;
+
+    /// <summary>
+    /// Se usa para registrar si se presionó el botón Confirmar o Cancelar.
+    /// <code>
+    /// True = Confirmar
+    /// False = Cancelar
+    /// </code>
+    /// </summary>
+    [ObservableProperty]
+    bool resultSalesConfirmationDialog;
+
+    [RelayCommand]
+    void SetSalesConfirmationDialog()
+    {
+        ResultSalesConfirmationDialog = true;
+        TitleSalesConfirmationDialog = null;
+        IsVisibleSalesConfirmationDialog = false;
+    }
+
+    [RelayCommand]
+    void CancelSalesConfirmationDialog()
+    {
+        ResultSalesConfirmationDialog = false;
+        TitleSalesConfirmationDialog = null;
+        IsVisibleSalesConfirmationDialog = false;
+    }
+
+    async Task ShowSalesConfirmationDialog(string title)
+    {
+        if (!string.IsNullOrEmpty(title))
+        {
+            TitleSalesConfirmationDialog = title;
+            IsVisibleSalesConfirmationDialog = true;
+            OptionSalesConfirmationDialog = true;
+
+            while (IsVisibleSalesConfirmationDialog)
+            {
+                await Task.Delay(1000);
+            }
+        }
     }
     #endregion
 
@@ -547,7 +600,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         {
             IsActive = false;
             DTO7 currentQuote = Quotations!.First(x => x.Code == SelectedQuotation!.Code);
-            bool deletedQuote = false;            
+            bool deletedQuote = false;
 
             if (bool.Parse(m))
             {
@@ -641,6 +694,7 @@ public partial class PgSalesViewModel : ObservableRecipient
                 SelectedQuotation = null;
                 SelectedOrder = null;
                 SelectedInvoice = null;
+                ShowAddEditOrderState = false;
             }
         });
     }
