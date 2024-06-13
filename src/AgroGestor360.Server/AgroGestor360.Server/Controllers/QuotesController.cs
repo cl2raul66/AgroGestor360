@@ -84,6 +84,7 @@ public class QuotesController : ControllerBase
             Date = found.Date,
             Code = found.Code,
             TotalAmount = totalAmount,
+            OrganizationName = found.Customer?.Contact?.Organization?.Name,
             CustomerName = found.Customer?.Contact?.FormattedName,
             SellerName = found.Seller?.Contact?.FormattedName,
             Status = found.Status,

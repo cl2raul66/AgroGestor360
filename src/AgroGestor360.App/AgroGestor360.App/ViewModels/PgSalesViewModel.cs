@@ -223,15 +223,15 @@ public partial class PgSalesViewModel : ObservableRecipient
             if (OptionSalesConfirmationDialog)
             {
                 DTO7 currentQuote = Quotations!.First(x => x.Code == SelectedQuotation!.Code);
-                var result2 = await ordersServ.InsertFromQuoteAsync(serverURL, currentQuote);
-                if (!string.IsNullOrEmpty(result2))
+                var resultInsert = await ordersServ.InsertFromQuoteAsync(serverURL, currentQuote);
+                if (!string.IsNullOrEmpty(resultInsert))
                 {
                     bool resultChanges = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = currentQuote.Code!, Status = QuotationStatus.Accepted });
                     if (resultChanges)
                     {
                         _ = Quotations!.Remove(currentQuote);
                         Orders ??= [];
-                        var orderGet = await ordersServ.GetByCodeAsync(serverURL, result2);
+                        var orderGet = await ordersServ.GetByCodeAsync(serverURL, resultInsert);
                         Orders.Insert(0, orderGet!);
                     }
                 }
@@ -387,7 +387,7 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task CreateInvoiceFromQuote()
     {
-        var resultInsert = await ordersServ.InsertFromQuoteAsync(serverURL, SelectedQuotation!);
+        var resultInsert = await invoicesServ.InsertFromQuoteAsync(serverURL, SelectedQuotation!);
         if (!string.IsNullOrEmpty(resultInsert))
         {
             bool resultChanges = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = SelectedQuotation!.Code!, Status = QuotationStatus.Accepted });
@@ -404,6 +404,7 @@ public partial class PgSalesViewModel : ObservableRecipient
             SelectedOrder = null;
             SelectedQuotation = null;
         }
+
         SelectedOrder = null;
         SelectedQuotation = null;
         await ViewBills();
@@ -412,8 +413,43 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task CreateInvoiceFromOrder()
     {
+        await ShowSalesConfirmationDialog("Crear una venta desde el pedido");
+        if (ResultSalesConfirmationDialog)
+        {
+            if (OptionSalesConfirmationDialog)
+            {
+                DTO8 currentOrder = Orders!.First(x => x.Code == SelectedOrder!.Code);
+                var resultInsert = await invoicesServ.InsertFromOrderAsync(serverURL, currentOrder);
+                if (!string.IsNullOrEmpty(resultInsert))
+                {
+                    bool resultChanges = await ordersServ.ChangeByStatusAsync(serverURL, new DTO8_6() { Code = currentOrder.Code!, Status = OrderStatus.Completed });
+                    if (resultChanges)
+                    {
+                        _ = Orders!.Remove(currentOrder);
+                        Invoices ??= [];
+                        var orderGet = await invoicesServ.GetByCodeAsync(serverURL, resultInsert);
+                        Invoices.Insert(0, orderGet!);
+                    }
+                }
+                else
+                {
+                    SelectedOrder = null;
+                    SelectedQuotation = null;
+                    return;
+                }
+            }
+            else
+            {
+
+                SelectedOrder = null;
+                SelectedQuotation = null;
+                await ViewBills();
+                await ShowAddEditSale();
+            }
+        }
+        SelectedOrder = null;
+        SelectedQuotation = null;
         await ViewBills();
-        await ShowAddEditSale();
     }
     #endregion
 
@@ -577,7 +613,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_2, string>(this, "setdepreciation", async (r, m) =>
         {
             IsActive = false;
-            var result = await invoicesServ.DepreciationUpdate(serverURL, m);
+            var result = await invoicesServ.DepreciationUpdateAsync(serverURL, m);
             if (result)
             {
                 r.Invoices ??= [];
@@ -644,7 +680,7 @@ public partial class PgSalesViewModel : ObservableRecipient
             else
             {
                 DTO8_6 dTO = new() { Code = currentOrder.Code, Status = OrderStatus.Rejected };
-                deletedOrder = await ordersServ.ChangeStatusAsync(serverURL, dTO);
+                deletedOrder = await ordersServ.ChangeByStatusAsync(serverURL, dTO);
             }
 
             if (deletedOrder)
@@ -675,7 +711,7 @@ public partial class PgSalesViewModel : ObservableRecipient
             else
             {
                 DTO10_3 dTO = new() { Code = currentInvoice.Code, Status = InvoiceStatus.Cancelled, Notes = m.Concept };
-                deletedInInvoice = await invoicesServ.UpdateState(serverURL, dTO);
+                deletedInInvoice = await invoicesServ.ChangeByStatusAsync(serverURL, dTO);
             }
 
             if (deletedInInvoice)
@@ -747,7 +783,15 @@ public partial class PgSalesViewModel : ObservableRecipient
         sb.AppendLine($"No.: {currentQuotation!.Code}");
         sb.AppendLine($"Fecha de creación: {currentQuotation!.Date:dd MMM yyyy}");
         sb.AppendLine($"Vendedor: {currentQuotation!.SellerName}");
-        sb.AppendLine($"Cliente: {currentQuotation!.CustomerName}");
+        if (string.IsNullOrEmpty(currentQuotation!.OrganizationName))
+        {
+            sb.AppendLine($"Cliente: {currentQuotation!.CustomerName}");
+        }
+        else
+        {
+            sb.AppendLine($"Entidad: {currentQuotation!.OrganizationName}");
+            sb.AppendLine($"Contacto: {currentQuotation!.CustomerName}");
+        }
         sb.AppendLine($"Estado: Pendiente");
         sb.AppendLine("Productos:");
         sb.AppendLine(string.Join(Environment.NewLine, currentQuotation.Products!));
@@ -762,7 +806,15 @@ public partial class PgSalesViewModel : ObservableRecipient
         sb.AppendLine($"No.: {currentOrder!.Code}");
         sb.AppendLine($"Fecha de creación: {currentOrder!.Date:dd MMM yyyy}");
         sb.AppendLine($"Vendedor: {currentOrder!.SellerName}");
-        sb.AppendLine($"Cliente: {currentOrder!.CustomerName}");
+        if (string.IsNullOrEmpty(currentOrder!.OrganizationName))
+        {
+            sb.AppendLine($"Cliente: {currentOrder!.CustomerName}");
+        }
+        else
+        {
+            sb.AppendLine($"Entidad: {currentOrder!.OrganizationName}");
+            sb.AppendLine($"Contacto: {currentOrder!.CustomerName}");
+        }
         sb.AppendLine($"Estado: Pendiente");
         sb.AppendLine("Productos:");
         sb.AppendLine(string.Join(Environment.NewLine, currentOrder.Products!));
@@ -777,7 +829,15 @@ public partial class PgSalesViewModel : ObservableRecipient
         sb.AppendLine($"No.: {currentInvoice!.Code}");
         sb.AppendLine($"Fecha de creación: {currentInvoice!.Date:dd MMM yyyy}");
         sb.AppendLine($"Vendedor: {currentInvoice!.SellerName}");
-        sb.AppendLine($"Cliente: {currentInvoice!.CustomerName}");
+        if (string.IsNullOrEmpty(currentInvoice!.OrganizationName))
+        {
+            sb.AppendLine($"Cliente: {currentInvoice!.CustomerName}");
+        }
+        else
+        {
+            sb.AppendLine($"Entidad: {currentInvoice!.OrganizationName}");
+            sb.AppendLine($"Contacto: {currentInvoice!.CustomerName}");
+        }
         sb.AppendLine($"Estado: Pendiente");
         sb.AppendLine("Productos:");
         sb.AppendLine(string.Join(Environment.NewLine, currentInvoice.Products!));

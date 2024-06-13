@@ -17,6 +17,7 @@ public static class OrdersDTOExtension
             CustomerName = string.IsNullOrEmpty(entity.Customer?.Contact?.Organization?.Name)
                     ? entity.Customer?.Contact?.FormattedName
                     : entity.Customer?.Contact?.Organization?.Name,
+            CustomerId = entity.Customer?.Id?.ToString(),
             TotalAmount = 0,
         };
         double totalAmount = 0;

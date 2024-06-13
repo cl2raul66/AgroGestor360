@@ -35,7 +35,7 @@
                     <RadioButton Content="Por error del operador" IsChecked="{Binding DueOperatorError}" />
                     <RadioButton
                         Grid.Row="1"
-                        Content="Por otros motivos"
+                        Content="Por rechazo del cliente"
                         IsChecked="{Binding DueOperatorError, Converter={ctk:InvertedBoolConverter}}" />
                 </Grid>
             </VerticalStackLayout>

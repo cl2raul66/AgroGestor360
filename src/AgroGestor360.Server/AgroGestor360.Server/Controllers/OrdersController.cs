@@ -48,33 +48,6 @@ public class OrdersController : ControllerBase
         {
             return NotFound();
         }
-        //OrderStatus orderStatus = OrderStatus.Processing;
-        //var quantityByArticle = articlesForWarehouseServ.GetAll().Select(x => (x.MerchandiseId, x.Quantity));
-        //List<DTO8> result = [];
-        //foreach (var item in all)
-        //{
-        //    if (orderStatus is not OrderStatus.Pending)
-        //    {
-        //        foreach (var pi in item.Products!)
-        //        {
-        //            var stock = quantityByArticle.FirstOrDefault(x => x.MerchandiseId == pi.Product!.MerchandiseId).Quantity;
-        //            if (pi.OfferId > 0)
-        //            {
-        //                var isMayor = pi.Product!.Offering![pi.OfferId - 1].Quantity > stock;
-        //                if (isMayor)
-        //                {
-        //                    orderStatus = OrderStatus.Pending;
-        //                }
-        //            }
-        //            if (pi.Quantity > stock)
-        //            {
-        //                orderStatus = OrderStatus.Pending;
-        //            }
-        //        }
-        //    }
-
-        //    result.Add(item.ToDTO8());
-        //}
 
         return Ok(all.Select(x => x.ToDTO8()));
     }
@@ -119,6 +92,7 @@ public class OrdersController : ControllerBase
             Date = found.Date,
             Code = found.Code,
             TotalAmount = totalAmount,
+            OrganizationName = found.Customer?.Contact?.Organization?.Name,
             CustomerName = found.Customer?.Contact?.FormattedName,
             SellerName = found.Seller?.Contact?.FormattedName,
             Status = found.Status,
@@ -362,8 +336,8 @@ public class OrdersController : ControllerBase
         return resultUpdateManyInWarehouse ? Ok() : NotFound();
     }
 
-    [HttpPut("changestatus")]
-    public IActionResult ChangeStatus(DTO8_6 dTO)
+    [HttpPut("changebystatus")]
+    public IActionResult ChangeByStatus(DTO8_6 dTO)
     {
         if (dTO is null)
         {
@@ -380,9 +354,9 @@ public class OrdersController : ControllerBase
 
         if (dTO.Status is OrderStatus.Completed)
         {
-            wasteOrdersServ.BeginTrans();
             try
             {
+                wasteOrdersServ.BeginTrans();
                 var wasteInsertResult = wasteOrdersServ.Insert(found);
                 if (string.IsNullOrEmpty(wasteInsertResult))
                 {

@@ -145,10 +145,7 @@
                                             Grid.Row="1"
                                             Padding="8,4"
                                             Spacing="2">
-                                            <Label
-                                                Style="{StaticResource LabelItem}"
-                                                Text="{Binding Code, StringFormat='No.: {0}'}"
-                                                TextTransform="Uppercase" />
+                                            <Label Style="{StaticResource LabelItem}" Text="{Binding Code, StringFormat='No: {0}'}" />
                                             <Label Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" TextColor="{StaticResource White}" />
                                             <Label Style="{StaticResource LabelItem}" Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" />
                                         </VerticalStackLayout>
@@ -193,9 +190,7 @@
                                             Converter="{ctk:IsNotNullConverter}"
                                             Mode="OneWay"
                                             Path="SelectedQuotation" />
-                                        <Binding
-                                            Converter="{ctk:InvertedBoolConverter}"
-                                            Path="SelectedQuotation.IsDraftStatus" />
+                                        <Binding Converter="{ctk:InvertedBoolConverter}" Path="SelectedQuotation.IsDraftStatus" />
                                     </MultiBinding>
                                 </Button.IsEnabled>
                             </Button>
@@ -306,10 +301,7 @@
                                             Grid.Row="1"
                                             Padding="8,4"
                                             Spacing="2">
-                                            <Label
-                                                Style="{StaticResource LabelItem}"
-                                                Text="{Binding Code, StringFormat='No.: {0}'}"
-                                                TextTransform="Uppercase" />
+                                            <Label Style="{StaticResource LabelItem}" Text="{Binding Code, StringFormat='No: {0}'}" />
                                             <Label Style="{StaticResource LabelItem}" Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" />
                                             <Label Style="{StaticResource LabelItem}" Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" />
                                         </VerticalStackLayout>

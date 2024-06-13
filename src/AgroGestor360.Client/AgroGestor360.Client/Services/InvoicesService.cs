@@ -10,7 +10,7 @@ public interface IInvoicesService
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string code);
     Task<bool> DeleteConceptAsync(string serverURL, int id);
-    Task<bool> DepreciationUpdate(string serverURL, DTO10_2 dTO);
+    Task<bool> DepreciationUpdateAsync(string serverURL, DTO10_2 dTO);
     Task<IEnumerable<DTO10>> GetAllAsync(string serverURL);
     Task<DTO10?> GetByCodeAsync(string serverURL, string code);
     Task<IEnumerable<ConceptForDeletedInvoice>> GetConceptsAsync(string serverURL);
@@ -20,7 +20,7 @@ public interface IInvoicesService
     Task<int> InsertConceptAsync(string serverURL, ConceptForDeletedInvoice entity);
     Task<string> InsertFromOrderAsync(string serverURL, DTO8 dTO);
     Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO);
-    Task<bool> UpdateState(string serverURL, DTO10_3 dTO);
+    Task<bool> ChangeByStatusAsync(string serverURL, DTO10_3 dTO);
 }
 
 public class InvoicesService : IInvoicesService
@@ -177,7 +177,7 @@ public class InvoicesService : IInvoicesService
         return string.Empty;
     }
 
-    public async Task<bool> DepreciationUpdate(string serverURL, DTO10_2 dTO)
+    public async Task<bool> DepreciationUpdateAsync(string serverURL, DTO10_2 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
@@ -191,14 +191,14 @@ public class InvoicesService : IInvoicesService
         return false;
     }
 
-    public async Task<bool> UpdateState(string serverURL, DTO10_3 dTO)
+    public async Task<bool> ChangeByStatusAsync(string serverURL, DTO10_3 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/invoices/updatestate", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/invoices/changerbystatus", content);
 
             return response.IsSuccessStatusCode;
         }

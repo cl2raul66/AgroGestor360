@@ -393,6 +393,7 @@ public class DTO7_4
     public DateTime Date { get; set; }
     public string? Code { get; set; }
     public string? SellerName { get; set; }
+    public string? OrganizationName { get; set; }
     public string? CustomerName { get; set; }
     public string[]? Products { get; set; }
     public QuotationStatus Status { get; set; }
@@ -496,6 +497,7 @@ public class DTO8_5
     public DateTime Date { get; set; }
     public string? Code { get; set; }
     public string? SellerName { get; set; }
+    public string? OrganizationName { get; set; }
     public string? CustomerName { get; set; }
     public string[]? Products { get; set; }
     public OrderStatus Status { get; set; }
@@ -640,6 +642,7 @@ public class DTO10_4
     public DateTime Date { get; set; }
     public string? Code { get; set; }
     public string? SellerName { get; set; }
+    public string? OrganizationName { get; set; }
     public string? CustomerName { get; set; }
     public string? NumberFEL { get; set; }
     public InvoiceStatus Status { get; set; }

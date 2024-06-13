@@ -106,6 +106,7 @@ public class InvoicesController : ControllerBase
                 _ => found.ImmediatePayments is null || found.ImmediatePayments.Length == 0 ? found.CreditsPayments?.Sum(x => x.Amount) ?? 0 : found.ImmediatePayments!.Sum(x => x.Amount)
             },
             DaysRemaining = DaysRemaining(found.Customer!.Credit!.TimeLimit, found.Date),
+            OrganizationName = found.Customer?.Contact?.Organization?.Name,
             CustomerName = found.Customer?.Contact?.FormattedName,
             SellerName = found.Seller?.Contact?.FormattedName,
             NumberFEL = found.NumberFEL,
@@ -297,12 +298,12 @@ public class InvoicesController : ControllerBase
             return NotFound();
         }
 
-        var warehouseUpdated = UpdateWarehouseAfterInsert(entity);
-        if (!warehouseUpdated)
-        {
-            invoicesServ.Rollback();
-            return NotFound();
-        }
+        //var warehouseUpdated = UpdateWarehouseAfterInsert(entity);
+        //if (!warehouseUpdated)
+        //{
+        //    invoicesServ.Rollback();
+        //    return NotFound();
+        //}
 
         invoicesServ.Commit();
         return Ok(resultInsert);
@@ -375,8 +376,8 @@ public class InvoicesController : ControllerBase
         return result ? Ok() : NotFound();
     }
 
-    [HttpPut("updatestate")]
-    public IActionResult UpdateState(DTO10_3 dTO)
+    [HttpPut("changebystatus")]
+    public IActionResult ChangeByStatus(DTO10_3 dTO)
     {
         if (dTO is null)
         {
@@ -689,7 +690,9 @@ public class InvoicesController : ControllerBase
             SellerId = entity.Seller?.Id?.ToString(),
             SellerName = entity.Seller?.Contact?.FormattedName,
             CustomerId = entity.Customer?.Id?.ToString(),
-            CustomerName = entity.Customer?.Contact?.FormattedName,
+            CustomerName = string.IsNullOrEmpty(entity.Customer?.Contact?.Organization?.Name)
+                    ? entity.Customer?.Contact?.FormattedName
+                    : entity.Customer?.Contact?.Organization?.Name,
             TotalAmount = totalAmount,
             Paid = paid,
             DaysRemaining = entity.CreditsPayments is null ? 0 : DaysRemaining(entity.Customer!.Credit!.TimeLimit, entity.Date),
