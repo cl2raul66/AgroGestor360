@@ -2,6 +2,7 @@
 using AgroGestor360.Server.Services;
 using AgroGestor360.Server.Tools;
 using AgroGestor360.Server.Tools.Enums;
+using AgroGestor360.Server.Tools.Extensions;
 using AgroGestor360.Server.Tools.Helpers;
 using LiteDB;
 using Microsoft.AspNetCore.Mvc;
@@ -117,6 +118,49 @@ public class InvoicesController : ControllerBase
         };
 
         return Ok(dTO);
+    }
+
+    [HttpGet("getdto_sb1fromorder/{code}")]
+    public ActionResult<DTO_SB1> GetDTO_SB1FromOrder(string code)
+    {
+        if (string.IsNullOrEmpty(code))
+        {
+            return BadRequest();
+        }
+
+        var order = ordersServ.GetByCode(code);
+        if (order is null)
+        {
+            return NotFound();
+        }
+
+        var dto5_1 = order.Customer!.ToDTO5_1();
+        var dto6 = order.Seller!.ToDTO6();
+
+        DTO_SB1 result = new()
+        {
+            Code = code,
+            Customer = dto5_1,
+            Seller = dto6
+        };
+
+        List<DTO9> products = [];
+        foreach (var productItem in order.Products!)
+        {
+            var product = productItem.Product;
+            DTO9 dTO9 = new()
+            {
+                ProductItemForSaleId = product!.Id!.ToString(),
+                Quantity = productItem.Quantity,
+                OfferId = productItem.OfferId,
+                HasCustomerDiscount = productItem.HasCustomerDiscount
+            };
+            products.Add(dTO9);
+        }
+
+        result.Products = [.. products];
+
+        return Ok(result);
     }
 
     [HttpPost]
@@ -298,12 +342,131 @@ public class InvoicesController : ControllerBase
             return NotFound();
         }
 
-        //var warehouseUpdated = UpdateWarehouseAfterInsert(entity);
-        //if (!warehouseUpdated)
-        //{
-        //    invoicesServ.Rollback();
-        //    return NotFound();
-        //}
+        invoicesServ.Commit();
+        return Ok(resultInsert);
+    }
+
+    [HttpPost("InsertFromOrderWithModifications")]
+    public ActionResult<string> InsertFromOrderWithModifications(DTO10_1 dTO)
+    {
+        if (dTO is null)
+        {
+            return BadRequest();
+        }
+
+        var found = ordersServ.GetByCode(dTO.Code!);
+        if (found is null)
+        {
+            return NotFound();
+        }
+
+        var ProductsDTO = productsForSalesServ.GetManyById(dTO.Products!.Select(x => new ObjectId(x.ProductItemForSaleId)));
+
+        if (found.Seller!.Id!.ToString() != dTO.SellerId)
+        {
+            found.Seller = sellersServ.GetById(new ObjectId(dTO.SellerId));
+        }
+
+        if (found.Customer!.Id!.ToString() != dTO.CustomerId)
+        {
+            found.Customer = customersServ.GetById(new ObjectId(dTO.SellerId));
+        }
+        found.Customer.Credit!.TimeLimit = 0;
+        if (dTO.TimeCredit is not null)
+        {
+            found.Customer.Credit!.TimeLimit = dTO.TimeCredit.TimeLimit;
+        }
+
+        List<DTO9> itemsDTO9 = [.. dTO.Products];
+        List<ProductSaleBase> itemsForAddWarehouse = [];
+        List<ProductSaleBase> itemsForRemoveWarehouse = [];
+        List<ProductSaleBase> productItems = [];
+
+        bool lengDistint = found.Products!.Length != dTO.Products!.Length;
+
+        if (lengDistint)
+        {
+            if (dTO.Products!.Length > found.Products!.Length)
+            {
+                var notFoundProducts = dTO.Products.Where(x => !found.Products.Any(y => y.Product!.Id!.ToString() == x.ProductItemForSaleId));
+                foreach (var item in notFoundProducts)
+                {
+                    var products = ProductsDTO.FirstOrDefault(x => x.Id!.ToString() == item.ProductItemForSaleId);
+                    itemsForAddWarehouse.Add(new() { HasCustomerDiscount = item.HasCustomerDiscount, OfferId = item.OfferId, Quantity = item.Quantity, Product = products });
+                    itemsDTO9.Remove(item);
+                }
+            }
+            else
+            {
+                var notFoundProducts = found.Products.Where(x => !dTO.Products.Any(y => y.ProductItemForSaleId == x.Product!.Id!.ToString()));
+                itemsForRemoveWarehouse.AddRange(notFoundProducts);
+            }
+        }
+
+        foreach (var item in itemsDTO9)
+        {
+            var itemFound = found.Products!.FirstOrDefault(x => x.Product!.Id!.ToString() == item.ProductItemForSaleId);
+            if (itemFound is null)
+            {
+                var products = ProductsDTO.FirstOrDefault(x => x.Id!.ToString() == item.ProductItemForSaleId);
+                itemsForAddWarehouse.Add(new() { HasCustomerDiscount = item.HasCustomerDiscount, OfferId = item.OfferId, Quantity = item.Quantity, Product = products });
+            }
+            else
+            {
+                bool hasChanges = itemFound.OfferId != item.OfferId || itemFound.Quantity != item.Quantity;
+                if (hasChanges)
+                {
+                    itemsForRemoveWarehouse.Add(itemFound);
+                    itemsForAddWarehouse.Add(new() { HasCustomerDiscount = item.HasCustomerDiscount, OfferId = item.OfferId, Quantity = item.Quantity, Product = itemFound.Product });
+                }
+                else
+                {
+                    productItems.Add(itemFound);
+                }
+            }
+        }
+
+        if (itemsForRemoveWarehouse.Count != 0)
+        {
+            found.Products = [.. itemsForRemoveWarehouse];
+            bool result = UpdateWarehouseAfterDeletion(found);
+            if (!result)
+            {
+                return NotFound();
+            }
+        }
+
+        Invoice entity = new()
+        {
+            Status = InvoiceStatus.Pending,
+            Code = dTO.Code!,
+            Date = DateTime.Now,
+            Seller = found.Seller,
+            Customer = found.Customer,
+            Products = [.. itemsForAddWarehouse]
+        };
+
+        if (itemsForAddWarehouse.Count != 0)
+        {
+            bool result = UpdateWarehouseAfterInsert(entity);
+            if (!result)
+            {
+                return NotFound();
+            }
+        }
+
+        if (productItems.Count != 0)
+        {
+            entity.Products = [..itemsForAddWarehouse.Concat(productItems)];
+        }
+
+        invoicesServ.BeginTrans();
+        var resultInsert = invoicesServ.Insert(entity);
+        if (string.IsNullOrEmpty(resultInsert))
+        {
+            invoicesServ.Rollback();
+            return NotFound();
+        }
 
         invoicesServ.Commit();
         return Ok(resultInsert);
@@ -376,7 +539,7 @@ public class InvoicesController : ControllerBase
         return result ? Ok() : NotFound();
     }
 
-    [HttpPut("changebystatus")]
+    [HttpPut("ChangeByStatus")]
     public IActionResult ChangeByStatus(DTO10_3 dTO)
     {
         if (dTO is null)
@@ -477,63 +640,6 @@ public class InvoicesController : ControllerBase
             }
 
             return Ok();
-
-            //wasteInvoicesServ.BeginTrans();
-            //WasteInvoice wasteInvoice = WasteInvoiceFabric(found, concept);
-            //var resultInsert = wasteInvoicesServ.Insert(wasteInvoice);
-            //if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
-            //{
-            //    wasteInvoicesServ.Rollback();
-            //    return NotFound();
-            //}
-
-            //var articlesForWarehouse = articlesForWarehouseServ.GetManyByIds(found.Products!.Select(p => p.Product!.MerchandiseId!).ToArray());
-
-            //var productQuantities = found.Products!.ToDictionary(p => p.Product!.MerchandiseId!, p => p.Quantity);
-
-            //List<ArticleItemForWarehouse> updateArticles = [];
-
-            //foreach (var article in articlesForWarehouse)
-            //{
-            //    if (productQuantities.TryGetValue(article.MerchandiseId!, out double value))
-            //    {
-            //        var updateArticle = new ArticleItemForWarehouse
-            //        {
-            //            Quantity = article.Quantity + value,
-            //            Reserved = article.Reserved - value,
-            //            MerchandiseName = article.MerchandiseName,
-            //            MerchandiseId = article.MerchandiseId,
-            //            Packaging = article.Packaging
-            //        };
-
-            //        updateArticles.Add(updateArticle);
-            //    }
-            //}
-
-            //articlesForWarehouseServ.BeginTrans();
-            //var updateResult = articlesForWarehouseServ.UpdateMany(updateArticles);
-            //if (!updateResult)
-            //{
-            //    wasteInvoicesServ.Rollback();
-            //    articlesForWarehouseServ.Rollback();
-            //    return NotFound();
-            //}
-
-            //invoicesServ.BeginTrans();
-            //var resultDelete = invoicesServ.Delete(dTO.Code!);
-            //if (!resultDelete)
-            //{
-            //    wasteInvoicesServ.Rollback();
-            //    invoicesServ.Rollback();
-            //    articlesForWarehouseServ.Rollback();
-            //    return NotFound();
-            //}
-
-            //wasteInvoicesServ.Commit();
-            //invoicesServ.Commit();
-            //articlesForWarehouseServ.Commit();
-
-            //return Ok();
         }
 
         return NotFound();
@@ -638,25 +744,41 @@ public class InvoicesController : ControllerBase
     }
 
     #region EXTRA
+
+    /// <summary>
+    /// Procesa los elementos de producto y artículo de la colección de DTO9.
+    /// </summary>
+    /// <param name="productItemsDTO">Colección de DTO9 que contiene los elementos de producto.</param>
+    /// <returns>Tupla que contiene dos listas: List of ProductSaleBase y List of ArticleItemForWarehouse.</returns>
     (List<ProductSaleBase>, List<ArticleItemForWarehouse>) ProcessProductItems(IEnumerable<DTO9> productItemsDTO)
     {
-        List<ProductSaleBase> productItems = [];
-        List<ArticleItemForWarehouse> articleItems = [];
+        // Se inicializan las listas vacías para almacenar los elementos de producto y artículo
+        List<ProductSaleBase> productItems = new List<ProductSaleBase>();
+        List<ArticleItemForWarehouse> articleItems = new List<ArticleItemForWarehouse>();
 
+        // Se obtienen los IDs de los productos de la colección de DTO9
         var productIds = productItemsDTO.Select(item => new ObjectId(item.ProductItemForSaleId)).ToList();
 
+        // Se obtienen los productos correspondientes a los IDs
         var products = productsForSalesServ.GetManyById(productIds).ToDictionary(item => item.Id!, item => item);
 
+        // Se obtienen los IDs de los artículos de almacén correspondientes a los productos
         var merchandiseIds = products.Values.Select(product => product.MerchandiseId!).ToList();
 
+        // Se obtienen los artículos de almacén correspondientes a los IDs
         var warehouseItems = articlesForWarehouseServ.GetManyByIds(merchandiseIds).ToDictionary(item => item.MerchandiseId!, item => item);
 
+        // Se itera sobre cada elemento de la colección de DTO9
         foreach (var item in productItemsDTO)
         {
+            // Se obtiene el producto correspondiente al ID del DTO9
             ProductItemForSale product = products[new ObjectId(item.ProductItemForSaleId)];
+
+            // Se obtiene el artículo de almacén correspondiente al producto
             ArticleItemForWarehouse articleItemForWarehouse = warehouseItems[product.MerchandiseId!];
 
-            ProductSaleBase productItemForOrder = new()
+            // Se crea un objeto ProductSaleBase para el pedido
+            ProductSaleBase productItemForOrder = new ProductSaleBase()
             {
                 HasCustomerDiscount = item.HasCustomerDiscount,
                 OfferId = item.OfferId,
@@ -664,13 +786,16 @@ public class InvoicesController : ControllerBase
                 Product = product
             };
 
+            // Se actualiza la cantidad reservada y disponible del artículo de almacén
             articleItemForWarehouse.Reserved += item.Quantity;
             articleItemForWarehouse.Quantity -= item.Quantity;
 
+            // Se agregan los elementos a las listas correspondientes
             productItems.Add(productItemForOrder);
             articleItems.Add(articleItemForWarehouse);
         }
 
+        // Se devuelve la tupla con las listas de productos y artículos
         return (productItems, articleItems);
     }
 

@@ -23,6 +23,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     readonly IQuotesService quotesServ;
     readonly string serverURL;
     Dictionary<string, double>? StockInWarehouse;
+    readonly SemaphoreSlim semaphore = new(0, 4);
 
     public PgAddEditSaleViewModel(IProductsForSalesService productsForSalesService, IArticlesForWarehouseService articlesForWarehouseService, IQuotesService quotesService)
     {
@@ -34,7 +35,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     }
 
     [ObservableProperty]
-    DTO10? currentInvoice;
+    DTO_SB1? currentInvoice;
 
     [ObservableProperty]
     int productsPending;
@@ -141,17 +142,18 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
             await Task.Delay(4000);
             TextInfo = null;
             return;
-        }
-        if (Stock < theQuantity)
-        {
-            ProductsPending += 1;
-        }
+        }        
 
         ProductItems ??= [];
         ProductItems.Insert(0, new() { ProductItemQuantity = theQuantity, Product = SelectedProduct! });
 
         UpdateTotal();
         await UpdateStock(SelectedProduct!.MerchandiseId!, theQuantity);
+        
+        if (Stock < theQuantity)
+        {
+            ProductsPending += 1;
+        }
 
         SelectedProduct = null;
         Quantity = null;
@@ -229,6 +231,10 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
         UpdateTotal();
     }
 
+    /// <summary>
+    /// Método que se ejecuta al presionar el botón "Add" para agregar una venta.
+    /// Realiza las validaciones necesarias y crea una nueva venta con los productos seleccionados.
+    /// </summary>
     [RelayCommand]
     async Task Add()
     {
@@ -288,7 +294,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
             Products = [.. productItems]
         };
 
-        string token = CurrentInvoice is not null ? "addorderfromquote" : "addinvoice";
+        string token = CurrentInvoice is null ? "addinvoice" : "addinvoicefromorder";
 
         _ = WeakReferenceMessenger.Default.Send(dTO, token);
 
@@ -309,13 +315,14 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
         {
             SelectedCreditTime = OnCredit ? CreditTime!.First(x => x.Id == DefaultCreditTime!.Id) : null;
         }
-         
+
         if (e.PropertyName == nameof(IsProductOffer))
         {
             if (!IsProductOffer)
             {
                 Offers = null;
-                SelectedOffer = null;
+                SelectedOffer = null; 
+                semaphore.Release();
                 return;
             }
 
@@ -323,12 +330,14 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
             if (SelectedProductItem!.ProductOffer is null)
             {
                 SelectedOffer = Offers![0];
+                semaphore.Release();
                 return;
             }
 
             var offer = Offers!.FirstOrDefault(x => x.Id == SelectedProductItem!.ProductOffer!.Id);
             int idx = Offers!.IndexOf(offer!);
             SelectedOffer = Offers[idx];
+            semaphore.Release();
         }
 
         if (e.PropertyName == nameof(SelectedProductItem))
@@ -359,6 +368,55 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
                 LoadingStock = true;
                 await UpdateStock(SelectedProduct!.MerchandiseId!);
                 LoadingStock = false;
+            }
+        }
+
+        if (e.PropertyName == nameof(Sellers))
+        {
+            semaphore.Release();
+        }
+
+        if (e.PropertyName == nameof(Customers))
+        {
+            semaphore.Release();
+        }
+
+        if (e.PropertyName == nameof(Products))
+        {
+            semaphore.Release();
+        }
+
+        if (e.PropertyName == nameof(CurrentInvoice))
+        {
+            if (CurrentInvoice is not null)
+            {
+                semaphore.Wait();
+                semaphore.Wait();
+                semaphore.Wait();
+                SelectedSeller = Sellers?.FirstOrDefault(x => x.Id == CurrentInvoice.Seller!.Id);
+                SelectedCustomer = Customers?.FirstOrDefault(x => x.CustomerId == CurrentInvoice.Customer!.CustomerId);
+                foreach (var item in CurrentInvoice.Products!)
+                {
+                    Quantity = (item.Quantity == 0 ? 1 : item.Quantity).ToString("F2");
+                    SelectedProduct = Products?.FirstOrDefault(x => x.Id == item!.ProductItemForSaleId);
+                    await SendProductItem();
+                    SelectedProductItem = ProductItems?.FirstOrDefault(x => x.Product!.Id == item.ProductItemForSaleId);
+                    if (item.HasCustomerDiscount)
+                    {
+                        IsCustomerDiscount = true;
+                    }
+                    else if (item.OfferId > 0)
+                    {
+                        IsProductOffer = true;
+                        await semaphore.WaitAsync();
+                        SelectedOffer = Offers?.FirstOrDefault(x => x.Id == item.OfferId);
+                    }
+                    else
+                    {
+                        IsNormalPrice = true;
+                    }
+                    SetDiscount();
+                }
             }
         }
     }
@@ -393,15 +451,30 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
         Difference = total - total1;
     }
 
+    /// <summary>
+    /// Actualiza el stock disponible de un producto específico. Este método ajusta el stock en la memoria local
+    /// y opcionalmente en un servicio o base de datos externa, asegurando que el inventario refleje correctamente
+    /// las operaciones de venta o devolución.
+    /// </summary>
+    /// <param name="merchandiseId">El identificador único del producto cuyo stock se va a actualizar.</param>
+    /// <param name="theQuantity">La cantidad por la cual se debe ajustar el stock. Un valor positivo indica una reducción
+    /// del stock (venta), mientras que un valor negativo indica un incremento (devolución). El valor predeterminado es 0.</param>
+    /// <returns>Una tarea que representa la operación asincrónica de actualización del stock.</returns>
+    /// <remarks>
+    /// Este método es asincrónico y debe ser esperado usando 'await'. Es importante manejar posibles errores durante
+    /// las llamadas asincrónicas, especialmente cuando se interactúa con servicios externos o bases de datos.
+    /// La actualización de la propiedad 'Stock' asegura que cualquier elemento de la UI vinculado a esta propiedad
+    /// se actualice automáticamente para reflejar los cambios.
+    /// </remarks>
     async Task UpdateStock(string merchandiseId, double theQuantity = 0)
     {
-        double value = 0;
         StockInWarehouse ??= [];
-        if (StockInWarehouse.Any())
+        double value;
+        if (StockInWarehouse.Count != 0)
         {
-            if (StockInWarehouse.ContainsKey(SelectedProduct!.MerchandiseId!))
+            if (StockInWarehouse.TryGetValue(SelectedProduct!.MerchandiseId!, out double theValue))
             {
-                value = StockInWarehouse[SelectedProduct!.MerchandiseId!];
+                value = theValue;
             }
             else
             {

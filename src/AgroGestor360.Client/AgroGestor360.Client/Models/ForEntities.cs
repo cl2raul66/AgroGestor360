@@ -594,7 +594,7 @@ public class DTO8_3
 }
 
 /// <summary>
-/// Represents a entity for create order from a quotation.
+/// Represents a entity for create order from a quotation or invoice from order.
 /// <code>
 /// string [Code]
 /// DTO5_1 [Customer]
@@ -602,7 +602,7 @@ public class DTO8_3
 /// Array DTO9 [Products]
 /// </code>
 /// </summary>
-public class DTO8_4
+public class DTO_SB1
 {
     public string? Code { get; set; }
     public DTO5_1? Customer { get; set; }

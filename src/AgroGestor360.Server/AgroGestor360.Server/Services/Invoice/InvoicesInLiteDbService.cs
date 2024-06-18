@@ -14,7 +14,7 @@ public interface IInvoicesInLiteDbService
     bool DeleteConcept(int id);
     IEnumerable<Invoice> GetAll();
     Invoice GetByCode(string code);
-    ConceptForDeletedInvoice GetConceptByNote(string note);
+    ConceptForDeletedInvoice? GetConceptByNote(string note);
     IEnumerable<ConceptForDeletedInvoice> GetConcepts();
     IEnumerable<Invoice> GetManyByCodes(IEnumerable<string> codes);
     string Insert(Invoice entity);
@@ -94,7 +94,7 @@ public class InvoicesInLiteDbService : IInvoicesInLiteDbService
 
     public IEnumerable<ConceptForDeletedInvoice> GetConcepts() => collection1.FindAll();
 
-    public ConceptForDeletedInvoice GetConceptByNote(string note) => collection1.FindOne(x => x.Concept == note);
+    public ConceptForDeletedInvoice? GetConceptByNote(string note) => collection1.FindOne(x => x.Concept == note);
 
     public int InsertConcept(ConceptForDeletedInvoice entity) => collection1.Insert(entity).AsInt32;
 

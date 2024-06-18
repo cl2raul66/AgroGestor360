@@ -7,6 +7,7 @@ namespace AgroGestor360.Client.Services;
 
 public interface IInvoicesService
 {
+    Task<bool> ChangeByStatusAsync(string serverURL, DTO10_3 dTO);
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string code);
     Task<bool> DeleteConceptAsync(string serverURL, int id);
@@ -15,12 +16,13 @@ public interface IInvoicesService
     Task<DTO10?> GetByCodeAsync(string serverURL, string code);
     Task<IEnumerable<ConceptForDeletedInvoice>> GetConceptsAsync(string serverURL);
     Task<IEnumerable<int>> GetCreditTimeAsync(string serverURL);
+    Task<DTO_SB1?> GetDTO_SB1FromOrderAsync(string serverURL, string code);
     Task<DTO10_4?> GetProductsByCodeAsync(string serverURL, string code);
     Task<string> InsertAsync(string serverURL, DTO10_1 dTO);
     Task<int> InsertConceptAsync(string serverURL, ConceptForDeletedInvoice entity);
     Task<string> InsertFromOrderAsync(string serverURL, DTO8 dTO);
+    Task<string> InsertFromOrderWithModificationsAsync(string serverURL, DTO10_1 dTO);
     Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO);
-    Task<bool> ChangeByStatusAsync(string serverURL, DTO10_3 dTO);
 }
 
 public class InvoicesService : IInvoicesService
@@ -126,6 +128,29 @@ public class InvoicesService : IInvoicesService
         return null;
     }
 
+    public async Task<DTO_SB1?> GetDTO_SB1FromOrderAsync(string serverURL, string code)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/invoices/getdto_sb1fromorder/{code}");
+
+            if (response.StatusCode == HttpStatusCode.NotFound || response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return null;
+            }
+
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<DTO_SB1>(content, ApiServiceBase.ProviderJSONOptions);
+        }
+        return null;
+    }
+
     public async Task<string> InsertAsync(string serverURL, DTO10_1 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
@@ -177,6 +202,23 @@ public class InvoicesService : IInvoicesService
         return string.Empty;
     }
 
+    public async Task<string> InsertFromOrderWithModificationsAsync(string serverURL, DTO10_1 dTO)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/invoices/InsertFromOrderWithModifications", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+        }
+        return string.Empty;
+    }
+
     public async Task<bool> DepreciationUpdateAsync(string serverURL, DTO10_2 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
@@ -198,7 +240,7 @@ public class InvoicesService : IInvoicesService
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/invoices/changerbystatus", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/invoices/ChangeByStatus", content);
 
             return response.IsSuccessStatusCode;
         }

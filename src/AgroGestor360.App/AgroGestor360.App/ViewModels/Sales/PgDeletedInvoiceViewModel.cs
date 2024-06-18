@@ -53,10 +53,7 @@ public partial class PgDeletedInvoiceViewModel : ObservableObject
             return;
         }
 
-        ConceptForDeletedInvoice send = new()
-        {
-            Concept = SelectedConcept is null ? AnotherConcept : null
-        };
+        var send = SelectedConcept ?? new ConceptForDeletedInvoice { Concept = AnotherConcept };
 
         _ = WeakReferenceMessenger.Default.Send(send, "deletedinvoice");
 

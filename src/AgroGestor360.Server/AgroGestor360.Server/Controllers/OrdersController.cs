@@ -102,30 +102,30 @@ public class OrdersController : ControllerBase
         return Ok(dTO);
     }
 
-    [HttpPost("getdto8_4fromquotation")]
-    public ActionResult<DTO8_4> GetDTO8_4FromQuotation(DTO7 dTO)
+    [HttpGet("getdto_sb1fromquotation/{code}")]
+    public ActionResult<DTO_SB1> GetDTO_SB1FromQuotation(string code)
     {
-        if (dTO is null)
+        if (string.IsNullOrEmpty(code))
         {
             return BadRequest();
         }
 
-        var customerId = new ObjectId(dTO.CustomerId);
-        var customer = customersServ.GetById(customerId);
-        var dto5_1 = customer.ToDTO5_1();
-
-        var sellerId = new ObjectId(dTO.SellerId);
-        var seller = sellersServ.GetById(sellerId);
-        var dto6 = seller.ToDTO6();
-
-        DTO8_4 result = new()
+        var quotation = quotesServ.GetByCode(code);
+        if (quotation is null)
         {
-            Code = dTO.Code,
+            return NotFound();
+        }
+
+        var dto5_1 = quotation.Customer!.ToDTO5_1();
+        var dto6 = quotation.Seller!.ToDTO6();
+
+        DTO_SB1 result = new()
+        {
+            Code = code,
             Customer = dto5_1,
             Seller = dto6
         };
 
-        var quotation = quotesServ.GetByCode(new(dTO.Code!));
         var products = new List<DTO9>();
         foreach (var productItem in quotation.Products!)
         {

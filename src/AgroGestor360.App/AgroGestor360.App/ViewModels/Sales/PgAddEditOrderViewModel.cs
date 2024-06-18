@@ -35,7 +35,7 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
     }
 
     [ObservableProperty]
-    DTO8_4? currentOrder;
+    DTO_SB1? currentOrder;
 
     [ObservableProperty]
     int productsPending;
@@ -271,7 +271,7 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
 
         DTO8_1 order = new()
         {
-            Code = CurrentOrder is not null ? CurrentOrder.Code : string.Empty,
+            Code = CurrentOrder is null ? string.Empty : CurrentOrder.Code,
             Status = ProductsPending > 0 ? OrderStatus.Pending : OrderStatus.Processing,
             Date = Date,
             CustomerId = SelectedCustomer!.CustomerId,
@@ -279,7 +279,7 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
             ProductItems = [.. productItems]
         };
 
-        string token = CurrentOrder is not null ? "addorderfromquote" : "addorder";
+        string token = CurrentOrder is null ? "addorder" : "addorderfromquote";
 
         _ = WeakReferenceMessenger.Default.Send(order, token);
 
@@ -433,13 +433,13 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
 
     async Task UpdateStock(string merchandiseId, double theQuantity = 0)
     {
-        double value = 0;
         StockInWarehouse ??= [];
-        if (StockInWarehouse.Any())
+        double value;
+        if (StockInWarehouse.Count != 0)
         {
-            if (StockInWarehouse.ContainsKey(SelectedProduct!.MerchandiseId!))
+            if (StockInWarehouse.TryGetValue(SelectedProduct!.MerchandiseId!, out double theValue))
             {
-                value = StockInWarehouse[SelectedProduct!.MerchandiseId!];
+                value = theValue;
             }
             else
             {

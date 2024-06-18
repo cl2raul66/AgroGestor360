@@ -12,7 +12,7 @@ public interface IOrdersService
     Task<bool> DeleteAsync(string serverURL, string code);
     Task<IEnumerable<DTO8>> GetAllAsync(string serverURL);
     Task<DTO8?> GetByCodeAsync(string serverURL, string code);
-    Task<DTO8_4?> GetDTO8_4FromQuotationAsync(string serverURL, DTO7 dTO);
+    Task<DTO_SB1?> GetDTO_SB1FromQuotationAsync(string serverURL, string code);
     Task<DTO8_5?> GetProductsByCodeAsync(string serverURL, string code);
     Task<string> InsertAsync(string serverURL, DTO8_1 dTO);
     Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO);
@@ -58,19 +58,17 @@ public class OrdersService : IOrdersService
         return [];
     }
 
-    public async Task<DTO8_4?> GetDTO8_4FromQuotationAsync(string serverURL, DTO7 dTO)
+    public async Task<DTO_SB1?> GetDTO_SB1FromQuotationAsync(string serverURL, string code)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/orders/getdto8_4fromquotation", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/orders/getdto_sb1fromquotation/{code}");
 
             if (response.IsSuccessStatusCode)
             {
+                response.EnsureSuccessStatusCode();
                 var responseContent = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<DTO8_4>(responseContent, ApiServiceBase.ProviderJSONOptions);
+                return JsonSerializer.Deserialize<DTO_SB1>(responseContent, ApiServiceBase.ProviderJSONOptions);
             }
         }
         return null;
@@ -82,18 +80,12 @@ public class OrdersService : IOrdersService
         {
             var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/orders/{code}");
 
-            switch (response.StatusCode)
+            if (response.IsSuccessStatusCode)
             {
-                case HttpStatusCode.NotFound:
-                case HttpStatusCode.BadRequest:
-                    return null;
-                default:
-                    response.EnsureSuccessStatusCode();
-                    break;
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<DTO8>(content, ApiServiceBase.ProviderJSONOptions);
             }
 
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<DTO8>(content, ApiServiceBase.ProviderJSONOptions);
         }
         return null;
     }

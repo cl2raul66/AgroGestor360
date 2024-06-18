@@ -25,7 +25,8 @@ public partial class PgSalesViewModel : ObservableRecipient
     readonly IAuthService authServ;
     readonly IInvoicesService invoicesServ;
     readonly IApiService apiServ;
-    readonly ITimeLimitsCreditsService timeLimitsCreditsServ;
+    readonly ITimeLimitsCreditsService timeLimitsCreditsServ; 
+    //readonly SemaphoreSlim semaphore = new(0, 2);
 
     public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, IAuthService authService, IInvoicesService invoicesService, IApiService apiService, ITimeLimitsCreditsService timeLimitsCreditsService)
     {
@@ -73,10 +74,9 @@ public partial class PgSalesViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    async Task ViewBills()
+    void ViewBills()
     {
         IsBillsVisible = true;
-        Invoices = new(await invoicesServ.GetAllAsync(serverURL));
     }
 
     [RelayCommand]
@@ -203,22 +203,18 @@ public partial class PgSalesViewModel : ObservableRecipient
     #endregion
 
     #region ORDERS
-    bool ShowAddEditOrderState;
-
     [ObservableProperty]
     ObservableCollection<DTO8>? orders;
 
     [ObservableProperty]
     DTO8? selectedOrder;
 
-    bool WaitPropertyChanged;
-
     [RelayCommand]
     async Task CreateOrderFomQuote()
     {
         await ShowSalesConfirmationDialog("Crear un pedido desde la cotización");
 
-        if (ResultSalesConfirmationDialog)
+        if (ResultSalesConfirmationDialog.HasValue && ResultSalesConfirmationDialog.Value)
         {
             if (OptionSalesConfirmationDialog)
             {
@@ -235,30 +231,19 @@ public partial class PgSalesViewModel : ObservableRecipient
                         Orders.Insert(0, orderGet!);
                     }
                 }
-                else
-                {
-                    SelectedOrder = null;
-                    SelectedQuotation = null;
-                }
             }
             else
             {
-                ShowAddEditOrderState = true;
+                //semaphore.Wait();
+                //semaphore.Wait();
                 await ShowAddEditOrder();
-                while (ShowAddEditOrderState)
-                {
-                    await Task.Delay(1000);
-                }
                 Orders ??= [];
-                while (WaitPropertyChanged)
-                {
-                    await Task.Delay(1000);
-                }
             }
         }
 
         SelectedOrder = null;
         SelectedQuotation = null;
+        ResultSalesConfirmationDialog = null;
     }
 
     [RelayCommand]
@@ -283,9 +268,9 @@ public partial class PgSalesViewModel : ObservableRecipient
             { "products", products.ToList() }
         };
 
-        if (ShowAddEditOrderState)
+        if (ResultSalesConfirmationDialog.HasValue && ResultSalesConfirmationDialog.Value)
         {
-            DTO8_4 currentOrder = await ordersServ.GetDTO8_4FromQuotationAsync(serverURL, SelectedQuotation!) ?? new();
+            DTO_SB1 currentOrder = await ordersServ.GetDTO_SB1FromQuotationAsync(serverURL, SelectedQuotation!.Code!) ?? new();
             sendData.Add("currentOrder", currentOrder);
         }
 
@@ -356,6 +341,12 @@ public partial class PgSalesViewModel : ObservableRecipient
             { "defaultcredittime", defaultCreditTime! }
         };
 
+        if (ResultSalesConfirmationDialog.HasValue && ResultSalesConfirmationDialog.Value)
+        {
+            DTO_SB1 currentInvoice = await invoicesServ.GetDTO_SB1FromOrderAsync(serverURL, SelectedOrder!.Code!) ?? new();
+            sendData.Add("currentInvoice", currentInvoice);
+        }
+
         await Shell.Current.GoToAsync(nameof(PgAddEditSale), true, sendData);
     }
 
@@ -407,14 +398,14 @@ public partial class PgSalesViewModel : ObservableRecipient
 
         SelectedOrder = null;
         SelectedQuotation = null;
-        await ViewBills();
+        ViewBills();
     }
 
     [RelayCommand]
     async Task CreateInvoiceFromOrder()
     {
         await ShowSalesConfirmationDialog("Crear una venta desde el pedido");
-        if (ResultSalesConfirmationDialog)
+        if (ResultSalesConfirmationDialog.HasValue && ResultSalesConfirmationDialog.Value)
         {
             if (OptionSalesConfirmationDialog)
             {
@@ -429,27 +420,22 @@ public partial class PgSalesViewModel : ObservableRecipient
                         Invoices ??= [];
                         var orderGet = await invoicesServ.GetByCodeAsync(serverURL, resultInsert);
                         Invoices.Insert(0, orderGet!);
+                        ViewBills();
                     }
-                }
-                else
-                {
-                    SelectedOrder = null;
-                    SelectedQuotation = null;
-                    return;
                 }
             }
             else
-            {
-
-                SelectedOrder = null;
-                SelectedQuotation = null;
-                await ViewBills();
+            {              
+                ViewBills();
                 await ShowAddEditSale();
+                //semaphore.Wait();
+                Invoices ??= [];
+                //semaphore.Wait();  
             }
+            ResultSalesConfirmationDialog = null;
         }
         SelectedOrder = null;
-        SelectedQuotation = null;
-        await ViewBills();
+        SelectedQuotation = null;        
     }
     #endregion
 
@@ -503,7 +489,7 @@ public partial class PgSalesViewModel : ObservableRecipient
     /// </code>
     /// </summary>
     [ObservableProperty]
-    bool resultSalesConfirmationDialog;
+    bool? resultSalesConfirmationDialog;
 
     [RelayCommand]
     void SetSalesConfirmationDialog()
@@ -584,8 +570,8 @@ public partial class PgSalesViewModel : ObservableRecipient
                 r.Orders.Insert(0, orderGet!);
             }
 
-            bool result1 = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = m.Code, Status = QuotationStatus.Accepted });
-            if (result1)
+            bool resultChanges = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = m.Code, Status = QuotationStatus.Accepted });
+            if (resultChanges)
             {
                 var currentQuotation = r.Quotations!.FirstOrDefault(x => x.Code == m.Code);
                 _ = r.Quotations!.Remove(currentQuotation!);
@@ -594,7 +580,7 @@ public partial class PgSalesViewModel : ObservableRecipient
             r.SelectedOrder = null;
             r.SelectedQuotation = null;
 
-            ShowAddEditOrderState = false;
+            //semaphore.Release();
         });
 
         WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_1, string>(this, "addinvoice", async (r, m) =>
@@ -604,10 +590,34 @@ public partial class PgSalesViewModel : ObservableRecipient
             if (!string.IsNullOrEmpty(result))
             {
                 r.Invoices ??= [];
-                var invoice = await invoicesServ.GetByCodeAsync(serverURL, result);
-                r.Invoices.Insert(0, invoice!);
+                var invoiceGet = await invoicesServ.GetByCodeAsync(serverURL, result);
+                r.Invoices.Insert(0, invoiceGet!);
             }
             r.SelectedInvoice = null;
+        });
+
+        WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_1, string>(this, "addinvoicefromorder", async (r, m) =>
+        {
+            IsActive = false;
+            var result = await invoicesServ.InsertFromOrderWithModificationsAsync(serverURL, m);
+            if (!string.IsNullOrEmpty(result))
+            {
+                r.Invoices ??= [];
+                var invoiceGet = await invoicesServ.GetByCodeAsync(serverURL, result);
+                r.Invoices.Insert(0, invoiceGet!);
+            }
+
+            bool resultChanges = await ordersServ.ChangeByStatusAsync(serverURL, new() { Code = m.Code, Status = OrderStatus.Completed });
+            if (resultChanges)
+            {
+                var currentOrder = r.Orders!.FirstOrDefault(x => x.Code == m.Code);
+                _ = r.Orders!.Remove(currentOrder!);
+            }
+
+            r.SelectedOrder = null;
+            r.SelectedQuotation = null;
+
+            //semaphore.Release();
         });
 
         WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_2, string>(this, "setdepreciation", async (r, m) =>
@@ -730,20 +740,25 @@ public partial class PgSalesViewModel : ObservableRecipient
                 SelectedQuotation = null;
                 SelectedOrder = null;
                 SelectedInvoice = null;
-                ShowAddEditOrderState = false;
+                //semaphore.Release();
             }
         });
     }
 
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
         if (e.PropertyName == nameof(Orders))
         {
             if (Orders is not null)
             {
-                WaitPropertyChanged = false;
+                //semaphore.Release();
             }
+        }
+
+        if (e.PropertyName == nameof(IsBillsVisible))
+        {
+            Invoices = IsBillsVisible ? new(await invoicesServ.GetAllAsync(serverURL)) : null;
         }
     }
     //todo: separar metodos de inicializacion de colecciones dependiendo de haveConnection
@@ -760,10 +775,10 @@ public partial class PgSalesViewModel : ObservableRecipient
         Quotations = new ObservableCollection<DTO7>(getAllQuotationsTask.Result);
         Orders = new ObservableCollection<DTO8>(getAllOrdersTask.Result);
 
-        if (IsBillsVisible)
-        {
-            Invoices = new(await invoicesServ.GetAllAsync(serverURL));
-        }
+        //if (IsBillsVisible)
+        //{
+        //    Invoices = new(await invoicesServ.GetAllAsync(serverURL));
+        //}
         IsBusy = false;
     }
 
