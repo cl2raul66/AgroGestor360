@@ -17,12 +17,28 @@
         RowDefinitions="auto,*,auto"
         RowSpacing="16">
         <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
-            <Label
-                Grid.Column="1"
-                FontSize="18"
-                Text="Ajustes"
-                TextTransform="Uppercase"
-                VerticalOptions="Center" />
+            <HorizontalStackLayout Spacing="8">
+                <Button
+                    Command="{Binding ShowMenuCommand}"
+                    FontFamily="icofont"
+                    Text="{StaticResource Settings}"
+                    ToolTipProperties.Text="Muestra el menu de ajustes">
+                    <Button.Triggers>
+                        <DataTrigger
+                            Binding="{Binding IsVisibleMenu}"
+                            TargetType="Button"
+                            Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Secondary}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Label
+                    Grid.Column="1"
+                    FontSize="18"
+                    Text="Ajustes"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
             <HorizontalStackLayout Grid.Column="2" Spacing="8">
                 <Button
                     Command="{Binding GoToBackCommand}"
@@ -31,43 +47,56 @@
                     ToolTipProperties.Text="Ir a inicio" />
             </HorizontalStackLayout>
         </Grid>
-        <Grid
-            Grid.Row="1"
-            ColumnDefinitions="200,*"
-            ColumnSpacing="16">
-            <ScrollView>
-                <CollectionView
-                    ItemsSource="{Binding Menu, Mode=OneWay}"
-                    SelectedItem="{Binding SelectedMenu, Mode=TwoWay}"
-                    SelectionChanged="CollectionView_SelectionChanged"
-                    SelectionMode="Single">
-                    <CollectionView.ItemsLayout>
-                        <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="x:String">
-                            <Border Style="{StaticResource BorderItem}">
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Body"
-                                    VerticalOptions="Center">
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span
-                                                FontFamily="icofont"
-                                                Text="{StaticResource SimpleRight}"
-                                                TextColor="{StaticResource White}" />
-                                            <Span Text=" " />
-                                            <Span Text="{Binding .}" TextColor="{StaticResource White}" />
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </ScrollView>
-            <Grid Grid.Column="1">
+        <Grid Grid.Row="1">
+            <Grid
+                Padding="8"
+                BackgroundColor="#99634833"
+                HorizontalOptions="Start"
+                IsVisible="{Binding IsVisibleMenu}"
+                RowDefinitions="auto,*"
+                RowSpacing="8"
+                WidthRequest="200"
+                ZIndex="10">
+                <Label
+                    Grid.Column="1"
+                    FontSize="16"
+                    Text="Menú"
+                    TextColor="{StaticResource White}"
+                    TextTransform="Uppercase" />
+                <ScrollView Grid.Row="1">
+                    <CollectionView
+                        ItemsSource="{Binding Menu, Mode=OneWay}"
+                        SelectedItem="{Binding SelectedMenu, Mode=TwoWay}"
+                        SelectionChanged="CollectionView_SelectionChanged"
+                        SelectionMode="Single">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Border Style="{StaticResource BorderItem}">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="Body"
+                                        VerticalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span
+                                                    FontFamily="icofont"
+                                                    Text="{StaticResource SimpleRight}"
+                                                    TextColor="{StaticResource White}" />
+                                                <Span Text=" " />
+                                                <Span Text="{Binding .}" TextColor="{StaticResource White}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </ScrollView>
+            </Grid>
+            <Grid Grid.Column="1" HorizontalOptions="FillAndExpand">
                 <ContentView
                     Content="{Binding CurrentContent, Mode=OneWay}"
                     HorizontalOptions="FillAndExpand"

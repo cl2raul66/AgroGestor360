@@ -119,6 +119,9 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     [ObservableProperty]
     bool loadingStock;
 
+    [ObservableProperty]
+    bool isCreditLimitExceeded;
+
     [RelayCommand]
     async Task SendProductItem()
     {
@@ -142,14 +145,14 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
             await Task.Delay(4000);
             TextInfo = null;
             return;
-        }        
+        }
 
         ProductItems ??= [];
         ProductItems.Insert(0, new() { ProductItemQuantity = theQuantity, Product = SelectedProduct! });
 
         UpdateTotal();
         await UpdateStock(SelectedProduct!.MerchandiseId!, theQuantity);
-        
+
         if (Stock < theQuantity)
         {
             ProductsPending += 1;
@@ -311,6 +314,14 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
+        if (e.PropertyName == nameof(Total))
+        {            
+            if (SelectedCustomer?.Credit is not null)
+            {
+                IsCreditLimitExceeded = Total > SelectedCustomer.Credit.Amount;
+            }
+        }
+
         if (e.PropertyName == nameof(OnCredit))
         {
             SelectedCreditTime = OnCredit ? CreditTime!.First(x => x.Id == DefaultCreditTime!.Id) : null;
@@ -321,7 +332,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
             if (!IsProductOffer)
             {
                 Offers = null;
-                SelectedOffer = null; 
+                SelectedOffer = null;
                 semaphore.Release();
                 return;
             }
@@ -424,8 +435,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     #region EXTRA
     private void UpdateTotal()
     {
-        double total = 0;
-        double total1 = 0;
+        double subTotal = 0, total = 0;
         if (ProductItems != null)
         {
             foreach (var item in ProductItems)
@@ -442,13 +452,13 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
                 {
                     itemQuantity = item.ProductOffer!.Quantity;
                 }
-                total1 += itemQuantity * itemPrice;
-                total += itemQuantity * item.Product!.ArticlePrice;
+                total += itemQuantity * itemPrice;
+                subTotal += itemQuantity * item.Product!.ArticlePrice;
             }
         }
-        Total = total;
-        TotalWithDiscount = total1;
-        Difference = total - total1;
+        Total = subTotal;
+        TotalWithDiscount = total;
+        Difference = subTotal - total;
     }
 
     /// <summary>

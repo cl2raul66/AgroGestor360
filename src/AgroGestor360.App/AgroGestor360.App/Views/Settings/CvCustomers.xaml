@@ -48,7 +48,7 @@
                                 Binding="{Binding EnableGetByDiscount, Mode=OneWay}"
                                 TargetType="Button"
                                 Value="true">
-                                <Setter Property="BackgroundColor" Value="{StaticResource Tertiary}" />
+                                <Setter Property="BackgroundColor" Value="{StaticResource Secondary}" />
                                 <Setter Property="ToolTipProperties.Text" Value="Ver clientes sin descuentos" />
                             </DataTrigger>
                             <DataTrigger

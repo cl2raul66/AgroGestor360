@@ -21,75 +21,91 @@
 
     <Frame
         Margin="16"
-        HorizontalOptions="Center"
+        HorizontalOptions="Fill"
         MaximumWidthRequest="480"
         VerticalOptions="Center">
-        <VerticalStackLayout Spacing="8">
+        <VerticalStackLayout Spacing="16">
             <Label
                 FontSize="18"
+                HorizontalOptions="Center"
                 Text="Establecer URL"
                 TextTransform="Uppercase"
                 VerticalOptions="Center" />
-            <Label Text="URL:" />
-            <Entry
-                ClearButtonVisibility="WhileEditing"
-                Placeholder="http://localhost:8000"
-                Text="{Binding ServerURL}" />
-            <HorizontalStackLayout Spacing="8">
-                <Label
-                    FontFamily="icofont"
-                    FontSize="Body"
-                    VerticalOptions="Center">
-                    <Label.Triggers>
-                        <DataTrigger
-                            Binding="{Binding ConnectedAPI, Mode=OneWay}"
-                            TargetType="Label"
-                            Value="true">
-                            <Setter Property="Text" Value="{StaticResource CheckCircled}" />
-                        </DataTrigger>
-                        <DataTrigger
-                            Binding="{Binding ConnectedAPI, Mode=OneWay}"
-                            TargetType="Label"
-                            Value="false">
-                            <Setter Property="Text" Value="{StaticResource NotAllowed}" />
-                            <Setter Property="TextColor" Value="Red" />
-                        </DataTrigger>
-                    </Label.Triggers>
-                </Label>
-                <Label FontSize="Body" VerticalOptions="Center">
-                    <Label.Triggers>
-                        <DataTrigger
-                            Binding="{Binding ConnectedAPI, Mode=OneWay}"
-                            TargetType="Label"
-                            Value="true">
-                            <Setter Property="Text" Value="URL permitido" />
-                        </DataTrigger>
-                        <DataTrigger
-                            Binding="{Binding ConnectedAPI, Mode=OneWay}"
-                            TargetType="Label"
-                            Value="false">
-                            <Setter Property="Text" Value="URL denegado" />
-                            <Setter Property="TextColor" Value="Red" />
-                        </DataTrigger>
-                        <DataTrigger
-                            Binding="{Binding ConnectedAPI, Mode=OneWay, Converter={ctk:IsNullConverter}}"
-                            TargetType="Label"
-                            Value="true">
-                            <Setter Property="Text" Value="URL no comprobado" />
-                        </DataTrigger>
-                    </Label.Triggers>
-                </Label>
-            </HorizontalStackLayout>
-            <Grid ColumnDefinitions="100, auto" ColumnSpacing="8">
-                <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                    <Button Command="{Binding TestCommand}" Text="Comprobar" />
-                    <Button
-                        Command="{Binding SaveCommand}"
-                        IsEnabled="{Binding ConnectedAPI, Mode=OneWay, Converter={StaticResource MyMultiConverter}}"
-                        Text="Guardar" />
-                    <Button Command="{Binding CancelCommand}" Text="Cancelar" />
+            <Grid RowDefinitions="auto,auto,auto" RowSpacing="{OnIdiom Phone='2', Default='8'}">
+                <Label Text="URL:" />
+                <Entry
+                    Grid.Row="1"
+                    ClearButtonVisibility="WhileEditing"
+                    Placeholder="http://localhost:8000"
+                    Text="{Binding ServerURL}" />
+                <HorizontalStackLayout Grid.Row="2" Spacing="8">
+                    <Label
+                        FontFamily="icofont"
+                        FontSize="12"
+                        VerticalOptions="Center">
+                        <Label.Triggers>
+                            <DataTrigger
+                                Binding="{Binding ConnectedAPI, Mode=OneWay}"
+                                TargetType="Label"
+                                Value="true">
+                                <Setter Property="Text" Value="{StaticResource CheckCircled}" />
+                                <Setter Property="TextColor" Value="{StaticResource Secondary}" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding ConnectedAPI, Mode=OneWay}"
+                                TargetType="Label"
+                                Value="false">
+                                <Setter Property="Text" Value="{StaticResource NotAllowed}" />
+                                <Setter Property="TextColor" Value="Red" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                    <Label FontSize="12" VerticalOptions="Center">
+                        <Label.Triggers>
+                            <DataTrigger
+                                Binding="{Binding ConnectedAPI, Mode=OneWay}"
+                                TargetType="Label"
+                                Value="true">
+                                <Setter Property="Text" Value="URL permitido" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding ConnectedAPI, Mode=OneWay}"
+                                TargetType="Label"
+                                Value="false">
+                                <Setter Property="Text" Value="URL denegado" />
+                                <Setter Property="TextColor" Value="Red" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding ConnectedAPI, Mode=OneWay, Converter={ctk:IsNullConverter}}"
+                                TargetType="Label"
+                                Value="true">
+                                <Setter Property="Text" Value="URL no comprobado" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
                 </HorizontalStackLayout>
             </Grid>
+            <HorizontalStackLayout
+                Grid.Column="1"
+                HorizontalOptions="End"
+                Spacing="8">
+                <Button
+                    Command="{Binding TestCommand}"
+                    Text="Comprobar"
+                    WidthRequest="{OnIdiom Default='110',
+                                           Phone='98'}" />
+                <Button
+                    Command="{Binding SaveCommand}"
+                    IsEnabled="{Binding ConnectedAPI, Mode=OneWay, Converter={StaticResource MyMultiConverter}}"
+                    Text="Guardar"
+                    WidthRequest="{OnIdiom Default='110',
+                                           Phone='98'}" />
+                <Button
+                    Command="{Binding CancelCommand}"
+                    Text="Cancelar"
+                    WidthRequest="{OnIdiom Default='110',
+                                           Phone='98'}" />
+            </HorizontalStackLayout>
         </VerticalStackLayout>
     </Frame>
 

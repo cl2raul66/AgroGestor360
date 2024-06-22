@@ -13,7 +13,7 @@
 
     <Grid
         Padding="8"
-        RowDefinitions="auto,*,auto"
+        RowDefinitions="auto,*,auto,auto"
         RowSpacing="16">
         <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
             <Label
@@ -24,17 +24,23 @@
                 VerticalOptions="Center" />
             <HorizontalStackLayout Grid.Column="2" Spacing="8">
                 <Button
+                    IsEnabled="{Binding HaveConnection}"
+                    IsVisible="{OnIdiom Phone='False',
+                                        Default='True'}"
                     Text="Reportes"
                     TextTransform="Uppercase"
                     ToolTipProperties.Text="Ir a reportes"
                     WidthRequest="110" />
                 <Button
                     Command="{Binding GoToSalesCommand}"
+                    IsEnabled="{Binding HaveConnection}"
+                    IsVisible="{OnIdiom Phone='False',
+                                        Default='True'}"
                     Text="Ventas"
                     TextTransform="Uppercase"
                     ToolTipProperties.Text="Ir a ventas"
                     WidthRequest="110" />
-                <BoxView Style="{StaticResource ElementSeparator}" />
+                <BoxView Style="{StaticResource ElementSeparator}" IsVisible="{OnIdiom Phone='False', Default='True'}" />
                 <Button
                     Command="{Binding GoToSettingsCommand}"
                     FontFamily="icofont"
@@ -44,26 +50,93 @@
             </HorizontalStackLayout>
         </Grid>
         <Frame
-            Grid.Row="1"
-            HorizontalOptions="Center"
+            Grid.Row="2"
+            HorizontalOptions="Fill"
+            IsVisible="{Binding HaveConnection}"
             VerticalOptions="Center">
-            <VerticalStackLayout Spacing="8">
+            <Grid RowDefinitions="auto,auto" RowSpacing="8">
                 <Label Text="Accesos rápidos:" />
-                <HorizontalStackLayout Spacing="8">
+                <FlexLayout
+                    Grid.Row="1"
+                    AlignContent="{OnIdiom Default=Stretch,
+                                           Phone=Start}"
+                    AlignItems="{OnIdiom Default=Center,
+                                         Phone=Stretch}"
+                    Direction="{OnIdiom Default=Row,
+                                        Phone=Column}"
+                    JustifyContent="{OnIdiom Default=Start,
+                                             Phone=Center}"
+                    Wrap="{OnIdiom Default=Wrap,
+                                   Phone=NoWrap}">
                     <Button
-                        Text="Realizar venta"
-                        ToolTipProperties.Text="Agregar nueva venta"
-                        WidthRequest="130" />
-                    <!--<Button
-                        Text="Aportes"
-                        ToolTipProperties.Text="Agregar aporte"
-                        WidthRequest="130" />-->
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='True',
+                                            Default='False'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Reportes"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Ir a reportes" />
+                    <Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        Command="{Binding GoToSalesCommand}"
+                        IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='True',
+                                            Default='False'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Ventas"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Ir a ventas" />
+                    <BoxView
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,4'}"
+                        Background="{StaticResource Gray200}"
+                        HeightRequest="2"
+                        IsVisible="{OnIdiom Phone='True',
+                                            Default='False'}" />
+                    <Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        Command="{Binding ShowAddQuoteCommand}"
+                        IsEnabled="{Binding HaveConnection}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Nueva cotización"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Elabora una nueva cotización" />
+                    <Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        Command="{Binding ShowAddOrderCommand}"
+                        IsEnabled="{Binding HaveConnection}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Nuevo pedido"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Agregar nuevo pedido" />
+                    <Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        Command="{Binding ShowAddSaleCommand}"
+                        IsEnabled="{Binding HaveConnection}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Nueva venta"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Agregar nueva venta" />
+                    <Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        IsEnabled="{Binding HaveConnection}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Nueva mercancía"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Agregar nueva mercancía" />
+                </FlexLayout>
+            </Grid>
         </Frame>
         <!--#region PIE DE PAGINA-->
         <Grid
-            Grid.Row="2"
+            Grid.Row="3"
             Padding="8,0"
             ColumnDefinitions="*,auto"
             ColumnSpacing="8">

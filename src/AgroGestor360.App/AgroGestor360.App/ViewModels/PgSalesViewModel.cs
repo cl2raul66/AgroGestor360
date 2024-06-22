@@ -13,6 +13,9 @@ using System.Text;
 
 namespace AgroGestor360.App.ViewModels;
 
+[QueryProperty(nameof(IsShowAddQuote), "ShowAddQuote")]
+[QueryProperty(nameof(IsShowAddOrder), "ShowAddOrder")]
+[QueryProperty(nameof(IsShowAddSale), "ShowAddSale")]
 public partial class PgSalesViewModel : ObservableRecipient
 {
     readonly string serverURL;
@@ -52,8 +55,17 @@ public partial class PgSalesViewModel : ObservableRecipient
             }
         });
 
-        AppInfo = $"{Assembly.GetExecutingAssembly().GetName().Name} V.{VersionTracking.Default.CurrentVersion}";
+        AppInfo = $"Versión: {VersionTracking.Default.CurrentVersion}";
     }
+
+    [ObservableProperty]
+    bool isShowAddQuote;
+
+    [ObservableProperty]
+    bool isShowAddOrder;
+
+    [ObservableProperty]
+    bool isShowAddSale;
 
     [ObservableProperty]
     bool haveConnection;
@@ -759,6 +771,31 @@ public partial class PgSalesViewModel : ObservableRecipient
         if (e.PropertyName == nameof(IsBillsVisible))
         {
             Invoices = IsBillsVisible ? new(await invoicesServ.GetAllAsync(serverURL)) : null;
+        }
+
+        if (e.PropertyName == nameof(IsShowAddOrder))
+        {
+            if (IsShowAddOrder)
+            {
+                await ShowAddEditOrder();
+            }
+        }
+
+        if (e.PropertyName == nameof(IsShowAddQuote))
+        {
+            if (IsShowAddQuote)
+            {
+                await ShowAddEditQuote();
+            }
+        }
+
+        if (e.PropertyName == nameof(IsShowAddSale))
+        {
+            if (IsShowAddSale)
+            {
+                ViewBills();
+                await ShowAddEditSale();
+            }
         }
     }
     //todo: separar metodos de inicializacion de colecciones dependiendo de haveConnection

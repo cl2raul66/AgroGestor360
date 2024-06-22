@@ -4,7 +4,6 @@ using AgroGestor360.Client.Tools;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.ComponentModel;
-using System.Reflection;
 using System.Text;
 
 namespace AgroGestor360.App.ViewModels;
@@ -26,9 +25,12 @@ public partial class PgSettingsViewModel : ObservableObject
 
         apiServ.OnReceiveStatusMessage += ApiServ_OnReceiveStatusMessage;
 
-        AppInfo = $"{Assembly.GetExecutingAssembly().GetName().Name} V.{VersionTracking.Default.CurrentVersion}";
+        AppInfo = $"Versión: {VersionTracking.Default.CurrentVersion}";
         Inizialice();
     }
+
+    [ObservableProperty]
+    bool isVisibleMenu;
 
     [ObservableProperty]
     bool haveConnection;
@@ -36,13 +38,13 @@ public partial class PgSettingsViewModel : ObservableObject
     [ObservableProperty]
     string? appInfo;
 
-    public IEnumerable<string> Menu =>
-    [
-        "Conexión",
+    public IEnumerable<string> Menu => DeviceInfo.Idiom == DeviceIdiom.Phone
+        ? ["Conexión", "Entidad"] 
+        : ["Conexión",
         "Entidad",
         "Bancos",
         "Descuentos",
-        "Linea de créditos",
+        "Línea de créditos",
         "Vendedores",
         "Clientes",
         "Almacén",
@@ -57,6 +59,12 @@ public partial class PgSettingsViewModel : ObservableObject
 
     [RelayCommand]
     async Task GoToBack() => await Shell.Current.GoToAsync("..", true);
+
+    [RelayCommand]
+    void ShowMenu()
+    {
+        IsVisibleMenu = !IsVisibleMenu;
+    }
 
     void ApiServ_OnReceiveStatusMessage(ServerStatus status)
     {
@@ -91,9 +99,6 @@ public partial class PgSettingsViewModel : ObservableObject
                     }
                     await Shell.Current.DisplayAlert("Información de la empresa", sb.ToString(), "Cerrar");
                     break;
-                case "Capital inicial":
-                    navigationServ.NavigateToView<CvSeedCapitalViewModel>(view => CurrentContent = view);
-                    break;
                 case "Bancos":
                     navigationServ.NavigateToView<CvBankAccountsViewModel>(view => CurrentContent = view);
                     break;
@@ -118,6 +123,10 @@ public partial class PgSettingsViewModel : ObservableObject
                 default:
                     navigationServ.NavigateToNullView(view => CurrentContent = view);
                     break;
+            }
+            if (SelectedMenu is not null)
+            {
+                IsVisibleMenu = false;
             }
         }
     }

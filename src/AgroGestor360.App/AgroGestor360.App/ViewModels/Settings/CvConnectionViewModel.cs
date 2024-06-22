@@ -1,4 +1,6 @@
 ﻿using AgroGestor360.App.Views.Settings;
+using AgroGestor360.Client.Services;
+using AgroGestor360.Client.Tools;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -7,11 +9,25 @@ namespace AgroGestor360.App.ViewModels;
 
 public partial class CvConnectionViewModel : ObservableRecipient
 {
-    public CvConnectionViewModel()
+    readonly IApiService apiServ;
+
+    public CvConnectionViewModel(IApiService apiService)
     {
         IsActive = true;
         ServerURL = Preferences.Default.Get<string?>("serverurl", null);
+        apiServ = apiService;
+        if (!string.IsNullOrEmpty(ServerURL))
+        {
+            Task.Run(async () =>
+            {
+                HaveConnection = await apiServ.ConnectToServerHub(ServerURL);
+            });
+        }
+        apiServ.OnReceiveStatusMessage += ApiServ_OnReceiveStatusMessage;
     }
+
+    [ObservableProperty]
+    bool haveConnection;
 
     [ObservableProperty]
     string? serverURL;
@@ -25,9 +41,14 @@ public partial class CvConnectionViewModel : ObservableRecipient
     protected override void OnActivated()
     {
         base.OnActivated();
-        WeakReferenceMessenger.Default.Register<CvConnectionViewModel,string, string>(this, nameof(PgSetURL), (r, m) =>
+        WeakReferenceMessenger.Default.Register<CvConnectionViewModel, string, string>(this, nameof(PgSetURL), (r, m) =>
         {
             r.ServerURL = m;
         });
+    }
+
+    void ApiServ_OnReceiveStatusMessage(ServerStatus status)
+    {
+        HaveConnection = status is ServerStatus.Running;
     }
 }

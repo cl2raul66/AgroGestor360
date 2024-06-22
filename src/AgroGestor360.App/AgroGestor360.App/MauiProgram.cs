@@ -68,7 +68,6 @@ public static class MauiProgram
         builder.Services.AddTransient<PgSettings, PgSettingsViewModel>();
         builder.Services.AddTransient<CvConnection, CvConnectionViewModel>();
         builder.Services.AddTransient<PgSetURL, PgSetURLViewModel>();
-        builder.Services.AddTransient<CvSeedCapital, CvSeedCapitalViewModel>();
         builder.Services.AddTransient<CvBankAccounts, CvBankAccountsViewModel>();
         builder.Services.AddTransient<PgAddAccountOrCard, PgAddAccountOrCardViewModel>();
         builder.Services.AddTransient<CvDiscounts, CvDiscountsViewModel>();

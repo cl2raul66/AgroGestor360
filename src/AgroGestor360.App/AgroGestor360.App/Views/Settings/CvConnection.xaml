@@ -25,11 +25,41 @@
             </Grid>
         </Frame>
         <Grid Grid.Row="1">
-            <Label
-                FontSize="16"
-                HorizontalOptions="Center"
-                Text="{Binding ServerURL, Mode=OneWay, StringFormat='Servidor en {0}.', TargetNullValue='¡No hay URL establecida!'}"
-                VerticalOptions="Center" />
+            <VerticalStackLayout Spacing="8" VerticalOptions="Center">
+                <Label FontSize="16" HorizontalOptions="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span
+                                FontAttributes="Bold"
+                                Text="Servidor: "
+                                TextColor="{StaticResource Black}" />
+                            <Span Text="{Binding ServerURL, TargetNullValue='¡No hay URL establecida!'}" TextColor="{StaticResource Black}" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <HorizontalStackLayout HorizontalOptions="Center">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        Text="Estado: " />
+                    <Label FontSize="16">
+                        <Label.Triggers>
+                            <DataTrigger
+                                Binding="{Binding HaveConnection}"
+                                TargetType="Label"
+                                Value="true">
+                                <Setter Property="Text" Value="Conectado" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding HaveConnection}"
+                                TargetType="Label"
+                                Value="false">
+                                <Setter Property="Text" Value="Desconectado" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
         </Grid>
     </Grid>
 

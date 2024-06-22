@@ -408,13 +408,33 @@
                                 HorizontalOptions="Start"
                                 Text="Saldo de la venta:"
                                 VerticalOptions="Center" />
-                            <Label
-                                FontAttributes="Bold"
-                                FontSize="14"
-                                HorizontalOptions="End"
-                                Text="{Binding TotalWithDiscount, StringFormat='{0:C}', FallbackValue='0.00'}"
-                                TextColor="{StaticResource Secondary}"
-                                VerticalOptions="Center" />
+                            <HorizontalStackLayout HorizontalOptions="End" Spacing="4">
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="14"
+                                    Text="{Binding TotalWithDiscount, StringFormat='{0:C}', FallbackValue='0.00'}"
+                                    TextColor="{StaticResource Secondary}"
+                                    VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding IsCreditLimitExceeded}"
+                                            TargetType="Label"
+                                            Value="True">
+                                            <Setter Property="TextColor" Value="Red" />
+                                            <Setter Property="ToolTipProperties.Text" Value="Crédito sobrepasado" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <Label
+                                    FontFamily="icofont"
+                                    FontSize="14"
+                                    IsVisible="{Binding IsCreditLimitExceeded}"
+                                    Text="{StaticResource Warning}"
+                                    TextColor="Red"
+                                    ToolTipProperties.Text="Crédito sobrepasado"
+                                    VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+
                         </Grid>
                     </VerticalStackLayout>
                 </Grid>

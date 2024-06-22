@@ -8,7 +8,9 @@
         <Label
             FontSize="16"
             HorizontalOptions="Center"
-            Text="¡Seleccione un ajuste de la izquierda para visualizar!"
+            HorizontalTextAlignment="Center"
+            LineBreakMode="WordWrap"
+            Text="¡Seleccione uno de los ajustes del menú para visualizar!"
             VerticalOptions="Center" />
     </Grid>
 

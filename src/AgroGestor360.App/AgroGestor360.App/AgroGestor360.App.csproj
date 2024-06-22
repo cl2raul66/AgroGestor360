@@ -24,7 +24,7 @@
 		<ApplicationTitle>AgroGestor360.App</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.agrogestor360.app</ApplicationId>
+		<ApplicationId>com.randamedialabgroup.agrogestor360.app</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -47,10 +47,18 @@
 		<HoursBetweenUpdateChecks>168</HoursBetweenUpdateChecks>
 		<AssemblyName>AgroGestor360.App</AssemblyName>
 		<Platforms>AnyCPU</Platforms>
+		<NeutralLanguage>es-GT</NeutralLanguage>
+		<AssemblyVersion></AssemblyVersion>
+		<FileVersion></FileVersion>
+		<AndroidSigningKeyStore>randamedialabgroup_android.keystore</AndroidSigningKeyStore>
 	</PropertyGroup>
 	
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
 	  <ApplicationTitle>AgroGestor360</ApplicationTitle>
+	  <ApplicationDisplayVersion>1.0.12.0</ApplicationDisplayVersion>
+	  <EnableLLVM>True</EnableLLVM>
+	  <AndroidKeyStore>False</AndroidKeyStore>
+	  <AndroidSigningStorePass>12345678</AndroidSigningStorePass>
 	</PropertyGroup>
 	
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|ARM64'">
@@ -59,6 +67,7 @@
 	
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
 	  <ApplicationTitle>AgroGestor360</ApplicationTitle>
+	  <ApplicationDisplayVersion>1.0.12.0</ApplicationDisplayVersion>
 	</PropertyGroup>
 	
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|ARM64'">
@@ -67,6 +76,11 @@
 	
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
 	  <ApplicationTitle>AgroGestor360</ApplicationTitle>
+	  <ApplicationDisplayVersion>1.0.12.0</ApplicationDisplayVersion>
+	  <AndroidPackageFormat>apk</AndroidPackageFormat>
+	  <EnableLLVM>True</EnableLLVM>
+	  <AndroidKeyStore>False</AndroidKeyStore>
+	  <AndroidSigningStorePass>12345678</AndroidSigningStorePass>
 	</PropertyGroup>
 	
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|ARM64'">
@@ -75,6 +89,7 @@
 	
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
 	  <ApplicationTitle>AgroGestor360</ApplicationTitle>
+	  <ApplicationDisplayVersion>1.0.12.0</ApplicationDisplayVersion>
 	</PropertyGroup>
 	
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|ARM64'">
@@ -113,16 +128,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.6" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.40" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.40" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.60" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.60" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.40" />
+		<PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.60" />
 		<PackageReference Include="QuestPDF" Version="2023.10.1" />
-		<PackageReference Include="UnitsNet" Version="5.50.0" />
+		<PackageReference Include="UnitsNet" Version="5.52.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -211,9 +226,6 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\CvProducts.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Settings\CvSeedCapital.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\CvUsers.xaml">

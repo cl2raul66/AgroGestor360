@@ -34,9 +34,6 @@ public class NavigationService : INavigationService
             case CvConnectionViewModel vm:
                 updateViewAction(new CvConnection(vm));
                 break;
-            case CvSeedCapitalViewModel vm:
-                updateViewAction(new CvSeedCapital(vm));
-                break;
             case CvUsersViewModel vm:
                 updateViewAction(new CvUsers(vm));
                 break;
