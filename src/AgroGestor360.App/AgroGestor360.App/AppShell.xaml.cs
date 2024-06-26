@@ -1,4 +1,5 @@
-﻿using AgroGestor360.App.Views;
+﻿using AgroGestor360.App.ViewModels;
+using AgroGestor360.App.Views;
 using AgroGestor360.App.Views.Expense;
 using AgroGestor360.App.Views.Loans;
 using AgroGestor360.App.Views.Sales;
@@ -38,5 +39,6 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(PgDeletedInSale), typeof(PgDeletedInSale));
         Routing.RegisterRoute(nameof(PgDeletedInvoice), typeof(PgDeletedInvoice));
         Routing.RegisterRoute(nameof(PgAmortizeInvoiceCredit), typeof(PgAmortizeInvoiceCredit));
+        Routing.RegisterRoute(nameof(PgReports), typeof(PgReports));
     }
 }

@@ -24,6 +24,7 @@
                 VerticalOptions="Center" />
             <HorizontalStackLayout Grid.Column="2" Spacing="8">
                 <Button
+                    Command="{Binding GoToReportsCommand}"
                     IsEnabled="{Binding HaveConnection}"
                     IsVisible="{OnIdiom Phone='False',
                                         Default='True'}"
@@ -71,13 +72,14 @@
                     <Button
                         Margin="{OnIdiom Default='2',
                                          Phone='0,2'}"
+                        Command="{Binding GoToReportsCommand}"
                         IsEnabled="{Binding HaveConnection}"
                         IsVisible="{OnIdiom Phone='True',
                                             Default='False'}"
                         MinimumWidthRequest="{OnIdiom Desktop='180'}"
                         Text="Reportes"
                         TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ir a reportes" />
+                        ToolTipProperties.Text="Ir a reportes." />
                     <Button
                         Margin="{OnIdiom Default='2',
                                          Phone='0,2'}"
@@ -88,7 +90,7 @@
                         MinimumWidthRequest="{OnIdiom Desktop='180'}"
                         Text="Ventas"
                         TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ir a ventas" />
+                        ToolTipProperties.Text="Ir a ventas." />
                     <BoxView
                         Margin="{OnIdiom Default='2',
                                          Phone='0,4'}"
@@ -99,12 +101,20 @@
                     <Button
                         Margin="{OnIdiom Default='2',
                                          Phone='0,2'}"
+                        IsEnabled="{Binding HaveConnection}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Conciliación de caja"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Realiza la conciliacion de caja del momento actual." />
+                    <Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
                         Command="{Binding ShowAddQuoteCommand}"
                         IsEnabled="{Binding HaveConnection}"
                         MinimumWidthRequest="{OnIdiom Desktop='180'}"
                         Text="Nueva cotización"
                         TextTransform="Uppercase"
-                        ToolTipProperties.Text="Elabora una nueva cotización" />
+                        ToolTipProperties.Text="Elabora una nueva cotización." />
                     <Button
                         Margin="{OnIdiom Default='2',
                                          Phone='0,2'}"
@@ -113,7 +123,7 @@
                         MinimumWidthRequest="{OnIdiom Desktop='180'}"
                         Text="Nuevo pedido"
                         TextTransform="Uppercase"
-                        ToolTipProperties.Text="Agregar nuevo pedido" />
+                        ToolTipProperties.Text="Agregar nuevo pedido." />
                     <Button
                         Margin="{OnIdiom Default='2',
                                          Phone='0,2'}"
@@ -122,7 +132,7 @@
                         MinimumWidthRequest="{OnIdiom Desktop='180'}"
                         Text="Nueva venta"
                         TextTransform="Uppercase"
-                        ToolTipProperties.Text="Agregar nueva venta" />
+                        ToolTipProperties.Text="Agregar nueva venta." />
                     <Button
                         Margin="{OnIdiom Default='2',
                                          Phone='0,2'}"
@@ -130,7 +140,7 @@
                         MinimumWidthRequest="{OnIdiom Desktop='180'}"
                         Text="Nueva mercancía"
                         TextTransform="Uppercase"
-                        ToolTipProperties.Text="Agregar nueva mercancía" />
+                        ToolTipProperties.Text="Agregar nueva mercancía." />
                 </FlexLayout>
             </Grid>
         </Frame>

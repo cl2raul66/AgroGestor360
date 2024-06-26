@@ -51,6 +51,7 @@
 		<AssemblyVersion></AssemblyVersion>
 		<FileVersion></FileVersion>
 		<AndroidSigningKeyStore>randamedialabgroup_android.keystore</AndroidSigningKeyStore>
+		<DefaultLanguage>Es-Gt</DefaultLanguage>
 	</PropertyGroup>
 	
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
@@ -147,6 +148,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\PgReports.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Sales\PgDeletedInSale.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -265,6 +269,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\PgReports.xaml.cs">
+	    <DependentUpon>PgReports.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\Sales\PgAddEditSale.xaml.cs">
 	    <DependentUpon>PgAddEditSale.xaml</DependentUpon>
 	  </Compile>

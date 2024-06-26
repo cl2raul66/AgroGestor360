@@ -109,7 +109,7 @@
                         </RadioButton>
                     </HorizontalStackLayout>-->
                 </VerticalStackLayout>
-                <ScrollView Grid.Row="1" Orientation="Horizontal">
+                <ScrollView Grid.Row="1">
                     <CollectionView
                         ItemsSource="{Binding Articles, Mode=OneWay}"
                         SelectedItem="{Binding SelectedArticle, Mode=TwoWay}"

@@ -134,5 +134,6 @@ public partial class PgSettingsViewModel : ObservableObject
     async void Inizialice()
     {
         HaveConnection = await apiServ.ConnectToServerHub(serverURL);
+        IsVisibleMenu = HaveConnection;
     }
 }

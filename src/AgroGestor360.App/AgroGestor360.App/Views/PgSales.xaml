@@ -460,6 +460,11 @@
                 <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                     <HorizontalStackLayout Spacing="8">
                         <Button
+                            FontFamily="icofont"
+                            IsEnabled="{Binding Invoices, Mode=OneWay, Converter={ctk:IsListNotNullOrEmptyConverter}}"
+                            Text="{StaticResource Inbox}"
+                            ToolTipProperties.Text="Conciliación de caja" />
+                        <Button
                             Command="{Binding ShowInvoiceDetailCommand}"
                             FontFamily="icofont"
                             IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"

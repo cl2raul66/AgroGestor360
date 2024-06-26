@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AgroGestor360.App.Views.PgReports"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
+    Title="Reportes"
+    x:DataType="vm:PgReportsViewModel"
+    Shell.NavBarIsVisible="False">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
+    <Grid
+        Padding="8"
+        RowDefinitions="auto,*,auto,auto"
+        RowSpacing="16">
+        <!--#region ENCABEZADO-->
+        <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+            <HorizontalStackLayout MinimumHeightRequest="36" Spacing="8">
+                <Button
+                    Command="{Binding GoToBackCommand}"
+                    FontFamily="icofont"
+                    Text="{StaticResource ArrowLeft}"
+                    ToolTipProperties.Text="Atras" />
+                <Label
+                    Grid.Column="1"
+                    FontSize="18"
+                    Text="Reportes"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout
+                Grid.Column="1"
+                IsEnabled="{Binding IsEnabledToolBar}"
+                Spacing="8">
+                <Button
+                    FontFamily="icofont"
+                    IsEnabled="{Binding IsSelectedElement}"
+                    Text="{StaticResource Share}"
+                    ToolTipProperties.Text="Compartir reporte como PDF" />
+                <Button
+                    FontFamily="icofont"
+                    IsEnabled="{Binding IsSelectedElement}"
+                    Text="{StaticResource FilePdf}"
+                    ToolTipProperties.Text="Ver como PDF, la cotización seleccionada." />
+                <BoxView Style="{StaticResource ElementSeparator}" />
+                <Button
+                    FontFamily="icofont"
+                    Text="{StaticResource Search1}"
+                    ToolTipProperties.Text="Ventas" />
+            </HorizontalStackLayout>
+        </Grid>
+        <!--#endregion-->
+        <!--#region CONTENIDO-->
+        <Frame
+            Grid.Row="1"
+            IsVisible="true"
+            ZIndex="10">
+            <Grid
+                IsVisible="{Binding IsSelectedSale}"
+                RowDefinitions="auto,*"
+                RowSpacing="8">
+                <Label
+                    FontSize="18"
+                    HorizontalOptions="{OnIdiom Default='Start',
+                                                Phone='Center'}"
+                    Text="Filtro de ventas"
+                    TextTransform="Uppercase" />
+                <FlexLayout
+                    Grid.Row="1"
+                    AlignContent="{OnIdiom Default=Stretch,
+                                           Phone=Start}"
+                    AlignItems="{OnIdiom Default=Center,
+                                         Phone=Stretch}"
+                    Direction="{OnIdiom Default=Row,
+                                        Phone=Column}"
+                    JustifyContent="{OnIdiom Default=Start,
+                                             Phone=Start}"
+                    Wrap="{OnIdiom Default=Wrap,
+                                   Phone=NoWrap}">
+                    <Grid
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        RowDefinitions="auto,auto"
+                        RowSpacing="{OnIdiom Default='4',
+                                             Phone='0'}">
+                        <Label Text="Cliente:" />
+                        <Entry
+                            Grid.Row="1"
+                            ClearButtonVisibility="WhileEditing"
+                            IsSpellCheckEnabled="True"
+                            IsTextPredictionEnabled="True"
+                            Placeholder="Escriba aquí" />
+                    </Grid>
+                    <Grid
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        RowDefinitions="auto,auto"
+                        RowSpacing="{OnIdiom Default='4',
+                                             Phone='0'}">
+                        <Label Text="Vendedor:" />
+                        <Entry
+                            Grid.Row="1"
+                            ClearButtonVisibility="WhileEditing"
+                            IsSpellCheckEnabled="True"
+                            IsTextPredictionEnabled="True"
+                            Placeholder="Escriba aquí" />
+                    </Grid>
+                    <Grid
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        RowDefinitions="auto,auto"
+                        RowSpacing="{OnIdiom Default='4',
+                                             Phone='0'}">
+                        <Label Text="Fechas: (desde - hasta)" />
+                        <HorizontalStackLayout Grid.Row="1" Spacing="8">
+                            <DatePicker Format="dd/MM/yyyy" />
+                            <Label Text=" - " VerticalOptions="Center" />
+                            <DatePicker Format="dd/MM/yyyy" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                    <Grid
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        RowDefinitions="auto,auto">
+                        <Label Text="Estado:" />
+                        <FlexLayout Grid.Row="1" Wrap="Wrap">
+                            <RadioButton
+                                Margin="{OnIdiom Default='2',
+                                                 Phone='0,2'}"
+                                Content="Todos"
+                                IsChecked="True" />
+                            <RadioButton Margin="{OnIdiom Default='2', Phone='0,2'}" Content="Pagadas" />
+                            <RadioButton Margin="{OnIdiom Default='2', Phone='0,2'}" Content="Pendientes" />
+                            <RadioButton Margin="{OnIdiom Default='2', Phone='0,2'}" Content="Canceladas" />
+                        </FlexLayout>
+                    </Grid>
+                </FlexLayout>
+            </Grid>
+        </Frame>
+        <Grid
+            Grid.Row="1"
+            IsVisible="{Binding IsSelectedSale}"
+            RowDefinitions="auto,*"
+            RowSpacing="8">
+            <Label
+                FontSize="18"
+                Text="Resultado de ventas"
+                TextTransform="Uppercase" />
+            <Grid
+                Grid.Row="1"
+                RowDefinitions="auto,*"
+                RowSpacing="8">
+                <ScrollView Grid.Row="1">
+                    <CollectionView />
+                </ScrollView>
+            </Grid>
+        </Grid>
+        <Frame
+            Grid.Row="2"
+            HorizontalOptions="Fill"
+            IsVisible="{Binding HaveConnection}"
+            VerticalOptions="Center">
+            <Grid RowDefinitions="auto,auto" RowSpacing="8">
+                <Label Text="Seleccione un reporte:" />
+                <FlexLayout
+                    Grid.Row="1"
+                    AlignContent="{OnIdiom Default=Stretch,
+                                           Phone=Start}"
+                    AlignItems="{OnIdiom Default=Center,
+                                         Phone=Stretch}"
+                    Direction="{OnIdiom Default=Row,
+                                        Phone=Column}"
+                    JustifyContent="{OnIdiom Default=Start,
+                                             Phone=Center}"
+                    Wrap="{OnIdiom Default=Wrap,
+                                   Phone=NoWrap}">
+                    <RadioButton
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        Content="Ventas"
+                        IsChecked="{Binding IsSelectedSale}"
+                        MinimumWidthRequest="{OnIdiom Desktop='120'}"
+                        ToolTipProperties.Text="Reporte de ventas." />
+                    <RadioButton
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        Content="Cierre de caja"
+                        MinimumWidthRequest="{OnIdiom Desktop='120'}"
+                        ToolTipProperties.Text="Reporte de reconteo de las operaciones al final del día." />
+                    <RadioButton
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        Content="Conciliación de caja"
+                        MinimumWidthRequest="{OnIdiom Desktop='120'}"
+                        ToolTipProperties.Text="Reporte para conciliaciones de caja realizadas." />
+                </FlexLayout>
+            </Grid>
+        </Frame>
+        <!--#endregion-->
+        <!--#region PIE DE PAGINA-->
+        <Grid
+            Grid.Row="3"
+            Padding="8,0"
+            ColumnDefinitions="*,auto"
+            ColumnSpacing="8">
+            <HorizontalStackLayout Spacing="8">
+                <Label
+                    Padding="2"
+                    FontFamily="icofont"
+                    FontSize="11">
+                    <Label.Triggers>
+                        <DataTrigger
+                            Binding="{Binding HaveConnection}"
+                            TargetType="Label"
+                            Value="true">
+                            <Setter Property="ToolTipProperties.Text" Value="Conectado al servidor" />
+                            <Setter Property="Text" Value="{StaticResource UiNetwork}" />
+                        </DataTrigger>
+                        <DataTrigger
+                            Binding="{Binding HaveConnection}"
+                            TargetType="Label"
+                            Value="false">
+                            <Setter Property="ToolTipProperties.Text" Value="Desconectado del servidor" />
+                            <Setter Property="Text" Value="{StaticResource Broken}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout
+                Grid.Column="1"
+                Spacing="8"
+                VerticalOptions="Center">
+                <Label FontSize="11" Text="{Binding AppInfo}" />
+                <BoxView Style="{StaticResource ElementSeparator}" />
+                <Label
+                    Grid.Column="1"
+                    FontSize="11"
+                    Text="by RandA Media Lab, Group" />
+            </HorizontalStackLayout>
+        </Grid>
+        <!--#endregion-->
+    </Grid>
+
+</ContentPage>

@@ -8,7 +8,6 @@ using AgroGestor360.App.Views.Sales;
 using AgroGestor360.App.Views.Settings;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Maui;
-using CommunityToolkit.Maui.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
@@ -99,6 +98,7 @@ public static class MauiProgram
         builder.Services.AddTransient<PgDeletedInvoice, PgDeletedInvoiceViewModel>();
         builder.Services.AddTransient<PgDeletedInSale, PgDeletedInSaleViewModel>();
         builder.Services.AddTransient<PgAmortizeInvoiceCredit, PgAmortizeInvoiceCreditViewModel>();
+        builder.Services.AddTransient<PgReports, PgReportsViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();

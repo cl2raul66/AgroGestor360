@@ -1,5 +1,4 @@
 ﻿using AgroGestor360.App.Views;
-using AgroGestor360.App.Views.Sales;
 using AgroGestor360.Client.Services;
 using AgroGestor360.Client.Tools;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -42,6 +41,17 @@ public partial class PgHomeViewModel : ObservableRecipient
     async Task GoToSales() => await Shell.Current.GoToAsync(nameof(PgSales), true);
 
     [RelayCommand]
+    async Task GoToReports()
+    {
+        Dictionary<string, object> sendData = new()
+        {
+            { "serverConnected", ServerConnected },
+            { "haveConnection", HaveConnection }
+        };
+        await Shell.Current.GoToAsync(nameof(PgReports), true, sendData);
+    }
+
+    [RelayCommand]
     async Task ShowAddQuote()
     {
         Dictionary<string, object> sendData = new()
@@ -71,12 +81,12 @@ public partial class PgHomeViewModel : ObservableRecipient
         await Shell.Current.GoToAsync(nameof(PgSales), true, sendData);
     }
 
-    #region EXTRA
     void ApiServ_OnReceiveStatusMessage(ServerStatus status)
     {
         HaveConnection = status is ServerStatus.Running;
     }
 
+    #region EXTRA
     public async void Initialize()
     {
         ServerConnected = await apiServ.CheckUrl(serverURL);
