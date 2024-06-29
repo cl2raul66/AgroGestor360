@@ -86,11 +86,11 @@ public partial class PgHomeViewModel : ObservableRecipient
         HaveConnection = status is ServerStatus.Running;
     }
 
-    #region EXTRA
     public async void Initialize()
     {
         ServerConnected = await apiServ.CheckUrl(serverURL);
         HaveConnection = await apiServ.ConnectToServerHub(serverURL);
     }
+    #region EXTRA
     #endregion
 }

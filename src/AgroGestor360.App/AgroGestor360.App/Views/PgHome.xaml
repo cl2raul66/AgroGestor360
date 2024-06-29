@@ -3,6 +3,7 @@
     x:Class="AgroGestor360.App.Views.PgHome"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:lcv="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui"
     xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     Title="Inicio"
     x:DataType="vm:PgHomeViewModel"
@@ -15,6 +16,7 @@
         Padding="8"
         RowDefinitions="auto,*,auto,auto"
         RowSpacing="16">
+        <!--#region ENCABEZADO-->
         <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
             <Label
                 Grid.Column="1"
@@ -50,6 +52,8 @@
                     ToolTipProperties.Text="Ajustes" />
             </HorizontalStackLayout>
         </Grid>
+        <!--#endregion-->
+        <!--#region CONTENIDO-->
         <Frame
             Grid.Row="2"
             HorizontalOptions="Fill"
@@ -144,6 +148,7 @@
                 </FlexLayout>
             </Grid>
         </Frame>
+        <!--#endregion-->
         <!--#region PIE DE PAGINA-->
         <Grid
             Grid.Row="3"

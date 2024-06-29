@@ -8,6 +8,7 @@ public partial class PgReports : ContentPage
 	{
 		InitializeComponent();
 
+		vm.Initialize();
         BindingContext = vm;
     }
 }

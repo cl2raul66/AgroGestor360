@@ -1,4 +1,5 @@
-﻿using AgroGestor360.App.Services;
+using Syncfusion.Maui.Core.Hosting;
+using AgroGestor360.App.Services;
 using AgroGestor360.App.Tools;
 using AgroGestor360.App.ViewModels;
 using AgroGestor360.App.Views;
@@ -21,6 +22,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .ConfigureSyncfusionCore()
             .UseMauiCommunityToolkit()
             .ConfigureFonts(fonts =>
             {

@@ -4,6 +4,8 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+    xmlns:inputs="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
     xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     Title="Reportes"
     x:DataType="vm:PgReportsViewModel"
@@ -68,80 +70,100 @@
                                                 Phone='Center'}"
                     Text="Filtro de ventas"
                     TextTransform="Uppercase" />
-                <FlexLayout
-                    Grid.Row="1"
-                    AlignContent="{OnIdiom Default=Stretch,
-                                           Phone=Start}"
-                    AlignItems="{OnIdiom Default=Center,
-                                         Phone=Stretch}"
-                    Direction="{OnIdiom Default=Row,
-                                        Phone=Column}"
-                    JustifyContent="{OnIdiom Default=Start,
-                                             Phone=Start}"
-                    Wrap="{OnIdiom Default=Wrap,
-                                   Phone=NoWrap}">
-                    <Grid
-                        Margin="{OnIdiom Default='2',
-                                         Phone='0,2'}"
-                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
-                        RowDefinitions="auto,auto"
-                        RowSpacing="{OnIdiom Default='4',
-                                             Phone='0'}">
-                        <Label Text="Cliente:" />
-                        <Entry
-                            Grid.Row="1"
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Placeholder="Escriba aquí" />
-                    </Grid>
-                    <Grid
-                        Margin="{OnIdiom Default='2',
-                                         Phone='0,2'}"
-                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
-                        RowDefinitions="auto,auto"
-                        RowSpacing="{OnIdiom Default='4',
-                                             Phone='0'}">
-                        <Label Text="Vendedor:" />
-                        <Entry
-                            Grid.Row="1"
-                            ClearButtonVisibility="WhileEditing"
-                            IsSpellCheckEnabled="True"
-                            IsTextPredictionEnabled="True"
-                            Placeholder="Escriba aquí" />
-                    </Grid>
-                    <Grid
-                        Margin="{OnIdiom Default='2',
-                                         Phone='0,2'}"
-                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
-                        RowDefinitions="auto,auto"
-                        RowSpacing="{OnIdiom Default='4',
-                                             Phone='0'}">
-                        <Label Text="Fechas: (desde - hasta)" />
-                        <HorizontalStackLayout Grid.Row="1" Spacing="8">
-                            <DatePicker Format="dd/MM/yyyy" />
-                            <Label Text=" - " VerticalOptions="Center" />
-                            <DatePicker Format="dd/MM/yyyy" />
-                        </HorizontalStackLayout>
-                    </Grid>
-                    <Grid
-                        Margin="{OnIdiom Default='2',
-                                         Phone='0,2'}"
-                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
-                        RowDefinitions="auto,auto">
-                        <Label Text="Estado:" />
-                        <FlexLayout Grid.Row="1" Wrap="Wrap">
-                            <RadioButton
-                                Margin="{OnIdiom Default='2',
-                                                 Phone='0,2'}"
-                                Content="Todos"
-                                IsChecked="True" />
-                            <RadioButton Margin="{OnIdiom Default='2', Phone='0,2'}" Content="Pagadas" />
-                            <RadioButton Margin="{OnIdiom Default='2', Phone='0,2'}" Content="Pendientes" />
-                            <RadioButton Margin="{OnIdiom Default='2', Phone='0,2'}" Content="Canceladas" />
-                        </FlexLayout>
-                    </Grid>
-                </FlexLayout>
+                <ScrollView Grid.Row="1">
+                    <FlexLayout
+                        AlignContent="{OnIdiom Default=Stretch,
+                                               Phone=Start}"
+                        AlignItems="{OnIdiom Default=Center,
+                                             Phone=Stretch}"
+                        Direction="{OnIdiom Default=Row,
+                                            Phone=Column}"
+                        JustifyContent="{OnIdiom Default=Start,
+                                                 Phone=Start}"
+                        Wrap="{OnIdiom Default=Wrap,
+                                       Phone=NoWrap}">
+                        <Grid
+                            Margin="{OnIdiom Default='2',
+                                             Phone='0'}"
+                            RowDefinitions="auto,auto"
+                            RowSpacing="{OnIdiom Default='4',
+                                                 Phone='0'}"
+                            WidthRequest="{OnIdiom Desktop='250'}">
+
+                            <Label Text="Cliente:" />
+                            <inputs:SfAutocomplete
+                                Grid.Row="1"
+                                DisplayMemberPath="FullName"
+                                HighlightedTextColor="{StaticResource Primary}"
+                                HighlightedTextFontAttributes="Bold"
+                                ItemsSource="{Binding Sellers}"
+                                MinimumWidthRequest="{OnIdiom Desktop='250'}"
+                                Placeholder="Escriba aquí"
+                                Text="{Binding SelectedSeller}"
+                                TextHighlightMode="FirstOccurrence"
+                                TextMemberPath="FullName"
+                                TextSearchMode="Contains" />
+                        </Grid>
+                        <Grid
+                            Margin="{OnIdiom Default='2',
+                                             Phone='0,4'}"
+                            RowDefinitions="auto,auto"
+                            RowSpacing="{OnIdiom Default='4',
+                                                 Phone='0'}"
+                            WidthRequest="{OnIdiom Desktop='250'}">
+                            <Label Text="Vendedor:" />
+                            <!--<Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Placeholder="Escriba aquí" />-->
+                            <inputs:SfAutocomplete
+                                Grid.Row="1"
+                                DisplayMemberPath="FullName"
+                                HighlightedTextColor="{StaticResource Primary}"
+                                HighlightedTextFontAttributes="Bold"
+                                ItemsSource="{Binding Sellers}"
+                                MinimumWidthRequest="{OnIdiom Desktop='250'}"
+                                Placeholder="Escriba aquí"
+                                Text="{Binding SelectedSeller}"
+                                TextHighlightMode="FirstOccurrence"
+                                TextMemberPath="FullName"
+                                TextSearchMode="Contains" />
+                        </Grid>
+                        <Grid
+                            Margin="{OnIdiom Default='2',
+                                             Phone='0,4'}"
+                            MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                            RowDefinitions="auto,auto"
+                            RowSpacing="{OnIdiom Default='4',
+                                                 Phone='0'}">
+                            <Label Text="Fechas: (desde - hasta)" />
+                            <HorizontalStackLayout Grid.Row="1" Spacing="8">
+                                <DatePicker Format="dd/MM/yyyy" />
+                                <Label Text=" - " VerticalOptions="Center" />
+                                <DatePicker Format="dd/MM/yyyy" />
+                            </HorizontalStackLayout>
+                        </Grid>
+                        <Grid
+                            Margin="{OnIdiom Default='2',
+                                             Phone='0'}"
+                            MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                            RowDefinitions="auto,auto">
+                            <Label Text="Estado:" />
+                            <FlexLayout Grid.Row="1" Wrap="Wrap">
+                                <RadioButton
+                                    Margin="{OnIdiom Default='2',
+                                                     Phone='0,2'}"
+                                    Content="Todos"
+                                    IsChecked="True" />
+                                <RadioButton Margin="{OnIdiom Default='2', Phone='0,2'}" Content="Pagadas" />
+                                <RadioButton Margin="{OnIdiom Default='2', Phone='0,2'}" Content="Pendientes" />
+                                <RadioButton Margin="{OnIdiom Default='2', Phone='0,2'}" Content="Canceladas" />
+                            </FlexLayout>
+                        </Grid>
+                    </FlexLayout>
+                </ScrollView>
             </Grid>
         </Frame>
         <Grid
