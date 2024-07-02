@@ -105,7 +105,7 @@ public partial class PgSettingsViewModel : ObservableObject
                 case "Descuentos":
                     navigationServ.NavigateToView<CvDiscountsViewModel>(view => CurrentContent = view);
                     break;
-                case "Linea de créditos":
+                case "Línea de créditos":
                     navigationServ.NavigateToView<CvLineCreditsViewModel>(view => CurrentContent = view);
                     break;
                 case "Almacén":

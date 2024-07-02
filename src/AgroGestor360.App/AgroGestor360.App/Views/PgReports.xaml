@@ -3,9 +3,11 @@
     x:Class="AgroGestor360.App.Views.PgReports"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ListView="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
     xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
     xmlns:inputs="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+    xmlns:localModel="clr-namespace:AgroGestor360.App.Models"
     xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     Title="Reportes"
     x:DataType="vm:PgReportsViewModel"
@@ -16,7 +18,7 @@
 
     <Grid
         Padding="8"
-        RowDefinitions="auto,*,auto,auto"
+        RowDefinitions="auto,*,auto"
         RowSpacing="16">
         <!--#region ENCABEZADO-->
         <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
@@ -29,7 +31,7 @@
                 <Label
                     Grid.Column="1"
                     FontSize="18"
-                    Text="Reportes"
+                    Text="{Binding SelectedMenu.Title, StringFormat='Reporte - {0}', FallbackValue='Reportes'}"
                     TextTransform="Uppercase"
                     VerticalOptions="Center" />
             </HorizontalStackLayout>
@@ -51,26 +53,90 @@
                 <Button
                     FontFamily="icofont"
                     Text="{StaticResource Search1}"
-                    ToolTipProperties.Text="Ventas" />
+                    ToolTipProperties.Text="Buscar reporte." />
+                <BoxView Style="{StaticResource ElementSeparator}" />
+                <Button
+                    Command="{Binding ShowMenuCommand}"
+                    FontFamily="icofont"
+                    Text="{StaticResource NavigationMenu}"
+                    ToolTipProperties.Text="Ver lista de reportes">
+                    <Button.Triggers>
+                        <DataTrigger
+                            Binding="{Binding IsVisibleMenu}"
+                            TargetType="Button"
+                            Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Secondary}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
             </HorizontalStackLayout>
         </Grid>
         <!--#endregion-->
         <!--#region CONTENIDO-->
-        <Frame
-            Grid.Row="1"
-            IsVisible="true"
-            ZIndex="10">
+        <Grid Grid.Row="1">
+            <!--#region MENU-->
             <Grid
-                IsVisible="{Binding IsSelectedSale}"
+                Padding="8"
+                BackgroundColor="#99634833"
+                HorizontalOptions="End"
+                IsVisible="{Binding IsVisibleMenu}"
                 RowDefinitions="auto,*"
-                RowSpacing="8">
-                <Label
-                    FontSize="18"
-                    HorizontalOptions="{OnIdiom Default='Start',
-                                                Phone='Center'}"
-                    Text="Filtro de ventas"
-                    TextTransform="Uppercase" />
-                <ScrollView Grid.Row="1">
+                RowSpacing="8"
+                WidthRequest="250"
+                ZIndex="10">
+                <VerticalStackLayout Spacing="8">
+                    <Label
+                        Grid.Row="1"
+                        FontSize="18"
+                        Text="Reportes"
+                        TextColor="{StaticResource White}"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                    <CollectionView
+                        ItemsSource="{Binding ReportsMenu, Mode=OneWay}"
+                        SelectedItem="{Binding SelectedMenu, Mode=TwoWay}"
+                        SelectionChanged="CollectionView_SelectionChanged"
+                        SelectionMode="Single">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="localModel:MenuItemReport">
+                                <Border Style="{StaticResource BorderItem}">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        ToolTipProperties.Text="{Binding Description}"
+                                        VerticalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span
+                                                    FontFamily="icofont"
+                                                    Text="{StaticResource SimpleRight}"
+                                                    TextColor="{StaticResource White}" />
+                                                <Span Text=" " />
+                                                <Span
+                                                    Text="{Binding Title}"
+                                                    TextColor="{StaticResource White}"
+                                                    TextTransform="Uppercase" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Grid>
+            <!--#endregion-->
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout IsVisible="{Binding IsSelectedSale}" Spacing="8">
+                    <Label
+                        FontSize="18"
+                        HorizontalOptions="{OnIdiom Default='Start',
+                                                    Phone='Center'}"
+                        Text="Filtro de ventas"
+                        TextTransform="Uppercase" />
                     <FlexLayout
                         AlignContent="{OnIdiom Default=Stretch,
                                                Phone=Start}"
@@ -112,12 +178,6 @@
                                                  Phone='0'}"
                             WidthRequest="{OnIdiom Desktop='250'}">
                             <Label Text="Vendedor:" />
-                            <!--<Entry
-                                Grid.Row="1"
-                                ClearButtonVisibility="WhileEditing"
-                                IsSpellCheckEnabled="True"
-                                IsTextPredictionEnabled="True"
-                                Placeholder="Escriba aquí" />-->
                             <inputs:SfAutocomplete
                                 Grid.Row="1"
                                 DisplayMemberPath="FullName"
@@ -163,68 +223,12 @@
                             </FlexLayout>
                         </Grid>
                     </FlexLayout>
-                </ScrollView>
-            </Grid>
-        </Frame>
-        <Grid
-            Grid.Row="1"
-            IsVisible="{Binding IsSelectedSale}"
-            RowDefinitions="auto,*"
-            RowSpacing="8">
-            <Label
-                FontSize="18"
-                Text="Resultado de ventas"
-                TextTransform="Uppercase" />
-            <Grid
-                Grid.Row="1"
-                RowDefinitions="auto,*"
-                RowSpacing="8">
-                <ScrollView Grid.Row="1">
-                    <CollectionView />
-                </ScrollView>
-            </Grid>
+                    <Frame IsVisible="{Binding IsSelectedSale}">
+                        <CollectionView />
+                    </Frame>
+                </VerticalStackLayout>
+            </ScrollView>
         </Grid>
-        <Frame
-            Grid.Row="2"
-            HorizontalOptions="Fill"
-            IsVisible="{Binding HaveConnection}"
-            VerticalOptions="Center">
-            <Grid RowDefinitions="auto,auto" RowSpacing="8">
-                <Label Text="Seleccione un reporte:" />
-                <FlexLayout
-                    Grid.Row="1"
-                    AlignContent="{OnIdiom Default=Stretch,
-                                           Phone=Start}"
-                    AlignItems="{OnIdiom Default=Center,
-                                         Phone=Stretch}"
-                    Direction="{OnIdiom Default=Row,
-                                        Phone=Column}"
-                    JustifyContent="{OnIdiom Default=Start,
-                                             Phone=Center}"
-                    Wrap="{OnIdiom Default=Wrap,
-                                   Phone=NoWrap}">
-                    <RadioButton
-                        Margin="{OnIdiom Default='2',
-                                         Phone='0,2'}"
-                        Content="Ventas"
-                        IsChecked="{Binding IsSelectedSale}"
-                        MinimumWidthRequest="{OnIdiom Desktop='120'}"
-                        ToolTipProperties.Text="Reporte de ventas." />
-                    <RadioButton
-                        Margin="{OnIdiom Default='2',
-                                         Phone='0,2'}"
-                        Content="Cierre de caja"
-                        MinimumWidthRequest="{OnIdiom Desktop='120'}"
-                        ToolTipProperties.Text="Reporte de reconteo de las operaciones al final del día." />
-                    <RadioButton
-                        Margin="{OnIdiom Default='2',
-                                         Phone='0,2'}"
-                        Content="Conciliación de caja"
-                        MinimumWidthRequest="{OnIdiom Desktop='120'}"
-                        ToolTipProperties.Text="Reporte para conciliaciones de caja realizadas." />
-                </FlexLayout>
-            </Grid>
-        </Frame>
         <!--#endregion-->
         <!--#region PIE DE PAGINA-->
         <Grid

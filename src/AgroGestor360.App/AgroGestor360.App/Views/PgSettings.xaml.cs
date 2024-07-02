@@ -4,11 +4,11 @@ namespace AgroGestor360.App.Views;
 
 public partial class PgSettings : ContentPage
 {
-	public PgSettings(PgSettingsViewModel vm)
-	{
-		InitializeComponent();
+    public PgSettings(PgSettingsViewModel vm)
+    {
+        InitializeComponent();
 
-		BindingContext = vm;
+        BindingContext = vm;
     }
 
     private void CollectionView_SelectionChanged(object sender, SelectionChangedEventArgs e)

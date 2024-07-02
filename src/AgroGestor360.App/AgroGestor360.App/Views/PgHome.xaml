@@ -3,7 +3,6 @@
     x:Class="AgroGestor360.App.Views.PgHome"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:lcv="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui"
     xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
     Title="Inicio"
     x:DataType="vm:PgHomeViewModel"

@@ -17,7 +17,20 @@
         RowDefinitions="auto,*,auto"
         RowSpacing="16">
         <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
-            <HorizontalStackLayout Spacing="8">
+            <HorizontalStackLayout MinimumHeightRequest="36" Spacing="8">
+                <Button
+                    Command="{Binding GoToBackCommand}"
+                    FontFamily="icofont"
+                    Text="{StaticResource ArrowLeft}"
+                    ToolTipProperties.Text="Ir a inicio" />
+                <Label
+                    Grid.Column="1"
+                    FontSize="18"
+                    Text="Ajustes"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Grid.Column="2" Spacing="8">
                 <Button
                     Command="{Binding ShowMenuCommand}"
                     FontFamily="icofont"
@@ -32,26 +45,13 @@
                         </DataTrigger>
                     </Button.Triggers>
                 </Button>
-                <Label
-                    Grid.Column="1"
-                    FontSize="18"
-                    Text="Ajustes"
-                    TextTransform="Uppercase"
-                    VerticalOptions="Center" />
-            </HorizontalStackLayout>
-            <HorizontalStackLayout Grid.Column="2" Spacing="8">
-                <Button
-                    Command="{Binding GoToBackCommand}"
-                    FontFamily="icofont"
-                    Text="{StaticResource UiHome}"
-                    ToolTipProperties.Text="Ir a inicio" />
             </HorizontalStackLayout>
         </Grid>
         <Grid Grid.Row="1">
             <Grid
                 Padding="8"
                 BackgroundColor="#99634833"
-                HorizontalOptions="Start"
+                HorizontalOptions="End"
                 IsVisible="{Binding IsVisibleMenu}"
                 RowDefinitions="auto,*"
                 RowSpacing="8"

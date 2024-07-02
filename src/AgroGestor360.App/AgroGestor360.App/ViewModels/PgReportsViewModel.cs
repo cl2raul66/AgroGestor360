@@ -1,4 +1,5 @@
-﻿using AgroGestor360.Client.Models;
+﻿using AgroGestor360.App.Models;
+using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using AgroGestor360.Client.Tools;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -26,8 +27,15 @@ public partial class PgReportsViewModel : ObservableObject
         sellersServ = sellersService;
 
         AppInfo = $"Versión: {VersionTracking.Default.CurrentVersion}";
-        IsSelectedSale = true;
+        ReportsMenu = [
+            new MenuItemReport() { Title = "Ventas", Description = "Reporte de ventas." },
+            new MenuItemReport() { Title = "Cierre de caja", Description = "Reporte de re conteo de las operaciones al final del día." },
+            new MenuItemReport() { Title = "Conciliación de caja", Description = "Reporte de ventas." }
+        ];
     }
+
+    [ObservableProperty]
+    bool isVisibleMenu;
 
     [ObservableProperty]
     bool haveConnection;
@@ -48,13 +56,31 @@ public partial class PgReportsViewModel : ObservableObject
     bool isSelectedElement;
 
     [ObservableProperty]
-    ObservableCollection<DTO6> sellers;
+    List<MenuItemReport> reportsMenu;
+
+    [ObservableProperty]
+    MenuItemReport? selectedMenu;
+
+    [ObservableProperty]
+    ObservableCollection<DTO5_1>? customers;
+
+    [ObservableProperty]
+    DTO5_1? selectedCustomer;
+
+    [ObservableProperty]
+    ObservableCollection<DTO6>? sellers;
 
     [ObservableProperty]
     DTO6? selectedSeller;
 
     [RelayCommand]
     async Task GoToBack() => await Shell.Current.GoToAsync("..", true);
+
+    [RelayCommand]
+    void ShowMenu()
+    {
+        IsVisibleMenu = !IsVisibleMenu;
+    }
 
     void ApiServ_OnReceiveStatusMessage(ServerStatus status)
     {
@@ -64,17 +90,46 @@ public partial class PgReportsViewModel : ObservableObject
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
+        if (e.PropertyName == nameof(HaveConnection))
+        {
+            IsEnabledToolBar = HaveConnection;
+        }
+
         if (e.PropertyName == nameof(IsSelectedSale))
         {
-            if (IsSelectedSale)
+            
+        }
+
+        if (e.PropertyName == nameof(SelectedMenu))
+        {
+            switch (SelectedMenu?.Title)
             {
-                IsEnabledToolBar = true;
+                case "Ventas":
+                    IsSelectedSale = true;
+                    break;
+                case "Cierre de caja":
+                    IsSelectedSale = false;
+                    break;
+                case "Conciliación de caja":
+                    IsSelectedSale = false;
+                    break;
+                default:
+                    
+                    break;
+            }
+            if (SelectedMenu is not null)
+            {
+                IsVisibleMenu = false;
             }
         }
     }
 
     public async void Initialize()
     {
+        if (await customersServ.ExistAsync(serverURL))
+        {
+            Customers = new(await customersServ.GetAllAsync(serverURL));
+        }
         if (await sellersServ.ExistAsync(serverURL))
         {
             Sellers = new(await sellersServ.GetAllAsync(serverURL));
