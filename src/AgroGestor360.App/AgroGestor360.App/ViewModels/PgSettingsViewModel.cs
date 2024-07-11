@@ -26,7 +26,6 @@ public partial class PgSettingsViewModel : ObservableObject
         apiServ.OnReceiveStatusMessage += ApiServ_OnReceiveStatusMessage;
 
         AppInfo = $"Versión: {VersionTracking.Default.CurrentVersion}";
-        Inizialice();
     }
 
     [ObservableProperty]
@@ -131,7 +130,7 @@ public partial class PgSettingsViewModel : ObservableObject
         }
     }
 
-    async void Inizialice()
+    public async void Initialize()
     {
         HaveConnection = await apiServ.ConnectToServerHub(serverURL);
         IsVisibleMenu = HaveConnection;

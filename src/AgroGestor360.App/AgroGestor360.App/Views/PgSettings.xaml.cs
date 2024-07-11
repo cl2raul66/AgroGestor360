@@ -8,6 +8,7 @@ public partial class PgSettings : ContentPage
     {
         InitializeComponent();
 
+        vm.Initialize();
         BindingContext = vm;
     }
 

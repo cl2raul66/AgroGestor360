@@ -1,4 +1,5 @@
 ﻿using AgroGestor360.Server.Models;
+using AgroGestor360.Server.Tools.Enums;
 using AgroGestor360.Server.Tools.Helpers;
 using LiteDB;
 
@@ -13,6 +14,7 @@ public interface IWasteInvoicesInLiteDbService
     bool Delete(string code);
     IEnumerable<WasteInvoice> GetAll();
     WasteInvoice GetById(string code);
+    IEnumerable<WasteInvoice> GetInvoicesByDateRange(DateTime endDate, DateTime? startDate, InvoiceStatus? status, ObjectId? sellerId, ObjectId? customerId);
     string Insert(WasteInvoice entity);
     void Rollback();
     bool Update(WasteInvoice entity);
@@ -50,6 +52,39 @@ public class WasteInvoicesInLiteDbService : IWasteInvoicesInLiteDbService
     public WasteInvoice GetById(string code) => collection.FindById(code);
 
     public IEnumerable<WasteInvoice> GetAll() => collection.FindAll();
+
+    //public IEnumerable<WasteInvoice> GetInvoicesByDateRange(DateTime endDate, DateTime? beginDate, InvoiceStatus? status, ObjectId? sellerId, ObjectId? customerId) => beginDate.HasValue
+    //    ? collection.Find(x => x.Date > beginDate!.Value.AddDays(-1) && x.Date < endDate.AddDays(1)).Where(invoice => (status is null || invoice.Status == status) && (sellerId is null || invoice.Seller?.Id == sellerId) && (customerId is null || invoice.Customer?.Id == customerId))
+    //    : collection.Find(x => x.Date < endDate.AddDays(1)).Where(invoice => (status is null || invoice.Status == status) && (sellerId is null || invoice.Seller?.Id == sellerId) && (customerId is null || invoice.Customer?.Id == customerId));
+
+    public IEnumerable<WasteInvoice> GetInvoicesByDateRange(DateTime endDate, DateTime? beginDate, InvoiceStatus? status, ObjectId? sellerId, ObjectId? customerId)
+    {
+        var query = collection.Query();
+
+        query = query.Where(x => x.Date.Date <= endDate.Date);
+
+        if (beginDate.HasValue)
+        {
+            query = query.Where(x => x.Date.Date >= beginDate.Value.Date);
+        }
+
+        if (status.HasValue)
+        {
+            query = query.Where(x => x.Status == status.Value);
+        }
+
+        if (sellerId is not null)
+        {
+            query = query.Where(x => x.Seller!.Id == sellerId);
+        }
+
+        if (customerId is not null)
+        {
+            query = query.Where(x => x.Customer!.Id == customerId);
+        }
+
+        return query.ToEnumerable();
+    }
 
     public string Insert(WasteInvoice entity) => collection.Insert(entity).AsString;
 

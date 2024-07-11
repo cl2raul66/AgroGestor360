@@ -7,7 +7,7 @@ using IContainer = QuestPDF.Infrastructure.IContainer;
 
 namespace AgroGestor360.Client.Tools.ReportsTemplate;
 
-public class QuoteDocument : IDocument
+public class SaleDocument : IDocument
 {
     class Report
     {
@@ -16,11 +16,12 @@ public class QuoteDocument : IDocument
         public double TotalCollected { get; set; }
     }
 
-    readonly CustomerQuoteReport data;
+    readonly SaleReport data;
 
-    public QuoteDocument(CustomerQuoteReport model)
+    public SaleDocument(SaleReport model)
     {
         data = model;
+        data.SaleItems = [.. model.SaleItems!.OrderBy(x => x.SaleEntryDate)];
     }
 
     public DocumentMetadata GetMetaData() => DocumentMetadata.Default;
@@ -35,7 +36,7 @@ public class QuoteDocument : IDocument
                 page.Size(PageSizes.Letter);
                 page.DefaultTextStyle(x => x.FontSize(9).FontColor(Colors.Black));
 
-                page.Header().Element(ComposeHeader);
+                page.Header().PaddingBottom(10).Element(ComposeHeader);
                 page.Content().Element(ComposeContent);
 
                 page.Footer().MaxHeight(30).Element(ComposeFooter);
@@ -47,7 +48,7 @@ public class QuoteDocument : IDocument
         container.Column(column =>
         {
             column.Spacing(15);
-            column.Item().AlignCenter().Text("COTIZACION").FontSize(11).SemiBold();
+            column.Item().AlignCenter().Text("REPORTE DE VENTAS").FontSize(11).SemiBold();
             column.Item().AlignLeft().Row(row =>
             {
                 row.RelativeItem().Column(column =>
@@ -79,22 +80,17 @@ public class QuoteDocument : IDocument
                     c.Item().AlignRight().Text(text =>
                     {
                         text.Span("EMISIÓN: ").SemiBold();
-                        text.Span($"{data.QuotationDate:dd MMM yyyy}");
+                        text.Span($"{data.IssueDate:dd MMM yyyy}");
                     });
                     c.Item().AlignRight().Text(text =>
                     {
-                        text.Span("VENCIMIENTO: ").SemiBold();
-                        text.Span($"{data.QuotationDate.AddDays(2):dd MMM yyyy}");
+                        text.Span("TIPO: ").SemiBold();
+                        text.Span($"{data.SaleState}");
                     });
                     c.Item().AlignRight().Text(text =>
                     {
-                        text.Span("VENDEDOR: ").SemiBold();
-                        text.Span($"{data.SellerName}");
-                    });
-                    c.Item().AlignRight().Text(text =>
-                    {
-                        text.Span("IMPORTE: ").SemiBold();
-                        text.Span($"{data.TotalAmount:C}");
+                        text.Span("ORDEN: ").SemiBold();
+                        text.Span($"{data.OrderBy}");
                     });
                 });
             });
@@ -103,60 +99,80 @@ public class QuoteDocument : IDocument
 
     private void ComposeContent(IContainer container)
     {
-        container.Column(c =>
-        {
-            c.Item().PaddingTop(10).Text(text =>
-            {
-                text.Span("CLIENTE: ").SemiBold();
-                text.Span($"{data.CustomerName}");
-            });
-            c.Item().Text(text =>
-            {
-                text.Span("TELÉFONO: ").SemiBold();
-                text.Span($"{data.CustomerPhone}");
-            });
-            c.Item().PaddingTop(10).Element(ComposeTable);
-        });
-    }
-
-    private void ComposeTable(IContainer container)
-    {
         container.Table(table =>
         {
-            table.ColumnsDefinition(c =>
+            table.ColumnsDefinition(cd =>
             {
-                c.ConstantColumn(32);
-                c.RelativeColumn();
-                c.ConstantColumn(75);
-                c.ConstantColumn(100);
+                cd.ConstantColumn(60);
+                cd.RelativeColumn(65);
+                cd.ConstantColumn(100);
+                cd.ConstantColumn(100);
+                cd.ConstantColumn(60);
+                cd.ConstantColumn(90);
+                cd.ConstantColumn(90);
             });
 
             table.Header(h =>
             {
-                h.Cell().Element(CellStyle).Text("NO.");
-                h.Cell().Element(CellStyle).Text("DESCRIPCIÓN");
-                h.Cell().Element(CellStyle).Text("CANTIDAD UNITARIA");
-                h.Cell().Element(CellStyle).Text("COSTO");
+                h.Cell().Element(CellStyle).Text("FECHA DE VENTA");
+                h.Cell().Element(CellStyle).Text("NO. FACTURA");
+                h.Cell().Element(CellStyle).Text("VENDEDOR");
+                h.Cell().Element(CellStyle).Text("CLIENTE");
+                h.Cell().Element(CellStyle).Text("ULTIMO ABONO");
+                h.Cell().Element(CellStyle).Text("ESTADO/ABONO");
+                h.Cell().Element(CellStyle).Text("IMPORTE");
 
                 static IContainer CellStyle(IContainer container)
                 {
                     return container.BorderHorizontal(1).PaddingVertical(2).DefaultTextStyle(ts => ts.SemiBold()).AlignCenter().AlignMiddle().BorderColor(Colors.Grey.Lighten2);
                 }
             });
-            int count = 1;
-            foreach (var item in data.ProductItems!)
+
+            foreach (var item in data.SaleItems!)
             {
-                table.Cell().Element(CellStyle).AlignCenter().Text(count.ToString());
-                table.Cell().Element(CellStyle).ExtendHorizontal().AlignLeft().Text(item.ProductName);
-                table.Cell().Element(CellStyle).AlignRight().Text(item.ProductQuantity.ToString("F2"));
-                table.Cell().Element(CellStyle).AlignRight().Text(item.ArticlePrice.ToString("N2"));
-                count++;
+                table.Cell().Element(CellStyle).AlignLeft().Text(item.SaleEntryDate.ToString("dd/MM/yyyy"));
+                table.Cell().Element(CellStyle).Text(item.Code);
+                table.Cell().Element(CellStyle).ExtendHorizontal().Text(item.Seller);
+                table.Cell().Element(CellStyle).ExtendHorizontal().Text(item.Customer);
+                table.Cell().Element(CellStyle).AlignCenter().Text(item.InvoiceDate?.ToString("dd/MM/yyyy") ?? "-");
+                switch (item.SaleStatus)
+                {
+                    case InvoiceStatus.Paid:
+                        table.Cell().Element(CellStyle).AlignCenter().Text("PAGADA");
+                        break;
+                    case InvoiceStatus.Cancelled:
+                        table.Cell().Element(CellStyle).AlignCenter().Text("CANCELADA");
+                        break;
+                    default:
+                        if (item.TotalPaid == 0)
+                        {
+                            table.Cell().Element(CellStyle).AlignCenter().Text("-");
+                        }
+                        else
+                        {
+                            table.Cell().Element(CellStyle).AlignRight().Text(item.TotalPaid.ToString("F2"));
+                        }
+                        break;
+                }
+                table.Cell().Element(CellStyle).AlignRight().Text(item.TotalToPay.ToString("F2"));
 
                 static IContainer CellStyle(IContainer container)
                 {
-                    return container.AlignMiddle().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(4);
+                    return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(2).PaddingHorizontal(2).DefaultTextStyle(dts => dts.FontSize(8)).AlignTop();
                 }
             }
+
+            table.Footer(f =>
+            {
+                f.Cell().ColumnSpan(5).Element(CellStyle).Text("TOTAL").SemiBold();
+                f.Cell().Element(CellStyle).AlignRight().Text(data.SaleItems.Sum(x => x.TotalPaid).ToString("C"));
+                f.Cell().Element(CellStyle).AlignRight().Text(data.SaleItems.Sum(x => x.TotalToPay).ToString("C"));
+
+                static IContainer CellStyle(IContainer container)
+                {
+                    return container.BorderHorizontal(1).PaddingVertical(2).AlignMiddle();
+                }
+            });
         });
     }
 
@@ -173,8 +189,6 @@ public class QuoteDocument : IDocument
                     t.Span(" de ");
                     t.TotalPages();
                 });
-
-            row.RelativeItem().AlignRight().Text($"No: {data.QuotationCode}").SemiBold();
         });
     }
 }

@@ -744,7 +744,6 @@ public class InvoicesController : ControllerBase
     }
 
     #region EXTRA
-
     /// <summary>
     /// Procesa los elementos de producto y artículo de la colección de DTO9.
     /// </summary>

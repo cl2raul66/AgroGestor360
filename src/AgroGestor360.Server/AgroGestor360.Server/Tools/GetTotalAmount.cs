@@ -26,5 +26,4 @@ public static class GetTotalAmount
 
         return totalAmount;
     }
-
 }

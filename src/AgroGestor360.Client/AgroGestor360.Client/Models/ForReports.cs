@@ -1,4 +1,6 @@
-﻿namespace AgroGestor360.Client.Models;
+﻿using AgroGestor360.Client.Tools;
+
+namespace AgroGestor360.Client.Models;
 
 #region QUOTE
 public class CustomerQuoteReport()
@@ -22,13 +24,44 @@ public class CustomerQuoteReport()
     public string? CustomerPhone { get; set; }
     #endregion
     #region PRODUCT ITEMS
-    public Product[]? ProductItems { get; set; }
+    public ProductTable[]? ProductItems { get; set; }
     #endregion
-    public class Product
+    public class ProductTable
     {
         public string? ProductName { get; set; }
         public double ProductQuantity { get; set; }
         public double ArticlePrice { get; set; }
+    }
+}
+#endregion
+
+#region Sale
+public class SaleReport()
+{
+    #region ORGANIZATION
+    public string? OrganizationName { get; set; }
+    public string? OrganizationAddress { get; set; }
+    public string? OrganizationPhone { get; set; }
+    public string? OrganizationEmail { get; set; }
+    #endregion
+    #region STATIC INFORMATION
+    public DateTime IssueDate { get; set; }
+    public string? SaleState { get; set; }
+    public string? OrderBy { get; set; }
+    #endregion
+    #region SALE ITEMS
+    public SaleTable[]? SaleItems { get; set; }
+    #endregion
+    public class SaleTable
+    {
+        public string? Code { get; set; }
+        public DateTime SaleEntryDate { get; set; }
+        public DateTime? InvoiceDate { get; set; }
+        public InvoiceStatus SaleStatus { get; set; }
+        public string? Seller { get; set; }
+        public string? Customer { get; set; }
+        public double TotalToPay { get; set; }
+        public double TotalPaid { get; set; }
     }
 }
 #endregion

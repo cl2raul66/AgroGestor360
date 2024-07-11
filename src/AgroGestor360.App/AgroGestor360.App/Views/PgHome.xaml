@@ -23,7 +23,10 @@
                 Text="Inicio"
                 TextTransform="Uppercase"
                 VerticalOptions="Center" />
-            <HorizontalStackLayout Grid.Column="2" Spacing="8">
+            <HorizontalStackLayout
+                Grid.Column="2"
+                MinimumHeightRequest="36"
+                Spacing="8">
                 <Button
                     Command="{Binding GoToReportsCommand}"
                     IsEnabled="{Binding HaveConnection}"
@@ -83,7 +86,7 @@
                         Text="Reportes"
                         TextTransform="Uppercase"
                         ToolTipProperties.Text="Ir a reportes." />
-                    <Button
+                    <!--<Button
                         Margin="{OnIdiom Default='2',
                                          Phone='0,2'}"
                         Command="{Binding GoToSalesCommand}"
@@ -93,18 +96,20 @@
                         MinimumWidthRequest="{OnIdiom Desktop='180'}"
                         Text="Ventas"
                         TextTransform="Uppercase"
-                        ToolTipProperties.Text="Ir a ventas." />
-                    <BoxView
+                        ToolTipProperties.Text="Ir a ventas." />-->
+                    <!--<BoxView
                         Margin="{OnIdiom Default='2',
                                          Phone='0,4'}"
                         Background="{StaticResource Gray200}"
                         HeightRequest="2"
                         IsVisible="{OnIdiom Phone='True',
-                                            Default='False'}" />
+                                            Default='False'}" />-->
                     <Button
                         Margin="{OnIdiom Default='2',
                                          Phone='0,2'}"
                         IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='False',
+                                            Default='True'}"
                         MinimumWidthRequest="{OnIdiom Desktop='180'}"
                         Text="Conciliación de caja"
                         TextTransform="Uppercase"
@@ -114,6 +119,8 @@
                                          Phone='0,2'}"
                         Command="{Binding ShowAddQuoteCommand}"
                         IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='False',
+                                            Default='True'}"
                         MinimumWidthRequest="{OnIdiom Desktop='180'}"
                         Text="Nueva cotización"
                         TextTransform="Uppercase"
@@ -123,6 +130,8 @@
                                          Phone='0,2'}"
                         Command="{Binding ShowAddOrderCommand}"
                         IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='False',
+                                            Default='True'}"
                         MinimumWidthRequest="{OnIdiom Desktop='180'}"
                         Text="Nuevo pedido"
                         TextTransform="Uppercase"
@@ -132,6 +141,8 @@
                                          Phone='0,2'}"
                         Command="{Binding ShowAddSaleCommand}"
                         IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='False',
+                                            Default='True'}"
                         MinimumWidthRequest="{OnIdiom Desktop='180'}"
                         Text="Nueva venta"
                         TextTransform="Uppercase"
@@ -140,6 +151,8 @@
                         Margin="{OnIdiom Default='2',
                                          Phone='0,2'}"
                         IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='False',
+                                            Default='True'}"
                         MinimumWidthRequest="{OnIdiom Desktop='180'}"
                         Text="Nueva mercancía"
                         TextTransform="Uppercase"

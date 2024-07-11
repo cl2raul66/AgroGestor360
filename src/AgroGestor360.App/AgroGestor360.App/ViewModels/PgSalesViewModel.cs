@@ -140,7 +140,7 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task ShareQuoteReport()
     {
-        string file = GenerateFile();
+        string file = GeneratePathFileForQuotation();
 
         var wasGeneratePDF = await reportsServ.GeneratePDFCustomerQuoteReportAsync(serverURL, SelectedQuotation!.Code!, file);
 
@@ -177,7 +177,7 @@ public partial class PgSalesViewModel : ObservableRecipient
     [RelayCommand]
     async Task ViewQuoteReport()
     {
-        string file = GenerateFile();
+        string file = GeneratePathFileForQuotation();
 
         bool wasGeneratePDF = await reportsServ.GeneratePDFCustomerQuoteReportAsync(serverURL, SelectedQuotation!.Code!, file);
 
@@ -819,7 +819,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         IsBusy = false;
     }
 
-    string GenerateFile()
+    string GeneratePathFileForQuotation()
     {
         string title = $"{SelectedQuotation!.Date:yyyyMMdd} - Cotización de {SelectedQuotation!.TotalAmount:F2} para {SelectedQuotation!.CustomerName}";
 

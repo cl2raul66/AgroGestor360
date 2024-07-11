@@ -4,6 +4,17 @@ using AgroGestor360.Client.Tools;
 
 namespace AgroGestor360.Client.Models;
 
+#region REPORTS
+public record SaleReportParameters(
+    string ReportState,
+    string OrderBy,
+    DateTime? BeginDate,
+    DateTime EndDate,
+    string? CustomerId,
+    string? SellerId
+);
+#endregion
+
 /// <summary>
 /// Organization: Represents an organization.
 /// <code>

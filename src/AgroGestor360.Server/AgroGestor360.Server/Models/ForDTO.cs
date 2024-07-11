@@ -4,6 +4,17 @@ using AgroGestor360.Server.Tools.Enums;
 
 namespace AgroGestor360.Server.Models;
 
+#region REPORTS
+public record SaleReportParameters(
+    string ReportState, 
+    string OrderBy, 
+    DateTime? BeginDate, 
+    DateTime EndDate, 
+    string? CustomerId, 
+    string? SellerId
+);
+#endregion
+
 #region Customer
 /// <summary>
 /// Object: Customer for GET

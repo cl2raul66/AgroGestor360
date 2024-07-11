@@ -48,33 +48,33 @@
             </HorizontalStackLayout>
         </Grid>
         <Grid Grid.Row="1">
-            <Grid
-                Padding="8"
-                BackgroundColor="#99634833"
-                HorizontalOptions="End"
+            <Frame
+                HorizontalOptions="{OnIdiom Default='End',
+                                            Phone='FillAndExpand'}"
                 IsVisible="{Binding IsVisibleMenu}"
-                RowDefinitions="auto,*"
-                RowSpacing="8"
-                WidthRequest="200"
+                VerticalOptions="{OnIdiom Default='FillAndExpand',
+                                          Phone='End'}"
+                WidthRequest="{OnIdiom Default='280',
+                                       Phone='-1'}"
                 ZIndex="10">
-                <Label
-                    Grid.Column="1"
-                    FontSize="16"
-                    Text="Menú"
-                    TextColor="{StaticResource White}"
-                    TextTransform="Uppercase" />
-                <ScrollView Grid.Row="1">
+                <VerticalStackLayout Spacing="8">
+                    <Label
+                        Grid.Column="1"
+                        FontSize="{OnIdiom Default='18',
+                                           Phone='16'}"
+                        Text="Menú"
+                        TextTransform="Uppercase" />
                     <CollectionView
                         ItemsSource="{Binding Menu, Mode=OneWay}"
                         SelectedItem="{Binding SelectedMenu, Mode=TwoWay}"
                         SelectionChanged="CollectionView_SelectionChanged"
                         SelectionMode="Single">
                         <CollectionView.ItemsLayout>
-                            <LinearItemsLayout ItemSpacing="2" Orientation="Vertical" />
+                            <LinearItemsLayout ItemSpacing="{OnIdiom Default='4', Phone='8'}" Orientation="Vertical" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="x:String">
-                                <Border Style="{StaticResource BorderItem}">
+                                <Border Style="{StaticResource BorderItemButton}">
                                     <Label
                                         FontAttributes="Bold"
                                         FontSize="Body"
@@ -94,8 +94,9 @@
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
-                </ScrollView>
-            </Grid>
+                </VerticalStackLayout>
+
+            </Frame>
             <Grid Grid.Column="1" HorizontalOptions="FillAndExpand">
                 <ContentView
                     Content="{Binding CurrentContent, Mode=OneWay}"

@@ -1,6 +1,8 @@
 ﻿using AgroGestor360.Server.Models;
+using AgroGestor360.Server.Tools.Enums;
 using AgroGestor360.Server.Tools.Helpers;
 using LiteDB;
+using System.Collections;
 
 namespace AgroGestor360.Server.Services;
 
@@ -16,6 +18,7 @@ public interface IInvoicesInLiteDbService
     Invoice GetByCode(string code);
     ConceptForDeletedInvoice? GetConceptByNote(string note);
     IEnumerable<ConceptForDeletedInvoice> GetConcepts();
+    IEnumerable<Invoice> GetInvoicesByDateRange(DateTime endDate, DateTime? startDate, InvoiceStatus? status, ObjectId? sellerId, ObjectId? customerId);
     IEnumerable<Invoice> GetManyByCodes(IEnumerable<string> codes);
     string Insert(Invoice entity);
     int InsertConcept(ConceptForDeletedInvoice entity);
@@ -63,6 +66,39 @@ public class InvoicesInLiteDbService : IInvoicesInLiteDbService
         : [];
 
     public IEnumerable<Invoice> GetAll() => collection.FindAll();
+
+    //public IEnumerable<Invoice> GetInvoicesByDateRange(DateTime endDate, DateTime? beginDate, InvoiceStatus? status, ObjectId? sellerId, ObjectId? customerId) => beginDate.HasValue 
+    //    ? collection.Find(x => x.Date < endDate.AddDays(1)).Where(invoice => (status is null || invoice.Status == status) &&
+    //(sellerId is null || invoice.Seller?.Id == sellerId) && (customerId is null || invoice.Customer?.Id == customerId))
+    //    : collection.Find(x => x.Date > beginDate!.Value.AddDays(-1) && x.Date < endDate.AddDays(1)).Where(invoice => (status is null || invoice.Status == status) && (sellerId is null || invoice.Seller?.Id == sellerId) && (customerId is null || invoice.Customer?.Id == customerId));
+    public IEnumerable<Invoice> GetInvoicesByDateRange(DateTime endDate, DateTime? beginDate, InvoiceStatus? status, ObjectId? sellerId, ObjectId? customerId)
+    {
+        var query = collection.Query();
+
+        query = query.Where(x => x.Date.Date <= endDate.Date);
+
+        if (beginDate.HasValue)
+        {
+            query = query.Where(x => x.Date.Date >= beginDate.Value.Date);
+        }
+
+        if (status.HasValue)
+        {
+            query = query.Where(x => x.Status == status.Value);
+        }
+
+        if (sellerId is not null)
+        {
+            query = query.Where(x => x.Seller!.Id == sellerId);
+        }
+
+        if (customerId is not null)
+        {
+            query = query.Where(x => x.Customer!.Id == customerId);
+        }
+
+        return query.ToEnumerable();
+    }
 
     public string Insert(Invoice entity) => collection.Insert(entity).AsString;
 
