@@ -137,10 +137,10 @@ public class SaleDocument : IDocument
                 table.Cell().Element(CellStyle).AlignCenter().Text(item.InvoiceDate?.ToString("dd/MM/yyyy") ?? "-");
                 switch (item.SaleStatus)
                 {
-                    case InvoiceStatus.Paid:
+                    case SaleStatus.Paid:
                         table.Cell().Element(CellStyle).AlignCenter().Text("PAGADA");
                         break;
-                    case InvoiceStatus.Cancelled:
+                    case SaleStatus.Cancelled:
                         table.Cell().Element(CellStyle).AlignCenter().Text("CANCELADA");
                         break;
                     default:

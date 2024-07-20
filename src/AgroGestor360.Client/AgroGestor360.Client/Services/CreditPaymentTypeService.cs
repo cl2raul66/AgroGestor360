@@ -2,20 +2,23 @@ using AgroGestor360.Client.Tools;
 
 namespace AgroGestor360.Client.Services
 {
-    public interface ICreditPaymentTypeService
+    public interface IPaymentTypeService
     {
         IEnumerable<string> GetAll();
-        CreditPaymentType GetByName(string name);
-        string GetNameByType(CreditPaymentType type);
+        PaymentType GetByName(string name);
+        string GetNameByType(PaymentType type);
     }
 
-    public class CreditPaymentTypeService : ICreditPaymentTypeService
+    public class PaymentTypeService : IPaymentTypeService
     {
-        private static readonly Dictionary<CreditPaymentType, string> translations = new()
+        private static readonly Dictionary<PaymentType, string> translations = new()
         {
-            { CreditPaymentType.Check, "Cheque" },
-            { CreditPaymentType.CreditCard, "Tarjeta de Crédito" },
-            { CreditPaymentType.CustomerAccount, "Cuenta del Cliente" }
+            { PaymentType.Check, "Cheque" },
+            { PaymentType.CreditCard, "Tarjeta de crédito" },
+            { PaymentType.Cash, "Efectivo" },
+            { PaymentType.DebitCard, "Tarjeta de débito" },
+            { PaymentType.BankTransfer, "Transferencia bancaria" },
+            { PaymentType.MobilePayment, "Pago móvil" }
         };
 
         public IEnumerable<string> GetAll()
@@ -23,12 +26,12 @@ namespace AgroGestor360.Client.Services
             return translations.Values;
         }
 
-        public CreditPaymentType GetByName(string name)
+        public PaymentType GetByName(string name)
         {
             return translations.First(x => x.Value == name).Key;
         }
 
-        public string GetNameByType(CreditPaymentType type)
+        public string GetNameByType(PaymentType type)
         {
             if (translations.TryGetValue(type, out var translation))
             {

@@ -8,7 +8,6 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Reflection;
 using System.Text;
 
 namespace AgroGestor360.App.ViewModels;
@@ -29,9 +28,11 @@ public partial class PgSalesViewModel : ObservableRecipient
     readonly IInvoicesService invoicesServ;
     readonly IApiService apiServ;
     readonly ITimeLimitsCreditsService timeLimitsCreditsServ; 
+    readonly IImmediatePaymentTypeService immediatePaymentTypeServ;
+    readonly ICreditPaymentTypeService creditPaymentTypeServ;
     //readonly SemaphoreSlim semaphore = new(0, 2);
 
-    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, IAuthService authService, IInvoicesService invoicesService, IApiService apiService, ITimeLimitsCreditsService timeLimitsCreditsService)
+    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, IAuthService authService, IInvoicesService invoicesService, IApiService apiService, ITimeLimitsCreditsService timeLimitsCreditsService, IImmediatePaymentTypeService immediatePaymentTypeService, ICreditPaymentTypeService creditPaymentTypeService)
     {
         quotationsServ = quotesService;
         sellersServ = sellersService;
@@ -43,6 +44,8 @@ public partial class PgSalesViewModel : ObservableRecipient
         invoicesServ = invoicesService;
         apiServ = apiService;
         timeLimitsCreditsServ = timeLimitsCreditsService;
+        immediatePaymentTypeServ = immediatePaymentTypeService;
+        creditPaymentTypeServ = creditPaymentTypeService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
 
         apiServ.OnReceiveStatusMessage += ApiServ_OnReceiveStatusMessage;
@@ -317,6 +320,9 @@ public partial class PgSalesViewModel : ObservableRecipient
     [ObservableProperty]
     DTO10? selectedInvoice;
 
+    [ObservableProperty]
+    bool onCredit;
+
     [RelayCommand]
     async Task ShowInvoiceDetail()
     {
@@ -388,9 +394,20 @@ public partial class PgSalesViewModel : ObservableRecipient
     }
 
     [RelayCommand]
+    async Task CompletePayment()
+    {
+        Debt = SelectedInvoice!.TotalAmount - SelectedInvoice!.Paid;
+        AmountPay = Debt.ToString();
+        IsOpenCompletePayment = true;
+        await Task.CompletedTask;
+    }
+
+    [RelayCommand]
     async Task CreateInvoiceFromQuote()
     {
-        var resultInsert = await invoicesServ.InsertFromQuoteAsync(serverURL, SelectedQuotation!);
+        DTO10_2 data = new() { Code = SelectedQuotation!.Code };
+
+        var resultInsert = await invoicesServ.InsertFromQuoteAsync(serverURL, data);
         if (!string.IsNullOrEmpty(resultInsert))
         {
             bool resultChanges = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = SelectedQuotation!.Code!, Status = QuotationStatus.Accepted });
@@ -535,6 +552,78 @@ public partial class PgSalesViewModel : ObservableRecipient
     }
     #endregion
 
+    #region DIALOGO PARA ABONO TOTAL O PARCIAL DE UNA VENTA SELECCIONADA
+    [ObservableProperty]
+    bool isOpenCompletePayment;
+
+    [ObservableProperty]
+    double debt;
+
+    [ObservableProperty]
+    DateTime? completePaymentDate;
+
+    [ObservableProperty]
+    string? amountPay;
+
+    [ObservableProperty]
+    string? referentNo;
+
+    [ObservableProperty]
+    string[]? immediatePaymentTypes;
+
+    [ObservableProperty]
+    string? selectedImmediatePayment;
+
+    [ObservableProperty]
+    string[]? creditPaymentTypes;
+
+    [ObservableProperty]
+    string? selectedCreditPayment;
+
+    [RelayCommand]
+    async Task PayCompletePayment()
+    {
+        if (!double.TryParse(AmountPay, out double theAmountPay))
+        {
+            theAmountPay = 0;
+        }
+
+        DTO10_2 data = new()
+        {
+            Code = SelectedInvoice!.Code,            
+        };
+
+        if (SelectedInvoice!.DaysRemaining == -1)
+        {
+            data.ImmediateMethod = new() { Date = DateTime.Now, Amount = theAmountPay, ReferenceNo = ReferentNo, Type = ImmediatePaymentType.Cash };
+        }
+        else
+        {
+            data.CreditPaymentMethod = new() { Date = DateTime.Now, Amount = theAmountPay, ReferenceNo = ReferentNo, Type = CreditPaymentType.CreditCard };
+        }
+
+        bool result = await invoicesServ.RepaymentAsync(serverURL, data);
+        if (result)
+        {
+            Invoices!.Remove(SelectedInvoice!);
+        }
+        IsOpenCompletePayment = false;
+        await Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    async Task CancelCompletePayment()
+    {
+        AmountPay = null;
+        Debt = 0;
+        ReferentNo = null;
+        IsOpenCompletePayment = false;
+        SelectedInvoice = null;
+        await Task.CompletedTask;
+    }
+
+    #endregion
+
     void ApiServ_OnReceiveStatusMessage(ServerStatus status)
     {
         HaveConnection = status is ServerStatus.Running;
@@ -635,7 +724,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_2, string>(this, "setdepreciation", async (r, m) =>
         {
             IsActive = false;
-            var result = await invoicesServ.DepreciationUpdateAsync(serverURL, m);
+            var result = await invoicesServ.RepaymentAsync(serverURL, m);
             if (result)
             {
                 r.Invoices ??= [];
@@ -724,10 +813,10 @@ public partial class PgSalesViewModel : ObservableRecipient
             if (isEmpty)
             {
                 IsVisiblePwdDialog = true;
-                while (IsVisiblePwdDialog)
-                {
-                    await Task.Delay(100);
-                }
+                //while (IsVisiblePwdDialog)
+                //{
+                //    await Task.Delay(100);
+                //}
                 deletedInInvoice = ResultPWD && await invoicesServ.DeleteAsync(serverURL, currentInvoice.Code!);
             }
             else
@@ -797,8 +886,14 @@ public partial class PgSalesViewModel : ObservableRecipient
                 await ShowAddEditSale();
             }
         }
+
+        if (e.PropertyName == nameof(IsOpenCompletePayment))
+        {
+            ImmediatePaymentTypes = IsOpenCompletePayment && SelectedInvoice!.DaysRemaining == -1 ? immediatePaymentTypeServ.GetAll().ToArray() : null;
+            CreditPaymentTypes = IsOpenCompletePayment && SelectedInvoice!.DaysRemaining > -1 ? creditPaymentTypeServ.GetAll().ToArray() : null;
+        }
     }
-    //todo: separar metodos de inicializacion de colecciones dependiendo de haveConnection
+
     #region EXTRA
     public async void Initialize()
     {

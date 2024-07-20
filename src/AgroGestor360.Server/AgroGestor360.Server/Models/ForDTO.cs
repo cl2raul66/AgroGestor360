@@ -572,7 +572,7 @@ public class DTO10
     public string? CustomerId { get; set; }
     public string? CustomerName { get; set; }
     public string? NumberFEL { get; set; }
-    public InvoiceStatus Status { get; set; }
+    public SaleStatus Status { get; set; }
 }
 
 /// <summary>
@@ -594,14 +594,14 @@ public class DTO10_1
     public string? Code { get; set; }
     public string? SellerId { get; set; }
     public string? CustomerId { get; set; }
-    public InvoiceStatus Status { get; set; }
+    public SaleStatus Status { get; set; }
     public DTO9[]? Products { get; set; }
 }
 
 /// <summary>
-/// Represents a invoice for POST.
+/// Represents a invoice for normal POST and POST from quote.
 /// <code>
-/// Code: Code of the invoice and key in database
+/// Code: Code of the invoice and key in database from invoice or quote
 /// ImmediateMethod: Immediate payment method
 /// CreditPaymentMethod: Credit payment method
 /// </code>
@@ -609,8 +609,7 @@ public class DTO10_1
 public class DTO10_2
 {
     public string? Code { get; set; }
-    public ImmediatePayment? ImmediateMethod { get; set; }
-    public CreditPayment? CreditPaymentMethod { get; set; }
+    public PaymentMethod? PaymentMethods { get; set; }
 }
 
 /// <summary>
@@ -625,7 +624,7 @@ public class DTO10_3
 {
     public string? Code { get; set; }
     public string? Notes { get; set; }
-    public InvoiceStatus Status { get; set; }
+    public SaleStatus Status { get; set; }
 }
 
 /// <summary>
@@ -656,10 +655,9 @@ public class DTO10_4
     public string? OrganizationName { get; set; }
     public string? CustomerName { get; set; }
     public string? NumberFEL { get; set; }
-    public InvoiceStatus Status { get; set; }
+    public SaleStatus Status { get; set; }
     public string[]? Products { get; set; }
-    public ImmediatePayment[]? ImmediatePayments { get; set; }
-    public CreditPayment[]? CreditsPayments { get; set; }
+    public PaymentMethod[]? PaymentMethods { get; set; }
 }
 
 /// <summary>
@@ -684,9 +682,8 @@ public class DTO10_5
     public string? SellerId { get; set; }
     public string? CustomerId { get; set; }
     public string? NumberFEL { get; set; }
-    public InvoiceStatus Status { get; set; }
+    public SaleStatus Status { get; set; }
     public DTO9[]? Products { get; set; }
-    public ImmediatePayment[]? ImmediatePayments { get; set; }
-    public CreditPayment[]? CreditsPayments { get; set; }
+    public PaymentMethod[]? PaymentMethods { get; set; }
 }
 #endregion

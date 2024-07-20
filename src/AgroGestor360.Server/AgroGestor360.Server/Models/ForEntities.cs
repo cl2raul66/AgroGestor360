@@ -183,37 +183,22 @@ public class BankAccount
 }
 
 /// <summary>
-/// Object: ImmediatePayment => Represents a payment method for immediate payment.
+/// Object: PaymentMethod => Representa un pago en el sistema.
 /// <code>
-/// DateTime [Date] => Date of payment
-/// double [Amount] => Amount of payment
-/// string [ReferenceNo] => Reference number of payment
-/// ImmediatePaymentType [Type] => Type of payment
+/// PaymentType [Type] => Tipo de pago
+/// PaymentCondition [Condition] => Condición del pago (inmediato o a crédito)
+/// DateTime [Date] => Fecha del pago
+/// decimal [Amount] => Monto del pago
+/// string [ReferenceNumber] => Número de referencia del pago
 /// </code>
 /// </summary>
-public class ImmediatePayment
+public class PaymentMethod
 {
     public DateTime Date { get; set; }
     public double Amount { get; set; }
-    public string? ReferenceNo { get; set; }
-    public ImmediatePaymentType Type { get; set; }
-}
-
-/// <summary>
-/// Object: CreditPayment => Represents a payment method for credit payment.
-/// <code>
-/// DateTime [Date] => Date of payment
-/// double [Amount] => Amount of payment
-/// string [ReferenceNo] => Reference number of payment
-/// CreditPaymentType [Type] => Type of payment
-/// </code>
-/// </summary>
-public class CreditPayment
-{
-    public DateTime Date { get; set; }
-    public double Amount { get; set; }
-    public string? ReferenceNo { get; set; }
-    public CreditPaymentType Type { get; set; }
+    public string? ReferenceNumber { get; set; }
+    public PaymentType Type { get; set; }
+    public PaymentCondition Condition { get; set; }
 }
 
 public class Loan
@@ -249,13 +234,13 @@ public class BankTransaction
 }
 
 /// <summary>
-/// Object: SaleBase => Represents a base class of sale for Quotation, Order and Invoice.
+/// Object: SaleBase => Representa la base común para todas las etapas de venta.
 /// <code>
-/// DateTime [Date]
-/// string [Code]
-/// Seller [Seller]
-/// Customer [Customer]
-/// Array ProductSaleBase [Products]
+/// DateTime [Date] => Fecha del documento
+/// string [Code] => Código único del documento
+/// Seller [Seller] => Vendedor asociado
+/// Customer [Customer] => Cliente asociado
+/// Array ProductSaleBase [Products] => Productos incluidos en la venta
 /// </code>
 /// </summary>
 public abstract class SaleBase
@@ -285,14 +270,14 @@ public class ProductSaleBase
 }
 
 /// <summary>
-/// Object: Quotation => Represent a quotation.
+/// Object: Quotation => Representa una cotización (etapa de preventa).
 /// <code>
-/// DateTime [Date]
-/// string [Code]
-/// Seller [Seller]
-/// Customer [Customer]
-/// Array ProductSaleBase [Products]
-/// Status [QuotationStatus]
+/// DateTime [Date] => Fecha del documento
+/// string [Code] => Código único del documento
+/// Seller [Seller] => Vendedor asociado
+/// Customer [Customer] => Cliente asociado
+/// Array ProductSaleBase [Products] => Productos incluidos en la venta
+/// Status [QuotationStatus] => Estado de la cotización
 /// </code>
 /// </summary>
 public class Quotation : SaleBase
@@ -301,14 +286,14 @@ public class Quotation : SaleBase
 }
 
 /// <summary>
-/// Object: Order => Represent an order.
+/// Object: Order => Representa un pedido (etapa de preventa).
 /// <code>
-/// DateTime [QuotationDate]
-/// string [Code]
-/// Seller [Seller]
-/// Customer [Customer]
-/// Array ProductItemForDocument [ProductItems]
-/// OrderStatus [Status]
+/// DateTime [Date] => Fecha del documento
+/// string [Code] => Código único del documento
+/// Seller [Seller] => Vendedor asociado
+/// Customer [Customer] => Cliente asociado
+/// Array ProductSaleBase [Products] => Productos incluidos en la venta
+/// OrderStatus [Status] => Estado del pedido
 /// </code>
 /// </summary>
 public class Order : SaleBase
@@ -317,57 +302,51 @@ public class Order : SaleBase
 }
 
 /// <summary>
-/// Object: Invoice => Represent an invoice for a sale.
+/// Object: SaleRecord => Representa el registro de una venta realizada.
 /// <code>
-/// DateTime [QuotationDate]
-/// string [Code]
-/// Seller [Seller]
-/// Customer [Customer]
-/// Array ProductItemForDocument [ProductItems]
-/// InvoiceStatus [Status]
-/// string [NumberFEL]
-/// ImmediatePayments: Array of immediate payments
-/// CreditsPayments: Array of credit payments
+/// DateTime [Date] => Fecha del documento
+/// string [Code] => Código único del documento
+/// Seller [Seller] => Vendedor asociado
+/// Customer [Customer] => Cliente asociado
+/// Array ProductSaleBase [Products] => Productos incluidos en la venta
+/// SaleStatus [Status] => Estado de la venta
+/// string [NumberFEL] => Número de factura (si aplica)
+/// Array PaymentMethod [Payments] => Métodos de pago utilizados
 /// </code>
 /// </summary>
-public class Invoice : SaleBase
+public class SaleRecord : SaleBase
 {
-    public InvoiceStatus Status { get; set; }
+    public SaleStatus Status { get; set; }
     public string? NumberFEL { get; set; }
-    public ImmediatePayment[]? ImmediatePayments { get; set; }
-    public CreditPayment[]? CreditsPayments { get; set; }
+    public PaymentMethod[]? PaymentMethods { get; set; }
 }
 
 /// <summary>
-/// Object: Invoice => Represent an invoice for a sale.
+/// Object: WasteSaleRecord => Representa el registro de una venta de desecho.
 /// <code>
-/// DateTime [QuotationDate]
-/// string [Code, Notes]
-/// Seller [Seller]
-/// Customer [Customer]
-/// Array ProductItemForDocument [ProductItems]
-/// InvoiceStatus [Status]
-/// string [NumberFEL]
-/// ImmediatePayments: Array of immediate payments
-/// CreditsPayments: Array of credit payments
+/// DateTime [Date] => Fecha del documento
+/// string [Code] => Código único del documento
+/// Seller [Seller] => Vendedor asociado
+/// Customer [Customer] => Cliente asociado
+/// Array ProductSaleBase [Products] => Productos incluidos en la venta
+/// SaleStatus [Status] => Estado de la venta
+/// string [NumberFEL] => Número de factura (si aplica)
+/// Array PaymentMethod [Payments] => Métodos de pago utilizados
+/// string [Notes] => Notas adicionales
 /// </code>
 /// </summary>
-public class WasteInvoice : SaleBase
+public class WasteSaleRecord : SaleRecord
 {
-    public InvoiceStatus Status { get; set; }
-    public string? NumberFEL { get; set; }
-    public ImmediatePayment[]? ImmediatePayments { get; set; }
-    public CreditPayment[]? CreditsPayments { get; set; }
     public string? Notes { get; set; }
 }
 
 /// <summary>
-/// Object: ConceptForDeletedInvoice => Represent a concept for a deleted invoice.
+/// Object: ConceptForDeletedSaleRecord => Represent a concept for a deleted invoice.
 /// <code>
 /// string [Id, Concept]
 /// </code>
 /// </summary>
-public class ConceptForDeletedInvoice
+public class ConceptForDeletedSaleRecord
 {
     public int Id { get; set; }
     public string? Concept { get; set; }

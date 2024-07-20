@@ -11,18 +11,18 @@ public interface IInvoicesService
     Task<bool> CheckExistence(string serverURL);
     Task<bool> DeleteAsync(string serverURL, string code);
     Task<bool> DeleteConceptAsync(string serverURL, int id);
-    Task<bool> DepreciationUpdateAsync(string serverURL, DTO10_2 dTO);
+    Task<bool> RepaymentAsync(string serverURL, DTO10_2 dTO);
     Task<IEnumerable<DTO10>> GetAllAsync(string serverURL);
     Task<DTO10?> GetByCodeAsync(string serverURL, string code);
-    Task<IEnumerable<ConceptForDeletedInvoice>> GetConceptsAsync(string serverURL);
+    Task<IEnumerable<ConceptForDeletedSaleRecord>> GetConceptsAsync(string serverURL);
     Task<IEnumerable<int>> GetCreditTimeAsync(string serverURL);
     Task<DTO_SB1?> GetDTO_SB1FromOrderAsync(string serverURL, string code);
     Task<DTO10_4?> GetProductsByCodeAsync(string serverURL, string code);
     Task<string> InsertAsync(string serverURL, DTO10_1 dTO);
-    Task<int> InsertConceptAsync(string serverURL, ConceptForDeletedInvoice entity);
+    Task<int> InsertConceptAsync(string serverURL, ConceptForDeletedSaleRecord entity);
     Task<string> InsertFromOrderAsync(string serverURL, DTO8 dTO);
     Task<string> InsertFromOrderWithModificationsAsync(string serverURL, DTO10_1 dTO);
-    Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO);
+    Task<string> InsertFromQuoteAsync(string serverURL, DTO10_2 dTO);
 }
 
 public class InvoicesService : IInvoicesService
@@ -168,7 +168,7 @@ public class InvoicesService : IInvoicesService
         return string.Empty;
     }
 
-    public async Task<string> InsertFromQuoteAsync(string serverURL, DTO7 dTO)
+    public async Task<string> InsertFromQuoteAsync(string serverURL, DTO10_2 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
@@ -219,14 +219,14 @@ public class InvoicesService : IInvoicesService
         return string.Empty;
     }
 
-    public async Task<bool> DepreciationUpdateAsync(string serverURL, DTO10_2 dTO)
+    public async Task<bool> RepaymentAsync(string serverURL, DTO10_2 dTO)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/invoices/depreciationupdate", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/invoices/Repayment", content);
 
             return response.IsSuccessStatusCode;
         }
@@ -259,7 +259,7 @@ public class InvoicesService : IInvoicesService
     }
 
 
-    public async Task<IEnumerable<ConceptForDeletedInvoice>> GetConceptsAsync(string serverURL)
+    public async Task<IEnumerable<ConceptForDeletedSaleRecord>> GetConceptsAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
@@ -273,12 +273,12 @@ public class InvoicesService : IInvoicesService
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<ConceptForDeletedInvoice>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
+            return JsonSerializer.Deserialize<IEnumerable<ConceptForDeletedSaleRecord>>(content, ApiServiceBase.ProviderJSONOptions) ?? [];
         }
         return [];
     }
 
-    public async Task<int> InsertConceptAsync(string serverURL, ConceptForDeletedInvoice entity)
+    public async Task<int> InsertConceptAsync(string serverURL, ConceptForDeletedSaleRecord entity)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {

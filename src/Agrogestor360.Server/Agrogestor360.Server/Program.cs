@@ -26,8 +26,8 @@ builder.Services.AddSingleton<IQuotesInLiteDbService, QuotesInLiteDbService>();
 builder.Services.AddSingleton<IWasteQuotationInLiteDbService, WasteQuotationInLiteDbService>();
 builder.Services.AddSingleton<IOrdersInLiteDbService, OrdersInLiteDbService>();
 builder.Services.AddSingleton<IWasteOrdersInLiteDbService, WasteOrdersInLiteDbService>();
-builder.Services.AddSingleton<IInvoicesInLiteDbService, InvoicesInLiteDbService>();
-builder.Services.AddSingleton<IWasteInvoicesInLiteDbService, WasteInvoicesInLiteDbService>();
+builder.Services.AddSingleton<ISaleRecordsInLiteDbService, SaleRecordsInLiteDbService>();
+builder.Services.AddSingleton<IWasteSaleRecordsInLiteDbService, WasteSaleRecordsInLiteDbService>();
 builder.Services.AddSingleton<ILineCreditsInLiteDbService, LineCreditsInLiteDbService>();
 builder.Services.AddSingleton<IDiscountsInLiteDbService, DiscountsInLiteDbService>();
 

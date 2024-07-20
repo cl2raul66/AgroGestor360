@@ -91,48 +91,31 @@ public class BankAccount
 }
 
 /// <summary>
-/// Object: ImmediatePayment => Represents a payment method for immediate payment.
+/// Object: PaymentMethod => Representa un pago en el sistema.
 /// <code>
-/// DateTime [Date] => Date of payment
-/// double [Amount] => Amount of payment
-/// string [ReferenceNo] => Reference number of payment
-/// ImmediatePaymentType [Type] => Type of payment
+/// PaymentType [Type] => Tipo de pago
+/// PaymentCondition [Condition] => Condición del pago (inmediato o a crédito)
+/// DateTime [Date] => Fecha del pago
+/// decimal [Amount] => Monto del pago
+/// string [ReferenceNumber] => Número de referencia del pago
 /// </code>
 /// </summary>
-public class ImmediatePayment
+public class PaymentMethod
 {
     public DateTime Date { get; set; }
     public double Amount { get; set; }
-    public string? ReferenceNo { get; set; }
-    public ImmediatePaymentType Type { get; set; }
+    public string? ReferenceNumber { get; set; }
+    public PaymentType Type { get; set; }
+    public PaymentCondition Condition { get; set; }
 }
 
 /// <summary>
-/// Object: CreditPayment => Represents a payment method for credit payment.
-/// <code>
-/// DateTime [Date] => Date of payment
-/// double [Amount] => Amount of payment
-/// string [ReferenceNo] => Reference number of payment
-/// int [NumberOfInstallments] => Number of installments
-/// CreditPaymentType [Type] => Type of payment
-/// </code>
-/// </summary>
-public class CreditPayment
-{
-    public DateTime Date { get; set; }
-    public double Amount { get; set; }
-    public string? ReferenceNo { get; set; }
-    public int NumberOfInstallments { get; set; }
-    public CreditPaymentType Type { get; set; }
-}
-
-/// <summary>
-/// Object: ConceptForDeletedInvoice => Represent a concept for a deleted invoice.
+/// Object: ConceptForDeletedSaleRecord => Represent a concept for a deleted invoice.
 /// <code>
 /// string [Id, Concept]
 /// </code>
 /// </summary>
-public class ConceptForDeletedInvoice
+public class ConceptForDeletedSaleRecord
 {
     public int Id { get; set; }
     public string? Concept { get; set; }
@@ -694,7 +677,7 @@ public class DTO10
     public string? CustomerId { get; set; }
     public string? CustomerName { get; set; }
     public string? NumberFEL { get; set; }
-    public InvoiceStatus Status { get; set; }
+    public SaleStatus Status { get; set; }
 }
 
 /// <summary>
@@ -716,14 +699,14 @@ public class DTO10_1
     public string? Code { get; set; }
     public string? SellerId { get; set; }
     public string? CustomerId { get; set; }
-    public InvoiceStatus Status { get; set; }
+    public SaleStatus Status { get; set; }
     public DTO9[]? Products { get; set; }
 }
 
 /// <summary>
-/// Represents a invoice for POST.
+/// Represents a invoice for normal POST and POST from quote.
 /// <code>
-/// Code: Code of the invoice and key in database
+/// Code: Code of the invoice and key in database from invoice or quote
 /// ImmediateMethod: Immediate payment method
 /// CreditPaymentMethod: Credit payment method
 /// </code>
@@ -731,8 +714,7 @@ public class DTO10_1
 public class DTO10_2
 {
     public string? Code { get; set; }
-    public ImmediatePayment? ImmediateMethod { get; set; }
-    public CreditPayment? CreditPaymentMethod { get; set; }
+    public PaymentMethod[]? PaymentMethods { get; set; }
 }
 
 /// <summary>
@@ -747,7 +729,7 @@ public class DTO10_3
 {
     public string? Code { get; set; }
     public string? Notes { get; set; }
-    public InvoiceStatus Status { get; set; }
+    public SaleStatus Status { get; set; }
 }
 
 /// <summary>
@@ -778,10 +760,9 @@ public class DTO10_4
     public string? OrganizationName { get; set; }
     public string? CustomerName { get; set; }
     public string? NumberFEL { get; set; }
-    public InvoiceStatus Status { get; set; }
+    public SaleStatus Status { get; set; }
     public string[]? Products { get; set; }
-    public ImmediatePayment[]? ImmediatePayments { get; set; }
-    public CreditPayment[]? CreditsPayments { get; set; }
+    public PaymentMethod[]? PaymentMethods { get; set; }
 }
 
 /// <summary>
@@ -806,9 +787,8 @@ public class DTO10_5
     public string? SellerId { get; set; }
     public string? CustomerId { get; set; }
     public string? NumberFEL { get; set; }
-    public InvoiceStatus Status { get; set; }
+    public SaleStatus Status { get; set; }
     public DTO9[]? Products { get; set; }
-    public ImmediatePayment[]? ImmediatePayments { get; set; }
-    public CreditPayment[]? CreditsPayments { get; set; }
+    public PaymentMethod[]? PaymentMethods { get; set; }
 }
 #endregion

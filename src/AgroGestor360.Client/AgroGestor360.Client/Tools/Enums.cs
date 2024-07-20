@@ -30,26 +30,38 @@ public enum TransactionType { Sale, Expense, Loan, ShareholderContribution }
 public enum LoanType { Fiduciary, Mortgage, Pledge, CreditCard, Lender }
 
 /// <summary>
-/// Representa el tipo de pago inmediato en el sistema.
+/// Representa el tipo de pago en el sistema.
 /// <code>
 /// Cash: Pago realizado en efectivo.
-/// Card: Pago realizado con tarjeta de crédito o débito.
-/// BankTransfer: Pago realizado con transferencia bancaria.
-/// MobilePayment: Pago realizado con un dispositivo móvil.
-/// CustomerAccount: Pago realizado con la cuenta del cliente.
+/// DebitCard: Pago realizado con tarjeta de débito.
+/// CreditCard: Pago realizado con tarjeta de crédito.
+/// BankTransfer: Pago realizado mediante transferencia bancaria.
+/// MobilePayment: Pago realizado a través de un dispositivo móvil.
+/// Check: Pago realizado mediante cheque.
 /// </code>
 /// </summary>
-public enum ImmediatePaymentType { Cash, Card, BankTransfer, MobilePayment, CustomerAccount }
+public enum PaymentType
+{
+    Cash,
+    DebitCard,
+    CreditCard,
+    BankTransfer,
+    MobilePayment,
+    Check
+}
 
 /// <summary>
-/// Representa el tipo de pago por crédito en el sistema.
+/// PaymentCondition: Representa la condición de pago en el sistema.
 /// <code>
-/// Check: Pago realizado con cheque.
-/// CreditCard: Pago realizado con tarjeta de crédito.
-/// CustomerAccount: Pago realizado con la cuenta del cliente.
+/// Immediate: El pago se realiza de forma inmediata.
+/// Credit: El pago se realiza a crédito o de forma diferida.
 /// </code>
 /// </summary>
-public enum CreditPaymentType { Check, CreditCard, CustomerAccount }
+public enum PaymentCondition
+{
+    Immediate,
+    Credit
+}
 
 /// <summary>
 /// Representa el tipo de gasto en el sistema.
@@ -93,17 +105,17 @@ public enum QuotationStatus { Draft, Sent, Accepted, Rejected, Cancelled }
 /// Processing: El pedido ha sido procesado y está en proceso de ser completado.
 /// Completed: El pedido ha sido completado y entregado al cliente.
 /// Rejected: La cotización ha sido rechazada por el cliente.
-/// Cancelled: El pedido ha sido cancelado por el cliente o por el sistema.
+/// Cancelled: El pedido ha sido cancelado por el sistema.
 /// </code>
 /// </summary>
 public enum OrderStatus { Pending, Processing, Completed, Rejected, Cancelled }
 
 /// <summary>
-/// Representa el estado de una factura en el sistema.
+/// Representa el estado de una venta en el sistema.
 /// <code>
-/// Paid: La factura ha sido pagada por el cliente.
-/// Pending: La factura ha sido creada pero no ha sido pagada.
-/// Cancelled: La factura ha sido cancelada por el cliente o por el sistema.
+/// Paid: La venta ha sido completamente pagada.
+/// Pending: La venta está pendiente de pago o facturación.
+/// Cancelled: La venta ha sido cancelada por el cliente o por el sistema.
 /// </code>
 /// </summary>
-public enum InvoiceStatus { Paid, Pending, Cancelled }
+public enum SaleStatus { Paid, Pending, Cancelled }

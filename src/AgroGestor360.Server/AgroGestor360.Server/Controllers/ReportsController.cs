@@ -15,15 +15,15 @@ public class ReportsController : ControllerBase
 {
     readonly IConfiguration config;
     readonly IQuotesInLiteDbService quotesServ;
-    readonly IInvoicesInLiteDbService invoicesServ;
-    readonly IWasteInvoicesInLiteDbService wasteInvoicesServ;
+    readonly ISaleRecordsInLiteDbService saleRecordsServ;
+    readonly IWasteSaleRecordsInLiteDbService wasteSaleRecordsServ;
 
-    public ReportsController(IConfiguration configuration, IQuotesInLiteDbService quotesService, IInvoicesInLiteDbService invoicesService, IWasteInvoicesInLiteDbService wasteInvoicesService)
+    public ReportsController(IConfiguration configuration, IQuotesInLiteDbService quotesService, ISaleRecordsInLiteDbService saleRecordsService, IWasteSaleRecordsInLiteDbService wasteSaleRecordsService)
     {
         config = configuration;
         quotesServ = quotesService;
-        invoicesServ = invoicesService;
-        wasteInvoicesServ = wasteInvoicesService;
+        saleRecordsServ = saleRecordsService;
+        wasteSaleRecordsServ = wasteSaleRecordsService;
     }
 
     [HttpGet("customerquotereport/{code}")]
@@ -104,60 +104,60 @@ public class ReportsController : ControllerBase
 
         try
         {
-            InvoiceStatus? statusToFilter = null;
+            SaleStatus? statusToFilter = null;
 
             var sellerId = string.IsNullOrEmpty(dTO.SellerId) ? null : new ObjectId(dTO.SellerId);
             var customerId = string.IsNullOrEmpty(dTO.CustomerId) ? null : new ObjectId(dTO.CustomerId);
 
             List<SaleTable> saleItems = [];
-            IEnumerable<WasteInvoice> getWasteInvoices = [];
-            IEnumerable<Invoice> getInvoices = [];
+            IEnumerable<WasteSaleRecord> getWasteSaleRecords = [];
+            IEnumerable<SaleRecord> getSaleRecords = [];
 
             switch (dTO.ReportState)
             {
                 case "Pagadas":
-                    statusToFilter = InvoiceStatus.Paid;
-                    getWasteInvoices = wasteInvoicesServ.GetInvoicesByDateRange(dTO.EndDate, dTO.BeginDate, statusToFilter, sellerId, customerId);
+                    statusToFilter = SaleStatus.Paid;
+                    getWasteSaleRecords = wasteSaleRecordsServ.GetWasteSaleRecordsByDateRange(dTO.EndDate, dTO.BeginDate, statusToFilter, sellerId, customerId);
 
-                    if (getWasteInvoices is null || !getWasteInvoices.Any())
+                    if (getWasteSaleRecords is null || !getWasteSaleRecords.Any())
                     {
                         return NotFound();
                     }
-                    saleItems.AddRange(CreateSaleTablesFromWasteInvoices(getWasteInvoices!, dTO));
+                    saleItems.AddRange(CreateSaleTablesFromWasteSaleRecords(getWasteSaleRecords!, dTO));
                     break;
                 case "Pendientes":
-                    statusToFilter = InvoiceStatus.Pending;
-                    getInvoices = invoicesServ.GetInvoicesByDateRange(dTO.EndDate, dTO.BeginDate, statusToFilter, sellerId, customerId);
+                    statusToFilter = SaleStatus.Pending;
+                    getSaleRecords = saleRecordsServ.GetSaleRecordsByDateRange(dTO.EndDate, dTO.BeginDate, statusToFilter, sellerId, customerId);
 
-                    if (getInvoices is null || !getInvoices.Any())
+                    if (getSaleRecords is null || !getSaleRecords.Any())
                     {
                         return NotFound();
                     }
-                    saleItems.AddRange(CreateSaleTablesFromInvoices(getInvoices!, dTO));
+                    saleItems.AddRange(CreateSaleTablesFromSaleRecords(getSaleRecords!, dTO));
                     break;
                 case "Canceladas":
-                    statusToFilter = InvoiceStatus.Cancelled;
-                    getWasteInvoices = wasteInvoicesServ.GetInvoicesByDateRange(dTO.EndDate, dTO.BeginDate, statusToFilter, sellerId, customerId);
-                    if (getWasteInvoices is null || !getWasteInvoices.Any())
+                    statusToFilter = SaleStatus.Cancelled;
+                    getWasteSaleRecords = wasteSaleRecordsServ.GetWasteSaleRecordsByDateRange(dTO.EndDate, dTO.BeginDate, statusToFilter, sellerId, customerId);
+                    if (getWasteSaleRecords is null || !getWasteSaleRecords.Any())
                     {
                         return NotFound();
                     }
-                    saleItems.AddRange(CreateSaleTablesFromWasteInvoices(getWasteInvoices!, dTO));
+                    saleItems.AddRange(CreateSaleTablesFromWasteSaleRecords(getWasteSaleRecords!, dTO));
                     break;
                 default:
-                    getInvoices = invoicesServ.GetInvoicesByDateRange(dTO.EndDate, dTO.BeginDate, statusToFilter, sellerId, customerId);
-                    getWasteInvoices = wasteInvoicesServ.GetInvoicesByDateRange(dTO.EndDate, dTO.BeginDate, statusToFilter, sellerId, customerId);
+                    getSaleRecords = saleRecordsServ.GetSaleRecordsByDateRange(dTO.EndDate, dTO.BeginDate, statusToFilter, sellerId, customerId);
+                    getWasteSaleRecords = wasteSaleRecordsServ.GetWasteSaleRecordsByDateRange(dTO.EndDate, dTO.BeginDate, statusToFilter, sellerId, customerId);
 
-                    if (getInvoices is not null && getInvoices!.Any())
+                    if (getSaleRecords is not null && getSaleRecords!.Any())
                     {
-                        saleItems.AddRange(CreateSaleTablesFromInvoices(getInvoices!, dTO));
+                        saleItems.AddRange(CreateSaleTablesFromSaleRecords(getSaleRecords!, dTO));
                     }
-                    if (getWasteInvoices is not null && getInvoices!.Any())
+                    if (getWasteSaleRecords is not null && getSaleRecords!.Any())
                     {
-                        saleItems.AddRange(CreateSaleTablesFromWasteInvoices(getWasteInvoices!, dTO));
+                        saleItems.AddRange(CreateSaleTablesFromWasteSaleRecords(getWasteSaleRecords!, dTO));
                     }
 
-                    if ((getInvoices is null || !getInvoices.Any()) && (getWasteInvoices is null || !getWasteInvoices.Any()))
+                    if ((getSaleRecords is null || !getSaleRecords.Any()) && (getWasteSaleRecords is null || !getWasteSaleRecords.Any()))
                     {
                         return NotFound();
                     }
@@ -187,27 +187,27 @@ public class ReportsController : ControllerBase
     }
 
     #region EXTRA
-    IEnumerable<SaleTable> CreateSaleTablesFromWasteInvoices(IEnumerable<WasteInvoice> invoices, SaleReportParameters dTO)
+    IEnumerable<SaleTable> CreateSaleTablesFromWasteSaleRecords(IEnumerable<WasteSaleRecord> invoices, SaleReportParameters dTO)
     {
         foreach (var item in invoices)
         {
             double totalToPay = GetTotalAmount.Get(item);
             double totalPaid = item.Status switch
             {
-                InvoiceStatus.Paid => totalToPay,
-                _ => item.ImmediatePayments is null || item.ImmediatePayments.Length == 0 ? item.CreditsPayments?.Sum(x => x.Amount) ?? 0 : item.ImmediatePayments!.Sum(x => x.Amount)
+                SaleStatus.Paid => totalToPay,
+                _ => item.PaymentMethods is null || item.PaymentMethods.Length == 0 ? item.PaymentMethods?.Sum(x => x.Amount) ?? 0 : item.PaymentMethods!.Sum(x => x.Amount)
             };
 
             DateTime? invoiceDate = null;
-            if (item.Status is InvoiceStatus.Paid)
+            if (item.Status is SaleStatus.Paid)
             {
-                if (item.ImmediatePayments is not null && item.ImmediatePayments.Length != 0)
+                if (item.PaymentMethods is not null && item.PaymentMethods.Length != 0)
                 {
-                    invoiceDate = item.ImmediatePayments.Last().Date;
+                    invoiceDate = item.PaymentMethods.Last().Date;
                 }
-                if (item.CreditsPayments is not null && item.CreditsPayments.Length != 0)
+                if (item.PaymentMethods is not null && item.PaymentMethods.Length != 0)
                 {
-                    invoiceDate = item.CreditsPayments.Last().Date;
+                    invoiceDate = item.PaymentMethods.Last().Date;
                 }
             }
 
@@ -219,7 +219,7 @@ public class ReportsController : ControllerBase
                     ? item.Customer?.Contact!.FormattedName
                     : item.Customer?.Contact!.Organization?.Name,
                 SaleEntryDate = item.Date,
-                InvoiceDate = invoiceDate,
+                SaleDate = invoiceDate,
                 SaleStatus = item.Status,
                 TotalToPay = totalToPay,
                 TotalPaid = totalPaid
@@ -227,21 +227,21 @@ public class ReportsController : ControllerBase
         }
     }
 
-    IEnumerable<SaleTable> CreateSaleTablesFromInvoices(IEnumerable<Invoice> invoices, SaleReportParameters dTO)
+    IEnumerable<SaleTable> CreateSaleTablesFromSaleRecords(IEnumerable<SaleRecord> invoices, SaleReportParameters dTO)
     {
         foreach (var item in invoices)
         {
             double totalToPay = GetTotalAmount.Get(item);
             double totalPaid = item.Status switch
             {
-                InvoiceStatus.Paid => totalToPay,
-                _ => item.ImmediatePayments is null || item.ImmediatePayments.Length == 0 ? item.CreditsPayments?.Sum(x => x.Amount) ?? 0 : item.ImmediatePayments!.Sum(x => x.Amount)
+                SaleStatus.Paid => totalToPay,
+                _ => item.PaymentMethods is null || item.PaymentMethods.Length == 0 ? item.PaymentMethods?.Sum(x => x.Amount) ?? 0 : item.PaymentMethods!.Sum(x => x.Amount)
             };
 
             DateTime? invoiceDate = null;
-            if (item.CreditsPayments is not null && item.CreditsPayments.Length != 0)
+            if (item.PaymentMethods is not null && item.PaymentMethods.Length != 0)
             {
-                invoiceDate = item.CreditsPayments.Last().Date;
+                invoiceDate = item.PaymentMethods.Last().Date;
             }
 
             yield return new SaleTable
@@ -252,7 +252,7 @@ public class ReportsController : ControllerBase
                     ? item.Customer?.Contact!.FormattedName
                     : item.Customer?.Contact!.Organization?.Name,
                 SaleEntryDate = item.Date,
-                InvoiceDate = invoiceDate,
+                SaleDate = invoiceDate,
                 SaleStatus = item.Status,
                 TotalToPay = totalToPay,
                 TotalPaid = totalPaid

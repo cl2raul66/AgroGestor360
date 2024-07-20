@@ -12,25 +12,25 @@ namespace AgroGestor360.Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class InvoicesController : ControllerBase
+public class SaleRecordsController : ControllerBase
 {
-    readonly IInvoicesInLiteDbService invoicesServ;
+    readonly ISaleRecordsInLiteDbService invoicesServ;
     readonly ISellersInLiteDbService sellersServ;
     readonly ICustomersInLiteDbService customersServ;
     readonly IProductsForSalesInLiteDbService productsForSalesServ;
-    readonly IWasteInvoicesInLiteDbService wasteInvoicesServ;
+    readonly IWasteSaleRecordsInLiteDbService wasteSaleRecordsServ;
     readonly IArticlesForWarehouseInLiteDbService articlesForWarehouseServ;
     readonly IQuotesInLiteDbService quotesServ;
     readonly IOrdersInLiteDbService ordersServ;
     readonly IConfiguration configurationServ;
 
-    public InvoicesController(IInvoicesInLiteDbService invoicesService, ISellersInLiteDbService sellersService, ICustomersInLiteDbService customersService, IProductsForSalesInLiteDbService productsForSalesService, IWasteInvoicesInLiteDbService wasteInvoicesService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService, IQuotesInLiteDbService quotesService, IOrdersInLiteDbService ordersService, IConfiguration configuration)
+    public SaleRecordsController(ISaleRecordsInLiteDbService invoicesService, ISellersInLiteDbService sellersService, ICustomersInLiteDbService customersService, IProductsForSalesInLiteDbService productsForSalesService, IWasteSaleRecordsInLiteDbService wasteSaleRecordsService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService, IQuotesInLiteDbService quotesService, IOrdersInLiteDbService ordersService, IConfiguration configuration)
     {
         invoicesServ = invoicesService;
         sellersServ = sellersService;
         customersServ = customersService;
         productsForSalesServ = productsForSalesService;
-        wasteInvoicesServ = wasteInvoicesService;
+        wasteSaleRecordsServ = wasteSaleRecordsService;
         articlesForWarehouseServ = articlesForWarehouseService;
         quotesServ = quotesService;
         ordersServ = ordersService;
@@ -103,8 +103,8 @@ public class InvoicesController : ControllerBase
             TotalAmount = totalAmount,
             Paid = found.Status switch
             {
-                InvoiceStatus.Paid => totalAmount,
-                _ => found.ImmediatePayments is null || found.ImmediatePayments.Length == 0 ? found.CreditsPayments?.Sum(x => x.Amount) ?? 0 : found.ImmediatePayments!.Sum(x => x.Amount)
+                SaleStatus.Paid => totalAmount,
+                _ => found.PaymentMethods is null || found.PaymentMethods.Length == 0 ? found.PaymentMethods?.Sum(x => x.Amount) ?? 0 : found.PaymentMethods!.Sum(x => x.Amount)
             },
             DaysRemaining = DaysRemaining(found.Customer!.Credit!.TimeLimit, found.Date),
             OrganizationName = found.Customer?.Contact?.Organization?.Name,
@@ -113,8 +113,7 @@ public class InvoicesController : ControllerBase
             NumberFEL = found.NumberFEL,
             Status = found.Status,
             Products = found.Products?.Select(p => ProductItemForDocumentToString.GetText(p.Quantity, p.Product!, p.HasCustomerDiscount, p.OfferId, found.Customer!)).ToArray(),
-            ImmediatePayments = found.ImmediatePayments,
-            CreditsPayments = found.CreditsPayments
+            PaymentMethods = found.PaymentMethods
         };
 
         return Ok(dTO);
@@ -191,16 +190,24 @@ public class InvoicesController : ControllerBase
                 productItems.Add(productSaleBase);
             }
 
-            Invoice entity = new()
+            SaleRecord entity = new()
             {
                 Code = ShortGuidHelper.Generate(),
                 Date = dTO.Date,
                 Seller = seller,
                 Customer = customer,
-                CreditsPayments = [],
                 Products = [.. productItems],
                 Status = dTO.Status
             };
+
+            if (dTO.TimeCredit is null)
+            {
+                entity.PaymentMethods = [];
+            }
+            else
+            {
+                entity.PaymentMethods = [];
+            }
 
             invoicesServ.BeginTrans();
             var resultInsert = invoicesServ.Insert(entity);
@@ -226,7 +233,7 @@ public class InvoicesController : ControllerBase
     }
 
     [HttpPost("insertfromquote")]
-    public ActionResult<string> InsertFromQuote(DTO7 dTO)
+    public ActionResult<string> InsertFromQuote(DTO10_2 dTO)
     {
         if (dTO is null)
         {
@@ -260,15 +267,25 @@ public class InvoicesController : ControllerBase
             }
         }
 
-        Invoice entity = new()
+        SaleRecord entity = new()
         {
-            Status = InvoiceStatus.Pending,
+            Status = SaleStatus.Pending,
             Code = dTO.Code!,
             Date = DateTime.Now,
             Seller = found.Seller,
             Customer = found.Customer,
             Products = [.. productItems]
         };
+
+        if (dTO.PaymentMethods is not null)
+        {
+            entity.PaymentMethods = [dTO.PaymentMethods];
+        }
+
+        if (dTO.PaymentMethods is not null)
+        {
+            entity.PaymentMethods = [dTO.PaymentMethods];
+        }
 
         invoicesServ.BeginTrans();
         var resultInsert = invoicesServ.Insert(entity);
@@ -324,9 +341,9 @@ public class InvoicesController : ControllerBase
             }
         }
 
-        Invoice entity = new()
+        SaleRecord entity = new()
         {
-            Status = InvoiceStatus.Pending,
+            Status = SaleStatus.Pending,
             Code = dTO.Code!,
             Date = DateTime.Now,
             Seller = found.Seller,
@@ -436,9 +453,9 @@ public class InvoicesController : ControllerBase
             }
         }
 
-        Invoice entity = new()
+        SaleRecord entity = new()
         {
-            Status = InvoiceStatus.Pending,
+            Status = SaleStatus.Pending,
             Code = dTO.Code!,
             Date = DateTime.Now,
             Seller = found.Seller,
@@ -457,7 +474,7 @@ public class InvoicesController : ControllerBase
 
         if (productItems.Count != 0)
         {
-            entity.Products = [..itemsForAddWarehouse.Concat(productItems)];
+            entity.Products = [.. itemsForAddWarehouse.Concat(productItems)];
         }
 
         invoicesServ.BeginTrans();
@@ -472,10 +489,10 @@ public class InvoicesController : ControllerBase
         return Ok(resultInsert);
     }
 
-    [HttpPut("depreciationupdate")]
-    public IActionResult DepreciationUpdate(DTO10_2 dTO)
+    [HttpPut("Repayment")]
+    public IActionResult Repayment(DTO10_2 dTO)
     {
-        if (dTO is null)
+        if (dTO is null || string.IsNullOrEmpty(dTO.Code))
         {
             return BadRequest();
         }
@@ -488,55 +505,73 @@ public class InvoicesController : ControllerBase
 
         double totalAmount = GetTotalAmount.Get(found);
 
-        if (dTO.ImmediateMethod is not null)
+        if (dTO.PaymentMethods is not null)
         {
-            List<ImmediatePayment> immediatePayments = new(found.ImmediatePayments ?? [])
+            List<PaymentMethod> immediatePayments = new(found.PaymentMethods ?? [])
             {
-                dTO.ImmediateMethod
+                dTO.PaymentMethods
+            };
+            found.PaymentMethods = [.. immediatePayments];
+
+            double paidAmount = found.PaymentMethods.Sum(x => x.Amount);
+            if (Math.Abs(paidAmount - totalAmount) < 0.01)
+            {
+                found.Status = SaleStatus.Paid;
+            }
+        }
+        else if (dTO.PaymentMethods is not null)
+        {
+            List<PaymentMethod> creditPayments = new(found.PaymentMethods ?? [])
+            {
+                dTO.PaymentMethods
             };
 
-            found.ImmediatePayments = [.. immediatePayments];
+            found.PaymentMethods = [.. creditPayments];
 
-            if (found.ImmediatePayments.Sum(x => x.Amount) == totalAmount)
+            double paidAmount = found.PaymentMethods.Sum(x => x.Amount);
+            if (Math.Abs(paidAmount - totalAmount) < 0.01)
             {
-                found.Status = InvoiceStatus.Paid;
-                WasteInvoice wasteInvoice = WasteInvoiceFabric(found);
-                var resultInsert = wasteInvoicesServ.Insert(wasteInvoice);
-                if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
-                {
-                    return NotFound();
-                }
-                var resultDelete = invoicesServ.Delete(dTO.Code!);
-                return resultDelete ? Ok() : NotFound();
+                found.Status = SaleStatus.Paid;
             }
         }
 
-        if (dTO.CreditPaymentMethod is not null)
+        invoicesServ.BeginTrans();
+
+        if (found.Status is SaleStatus.Paid)
         {
-            List<CreditPayment> creditPayments = new(found.CreditsPayments ?? [])
-            {
-                dTO.CreditPaymentMethod
-            };
+            WasteSaleRecord wasteSaleRecord = WasteSaleRecordFabric(found);
 
-            found.CreditsPayments = [.. creditPayments];
+            wasteSaleRecordsServ.BeginTrans();
 
-            if (found.CreditsPayments.Sum(x => x.Amount) == totalAmount)
+            var resultInsert = wasteSaleRecordsServ.Insert(wasteSaleRecord);
+            if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
             {
-                found.Status = InvoiceStatus.Paid;
-                WasteInvoice wasteInvoice = WasteInvoiceFabric(found);
-                var resultInsert = wasteInvoicesServ.Insert(wasteInvoice);
-                if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
-                {
-                    return NotFound();
-                }
-                var resultDelete = invoicesServ.Delete(dTO.Code!);
-                return resultDelete ? Ok() : NotFound();
+                invoicesServ.Rollback();
+                return NotFound();
+            }
+
+            var resultDelete = invoicesServ.Delete(dTO.Code);
+            if (!resultDelete)
+            {
+                wasteSaleRecordsServ.Rollback();
+                invoicesServ.Rollback();
+                return NotFound();
+            }
+
+            wasteSaleRecordsServ.Commit();
+        }
+        else
+        {
+            var result = invoicesServ.Update(found);
+            if (!result)
+            {
+                invoicesServ.Rollback();
+                return NotFound();
             }
         }
 
-        var result = invoicesServ.Update(found);
-
-        return result ? Ok() : NotFound();
+        invoicesServ.Commit();
+        return Ok();
     }
 
     [HttpPut("ChangeByStatus")]
@@ -555,14 +590,14 @@ public class InvoicesController : ControllerBase
 
         found.Status = dTO.Status;
 
-        if (dTO.Status is InvoiceStatus.Paid)
+        if (dTO.Status is SaleStatus.Paid)
         {
-            wasteInvoicesServ.BeginTrans();
-            WasteInvoice wasteInvoice = WasteInvoiceFabric(found);
-            var resultInsert = wasteInvoicesServ.Insert(wasteInvoice);
+            wasteSaleRecordsServ.BeginTrans();
+            WasteSaleRecord wasteSaleRecord = WasteSaleRecordFabric(found);
+            var resultInsert = wasteSaleRecordsServ.Insert(wasteSaleRecord);
             if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
             {
-                wasteInvoicesServ.Rollback();
+                wasteSaleRecordsServ.Rollback();
                 return NotFound();
             }
 
@@ -570,17 +605,17 @@ public class InvoicesController : ControllerBase
             var resultDelete = invoicesServ.Delete(dTO.Code!);
             if (!resultDelete)
             {
-                wasteInvoicesServ.Rollback();
+                wasteSaleRecordsServ.Rollback();
                 invoicesServ.Rollback();
                 return NotFound();
             }
 
-            wasteInvoicesServ.Commit();
+            wasteSaleRecordsServ.Commit();
             invoicesServ.Commit();
             return Ok();
         }
 
-        if (dTO.Status is InvoiceStatus.Cancelled)
+        if (dTO.Status is SaleStatus.Cancelled)
         {
             string concept = string.Empty;
             if (!string.IsNullOrEmpty(dTO.Notes))
@@ -589,7 +624,7 @@ public class InvoicesController : ControllerBase
                 var foundConcept = invoicesServ.GetConceptByNote(concept);
                 if (foundConcept is null)
                 {
-                    var newConcept = new ConceptForDeletedInvoice
+                    var newConcept = new ConceptForDeletedSaleRecord
                     {
                         Concept = concept
                     };
@@ -603,12 +638,12 @@ public class InvoicesController : ControllerBase
 
             try
             {
-                wasteInvoicesServ.BeginTrans();
-                WasteInvoice wasteInvoice = WasteInvoiceFabric(found, concept);
-                var wasteInsertResult = wasteInvoicesServ.Insert(wasteInvoice);
+                wasteSaleRecordsServ.BeginTrans();
+                WasteSaleRecord wasteSaleRecord = WasteSaleRecordFabric(found, concept);
+                var wasteInsertResult = wasteSaleRecordsServ.Insert(wasteSaleRecord);
                 if (string.IsNullOrEmpty(wasteInsertResult))
                 {
-                    wasteInvoicesServ.Rollback();
+                    wasteSaleRecordsServ.Rollback();
                     return NotFound();
                 }
 
@@ -616,7 +651,7 @@ public class InvoicesController : ControllerBase
                 var deleteResult = invoicesServ.Delete(found.Code!);
                 if (!deleteResult)
                 {
-                    wasteInvoicesServ.Rollback();
+                    wasteSaleRecordsServ.Rollback();
                     invoicesServ.Rollback();
                     return NotFound();
                 }
@@ -624,17 +659,17 @@ public class InvoicesController : ControllerBase
                 var warehouseUpdated = UpdateWarehouseAfterDeletion(found);
                 if (!warehouseUpdated)
                 {
-                    wasteInvoicesServ.Rollback();
+                    wasteSaleRecordsServ.Rollback();
                     invoicesServ.Rollback();
                     return NotFound();
                 }
 
-                wasteInvoicesServ.Commit();
+                wasteSaleRecordsServ.Commit();
                 invoicesServ.Commit();
             }
             catch
             {
-                wasteInvoicesServ.Rollback();
+                wasteSaleRecordsServ.Rollback();
                 ordersServ.Rollback();
                 return NotFound();
             }
@@ -686,7 +721,7 @@ public class InvoicesController : ControllerBase
         var updateResult = articlesForWarehouseServ.UpdateMany(updateArticles);
         if (!updateResult)
         {
-            wasteInvoicesServ.Rollback();
+            wasteSaleRecordsServ.Rollback();
             articlesForWarehouseServ.Rollback();
             return NotFound();
         }
@@ -695,13 +730,13 @@ public class InvoicesController : ControllerBase
         var resultDelete = invoicesServ.Delete(code);
         if (!resultDelete)
         {
-            wasteInvoicesServ.Rollback();
+            wasteSaleRecordsServ.Rollback();
             invoicesServ.Rollback();
             articlesForWarehouseServ.Rollback();
             return NotFound();
         }
 
-        wasteInvoicesServ.Commit();
+        wasteSaleRecordsServ.Commit();
         invoicesServ.Commit();
         articlesForWarehouseServ.Commit();
 
@@ -710,7 +745,7 @@ public class InvoicesController : ControllerBase
 
 
     [HttpGet("concepts")]
-    public ActionResult<IEnumerable<ConceptForDeletedInvoice>> GetConcepts()
+    public ActionResult<IEnumerable<ConceptForDeletedSaleRecord>> GetConcepts()
     {
         var result = invoicesServ.GetConcepts();
 
@@ -718,7 +753,7 @@ public class InvoicesController : ControllerBase
     }
 
     [HttpPost("concepts")]
-    public ActionResult<int> InsertConcept(ConceptForDeletedInvoice entity)
+    public ActionResult<int> InsertConcept(ConceptForDeletedSaleRecord entity)
     {
         if (entity is null)
         {
@@ -798,13 +833,13 @@ public class InvoicesController : ControllerBase
         return (productItems, articleItems);
     }
 
-    DTO10 CreateDTO10(Invoice entity)
+    DTO10 CreateDTO10(SaleRecord entity)
     {
         double totalAmount = GetTotalAmount.Get(entity);
         double paid = entity.Status switch
         {
-            InvoiceStatus.Paid => totalAmount,
-            _ => entity.ImmediatePayments is null || entity.ImmediatePayments.Length == 0 ? entity.CreditsPayments?.Sum(x => x.Amount) ?? 0 : entity.ImmediatePayments!.Sum(x => x.Amount)
+            SaleStatus.Paid => totalAmount,
+            _ => entity.PaymentMethods is null || entity.PaymentMethods.Length == 0 ? entity.PaymentMethods?.Sum(x => x.Amount) ?? 0 : entity.PaymentMethods!.Sum(x => x.Amount)
         };
 
         var result = new DTO10
@@ -819,7 +854,7 @@ public class InvoicesController : ControllerBase
                     : entity.Customer?.Contact?.Organization?.Name,
             TotalAmount = totalAmount,
             Paid = paid,
-            DaysRemaining = entity.CreditsPayments is null ? 0 : DaysRemaining(entity.Customer!.Credit!.TimeLimit, entity.Date),
+            DaysRemaining = entity.PaymentMethods is null ? -1 : DaysRemaining(entity.Customer!.Credit!.TimeLimit, entity.Date),
             NumberFEL = entity.NumberFEL,
             Status = entity.Status
         };
@@ -827,9 +862,9 @@ public class InvoicesController : ControllerBase
         return result;
     }
 
-    WasteInvoice WasteInvoiceFabric(Invoice invoice)
+    WasteSaleRecord WasteSaleRecordFabric(SaleRecord invoice)
     {
-        return new WasteInvoice
+        return new WasteSaleRecord
         {
             Date = invoice.Date,
             Code = invoice.Code,
@@ -838,14 +873,13 @@ public class InvoicesController : ControllerBase
             Products = invoice.Products,
             Status = invoice.Status,
             NumberFEL = invoice.NumberFEL,
-            ImmediatePayments = invoice.ImmediatePayments,
-            CreditsPayments = invoice.CreditsPayments
+            PaymentMethods = invoice.PaymentMethods
         };
     }
 
-    WasteInvoice WasteInvoiceFabric(Invoice invoice, string notes)
+    WasteSaleRecord WasteSaleRecordFabric(SaleRecord invoice, string notes)
     {
-        var result = WasteInvoiceFabric(invoice);
+        var result = WasteSaleRecordFabric(invoice);
         result.Notes = notes;
         return result;
     }
