@@ -14,7 +14,7 @@ namespace AgroGestor360.Server.Controllers;
 [Route("[controller]")]
 public class SaleRecordsController : ControllerBase
 {
-    readonly ISaleRecordsInLiteDbService invoicesServ;
+    readonly ISaleRecordsInLiteDbService saleRecordsServ;
     readonly ISellersInLiteDbService sellersServ;
     readonly ICustomersInLiteDbService customersServ;
     readonly IProductsForSalesInLiteDbService productsForSalesServ;
@@ -24,9 +24,9 @@ public class SaleRecordsController : ControllerBase
     readonly IOrdersInLiteDbService ordersServ;
     readonly IConfiguration configurationServ;
 
-    public SaleRecordsController(ISaleRecordsInLiteDbService invoicesService, ISellersInLiteDbService sellersService, ICustomersInLiteDbService customersService, IProductsForSalesInLiteDbService productsForSalesService, IWasteSaleRecordsInLiteDbService wasteSaleRecordsService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService, IQuotesInLiteDbService quotesService, IOrdersInLiteDbService ordersService, IConfiguration configuration)
+    public SaleRecordsController(ISaleRecordsInLiteDbService saleRecordsService, ISellersInLiteDbService sellersService, ICustomersInLiteDbService customersService, IProductsForSalesInLiteDbService productsForSalesService, IWasteSaleRecordsInLiteDbService wasteSaleRecordsService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService, IQuotesInLiteDbService quotesService, IOrdersInLiteDbService ordersService, IConfiguration configuration)
     {
-        invoicesServ = invoicesService;
+        saleRecordsServ = saleRecordsService;
         sellersServ = sellersService;
         customersServ = customersService;
         productsForSalesServ = productsForSalesService;
@@ -37,7 +37,7 @@ public class SaleRecordsController : ControllerBase
         configurationServ = configuration;
     }
 
-    [HttpGet("getcredittime")]
+    [HttpGet("GetCreditTime")]
     public ActionResult<IEnumerable<int>> GetCreditTime()
     {
         var days = configurationServ.GetSection("CreditTime:Days").Get<int[]>();
@@ -45,10 +45,10 @@ public class SaleRecordsController : ControllerBase
         return days is null ? NotFound() : Ok(days);
     }
 
-    [HttpGet("exist")]
+    [HttpGet("CheckExistence")]
     public IActionResult CheckExistence()
     {
-        bool exist = invoicesServ.Exist;
+        bool exist = saleRecordsServ.Exist;
 
         return Ok(exist);
     }
@@ -56,7 +56,7 @@ public class SaleRecordsController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<DTO10>> GetAll()
     {
-        var all = invoicesServ.GetAll().Select(CreateDTO10);
+        var all = saleRecordsServ.GetAll().Select(CreateDTO10);
 
         return all is not null && all.Any() ? Ok(all) : NotFound();
     }
@@ -69,7 +69,7 @@ public class SaleRecordsController : ControllerBase
             return BadRequest();
         }
 
-        var found = invoicesServ.GetByCode(code);
+        var found = saleRecordsServ.GetByCode(code);
         if (found is null)
         {
             return NotFound();
@@ -88,7 +88,7 @@ public class SaleRecordsController : ControllerBase
             return BadRequest();
         }
 
-        var found = invoicesServ.GetByCode(code);
+        var found = saleRecordsServ.GetByCode(code);
         if (found is null)
         {
             return NotFound();
@@ -209,23 +209,23 @@ public class SaleRecordsController : ControllerBase
                 entity.PaymentMethods = [];
             }
 
-            invoicesServ.BeginTrans();
-            var resultInsert = invoicesServ.Insert(entity);
+            saleRecordsServ.BeginTrans();
+            var resultInsert = saleRecordsServ.Insert(entity);
 
             if (string.IsNullOrEmpty(resultInsert))
             {
-                invoicesServ.Rollback();
+                saleRecordsServ.Rollback();
                 return NotFound();
             }
 
             var warehouseUpdated = UpdateWarehouseAfterInsert(entity);
             if (!warehouseUpdated)
             {
-                invoicesServ.Rollback();
+                saleRecordsServ.Rollback();
                 return NotFound();
             }
 
-            invoicesServ.Commit();
+            saleRecordsServ.Commit();
             return Ok(resultInsert);
         }
 
@@ -287,22 +287,22 @@ public class SaleRecordsController : ControllerBase
             entity.PaymentMethods = [dTO.PaymentMethods];
         }
 
-        invoicesServ.BeginTrans();
-        var resultInsert = invoicesServ.Insert(entity);
+        saleRecordsServ.BeginTrans();
+        var resultInsert = saleRecordsServ.Insert(entity);
         if (string.IsNullOrEmpty(resultInsert))
         {
-            invoicesServ.Rollback();
+            saleRecordsServ.Rollback();
             return NotFound();
         }
 
         var warehouseUpdated = UpdateWarehouseAfterInsert(entity);
         if (!warehouseUpdated)
         {
-            invoicesServ.Rollback();
+            saleRecordsServ.Rollback();
             return NotFound();
         }
 
-        invoicesServ.Commit();
+        saleRecordsServ.Commit();
         return Ok(resultInsert);
     }
 
@@ -351,15 +351,15 @@ public class SaleRecordsController : ControllerBase
             Products = [.. productItems]
         };
 
-        invoicesServ.BeginTrans();
-        var resultInsert = invoicesServ.Insert(entity);
+        saleRecordsServ.BeginTrans();
+        var resultInsert = saleRecordsServ.Insert(entity);
         if (string.IsNullOrEmpty(resultInsert))
         {
-            invoicesServ.Rollback();
+            saleRecordsServ.Rollback();
             return NotFound();
         }
 
-        invoicesServ.Commit();
+        saleRecordsServ.Commit();
         return Ok(resultInsert);
     }
 
@@ -477,15 +477,15 @@ public class SaleRecordsController : ControllerBase
             entity.Products = [.. itemsForAddWarehouse.Concat(productItems)];
         }
 
-        invoicesServ.BeginTrans();
-        var resultInsert = invoicesServ.Insert(entity);
+        saleRecordsServ.BeginTrans();
+        var resultInsert = saleRecordsServ.Insert(entity);
         if (string.IsNullOrEmpty(resultInsert))
         {
-            invoicesServ.Rollback();
+            saleRecordsServ.Rollback();
             return NotFound();
         }
 
-        invoicesServ.Commit();
+        saleRecordsServ.Commit();
         return Ok(resultInsert);
     }
 
@@ -497,7 +497,7 @@ public class SaleRecordsController : ControllerBase
             return BadRequest();
         }
 
-        var found = invoicesServ.GetByCode(dTO.Code!);
+        var found = saleRecordsServ.GetByCode(dTO.Code!);
         if (found is null)
         {
             return NotFound();
@@ -535,7 +535,7 @@ public class SaleRecordsController : ControllerBase
             }
         }
 
-        invoicesServ.BeginTrans();
+        saleRecordsServ.BeginTrans();
 
         if (found.Status is SaleStatus.Paid)
         {
@@ -546,15 +546,15 @@ public class SaleRecordsController : ControllerBase
             var resultInsert = wasteSaleRecordsServ.Insert(wasteSaleRecord);
             if (string.IsNullOrEmpty(resultInsert) || resultInsert != dTO.Code)
             {
-                invoicesServ.Rollback();
+                saleRecordsServ.Rollback();
                 return NotFound();
             }
 
-            var resultDelete = invoicesServ.Delete(dTO.Code);
+            var resultDelete = saleRecordsServ.Delete(dTO.Code);
             if (!resultDelete)
             {
                 wasteSaleRecordsServ.Rollback();
-                invoicesServ.Rollback();
+                saleRecordsServ.Rollback();
                 return NotFound();
             }
 
@@ -562,15 +562,15 @@ public class SaleRecordsController : ControllerBase
         }
         else
         {
-            var result = invoicesServ.Update(found);
+            var result = saleRecordsServ.Update(found);
             if (!result)
             {
-                invoicesServ.Rollback();
+                saleRecordsServ.Rollback();
                 return NotFound();
             }
         }
 
-        invoicesServ.Commit();
+        saleRecordsServ.Commit();
         return Ok();
     }
 
@@ -582,7 +582,7 @@ public class SaleRecordsController : ControllerBase
             return BadRequest();
         }
 
-        var found = invoicesServ.GetByCode(dTO.Code!);
+        var found = saleRecordsServ.GetByCode(dTO.Code!);
         if (found is null)
         {
             return NotFound();
@@ -601,17 +601,17 @@ public class SaleRecordsController : ControllerBase
                 return NotFound();
             }
 
-            invoicesServ.BeginTrans();
-            var resultDelete = invoicesServ.Delete(dTO.Code!);
+            saleRecordsServ.BeginTrans();
+            var resultDelete = saleRecordsServ.Delete(dTO.Code!);
             if (!resultDelete)
             {
                 wasteSaleRecordsServ.Rollback();
-                invoicesServ.Rollback();
+                saleRecordsServ.Rollback();
                 return NotFound();
             }
 
             wasteSaleRecordsServ.Commit();
-            invoicesServ.Commit();
+            saleRecordsServ.Commit();
             return Ok();
         }
 
@@ -621,14 +621,14 @@ public class SaleRecordsController : ControllerBase
             if (!string.IsNullOrEmpty(dTO.Notes))
             {
                 concept = dTO.Notes!.Trim().ToUpper();
-                var foundConcept = invoicesServ.GetConceptByNote(concept);
+                var foundConcept = saleRecordsServ.GetConceptByNote(concept);
                 if (foundConcept is null)
                 {
                     var newConcept = new ConceptForDeletedSaleRecord
                     {
                         Concept = concept
                     };
-                    var insertResult = invoicesServ.InsertConcept(newConcept);
+                    var insertResult = saleRecordsServ.InsertConcept(newConcept);
                     if (insertResult < 1)
                     {
                         return NotFound();
@@ -647,12 +647,12 @@ public class SaleRecordsController : ControllerBase
                     return NotFound();
                 }
 
-                invoicesServ.BeginTrans();
-                var deleteResult = invoicesServ.Delete(found.Code!);
+                saleRecordsServ.BeginTrans();
+                var deleteResult = saleRecordsServ.Delete(found.Code!);
                 if (!deleteResult)
                 {
                     wasteSaleRecordsServ.Rollback();
-                    invoicesServ.Rollback();
+                    saleRecordsServ.Rollback();
                     return NotFound();
                 }
 
@@ -660,12 +660,12 @@ public class SaleRecordsController : ControllerBase
                 if (!warehouseUpdated)
                 {
                     wasteSaleRecordsServ.Rollback();
-                    invoicesServ.Rollback();
+                    saleRecordsServ.Rollback();
                     return NotFound();
                 }
 
                 wasteSaleRecordsServ.Commit();
-                invoicesServ.Commit();
+                saleRecordsServ.Commit();
             }
             catch
             {
@@ -688,7 +688,7 @@ public class SaleRecordsController : ControllerBase
             return BadRequest();
         }
 
-        var found = invoicesServ.GetByCode(code);
+        var found = saleRecordsServ.GetByCode(code);
         if (found is null)
         {
             return NotFound();
@@ -726,18 +726,18 @@ public class SaleRecordsController : ControllerBase
             return NotFound();
         }
 
-        invoicesServ.BeginTrans();
-        var resultDelete = invoicesServ.Delete(code);
+        saleRecordsServ.BeginTrans();
+        var resultDelete = saleRecordsServ.Delete(code);
         if (!resultDelete)
         {
             wasteSaleRecordsServ.Rollback();
-            invoicesServ.Rollback();
+            saleRecordsServ.Rollback();
             articlesForWarehouseServ.Rollback();
             return NotFound();
         }
 
         wasteSaleRecordsServ.Commit();
-        invoicesServ.Commit();
+        saleRecordsServ.Commit();
         articlesForWarehouseServ.Commit();
 
         return Ok();
@@ -747,7 +747,7 @@ public class SaleRecordsController : ControllerBase
     [HttpGet("concepts")]
     public ActionResult<IEnumerable<ConceptForDeletedSaleRecord>> GetConcepts()
     {
-        var result = invoicesServ.GetConcepts();
+        var result = saleRecordsServ.GetConcepts();
 
         return result is not null && result.Any() ? Ok(result) : NotFound();
     }
@@ -760,7 +760,7 @@ public class SaleRecordsController : ControllerBase
             return BadRequest();
         }
 
-        var result = invoicesServ.InsertConcept(entity);
+        var result = saleRecordsServ.InsertConcept(entity);
 
         return result > 0 ? Ok(result) : NotFound();
     }
@@ -773,7 +773,7 @@ public class SaleRecordsController : ControllerBase
             return BadRequest();
         }
 
-        var result = invoicesServ.DeleteConcept(id);
+        var result = saleRecordsServ.DeleteConcept(id);
 
         return !result ? NotFound() : Ok();
     }

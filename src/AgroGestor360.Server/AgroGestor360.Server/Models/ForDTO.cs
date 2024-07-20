@@ -17,7 +17,7 @@ public record SaleReportParameters(
 
 #region Customer
 /// <summary>
-/// Object: Customer for GET
+/// Objeto: Cliente para GET
 /// <code>
 /// string [CustomerId, CustomerName] 
 /// CustomerDiscountClass [Discount]
@@ -29,11 +29,11 @@ public class DTO5_1
     public string? CustomerName { get; set; }
     public bool IsOrganization { get; set; }
     public DiscountForCustomer? Discount { get; set; }
-    public LineCredit? Credit { get; set; }
+    public CustomerLineCredit? Credit { get; set; }
 }
 
 /// <summary>
-/// Object: Customer for POST
+/// Objeto: Cliente para POST
 /// <code>
 /// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName]
 /// CustomerDiscountClass [Discount]
@@ -51,11 +51,11 @@ public class DTO5_2
     public string? CustomerOccupation { get; set; }
     public string? CustomerOrganizationName { get; set; }
     public DiscountForCustomer? Discount { get; set; }
-    public LineCredit? Credit { get; set; }
+    public CustomerLineCredit? Credit { get; set; }
 }
 
 /// <summary>
-/// Object: Customer for PUT by customer and/or discount
+/// Objeto: Cliente para PUT por cliente y/o descuento
 /// <code>
 /// string [CustomerFullName, CustomerAddress, CustomerPhone, CustomerMail, CustomerNIT, CustomerNIP, CustomerOccupation, CustomerOrganizationName] 
 /// CustomerDiscountClass [Discount]
@@ -74,11 +74,11 @@ public class DTO5_3
     public string? CustomerOccupation { get; set; }
     public string? CustomerOrganizationName { get; set; }
     public DiscountForCustomer? Discount { get; set; }
-    public LineCredit? Credit { get; set; }
+    public CustomerLineCredit? Credit { get; set; }
 }
 
 /// <summary>
-/// Object: Customer for PUT by discount
+/// Objeto: Cliente para PUT por descuento
 /// <code>
 /// string [CustomerId]
 /// int [DiscountId]
@@ -91,7 +91,7 @@ public class DTO5_4
 }
 
 /// <summary>
-/// Object: Customer for PUT by credit
+/// Objeto: Cliente para PUT por crédito
 /// <code>
 /// string [CustomerId]
 /// LineCredit [Credit]
@@ -100,13 +100,13 @@ public class DTO5_4
 public class DTO5_5
 {
     public string? CustomerId { get; set; }
-    public LineCredit? Credit { get; set; }
+    public CustomerLineCredit? Credit { get; set; }
 }
 #endregion
 
 #region Seller
 /// <summary>
-/// Object: Seller for GET
+/// Objeto: Vendedor para GET
 /// <para>
 /// string [Id, FullName]
 /// </para>
@@ -118,7 +118,7 @@ public class DTO6
 }
 
 /// <summary>
-/// Object: Seller for POST
+/// Objeto: Vendedor para POST
 /// <para>
 /// DateTime [Birthday], string [FullName, Address, Phone, Mail, NIT, NIP, Occupation], 
 /// </para>
@@ -136,7 +136,7 @@ public class DTO6_1
 }
 
 /// <summary>
-/// Object: Seller for PUT
+/// Objeto: Vendedor para PUT
 /// <para>
 /// DateTime [Birthday], string [Id, FullName, Address, Phone, Mail, NIT, NIP, Occupation], 
 /// </para>
@@ -157,7 +157,7 @@ public class DTO6_2
 
 #region Merchandise
 /// <summary>
-/// Represents a merchandise item for GET, POST and PUT operations.
+/// Representa un artículo de mercancía para operaciones GET, POST y PUT.
 /// <code>
 /// string [Id, Name, Description, Category]
 /// Presentation [Packaging]
@@ -175,7 +175,7 @@ public class DTO1
 
 #region Warehouse
 /// <summary>
-/// Represents a article item of warehouse for GET 
+/// Representa un artículo de almacén para GET 
 /// <code>
 /// string [MerchandiseId, MerchandiseName]
 /// Presentation [Packaging]
@@ -192,7 +192,7 @@ public class DTO2
 }
 
 /// <summary>
-/// Represents a article item of warehouse for PUT 
+/// Representa un artículo de almacén para PUT 
 /// <code>
 /// string [MerchandiseId]
 /// double [Quantity, Reserved]
@@ -208,7 +208,7 @@ public class DTO2_1
 
 #region Sales
 /// <summary>
-/// Represents a article item of Sale for GET
+/// Representa un artículo para la venta empleado en el método GET
 /// <code>
 /// string [MerchandiseId, MerchandiseName] 
 /// Presentation [Packaging] 
@@ -224,7 +224,7 @@ public class DTO3
 }
 
 /// <summary>
-/// Represents a article item of sale for PUT
+/// Representa un artículo de venta para PUT
 /// <code>
 /// string [MerchandiseId] 
 /// double [Price] 
@@ -330,7 +330,7 @@ public class DTO4_5
 }
 
 /// <summary>
-/// Represents a quotation for GET or POST from order
+/// Representa una cotización para GET o POST desde orden
 /// <code>
 /// bool [IsDraftStatus]
 /// double [TotalAmount]
@@ -351,7 +351,7 @@ public class DTO7
 }
 
 /// <summary>
-/// Represents a quotation for POST
+/// Representa una cotización para POST
 /// <code>
 /// QuotationStatus [Status]
 /// DateTime [QuotationDate]
@@ -411,7 +411,7 @@ public class DTO7_4
 }
 
 /// <summary>
-/// Represents a order for GET
+/// Representa una orden para GET
 /// <code>
 /// bool [IsPendingStatus]
 /// double [TotalAmount]
@@ -432,7 +432,7 @@ public class DTO8
 }
 
 /// <summary>
-/// Represents a order for POST
+/// Representa una orden para POST
 /// <code>
 /// OrderStatus [Status]
 /// DateTime [QuotationDate]
@@ -545,19 +545,19 @@ public class DTO9
 }
 
 /// <summary>
-/// Represents a invoice of GET method for invoice with credit payment type.
+/// Representa una factura del método GET para factura con tipo de pago a crédito.
 /// <code>
-/// Paid: Amount paid
-/// DaysRemaining: Days remaining to pay
-/// TotalAmount: Total amount of the invoice
-/// Date: Date of the invoice
-/// Code: Code of the invoice and key in database
-/// SellerId: Id of the seller
-/// SellerName: Name of the seller
-/// CustomerId: Id of the customer
-/// CustomerName: Name of the customer
-/// NumberFEL: Number of the invoice in FEL
-/// Status: Status of the invoice
+/// Paid: Monto pagado
+/// DaysRemaining: Días restantes para pagar
+/// TotalAmount: Monto total de la factura
+/// Date: Fecha de la factura
+/// Code: Código de la factura y clave en la base de datos
+/// SellerId: Id del vendedor
+/// SellerName: Nombre del vendedor
+/// CustomerId: Id del cliente
+/// CustomerName: Nombre del cliente
+/// NumberFEL: Número de la factura en FEL
+/// Status: Estado de la factura
 /// </code>
 /// </summary>
 public class DTO10

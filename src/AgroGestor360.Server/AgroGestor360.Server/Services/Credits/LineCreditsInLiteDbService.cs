@@ -13,22 +13,22 @@ public interface ILineCreditsInLiteDbService
     bool Delete(int id, bool withInternalTrans = true);
     bool Delete1(int id, bool withInternalTrans = true);
     bool ExistById(int id);
-    IEnumerable<LineCreditItem> GetAll();
+    IEnumerable<LineCredit> GetAll();
     IEnumerable<TimeLimitForCredit> GetAll1();
-    LineCreditItem GetById(int id);
+    LineCredit GetById(int id);
     TimeLimitForCredit GetById1(int id);
     TimeLimitForCredit GetDefault();
-    int Insert(LineCreditItem entity, bool withInternalTrans = true);
+    int Insert(LineCredit entity, bool withInternalTrans = true);
     int Insert1(TimeLimitForCredit entity, bool withInternalTrans = true);
     void Rollback();
     bool SetDefault(TimeLimitForCredit newDefault);
-    bool Update(LineCreditItem entity, bool withInternalTrans = true);
+    bool Update(LineCredit entity, bool withInternalTrans = true);
 }
 
 public class LineCreditsInLiteDbService : ILineCreditsInLiteDbService
 {
     readonly LiteDatabase db;
-    readonly ILiteCollection<LineCreditItem> collection;
+    readonly ILiteCollection<LineCredit> collection;
     readonly ILiteCollection<TimeLimitForCredit> collection1, collection2;
 
     public LineCreditsInLiteDbService()
@@ -39,7 +39,7 @@ public class LineCreditsInLiteDbService : ILineCreditsInLiteDbService
         };
 
         db = new(cnx);
-        collection = db.GetCollection<LineCreditItem>(nameof(LineCreditItem));
+        collection = db.GetCollection<LineCredit>(nameof(LineCredit));
         collection1 = db.GetCollection<TimeLimitForCredit>(nameof(TimeLimitForCredit));
         collection2 = db.GetCollection<TimeLimitForCredit>("Default" + nameof(TimeLimitForCredit));
     }
@@ -55,9 +55,9 @@ public class LineCreditsInLiteDbService : ILineCreditsInLiteDbService
 
     public bool ExistById(int id) => collection.FindById(id) is not null;
 
-    public LineCreditItem GetById(int id) => collection.FindById(id);
+    public LineCredit GetById(int id) => collection.FindById(id);
 
-    public int Insert(LineCreditItem entity, bool withInternalTrans = true)
+    public int Insert(LineCredit entity, bool withInternalTrans = true)
     {
         if (withInternalTrans)
         {
@@ -80,7 +80,7 @@ public class LineCreditsInLiteDbService : ILineCreditsInLiteDbService
         }
     }
 
-    public bool Update(LineCreditItem entity, bool withInternalTrans = true)
+    public bool Update(LineCredit entity, bool withInternalTrans = true)
     {
         if (withInternalTrans)
         {
@@ -103,7 +103,7 @@ public class LineCreditsInLiteDbService : ILineCreditsInLiteDbService
         }
     }
 
-    public IEnumerable<LineCreditItem> GetAll() => collection.FindAll();
+    public IEnumerable<LineCredit> GetAll() => collection.FindAll();
 
     public bool Delete(int id, bool withInternalTrans = true)
     {

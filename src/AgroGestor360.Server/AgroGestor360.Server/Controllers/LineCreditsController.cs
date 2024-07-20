@@ -24,7 +24,7 @@ public class LineCreditsController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<LineCreditItem>> GetAll()
+    public ActionResult<IEnumerable<LineCredit>> GetAll()
     {
         var all = lineCreditsServ.GetAll();
 
@@ -32,7 +32,7 @@ public class LineCreditsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public ActionResult<LineCreditItem?> GetById(int id)
+    public ActionResult<LineCredit?> GetById(int id)
     {
         if (id < 1)
         {
@@ -44,7 +44,7 @@ public class LineCreditsController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<int> Post(LineCreditItem newEntity)
+    public ActionResult<int> Post(LineCredit newEntity)
     {
         if (newEntity is null)
         {
@@ -57,7 +57,7 @@ public class LineCreditsController : ControllerBase
     }
 
     [HttpPut]
-    public ActionResult<bool> Update(LineCreditItem entity)
+    public ActionResult<bool> Update(LineCredit entity)
     {
         if (entity is null)
         {
