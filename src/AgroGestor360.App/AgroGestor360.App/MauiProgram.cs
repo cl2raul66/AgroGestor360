@@ -59,8 +59,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IOrdersService, OrdersService>();
         builder.Services.AddSingleton<IInvoicesService, InvoicesService>();
         builder.Services.AddSingleton<IFinancialInstrumentTypeService, FinancialInstrumentTypeService>();
-        builder.Services.AddSingleton<IImmediatePaymentTypeService, ImmediatePaymentTypeService>();
-        builder.Services.AddSingleton<ICreditPaymentTypeService, CreditPaymentTypeService>();
+        builder.Services.AddSingleton<IPaymentTypeService, PaymentTypeService>();
         builder.Services.AddSingleton<IMeasurementService, MeasurementService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
 
@@ -109,16 +108,16 @@ public static class MauiProgram
         return builder.Build();
     }
 
-private static void AddAppsettings(this MauiAppBuilder builder)
-{
-    Assembly assembly = Assembly.GetExecutingAssembly();
-    using Stream stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.appsettings.json")!;
-    if (stream is not null)
+    private static void AddAppsettings(this MauiAppBuilder builder)
     {
-        IConfiguration config = new ConfigurationBuilder()
-            .AddJsonStream(stream)
-            .Build();
-        builder.Configuration.AddConfiguration(config);
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        using Stream stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.appsettings.json")!;
+        if (stream is not null)
+        {
+            IConfiguration config = new ConfigurationBuilder()
+                .AddJsonStream(stream)
+                .Build();
+            builder.Configuration.AddConfiguration(config);
+        }
     }
-}
 }

@@ -21,7 +21,7 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>AgroGestor360.App</ApplicationTitle>
+		<ApplicationTitle>AgroGestor360</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.randamedialabgroup.agrogestor360.app</ApplicationId>
@@ -36,65 +36,8 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
-		<GenerateAppInstallerFile>True</GenerateAppInstallerFile>
-		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-		<PackageCertificateThumbprint>02733B7210C325FAAEFB7F6F7C18D82813B50E88</PackageCertificateThumbprint>
-		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
-		<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
-		<GenerateTestArtifacts>True</GenerateTestArtifacts>
-		<AppInstallerUri>\\c</AppInstallerUri>
-		<HoursBetweenUpdateChecks>168</HoursBetweenUpdateChecks>
-		<AssemblyName>AgroGestor360.App</AssemblyName>
-		<Platforms>AnyCPU</Platforms>
 		<NeutralLanguage>es-GT</NeutralLanguage>
-		<AssemblyVersion></AssemblyVersion>
-		<FileVersion></FileVersion>
-		<AndroidSigningKeyStore>randamedialabgroup_android.keystore</AndroidSigningKeyStore>
 		<DefaultLanguage>Es-Gt</DefaultLanguage>
-	</PropertyGroup>
-	
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
-	  <ApplicationTitle>AgroGestor360</ApplicationTitle>
-	  <ApplicationDisplayVersion>1.0.12.0</ApplicationDisplayVersion>
-	  <EnableLLVM>True</EnableLLVM>
-	  <AndroidKeyStore>False</AndroidKeyStore>
-	  <AndroidSigningStorePass>12345678</AndroidSigningStorePass>
-	</PropertyGroup>
-	
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|ARM64'">
-	  <ApplicationTitle>AgroGestor360</ApplicationTitle>
-	</PropertyGroup>
-	
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
-	  <ApplicationTitle>AgroGestor360</ApplicationTitle>
-	  <ApplicationDisplayVersion>1.0.12.0</ApplicationDisplayVersion>
-	</PropertyGroup>
-	
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|ARM64'">
-	  <ApplicationTitle>AgroGestor360</ApplicationTitle>
-	</PropertyGroup>
-	
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
-	  <ApplicationTitle>AgroGestor360</ApplicationTitle>
-	  <ApplicationDisplayVersion>1.0.12.0</ApplicationDisplayVersion>
-	  <AndroidPackageFormat>apk</AndroidPackageFormat>
-	  <EnableLLVM>True</EnableLLVM>
-	  <AndroidKeyStore>False</AndroidKeyStore>
-	  <AndroidSigningStorePass>12345678</AndroidSigningStorePass>
-	</PropertyGroup>
-	
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|ARM64'">
-	  <ApplicationTitle>AgroGestor360</ApplicationTitle>
-	</PropertyGroup>
-	
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
-	  <ApplicationTitle>AgroGestor360</ApplicationTitle>
-	  <ApplicationDisplayVersion>1.0.12.0</ApplicationDisplayVersion>
-	</PropertyGroup>
-	
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|ARM64'">
-	  <ApplicationTitle>AgroGestor360</ApplicationTitle>
 	</PropertyGroup>
 	
 	<ItemGroup>
@@ -265,10 +208,6 @@
 	  <MauiXaml Update="Views\Settings\Warehouse\PgAddWarehouse.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Compile Remove="C:\Users\elrau\.nuget\packages\microsoft.windowsappsdk\1.4.240211001\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

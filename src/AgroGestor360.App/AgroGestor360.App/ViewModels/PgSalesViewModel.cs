@@ -27,12 +27,11 @@ public partial class PgSalesViewModel : ObservableRecipient
     readonly IAuthService authServ;
     readonly IInvoicesService invoicesServ;
     readonly IApiService apiServ;
-    readonly ITimeLimitsCreditsService timeLimitsCreditsServ; 
-    readonly IImmediatePaymentTypeService immediatePaymentTypeServ;
-    readonly ICreditPaymentTypeService creditPaymentTypeServ;
+    readonly ITimeLimitsCreditsService timeLimitsCreditsServ;
+    readonly IPaymentTypeService paymentTypeServ;
     //readonly SemaphoreSlim semaphore = new(0, 2);
 
-    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, IAuthService authService, IInvoicesService invoicesService, IApiService apiService, ITimeLimitsCreditsService timeLimitsCreditsService, IImmediatePaymentTypeService immediatePaymentTypeService, ICreditPaymentTypeService creditPaymentTypeService)
+    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, IAuthService authService, IInvoicesService invoicesService, IApiService apiService, ITimeLimitsCreditsService timeLimitsCreditsService, IPaymentTypeService paymentTypeService)
     {
         quotationsServ = quotesService;
         sellersServ = sellersService;
@@ -44,8 +43,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         invoicesServ = invoicesService;
         apiServ = apiService;
         timeLimitsCreditsServ = timeLimitsCreditsService;
-        immediatePaymentTypeServ = immediatePaymentTypeService;
-        creditPaymentTypeServ = creditPaymentTypeService;
+        paymentTypeServ = paymentTypeService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
 
         apiServ.OnReceiveStatusMessage += ApiServ_OnReceiveStatusMessage;
@@ -454,7 +452,7 @@ public partial class PgSalesViewModel : ObservableRecipient
                 }
             }
             else
-            {              
+            {
                 ViewBills();
                 await ShowAddEditSale();
                 //semaphore.Wait();
@@ -464,7 +462,7 @@ public partial class PgSalesViewModel : ObservableRecipient
             ResultSalesConfirmationDialog = null;
         }
         SelectedOrder = null;
-        SelectedQuotation = null;        
+        SelectedQuotation = null;
     }
     #endregion
 
@@ -569,16 +567,10 @@ public partial class PgSalesViewModel : ObservableRecipient
     string? referentNo;
 
     [ObservableProperty]
-    string[]? immediatePaymentTypes;
+    string[]? paymentsTypes;
 
     [ObservableProperty]
-    string? selectedImmediatePayment;
-
-    [ObservableProperty]
-    string[]? creditPaymentTypes;
-
-    [ObservableProperty]
-    string? selectedCreditPayment;
+    string? selectedPaymentType;
 
     [RelayCommand]
     async Task PayCompletePayment()
@@ -590,23 +582,16 @@ public partial class PgSalesViewModel : ObservableRecipient
 
         DTO10_2 data = new()
         {
-            Code = SelectedInvoice!.Code,            
+            Code = SelectedInvoice!.Code,
+            PaymentMethods = [new() { Date = DateTime.Now, Amount = theAmountPay, ReferenceNumber = ReferentNo, Type = PaymentType.Cash }]
         };
-
-        if (SelectedInvoice!.DaysRemaining == -1)
-        {
-            data.ImmediateMethod = new() { Date = DateTime.Now, Amount = theAmountPay, ReferenceNo = ReferentNo, Type = ImmediatePaymentType.Cash };
-        }
-        else
-        {
-            data.CreditPaymentMethod = new() { Date = DateTime.Now, Amount = theAmountPay, ReferenceNo = ReferentNo, Type = CreditPaymentType.CreditCard };
-        }
 
         bool result = await invoicesServ.RepaymentAsync(serverURL, data);
         if (result)
         {
             Invoices!.Remove(SelectedInvoice!);
         }
+
         IsOpenCompletePayment = false;
         await Task.CompletedTask;
     }
@@ -803,7 +788,7 @@ public partial class PgSalesViewModel : ObservableRecipient
             SelectedQuotation = null;
         });
 
-        WeakReferenceMessenger.Default.Register<PgSalesViewModel, ConceptForDeletedInvoice, string>(this, "deletedinvoice", async (r, m) =>
+        WeakReferenceMessenger.Default.Register<PgSalesViewModel, ConceptForDeletedSaleRecord, string>(this, "deletedinvoice", async (r, m) =>
         {
             IsActive = false;
             bool isEmpty = ConceptForDeletedInvoiceIsEmpty(m);
@@ -821,7 +806,7 @@ public partial class PgSalesViewModel : ObservableRecipient
             }
             else
             {
-                DTO10_3 dTO = new() { Code = currentInvoice.Code, Status = InvoiceStatus.Cancelled, Notes = m.Concept };
+                DTO10_3 dTO = new() { Code = currentInvoice.Code, Status = SaleStatus.Cancelled, Notes = m.Concept };
                 deletedInInvoice = await invoicesServ.ChangeByStatusAsync(serverURL, dTO);
             }
 
@@ -889,8 +874,10 @@ public partial class PgSalesViewModel : ObservableRecipient
 
         if (e.PropertyName == nameof(IsOpenCompletePayment))
         {
-            ImmediatePaymentTypes = IsOpenCompletePayment && SelectedInvoice!.DaysRemaining == -1 ? immediatePaymentTypeServ.GetAll().ToArray() : null;
-            CreditPaymentTypes = IsOpenCompletePayment && SelectedInvoice!.DaysRemaining > -1 ? creditPaymentTypeServ.GetAll().ToArray() : null;
+            if (IsOpenCompletePayment)
+            {
+                PaymentsTypes = [.. paymentTypeServ.GetAll()];
+            }
         }
     }
 
@@ -1048,7 +1035,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         return await Shell.Current.DisplayAlert("Eliminar", message, "Eliminar", "Cancelar");
     }
 
-    bool ConceptForDeletedInvoiceIsEmpty(ConceptForDeletedInvoice obj)
+    bool ConceptForDeletedInvoiceIsEmpty(ConceptForDeletedSaleRecord obj)
     {
         return obj is null || (obj.Id < 1 && (string.IsNullOrEmpty(obj.Concept) || string.IsNullOrWhiteSpace(obj.Concept)));
     }

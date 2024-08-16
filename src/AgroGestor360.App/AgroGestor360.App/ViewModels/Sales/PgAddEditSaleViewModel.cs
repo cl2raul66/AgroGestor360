@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using AgroGestor360.App.Models;
+using AgroGestor360.Client.Tools;
 
 namespace AgroGestor360.App.ViewModels;
 
@@ -293,7 +294,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
             TimeCredit = SelectedCreditTime,
             CustomerId = SelectedCustomer!.CustomerId,
             SellerId = SelectedSeller!.Id,
-            Status = Client.Tools.InvoiceStatus.Pending,
+            Status = SaleStatus.Pending,
             Products = [.. productItems]
         };
 

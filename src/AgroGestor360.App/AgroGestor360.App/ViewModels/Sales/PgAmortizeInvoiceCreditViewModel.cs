@@ -4,27 +4,19 @@ using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AgroGestor360.App.ViewModels;
 
 [QueryProperty(nameof(CurrentInvoice), "currentInvoice")]
 public partial class PgAmortizeInvoiceCreditViewModel : ObservableValidator
 {
-    readonly IImmediatePaymentTypeService immediatePaymentTypeServ;
-    readonly ICreditPaymentTypeService creditPaymentTypeServ;
+    readonly IPaymentTypeService paymentTypeServ;
     readonly IInvoicesService invoicesServ;
 
-    public PgAmortizeInvoiceCreditViewModel(IImmediatePaymentTypeService immediatePaymentTypeService, ICreditPaymentTypeService creditPaymentTypeService, IInvoicesService invoicesService)
+    public PgAmortizeInvoiceCreditViewModel(IPaymentTypeService paymentTypeService, IInvoicesService invoicesService)
     {
-        immediatePaymentTypeServ = immediatePaymentTypeService;
-        creditPaymentTypeServ = creditPaymentTypeService;
+        paymentTypeServ = paymentTypeService;
         invoicesServ = invoicesService;
         Date = DateTime.Now;
     }
@@ -69,27 +61,18 @@ public partial class PgAmortizeInvoiceCreditViewModel : ObservableValidator
             return;
         }
 
-        ImmediatePayment immediatePayment = new()
+        PaymentMethod paymentMethod = new()
         {
             Amount = theAmount,
             Date = Date,
-            ReferenceNo = ReferenceNo,
-            Type = immediatePaymentTypeServ.GetByName(SelectedImmediateType!)
+            ReferenceNumber = ReferenceNo,
+            Type = paymentTypeServ.GetByName(SelectedCreditType!)
         };
-
-        CreditPayment creditPayment = new()
-        {
-            Amount = theAmount,
-            Date = Date,
-            ReferenceNo = ReferenceNo,
-            Type = creditPaymentTypeServ.GetByName(SelectedCreditType!)
-        };
-
+        
         DTO10_2 dTO = new()
         {
             Code = CurrentInvoice!.Code,
-            ImmediateMethod = immediatePayment,
-            CreditPaymentMethod = creditPayment
+            PaymentMethods = [paymentMethod]
         };
 
         _ = WeakReferenceMessenger.Default.Send(dTO, "setdepreciation");

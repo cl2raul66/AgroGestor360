@@ -796,28 +796,14 @@
                                 <Picker
                                     Grid.Row="1"
                                     IsEnabled="{Binding SelectedInvoice, Converter={ctk:IsNotNullConverter}}"
-                                    ItemsSource="{Binding ImmediatePaymentTypes}"
-                                    SelectedItem="{Binding SelectedImmediatePayment}">
+                                    ItemsSource="{Binding PaymentsTypes}"
+                                    SelectedItem="{Binding SelectedPaymentType}">
                                     <Picker.Triggers>
                                         <DataTrigger
                                             Binding="{Binding SelectedInvoice.DaysRemaining}"
                                             TargetType="Picker"
                                             Value="-1">
                                             <Setter Property="IsVisible" Value="True" />
-                                        </DataTrigger>
-                                    </Picker.Triggers>
-                                </Picker>
-                                <Picker
-                                    Grid.Row="1"
-                                    IsEnabled="{Binding SelectedInvoice, Converter={ctk:IsNotNullConverter}}"
-                                    ItemsSource="{Binding CreditPaymentTypes}"
-                                    SelectedItem="{Binding SelectedCreditPayment}">
-                                    <Picker.Triggers>
-                                        <DataTrigger
-                                            Binding="{Binding SelectedInvoice.DaysRemaining}"
-                                            TargetType="Picker"
-                                            Value="-1">
-                                            <Setter Property="IsVisible" Value="False" />
                                         </DataTrigger>
                                     </Picker.Triggers>
                                 </Picker>

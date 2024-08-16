@@ -10,10 +10,10 @@ namespace AgroGestor360.App.ViewModels;
 public partial class PgDeletedInvoiceViewModel : ObservableObject
 {
     [ObservableProperty]
-    ConceptForDeletedInvoice[]? concepts;
+    ConceptForDeletedSaleRecord[]? concepts;
 
     [ObservableProperty]
-    ConceptForDeletedInvoice? selectedConcept;
+    ConceptForDeletedSaleRecord? selectedConcept;
 
     [ObservableProperty]
     string? anotherConcept;
@@ -53,7 +53,7 @@ public partial class PgDeletedInvoiceViewModel : ObservableObject
             return;
         }
 
-        var send = SelectedConcept ?? new ConceptForDeletedInvoice { Concept = AnotherConcept };
+        ConceptForDeletedSaleRecord send = SelectedConcept ?? new() { Concept = AnotherConcept };
 
         _ = WeakReferenceMessenger.Default.Send(send, "deletedinvoice");
 
