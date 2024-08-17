@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="AgroGestor360.App.Views.Settings.CvConnection"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
+    x:DataType="vm:CvConnectionViewModel">
+
+    <Grid RowDefinitions="auto,*" RowSpacing="8">
+        <Frame Padding="8">
+            <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
+                <Label
+                    Grid.Column="1"
+                    FontSize="18"
+                    Text="Conexión"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+                <HorizontalStackLayout Grid.Column="2" Spacing="8">
+                    <Button
+                        Command="{Binding ShowSetURLCommand}"
+                        FontFamily="icofont"
+                        Text="{StaticResource Plugin}"
+                        ToolTipProperties.Text="Establecer conexión" />
+                </HorizontalStackLayout>
+            </Grid>
+        </Frame>
+        <Grid Grid.Row="1">
+            <VerticalStackLayout Spacing="8" VerticalOptions="Center">
+                <Label FontSize="16" HorizontalOptions="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span
+                                FontAttributes="Bold"
+                                Text="Servidor: "
+                                TextColor="{StaticResource Black}" />
+                            <Span Text="{Binding ServerURL, TargetNullValue='¡No hay URL establecida!'}" TextColor="{StaticResource Black}" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <HorizontalStackLayout HorizontalOptions="Center">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        Text="Estado: " />
+                    <Label FontSize="16">
+                        <Label.Triggers>
+                            <DataTrigger
+                                Binding="{Binding HaveConnection}"
+                                TargetType="Label"
+                                Value="true">
+                                <Setter Property="Text" Value="Conectado" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding HaveConnection}"
+                                TargetType="Label"
+                                Value="false">
+                                <Setter Property="Text" Value="Desconectado" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+
+</ContentView>

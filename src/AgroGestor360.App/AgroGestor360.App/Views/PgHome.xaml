@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AgroGestor360.App.Views.PgHome"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
+    Title="Inicio"
+    x:DataType="vm:PgHomeViewModel"
+    Shell.NavBarIsVisible="False">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
+    <Grid
+        Padding="8"
+        RowDefinitions="auto,*,auto,auto"
+        RowSpacing="16">
+        <!--#region ENCABEZADO-->
+        <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
+            <Label
+                Grid.Column="1"
+                FontSize="18"
+                Text="Inicio"
+                TextTransform="Uppercase"
+                VerticalOptions="Center" />
+            <HorizontalStackLayout
+                Grid.Column="2"
+                MinimumHeightRequest="36"
+                Spacing="8">
+                <Button
+                    Command="{Binding GoToReportsCommand}"
+                    IsEnabled="{Binding HaveConnection}"
+                    IsVisible="{OnIdiom Phone='False',
+                                        Default='True'}"
+                    Text="Reportes"
+                    TextTransform="Uppercase"
+                    ToolTipProperties.Text="Ir a reportes"
+                    WidthRequest="110" />
+                <Button
+                    Command="{Binding GoToSalesCommand}"
+                    IsEnabled="{Binding HaveConnection}"
+                    IsVisible="{OnIdiom Phone='False',
+                                        Default='True'}"
+                    Text="Ventas"
+                    TextTransform="Uppercase"
+                    ToolTipProperties.Text="Ir a ventas"
+                    WidthRequest="110" />
+                <BoxView Style="{StaticResource ElementSeparator}" IsVisible="{OnIdiom Phone='False', Default='True'}" />
+                <Button
+                    Command="{Binding GoToSettingsCommand}"
+                    FontFamily="icofont"
+                    Text="{StaticResource UiSettings}"
+                    TextTransform="Uppercase"
+                    ToolTipProperties.Text="Ajustes" />
+            </HorizontalStackLayout>
+        </Grid>
+        <!--#endregion-->
+        <!--#region CONTENIDO-->
+        <Frame
+            Grid.Row="2"
+            HorizontalOptions="Fill"
+            IsVisible="{Binding HaveConnection}"
+            VerticalOptions="Center">
+            <Grid RowDefinitions="auto,auto" RowSpacing="8">
+                <Label Text="Accesos rápidos:" />
+                <FlexLayout
+                    Grid.Row="1"
+                    AlignContent="{OnIdiom Default=Stretch,
+                                           Phone=Start}"
+                    AlignItems="{OnIdiom Default=Center,
+                                         Phone=Stretch}"
+                    Direction="{OnIdiom Default=Row,
+                                        Phone=Column}"
+                    JustifyContent="{OnIdiom Default=Start,
+                                             Phone=Center}"
+                    Wrap="{OnIdiom Default=Wrap,
+                                   Phone=NoWrap}">
+                    <Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        Command="{Binding GoToReportsCommand}"
+                        IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='True',
+                                            Default='False'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Reportes"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Ir a reportes." />
+                    <!--<Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        Command="{Binding GoToSalesCommand}"
+                        IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='True',
+                                            Default='False'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Ventas"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Ir a ventas." />-->
+                    <!--<BoxView
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,4'}"
+                        Background="{StaticResource Gray200}"
+                        HeightRequest="2"
+                        IsVisible="{OnIdiom Phone='True',
+                                            Default='False'}" />-->
+                    <Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='False',
+                                            Default='True'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Conciliación de caja"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Realiza la conciliacion de caja del momento actual." />
+                    <Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        Command="{Binding ShowAddQuoteCommand}"
+                        IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='False',
+                                            Default='True'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Nueva cotización"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Elabora una nueva cotización." />
+                    <Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        Command="{Binding ShowAddOrderCommand}"
+                        IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='False',
+                                            Default='True'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Nuevo pedido"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Agregar nuevo pedido." />
+                    <Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        Command="{Binding ShowAddSaleCommand}"
+                        IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='False',
+                                            Default='True'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Nueva venta"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Agregar nueva venta." />
+                    <Button
+                        Margin="{OnIdiom Default='2',
+                                         Phone='0,2'}"
+                        IsEnabled="{Binding HaveConnection}"
+                        IsVisible="{OnIdiom Phone='False',
+                                            Default='True'}"
+                        MinimumWidthRequest="{OnIdiom Desktop='180'}"
+                        Text="Nueva mercancía"
+                        TextTransform="Uppercase"
+                        ToolTipProperties.Text="Agregar nueva mercancía." />
+                </FlexLayout>
+            </Grid>
+        </Frame>
+        <!--#endregion-->
+        <!--#region PIE DE PAGINA-->
+        <Grid
+            Grid.Row="3"
+            Padding="8,0"
+            ColumnDefinitions="*,auto"
+            ColumnSpacing="8">
+            <HorizontalStackLayout Spacing="8">
+                <Label
+                    Padding="2"
+                    FontFamily="icofont"
+                    FontSize="11">
+                    <Label.Triggers>
+                        <DataTrigger
+                            Binding="{Binding HaveConnection}"
+                            TargetType="Label"
+                            Value="true">
+                            <Setter Property="ToolTipProperties.Text" Value="Conectado al servidor" />
+                            <Setter Property="Text" Value="{StaticResource UiNetwork}" />
+                        </DataTrigger>
+                        <DataTrigger
+                            Binding="{Binding HaveConnection}"
+                            TargetType="Label"
+                            Value="false">
+                            <Setter Property="ToolTipProperties.Text" Value="Desconectado del servidor" />
+                            <Setter Property="Text" Value="{StaticResource Broken}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout
+                Grid.Column="1"
+                Spacing="8"
+                VerticalOptions="Center">
+                <Label FontSize="11" Text="{Binding AppInfo}" />
+                <BoxView Style="{StaticResource ElementSeparator}" />
+                <Label
+                    Grid.Column="1"
+                    FontSize="11"
+                    Text="by RandA Media Lab, Group" />
+            </HorizontalStackLayout>
+        </Grid>
+        <!--#endregion-->
+    </Grid>
+
+</ContentPage>

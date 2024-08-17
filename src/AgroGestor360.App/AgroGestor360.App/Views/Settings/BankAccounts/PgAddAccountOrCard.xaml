@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AgroGestor360.App.Views.Settings.PgAddAccountOrCard"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
+    Title="AddAccountOrCard"
+    x:DataType="vm:PgAddAccountOrCardViewModel"
+    BackgroundColor="#99634833"
+    Shell.NavBarIsVisible="False"
+    Shell.PresentationMode="ModalAnimated">
+
+    <Frame
+        Margin="16"
+        HorizontalOptions="Center"
+        MaximumWidthRequest="480"
+        VerticalOptions="Center">
+        <Grid RowDefinitions="auto,*,auto" RowSpacing="16">
+            <Label
+                FontSize="18"
+                Text="Agregar cuenta o tarjeta"
+                TextTransform="Uppercase"
+                VerticalOptions="Center" />
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding CurrentBank, Mode=OneWay, StringFormat='Banco: {0}'}" />
+                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                        <Label Text="Alias:" />
+                        <Entry
+                            Grid.Row="1"
+                            ClearButtonVisibility="WhileEditing"
+                            IsSpellCheckEnabled="True"
+                            IsTextPredictionEnabled="True"
+                            Keyboard="Plain"
+                            Placeholder="Escriba aquí"
+                            Text="{Binding Alias}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                            <Label Text="Número: *" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Keyboard="Numeric"
+                                Placeholder="Escriba aquí"
+                                Text="{Binding Number}" />
+                        </Grid>
+                        <Grid
+                            Grid.Column="1"
+                            RowDefinitions="auto,auto"
+                            RowSpacing="4">
+                            <Label Text="Tipo: *" />
+                            <Picker
+                                Grid.Row="1"
+                                ItemsSource="{Binding FinancialType}"
+                                SelectedItem="{Binding SelectedFinancialType}" />
+                        </Grid>
+                    </Grid>
+                </VerticalStackLayout>
+            </ScrollView>
+            <Grid
+                Grid.Row="2"
+                ColumnDefinitions="*,auto"
+                ColumnSpacing="8">
+                <Label
+                    FontSize="14"
+                    IsVisible="{Binding IsVisibleInfo, Mode=OneWay}"
+                    VerticalOptions="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span
+                                FontFamily="icofont"
+                                Text="{StaticResource InfoCircle}"
+                                TextColor="Red" />
+                            <Span Text=" Rellene toda la información los requeridos (*)" TextColor="Red" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <HorizontalStackLayout Grid.Column="1" Spacing="4">
+                    <Button
+                        Command="{Binding AddCommand}"
+                        Text="Agregar"
+                        TextTransform="Uppercase" />
+                    <Button
+                        Command="{Binding CancelCommand}"
+                        Text="Cancelar"
+                        TextTransform="Uppercase" />
+                </HorizontalStackLayout>
+            </Grid>
+        </Grid>
+    </Frame>
+
+</ContentPage>

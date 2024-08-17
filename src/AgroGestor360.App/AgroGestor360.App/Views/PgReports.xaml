@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AgroGestor360.App.Views.PgReports"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:DataGrid="clr-namespace:Syncfusion.Maui.DataGrid;assembly=Syncfusion.Maui.DataGrid"
+    xmlns:ListView="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:inputs="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+    xmlns:localModel="clr-namespace:AgroGestor360.App.Models"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
+    Title="Reportes"
+    x:DataType="vm:PgReportsViewModel"
+    Shell.NavBarIsVisible="False">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
+    <Grid
+        Padding="8"
+        RowDefinitions="auto,*,auto"
+        RowSpacing="16">
+        <!--#region ENCABEZADO-->
+        <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+            <HorizontalStackLayout MinimumHeightRequest="36" Spacing="8">
+                <Button
+                    Command="{Binding GoToBackCommand}"
+                    FontFamily="icofont"
+                    Text="{StaticResource ArrowLeft}"
+                    ToolTipProperties.Text="Atras" />
+                <Label
+                    Grid.Column="1"
+                    FontSize="18"
+                    LineBreakMode="HeadTruncation"
+                    Text="{Binding SelectedMenu.Title, StringFormat='Reporte - {0}', FallbackValue='Reportes'}"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout
+                Grid.Column="1"
+                IsEnabled="{Binding IsEnabledToolBar}"
+                Spacing="8">
+                <Button
+                    FontFamily="icofont"
+                    IsEnabled="{Binding IsFoundElement}"
+                    Text="{StaticResource Share}"
+                    ToolTipProperties.Text="Compartir reporte como PDF" />
+                <Button
+                    FontFamily="icofont"
+                    IsEnabled="{Binding IsFoundElement}"
+                    Text="{StaticResource FilePdf}"
+                    ToolTipProperties.Text="Ver como PDF, la cotización seleccionada." />
+                <BoxView Style="{StaticResource ElementSeparator}" />
+                <Button
+                    Command="{Binding SearchCommand}"
+                    FontFamily="icofont"
+                    IsEnabled="{Binding IsEnableSearch}"
+                    Text="{StaticResource Search1}"
+                    ToolTipProperties.Text="Buscar reporte." />
+                <BoxView Style="{StaticResource ElementSeparator}" />
+                <Button
+                    Command="{Binding ShowMenuCommand}"
+                    FontFamily="icofont"
+                    Text="{StaticResource NavigationMenu}"
+                    ToolTipProperties.Text="Ver lista de reportes">
+                    <Button.Triggers>
+                        <DataTrigger
+                            Binding="{Binding IsVisibleMenu}"
+                            TargetType="Button"
+                            Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Secondary}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </HorizontalStackLayout>
+        </Grid>
+        <!--#endregion-->
+        <!--#region CONTENIDO-->
+        <Grid Grid.Row="1">
+            <!--#region MENU-->
+            <Frame
+                HorizontalOptions="{OnIdiom Default='End',
+                                            Phone='FillAndExpand'}"
+                IsVisible="{Binding IsVisibleMenu}"
+                VerticalOptions="{OnIdiom Default='FillAndExpand',
+                                          Phone='End'}"
+                WidthRequest="{OnIdiom Default='280',
+                                       Phone='-1'}"
+                ZIndex="10">
+                <VerticalStackLayout Spacing="8">
+                    <Label
+                        Grid.Row="1"
+                        FontSize="{OnIdiom Default='18',
+                                           Phone='16'}"
+                        Text="Reportes"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                    <CollectionView
+                        ItemsSource="{Binding ReportsMenu, Mode=OneWay}"
+                        SelectedItem="{Binding SelectedMenu, Mode=TwoWay}"
+                        SelectionChanged="CollectionView_SelectionChanged"
+                        SelectionMode="Single">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="{OnIdiom Default='4', Phone='8'}" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="localModel:MenuItemReport">
+                                <Border Style="{StaticResource BorderItemButton}">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        ToolTipProperties.Text="{Binding Description}"
+                                        VerticalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span
+                                                    FontFamily="icofont"
+                                                    Text="{StaticResource SimpleRight}"
+                                                    TextColor="{StaticResource White}" />
+                                                <Span Text=" " />
+                                                <Span
+                                                    Text="{Binding Title}"
+                                                    TextColor="{StaticResource White}"
+                                                    TextTransform="Uppercase" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+            <!--#endregion-->
+            <Grid
+                Grid.Row="1"
+                IsVisible="{Binding IsSelectedSale}"
+                RowDefinitions="auto,*"
+                RowSpacing="16">
+                <Frame>
+                    <VerticalStackLayout Spacing="8">
+                        <Label
+                            FontSize="18"
+                            HorizontalOptions="{OnIdiom Default='Start',
+                                                        Phone='Center'}"
+                            Text="Filtro de ventas"
+                            TextTransform="Uppercase" />
+                        <FlexLayout
+                            AlignContent="{OnIdiom Default=Stretch,
+                                                   Phone=Start}"
+                            AlignItems="{OnIdiom Default=Center,
+                                                 Phone=Stretch}"
+                            Direction="{OnIdiom Default=Row,
+                                                Phone=Column}"
+                            JustifyContent="{OnIdiom Default=Start,
+                                                     Phone=Start}"
+                            Wrap="{OnIdiom Default=Wrap,
+                                           Phone=NoWrap}">
+                            <Grid
+                                Margin="{OnIdiom Default='2',
+                                                 Phone='0'}"
+                                RowDefinitions="auto,auto"
+                                RowSpacing="{OnIdiom Default='4',
+                                                     Phone='0'}">
+                                <HorizontalStackLayout>
+                                    <CheckBox IsChecked="{Binding IsFiltredByCustomer}" />
+                                    <Label Text="Cliente:" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <inputs:SfAutocomplete
+                                    Grid.Row="1"
+                                    BackgroundColor="Transparent"
+                                    DisplayMemberPath="CustomerName"
+                                    HighlightedTextColor="{StaticResource Primary}"
+                                    HighlightedTextFontAttributes="Bold"
+                                    IsEnabled="{Binding IsFiltredByCustomer}"
+                                    ItemsSource="{Binding Customers}"
+                                    Placeholder="Escriba aquí"
+                                    SelectedItem="{Binding SelectedCustomer}"
+                                    TextHighlightMode="FirstOccurrence"
+                                    TextMemberPath="CustomerName"
+                                    TextSearchMode="Contains"
+                                    WidthRequest="{OnIdiom Desktop='250',
+                                                           Phone='-1'}" />
+                            </Grid>
+                            <Grid
+                                Margin="{OnIdiom Default='2',
+                                                 Phone='0,4'}"
+                                RowDefinitions="auto,auto"
+                                RowSpacing="{OnIdiom Default='4',
+                                                     Phone='0'}">
+                                <HorizontalStackLayout>
+                                    <CheckBox IsChecked="{Binding IsFiltredBySeller}" />
+                                    <Label Text="Vendedor:" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <inputs:SfAutocomplete
+                                    Grid.Row="1"
+                                    BackgroundColor="Transparent"
+                                    DisplayMemberPath="FullName"
+                                    HighlightedTextColor="{StaticResource Primary}"
+                                    HighlightedTextFontAttributes="Bold"
+                                    IsEnabled="{Binding IsFiltredBySeller}"
+                                    ItemsSource="{Binding Sellers}"
+                                    Placeholder="Escriba aquí"
+                                    SelectedItem="{Binding SelectedSeller}"
+                                    TextHighlightMode="FirstOccurrence"
+                                    TextMemberPath="FullName"
+                                    TextSearchMode="Contains"
+                                    WidthRequest="{OnIdiom Desktop='250',
+                                                           Phone='-1'}" />
+                            </Grid>
+                            <Grid
+                                Margin="{OnIdiom Default='2',
+                                                 Phone='0,4'}"
+                                RowDefinitions="auto,auto"
+                                RowSpacing="{OnIdiom Default='4',
+                                                     Phone='0'}">
+                                <HorizontalStackLayout>
+                                    <CheckBox IsChecked="{Binding IsFiltredByDates}" />
+                                    <Label Text="Fechas: (desde - hasta)" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout
+                                    Grid.Row="1"
+                                    IsEnabled="{Binding IsFiltredByDates}"
+                                    Spacing="8">
+                                    <DatePicker Date="{Binding BeginDate}" Format="dd/MM/yyyy" />
+                                    <Label Text=" - " VerticalOptions="Center" />
+                                    <DatePicker Date="{Binding EndDate}" Format="dd/MM/yyyy" />
+                                </HorizontalStackLayout>
+                            </Grid>
+                            <Grid Margin="{OnIdiom Default='2', Phone='0'}" RowDefinitions="auto,auto">
+                                <HorizontalStackLayout>
+                                    <CheckBox IsChecked="{Binding IsFiltredByStates}" />
+                                    <Label
+                                        Text="Estado: (Todos)"
+                                        ToolTipProperties.Text="Si no establece un estado"
+                                        VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <FlexLayout
+                                    Grid.Row="1"
+                                    IsEnabled="{Binding IsFiltredByStates}"
+                                    Wrap="Wrap">
+                                    <RadioButton
+                                        Margin="{OnIdiom Default='2',
+                                                         Phone='0,2'}"
+                                        Content="Pagadas"
+                                        IsChecked="{Binding IsStatePaid}" />
+                                    <RadioButton
+                                        Margin="{OnIdiom Default='2',
+                                                         Phone='0,2'}"
+                                        Content="Pendientes"
+                                        IsChecked="{Binding IsStatePending}" />
+                                    <RadioButton
+                                        Margin="{OnIdiom Default='2',
+                                                         Phone='0,2'}"
+                                        Content="Canceladas"
+                                        IsChecked="{Binding IsStateCancelled}" />
+                                </FlexLayout>
+                            </Grid>
+                        </FlexLayout>
+                    </VerticalStackLayout>
+                </Frame>
+                <Frame Grid.Row="1">
+                    <Grid RowDefinitions="auto,*" RowSpacing="16">
+                        <VerticalStackLayout Spacing="8">
+                            <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                                <Label
+                                    FontSize="18"
+                                    Text="Resultados"
+                                    TextTransform="Uppercase"
+                                    VerticalOptions="Center" />
+                                <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                                    <Label VerticalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span
+                                                    Text="Total de abonos: "
+                                                    TextColor="{StaticResource Primary}"
+                                                    TextTransform="Uppercase" />
+                                                <Span
+                                                    FontAttributes="Bold"
+                                                    Text="{Binding TotalPaid, StringFormat='{0:C}'}"
+                                                    TextColor="{StaticResource Secondary}"
+                                                    TextTransform="Uppercase" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                    <BoxView Style="{StaticResource ElementSeparator}" />
+                                    <Label VerticalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span
+                                                    Text="Total de importes: "
+                                                    TextColor="{StaticResource Primary}"
+                                                    TextTransform="Uppercase" />
+                                                <Span
+                                                    FontAttributes="Bold"
+                                                    Text="{Binding TotalToPay, StringFormat='{0:C}'}"
+                                                    TextColor="{StaticResource Secondary}"
+                                                    TextTransform="Uppercase" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </VerticalStackLayout>
+                        <ScrollView Grid.Row="1">
+                            <DataGrid:SfDataGrid
+                                ColumnWidthMode="Fill"
+                                FrozenRowCount="0"
+                                ItemsSource="{Binding SaleTableItems}"
+                                SelectionMode="Single"
+                                SortingMode="Single"
+                                VerticalOptions="FillAndExpand">
+                                <DataGrid:SfDataGrid.Columns>
+                                    <DataGrid:DataGridTextColumn
+                                        ColumnWidthMode="FitByCell"
+                                        Format="dd/MM/yyyy"
+                                        HeaderText="FECHA DE VENTA"
+                                        HeaderTextAlignment="Center"
+                                        MappingName="SaleEntryDate" />
+                                    <DataGrid:DataGridTextColumn
+                                        ColumnWidthMode="FitByCell"
+                                        HeaderText="NO. FACTURA"
+                                        HeaderTextAlignment="Center"
+                                        MappingName="Code" />
+                                    <DataGrid:DataGridTextColumn
+                                        ColumnWidthMode="Auto"
+                                        HeaderText="VENDEDOR"
+                                        HeaderTextAlignment="Center"
+                                        MappingName="Seller" />
+                                    <DataGrid:DataGridTextColumn
+                                        ColumnWidthMode="Auto"
+                                        HeaderText="CLIENTE"
+                                        HeaderTextAlignment="Center"
+                                        MappingName="Customer" />
+                                    <DataGrid:DataGridTextColumn
+                                        ColumnWidthMode="FitByCell"
+                                        HeaderText="ESTADO"
+                                        HeaderTextAlignment="Center"
+                                        MappingName="SaleStatus" />
+                                    <DataGrid:DataGridTextColumn
+                                        ColumnWidthMode="Auto"
+                                        Format="dd/MM/yyyy"
+                                        HeaderText="ULTIMO ABONO"
+                                        HeaderTextAlignment="Center"
+                                        MappingName="InvoiceDate" />
+                                    <DataGrid:DataGridTextColumn
+                                        ColumnWidthMode="Fill"
+                                        Format="F2"
+                                        HeaderText="ABONO"
+                                        HeaderTextAlignment="Center"
+                                        MappingName="TotalPaid" />
+                                    <DataGrid:DataGridTextColumn
+                                        CellTextAlignment="End"
+                                        ColumnWidthMode="Fill"
+                                        Format="F2"
+                                        HeaderText="IMPORTE"
+                                        HeaderTextAlignment="Center"
+                                        MappingName="TotalToPay" />
+                                </DataGrid:SfDataGrid.Columns>
+                                <DataGrid:SfDataGrid.SortColumnDescriptions>
+                                    <DataGrid:SortColumnDescription ColumnName="SaleEntryDate" />
+                                    <DataGrid:SortColumnDescription ColumnName="InvoiceDate" />
+                                </DataGrid:SfDataGrid.SortColumnDescriptions>
+                            </DataGrid:SfDataGrid>
+                        </ScrollView>
+                    </Grid>
+                </Frame>
+            </Grid>
+        </Grid>
+        <!--#endregion-->
+        <!--#region PIE DE PAGINA-->
+        <Grid
+            Grid.Row="2"
+            Padding="8,0"
+            ColumnDefinitions="*,auto"
+            ColumnSpacing="8">
+            <HorizontalStackLayout Spacing="8">
+                <Label
+                    Padding="2"
+                    FontFamily="icofont"
+                    FontSize="11">
+                    <Label.Triggers>
+                        <DataTrigger
+                            Binding="{Binding HaveConnection}"
+                            TargetType="Label"
+                            Value="true">
+                            <Setter Property="ToolTipProperties.Text" Value="Conectado al servidor" />
+                            <Setter Property="Text" Value="{StaticResource UiNetwork}" />
+                        </DataTrigger>
+                        <DataTrigger
+                            Binding="{Binding HaveConnection}"
+                            TargetType="Label"
+                            Value="false">
+                            <Setter Property="ToolTipProperties.Text" Value="Desconectado del servidor" />
+                            <Setter Property="Text" Value="{StaticResource Broken}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout
+                Grid.Column="1"
+                Spacing="8"
+                VerticalOptions="Center">
+                <Label FontSize="11" Text="{Binding AppInfo}" />
+                <BoxView Style="{StaticResource ElementSeparator}" />
+                <Label
+                    Grid.Column="1"
+                    FontSize="11"
+                    Text="by RandA Media Lab, Group" />
+            </HorizontalStackLayout>
+        </Grid>
+        <!--#endregion-->
+    </Grid>
+
+</ContentPage>

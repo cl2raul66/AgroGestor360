@@ -1,0 +1,895 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AgroGestor360.App.Views.PgSales"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:model="clr-namespace:AgroGestor360.Client.Models;assembly=AgroGestor360.Client"
+    xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
+    Title="Ventas"
+    x:DataType="vm:PgSalesViewModel"
+    Shell.NavBarIsVisible="False">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
+    <Grid RowDefinitions="auto,*,auto" RowSpacing="0">
+        <!--#region ENCABEZADO-->
+        <Grid
+            Padding="8"
+            ColumnDefinitions="auto,*,auto"
+            ColumnSpacing="8">
+            <HorizontalStackLayout Padding="2" Spacing="8">
+                <Button
+                    Command="{Binding GoToBackCommand}"
+                    FontFamily="icofont"
+                    Text="{StaticResource ArrowLeft}"
+                    TextTransform="Uppercase"
+                    ToolTipProperties.Text="Atras" />
+                <Label
+                    Grid.Column="1"
+                    FontSize="18"
+                    Text="Ventas"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Grid.Column="2" Spacing="8">
+                <!--<BoxView Style="{StaticResource ElementSeparator}"  />-->
+                <Button
+                    Command="{Binding ViewPresaleCommand}"
+                    FontFamily="icofont"
+                    IsEnabled="{Binding IsBillsVisible, Mode=OneWay}"
+                    Text="{StaticResource SubListing}"
+                    TextTransform="Uppercase"
+                    ToolTipProperties.Text="Preventa" />
+                <Button
+                    Command="{Binding ViewBillsCommand}"
+                    FontFamily="icofont"
+                    IsEnabled="{Binding IsBillsVisible, Mode=OneWay, Converter={ctk:InvertedBoolConverter}}"
+                    Text="{StaticResource Ticket}"
+                    TextTransform="Uppercase"
+                    ToolTipProperties.Text="Ventas" />
+            </HorizontalStackLayout>
+        </Grid>
+        <!--#endregion-->
+        <!--#region CONTENIDO-->
+        <ActivityIndicator
+            Grid.Row="1"
+            HeightRequest="96"
+            HorizontalOptions="CenterAndExpand"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}"
+            VerticalOptions="CenterAndExpand"
+            WidthRequest="96" />
+        <!--#region VISTA DE PREVENTAS-->
+        <Grid
+            Grid.Row="1"
+            Padding="8"
+            ColumnDefinitions="*,auto,*"
+            ColumnSpacing="8">
+            <Grid.IsVisible>
+                <MultiBinding Converter="{ctk:VariableMultiValueConverter ConditionType=Exact, Count=2}">
+                    <Binding Converter="{ctk:InvertedBoolConverter}" Path="IsBillsVisible" />
+                    <Binding Converter="{ctk:InvertedBoolConverter}" Path="IsBusy" />
+                </MultiBinding>
+            </Grid.IsVisible>
+            <!--#region PANEL IZQUIERDO-->
+            <Grid RowDefinitions="auto,*,auto" RowSpacing="8">
+                <VerticalStackLayout Spacing="8">
+                    <Label
+                        FontSize="18"
+                        Text="Cotización"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                </VerticalStackLayout>
+                <ScrollView Grid.Row="1">
+                    <CollectionView
+                        ItemsSource="{Binding Quotations}"
+                        SelectedItem="{Binding SelectedQuotation}"
+                        SelectionChanged="OnSelectionChanged"
+                        SelectionMode="Single">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout
+                                HorizontalItemSpacing="2"
+                                Orientation="Vertical"
+                                Span="2"
+                                VerticalItemSpacing="2" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:DTO7">
+                                <Border Style="{StaticResource BorderItemForSales}">
+                                    <Grid RowDefinitions="auto,auto">
+                                        <Border
+                                            BackgroundColor="#45111111"
+                                            StrokeShape="RoundRectangle 4"
+                                            StrokeThickness="0" />
+                                        <Grid
+                                            Padding="8"
+                                            ColumnDefinitions="*,auto"
+                                            ColumnSpacing="8">
+                                            <HorizontalStackLayout Spacing="8">
+                                                <Label
+                                                    Style="{StaticResource LabelItem}"
+                                                    FontFamily="icofont"
+                                                    FontSize="16">
+                                                    <Label.Triggers>
+                                                        <DataTrigger
+                                                            Binding="{Binding IsDraftStatus}"
+                                                            TargetType="Label"
+                                                            Value="true">
+                                                            <Setter Property="Text" Value="{StaticResource UiClock}" />
+                                                            <Setter Property="ToolTipProperties.Text" Value="Pedido pendiente a enviar" />
+                                                        </DataTrigger>
+                                                        <DataTrigger
+                                                            Binding="{Binding IsDraftStatus}"
+                                                            TargetType="Label"
+                                                            Value="false">
+                                                            <Setter Property="Text" Value="{StaticResource UiCheck}" />
+                                                            <Setter Property="ToolTipProperties.Text" Value="Pedido enviado" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                                <Label
+                                                    Style="{StaticResource LabelItem}"
+                                                    FontAttributes="Bold"
+                                                    Text="{Binding Date, StringFormat='{0:dd} {0:MMMM} {0:yyyy}'}"
+                                                    TextTransform="Uppercase" />
+                                            </HorizontalStackLayout>
+                                            <Label
+                                                Style="{StaticResource LabelItem}"
+                                                Grid.Column="1"
+                                                FontAttributes="Bold"
+                                                Text="{Binding TotalAmount, StringFormat='TOTAL: {0:C}'}" />
+                                        </Grid>
+                                        <VerticalStackLayout
+                                            Grid.Row="1"
+                                            Padding="8,4"
+                                            Spacing="2">
+                                            <Label Style="{StaticResource LabelItem}" Text="{Binding Code, StringFormat='No: {0}'}" />
+                                            <Label Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" TextColor="{StaticResource White}" />
+                                            <Label Style="{StaticResource LabelItem}" Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </ScrollView>
+                <Frame Grid.Row="2" Padding="8">
+                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <HorizontalStackLayout Spacing="8">
+                            <Button
+                                Command="{Binding ShareQuoteReportCommand}"
+                                FontFamily="icofont"
+                                IsEnabled="{Binding SelectedQuotation, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                                Text="{StaticResource Share}"
+                                ToolTipProperties.Text="Compartir cotización seleccionada." />
+                            <Button
+                                Command="{Binding ViewQuoteReportCommand}"
+                                FontFamily="icofont"
+                                IsEnabled="{Binding SelectedQuotation, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                                Text="{StaticResource FilePdf}"
+                                ToolTipProperties.Text="Ver como PDF, la cotización seleccionada." />
+                            <BoxView Style="{StaticResource ElementSeparator}" />
+                            <Button
+                                Command="{Binding ShowQuotationDetailCommand}"
+                                FontFamily="icofont"
+                                IsEnabled="{Binding SelectedQuotation, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                                Text="{StaticResource UiNote}"
+                                ToolTipProperties.Text="Ver detalles de la cotización seleccionada." />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                            <Button
+                                Command="{Binding CreateInvoiceFromQuoteCommand}"
+                                FontFamily="icofont"
+                                Text="{StaticResource Ticket}"
+                                ToolTipProperties.Text="Crear venta de la cotización seleccionada.">
+                                <Button.IsEnabled>
+                                    <MultiBinding Converter="{ctk:VariableMultiValueConverter ConditionType=Exact, Count=2}">
+                                        <Binding
+                                            Converter="{ctk:IsNotNullConverter}"
+                                            Mode="OneWay"
+                                            Path="SelectedQuotation" />
+                                        <Binding Converter="{ctk:InvertedBoolConverter}" Path="SelectedQuotation.IsDraftStatus" />
+                                    </MultiBinding>
+                                </Button.IsEnabled>
+                            </Button>
+                            <Button
+                                Command="{Binding CreateOrderFomQuoteCommand}"
+                                FontFamily="icofont"
+                                Text="{StaticResource ArrowRight}"
+                                ToolTipProperties.Text="Crear pedido a partir de la cotización seleccionada.">
+                                <Button.IsEnabled>
+                                    <MultiBinding Converter="{ctk:VariableMultiValueConverter ConditionType=Exact, Count=2}">
+                                        <Binding Converter="{ctk:IsNotNullConverter}" Path="SelectedQuotation" />
+                                        <Binding
+                                            Converter="{ctk:InvertedBoolConverter}"
+                                            Path="SelectedQuotation.IsDraftStatus"
+                                            TargetNullValue="false" />
+                                    </MultiBinding>
+                                </Button.IsEnabled>
+                            </Button>
+                            <BoxView Style="{StaticResource ElementSeparator}" />
+                            <Button
+                                Command="{Binding ShowAddEditQuoteCommand}"
+                                FontFamily="icofont"
+                                Text="{StaticResource Plus}"
+                                ToolTipProperties.Text="Agregar cotización." />
+                            <Button
+                                Command="{Binding RemovedQuoteCommand}"
+                                FontFamily="icofont"
+                                IsEnabled="{Binding SelectedQuotation, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                                Text="{StaticResource UiDelete}"
+                                ToolTipProperties.Text="Cancelar cotización." />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Frame>
+            </Grid>
+            <!--#endregion-->
+            <BoxView
+                Style="{StaticResource ElementSeparator}"
+                Grid.RowSpan="3"
+                Grid.Column="1" />
+            <!--#region PANEL DERECHA-->
+            <Grid
+                Grid.Column="2"
+                RowDefinitions="auto,*,auto"
+                RowSpacing="8">
+                <VerticalStackLayout Grid.Column="2" Spacing="8">
+                    <Label
+                        FontSize="18"
+                        Text="Pedidos"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                </VerticalStackLayout>
+                <ScrollView Grid.Row="1" Grid.Column="2">
+                    <CollectionView
+                        ItemsSource="{Binding Orders}"
+                        SelectedItem="{Binding SelectedOrder}"
+                        SelectionChanged="OnSelectionChanged"
+                        SelectionMode="Single">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout
+                                HorizontalItemSpacing="2"
+                                Orientation="Vertical"
+                                Span="2"
+                                VerticalItemSpacing="2" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:DTO8">
+                                <Border Style="{StaticResource BorderItemForSales}">
+                                    <Grid RowDefinitions="auto,auto">
+                                        <Border
+                                            BackgroundColor="#45111111"
+                                            StrokeShape="RoundRectangle 4"
+                                            StrokeThickness="0" />
+                                        <Grid
+                                            Padding="8"
+                                            ColumnDefinitions="*,auto"
+                                            ColumnSpacing="8">
+                                            <HorizontalStackLayout Spacing="8">
+                                                <Label
+                                                    Style="{StaticResource LabelItem}"
+                                                    FontFamily="icofont"
+                                                    FontSize="16"
+                                                    IsVisible="{Binding IsPendingStatus}"
+                                                    Text="{StaticResource UiClock}">
+                                                    <Label.Triggers>
+                                                        <DataTrigger
+                                                            Binding="{Binding IsPendingStatus}"
+                                                            TargetType="Label"
+                                                            Value="True">
+                                                            <Setter Property="ToolTipProperties.Text" Value="Pedido pendiente" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                                <Label
+                                                    Style="{StaticResource LabelItem}"
+                                                    FontAttributes="Bold"
+                                                    Text="{Binding Date, StringFormat='{0:dd} {0:MMMM} {0:yyyy}'}"
+                                                    TextTransform="Uppercase"
+                                                    VerticalOptions="CenterAndExpand" />
+                                            </HorizontalStackLayout>
+                                            <Label
+                                                Style="{StaticResource LabelItem}"
+                                                Grid.Column="1"
+                                                FontAttributes="Bold"
+                                                Text="{Binding TotalAmount, StringFormat='TOTAL: {0:C}'}"
+                                                VerticalOptions="CenterAndExpand" />
+                                        </Grid>
+                                        <VerticalStackLayout
+                                            Grid.Row="1"
+                                            Padding="8,4"
+                                            Spacing="2">
+                                            <Label Style="{StaticResource LabelItem}" Text="{Binding Code, StringFormat='No: {0}'}" />
+                                            <Label Style="{StaticResource LabelItem}" Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" />
+                                            <Label Style="{StaticResource LabelItem}" Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </ScrollView>
+                <Frame
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    Padding="8">
+                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <HorizontalStackLayout Spacing="8">
+                            <Button
+                                Command="{Binding ShowOrderDetailCommand}"
+                                FontFamily="icofont"
+                                IsEnabled="{Binding SelectedOrder, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                                Text="{StaticResource UiNote}"
+                                ToolTipProperties.Text="Ver detalles del pedido seleccionado." />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                            <Button
+                                Command="{Binding CreateInvoiceFromOrderCommand}"
+                                FontFamily="icofont"
+                                IsEnabled="{Binding SelectedOrder, Converter={ctk:IsNotNullConverter}}"
+                                Text="{StaticResource Ticket}"
+                                ToolTipProperties.Text="Crear venta del pedido seleccionado." />
+                            <BoxView Style="{StaticResource ElementSeparator}" />
+                            <Button
+                                Command="{Binding ShowAddEditOrderCommand}"
+                                FontFamily="icofont"
+                                Text="{StaticResource Plus}"
+                                ToolTipProperties.Text="Agregar pedido" />
+                            <Button
+                                Command="{Binding RemovedOrderCommand}"
+                                FontFamily="icofont"
+                                IsEnabled="{Binding SelectedOrder, Converter={ctk:IsNotNullConverter}}"
+                                Text="{StaticResource UiDelete}"
+                                ToolTipProperties.Text="Cancelar pedido" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Frame>
+            </Grid>
+            <!--#endregion-->
+        </Grid>
+        <!--#endregion-->
+        <!--#region VISTA DE REGISTROS DE VENTAS-->
+        <Grid
+            Grid.Row="1"
+            Padding="8"
+            IsVisible="{Binding IsBillsVisible, Mode=OneWay}"
+            RowDefinitions="auto,*,auto"
+            RowSpacing="8">
+            <VerticalStackLayout Spacing="8">
+                <Label
+                    Grid.Column="1"
+                    FontSize="18"
+                    Text="Registros de ventas"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+            </VerticalStackLayout>
+            <ScrollView Grid.Row="1">
+                <CollectionView
+                    ItemsSource="{Binding Invoices}"
+                    SelectedItem="{Binding SelectedInvoice}"
+                    SelectionChanged="OnSelectionChanged"
+                    SelectionMode="Single">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout
+                            HorizontalItemSpacing="4"
+                            Orientation="Vertical"
+                            Span="4"
+                            VerticalItemSpacing="4" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:DTO10">
+                            <Border Style="{StaticResource BorderItemForSales}">
+                                <Grid RowDefinitions="auto,auto,auto">
+                                    <Border BackgroundColor="#45111111" StrokeThickness="0" />
+                                    <Grid
+                                        Padding="8"
+                                        ColumnDefinitions="*,auto"
+                                        ColumnSpacing="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label
+                                                Style="{StaticResource LabelItem}"
+                                                FontAttributes="Bold"
+                                                Text="{Binding Date, StringFormat='{0:dd} {0:MMMM} {0:yyyy}'}"
+                                                TextTransform="Uppercase" />
+                                        </HorizontalStackLayout>
+                                        <Label
+                                            Style="{StaticResource LabelItem}"
+                                            Grid.Column="1"
+                                            FontAttributes="Bold"
+                                            Text="{Binding TotalAmount, StringFormat='TOTAL: {0:C}'}" />
+                                    </Grid>
+                                    <VerticalStackLayout
+                                        Grid.Row="1"
+                                        Padding="8,4"
+                                        Spacing="2">
+                                        <Label Style="{StaticResource LabelItem}" Text="{Binding Code, StringFormat='No.: {0}'}" />
+                                        <Label Style="{StaticResource LabelItem}" Text="{Binding SellerName, StringFormat='Vendedor: {0}'}" />
+                                        <Label Style="{StaticResource LabelItem}" Text="{Binding CustomerName, StringFormat='Cliente: {0}'}" />
+                                    </VerticalStackLayout>
+                                    <Border
+                                        Grid.Row="2"
+                                        BackgroundColor="#45111111"
+                                        StrokeThickness="0" />
+                                    <Grid
+                                        Grid.Row="2"
+                                        Padding="8"
+                                        ColumnDefinitions="*,auto"
+                                        ColumnSpacing="8">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label
+                                                Style="{StaticResource LabelItem}"
+                                                FontAttributes="Bold"
+                                                Text="{Binding DaysRemaining, StringFormat='Vence en {0} días'}"
+                                                TextTransform="Uppercase">
+                                                <Label.Triggers>
+                                                    <DataTrigger
+                                                        Binding="{Binding DaysRemaining}"
+                                                        TargetType="Label"
+                                                        Value="-1">
+                                                        <Setter Property="Text" Value="PAGO AL CONTADO" />
+                                                        <Setter Property="TextColor" Value="{StaticResource White}" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                        </HorizontalStackLayout>
+                                        <Label
+                                            Style="{StaticResource LabelItem}"
+                                            Grid.Column="1"
+                                            FontAttributes="Bold"
+                                            Text="{Binding Paid, StringFormat='PAGADO: {0:C}', TargetNullValue='NO PAGADA', FallbackValue='NO PAGADA'}">
+                                            <Label.Triggers>
+                                                <DataTrigger
+                                                    Binding="{Binding Paid}"
+                                                    TargetType="Label"
+                                                    Value="0">
+                                                    <Setter Property="Text" Value="NO PAGADA" />
+                                                    <Setter Property="TextColor" Value="{StaticResource Secondary}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </ScrollView>
+            <Frame Grid.Row="2" Padding="8">
+                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <HorizontalStackLayout Spacing="8">
+                        <Button
+                            FontFamily="icofont"
+                            IsEnabled="{Binding Invoices, Mode=OneWay, Converter={ctk:IsListNotNullOrEmptyConverter}}"
+                            Text="{StaticResource Inbox}"
+                            ToolTipProperties.Text="Conciliación de caja" />
+                        <Button
+                            Command="{Binding ShowInvoiceDetailCommand}"
+                            FontFamily="icofont"
+                            IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                            Text="{StaticResource UiNote}"
+                            ToolTipProperties.Text="Ver detalles del pedido seleccionado." />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                        <Button
+                            Command="{Binding CompletePaymentCommand}"
+                            FontFamily="icofont"
+                            IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                            Text="{StaticResource BillAlt}"
+                            ToolTipProperties.Text="Pagar saldo pendiente o liquidar deuda" />
+                        <Button
+                            Command="{Binding ShowAmortizeInvoiceCommand}"
+                            FontFamily="icofont"
+                            Text="{StaticResource MoneyBag}"
+                            ToolTipProperties.Text="Abonar a deuda.">
+                            <Button.IsEnabled>
+                                <MultiBinding Converter="{ctk:VariableMultiValueConverter ConditionType=Exact, Count=2}">
+                                    <Binding Converter="{ctk:IntToBoolConverter}" Path="SelectedInvoice.DaysRemaining" />
+                                    <Binding Converter="{ctk:IsNotNullConverter}" Path="SelectedInvoice" />
+                                </MultiBinding>
+                            </Button.IsEnabled>
+                        </Button>
+                        <BoxView Style="{StaticResource ElementSeparator}" />
+                        <Button
+                            Command="{Binding ShowAddEditSaleCommand}"
+                            FontFamily="icofont"
+                            Text="{StaticResource Plus}"
+                            ToolTipProperties.Text="Agregar" />
+                        <Button
+                            Command="{Binding RemovedInvoiceCommand}"
+                            FontFamily="icofont"
+                            IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                            Text="{StaticResource UiDelete}"
+                            ToolTipProperties.Text="Eliminar o cancelar factura" />
+                    </HorizontalStackLayout>
+                </Grid>
+            </Frame>
+        </Grid>
+        <!--#endregion-->
+        <!--#endregion-->
+        <!--#region PIE DE PAGINA-->
+        <Grid
+            Grid.Row="2"
+            Padding="8,0"
+            ColumnDefinitions="*,auto"
+            ColumnSpacing="8">
+            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                <Label
+                    Padding="2"
+                    FontFamily="icofont"
+                    FontSize="11">
+                    <Label.Triggers>
+                        <DataTrigger
+                            Binding="{Binding HaveConnection}"
+                            TargetType="Label"
+                            Value="true">
+                            <Setter Property="ToolTipProperties.Text" Value="Conectado al servidor" />
+                            <Setter Property="Text" Value="{StaticResource UiNetwork}" />
+                        </DataTrigger>
+                        <DataTrigger
+                            Binding="{Binding HaveConnection}"
+                            TargetType="Label"
+                            Value="false">
+                            <Setter Property="ToolTipProperties.Text" Value="Desconectado del servidor" />
+                            <Setter Property="Text" Value="{StaticResource Broken}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout
+                Grid.Column="1"
+                Padding="8"
+                Spacing="8">
+                <Label FontSize="11" Text="{Binding AppInfo}" />
+                <BoxView Style="{StaticResource ElementSeparator}" />
+                <Label
+                    Grid.Column="1"
+                    FontSize="11"
+                    Text="by RandA Media Lab, Group" />
+            </HorizontalStackLayout>
+        </Grid>
+        <!--#endregion-->
+        <!--#region EXTRA-->
+        <!--#region PASSWORD DIALOG-->
+        <Border
+            Grid.RowSpan="3"
+            BackgroundColor="#99634833"
+            IsVisible="{Binding IsVisiblePwdDialog}">
+            <Frame
+                Margin="16"
+                BackgroundColor="{StaticResource White}"
+                HorizontalOptions="Center"
+                MinimumWidthRequest="400"
+                VerticalOptions="Center">
+                <Grid RowDefinitions="auto,*,auto" RowSpacing="12">
+                    <!--#region TITULO-->
+                    <Label
+                        Grid.ColumnSpan="3"
+                        FontSize="18"
+                        HorizontalOptions="Center"
+                        Text="Autorización"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                    <!--#endregion-->
+                    <!--#region CONTENIDO-->
+                    <VerticalStackLayout Grid.Row="1" Spacing="16">
+                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                            <Label Text="Contraseña: *" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                IsPassword="True"
+                                Keyboard="Plain"
+                                Placeholder="Escriba aquí"
+                                Text="{Binding Pwd}" />
+                        </Grid>
+                    </VerticalStackLayout>
+                    <!--#endregion-->
+                    <!--#region PIE-->
+                    <Grid
+                        Grid.Row="2"
+                        ColumnDefinitions="*,auto"
+                        ColumnSpacing="8">
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                            <Button
+                                Command="{Binding SetPasswordCommand}"
+                                Text="Confirmar"
+                                TextTransform="Uppercase" />
+                            <Button
+                                Command="{Binding CancelPwdDialogCommand}"
+                                Text="Cancelar"
+                                TextTransform="Uppercase" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                    <!--#endregion-->
+                </Grid>
+            </Frame>
+        </Border>
+        <!--#endregion-->
+        <!--#region DIALOGUE FOR TRANSITION CONFIRMATION WITHIN SALES-->
+        <Border
+            Grid.RowSpan="3"
+            BackgroundColor="#99634833"
+            IsVisible="{Binding IsVisibleSalesConfirmationDialog}">
+            <Frame
+                Margin="16"
+                BackgroundColor="{StaticResource White}"
+                HorizontalOptions="Center"
+                MinimumWidthRequest="400"
+                VerticalOptions="Center">
+                <Grid RowDefinitions="auto,*,auto" RowSpacing="12">
+                    <!--#region TITULO-->
+                    <Label
+                        Grid.ColumnSpan="3"
+                        FontSize="18"
+                        HorizontalOptions="Center"
+                        Text="{Binding TitleSalesConfirmationDialog}"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                    <!--#endregion-->
+                    <!--#region CONTENIDO-->
+                    <VerticalStackLayout Grid.Row="1" Spacing="16">
+                        <RadioButton Content="Sin cambios" IsChecked="{Binding OptionSalesConfirmationDialog}" />
+                        <RadioButton Content="Con cambios" />
+                    </VerticalStackLayout>
+                    <!--#endregion-->
+                    <!--#region PIE-->
+                    <Grid
+                        Grid.Row="2"
+                        ColumnDefinitions="*,auto"
+                        ColumnSpacing="8">
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                            <Button
+                                Command="{Binding SetSalesConfirmationDialogCommand}"
+                                Text="Confirmar"
+                                TextTransform="Uppercase" />
+                            <Button
+                                Command="{Binding CancelSalesConfirmationDialogCommand}"
+                                Text="Cancelar"
+                                TextTransform="Uppercase" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                    <!--#endregion-->
+                </Grid>
+            </Frame>
+        </Border>
+        <!--#endregion-->
+        <!--#region DIALOGO PARA ESTABLECER EL MODO DE PAGO PARA LA TRANCISION DE COTIZACION A VENTA-->
+        <Border
+            Grid.RowSpan="3"
+            BackgroundColor="#99634833"
+            IsVisible="False">
+            <Frame
+                Margin="16"
+                BackgroundColor="{StaticResource White}"
+                HorizontalOptions="Center"
+                MinimumWidthRequest="400"
+                VerticalOptions="Center">
+                <Grid RowDefinitions="auto,*,auto" RowSpacing="16">
+                    <!--#region TITULO-->
+                    <Label
+                        Grid.ColumnSpan="3"
+                        FontSize="18"
+                        HorizontalOptions="Center"
+                        Text="Condición de pago"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                    <!--#endregion-->
+                    <!--#region CONTENIDO-->
+                    <VerticalStackLayout Grid.Row="1" Spacing="16">
+                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                            <Label Text="Condición:" />
+                            <HorizontalStackLayout Grid.Row="1">
+                                <RadioButton
+                                    Content="Al contado"
+                                    IsChecked="True"
+                                    ToolTipProperties.Text="Pago al contado" />
+                                <RadioButton
+                                    Content="A crédito"
+                                    IsChecked="{Binding OnCredit}"
+                                    ToolTipProperties.Text="Pago a crédito" />
+                            </HorizontalStackLayout>
+                        </Grid>
+                        <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                HorizontalOptions="Start"
+                                Text="CRÉDITO:"
+                                TextColor="{StaticResource Primary}"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                HorizontalOptions="End"
+                                Text="0.00"
+                                TextColor="{StaticResource Secondary}"
+                                VerticalOptions="Center" />
+                        </Grid>
+                    </VerticalStackLayout>
+                    <!--#endregion-->
+                    <!--#region PIE-->
+                    <Grid
+                        Grid.Row="2"
+                        ColumnDefinitions="*,auto"
+                        ColumnSpacing="8">
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                            <Button Text="Confirmar" TextTransform="Uppercase" />
+                            <Button Text="Cancelar" TextTransform="Uppercase" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                    <!--#endregion-->
+                </Grid>
+            </Frame>
+        </Border>
+        <!--#endregion-->
+        <!--#region DIALOGO PARA ABONO TOTAL O PARCIAL DE UNA VENTA SELECCIONADA-->
+        <Border
+            Grid.RowSpan="3"
+            BackgroundColor="#99634833"
+            IsVisible="{Binding IsOpenCompletePayment}">
+            <Frame
+                Margin="16"
+                BackgroundColor="{StaticResource White}"
+                HorizontalOptions="Center"
+                MinimumWidthRequest="400"
+                VerticalOptions="Center">
+                <Grid RowDefinitions="auto,*,auto" RowSpacing="16">
+                    <!--#region TITULO-->
+                    <Label
+                        Grid.ColumnSpan="3"
+                        FontSize="18"
+                        HorizontalOptions="Center"
+                        Text="Pago"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
+                    <!--#endregion-->
+                    <!--#region CONTENIDO-->
+                    <VerticalStackLayout Grid.Row="1" Spacing="16">
+                        <Grid ColumnDefinitions="auto,auto" ColumnSpacing="16">
+                            <Grid
+                                RowDefinitions="auto,auto"
+                                RowSpacing="6"
+                                VerticalOptions="End">
+                                <Label Text="Fecha:" />
+                                <DatePicker Grid.Row="1" Format="dd/MM/yyyy" />
+                            </Grid>
+                            <Grid
+                                Grid.Column="1"
+                                RowDefinitions="auto,auto"
+                                RowSpacing="4">
+                                <Label Text="Cantidad:" />
+                                <Entry
+                                    Grid.Row="1"
+                                    ClearButtonVisibility="WhileEditing"
+                                    HorizontalOptions="Start"
+                                    HorizontalTextAlignment="End"
+                                    IsSpellCheckEnabled="True"
+                                    IsTextPredictionEnabled="True"
+                                    Keyboard="Numeric"
+                                    Placeholder="0"
+                                    Text="{Binding AmountPay}"
+                                    WidthRequest="100" />
+                            </Grid>
+                        </Grid>
+                        <Grid ColumnDefinitions="auto,*" ColumnSpacing="16">
+                            <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                                <Label Text="No. Referencia:" />
+                                <Entry
+                                    Grid.Row="1"
+                                    ClearButtonVisibility="WhileEditing"
+                                    HorizontalOptions="Start"
+                                    IsSpellCheckEnabled="True"
+                                    IsTextPredictionEnabled="True"
+                                    Keyboard="Plain"
+                                    Placeholder="Escriba aquí"
+                                    Text="{Binding ReferentNo}"
+                                    WidthRequest="140" />
+                            </Grid>
+                            <Grid
+                                Grid.Column="1"
+                                RowDefinitions="auto,auto"
+                                RowSpacing="4">
+                                <Label Text="Modo de pago: *" />
+                                <Picker
+                                    Grid.Row="1"
+                                    IsEnabled="{Binding SelectedInvoice, Converter={ctk:IsNotNullConverter}}"
+                                    ItemsSource="{Binding PaymentsTypes}"
+                                    SelectedItem="{Binding SelectedPaymentType}">
+                                    <Picker.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding SelectedInvoice.DaysRemaining}"
+                                            TargetType="Picker"
+                                            Value="-1">
+                                            <Setter Property="IsVisible" Value="True" />
+                                        </DataTrigger>
+                                    </Picker.Triggers>
+                                </Picker>
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            Grid.Column="1"
+                            RowDefinitions="auto,auto"
+                            RowSpacing="4">
+                            <Label Text="Información del pago" />
+                            <VerticalStackLayout Grid.Row="1" Spacing="8">
+                                <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalOptions="Start"
+                                        Text="IMPORTE:"
+                                        TextColor="{StaticResource Primary}"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalOptions="End"
+                                        Text="{Binding SelectedInvoice.TotalAmount, StringFormat='{0:C}'}"
+                                        TextColor="{StaticResource Primary}"
+                                        VerticalOptions="Center" />
+                                </Grid>
+                                <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalOptions="Start"
+                                        Text="MONTO ABONADO:"
+                                        TextColor="{StaticResource Primary}"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalOptions="End"
+                                        Text="{Binding SelectedInvoice.Paid, StringFormat='{0:C}'}"
+                                        TextColor="{StaticResource Primary}"
+                                        VerticalOptions="Center" />
+                                </Grid>
+                                <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalOptions="Start"
+                                        Text="MONTO A PAGAR:"
+                                        TextColor="{StaticResource Primary}"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        HorizontalOptions="End"
+                                        Text="{Binding Debt, StringFormat='{0:C}'}"
+                                        TextColor="{StaticResource Secondary}"
+                                        VerticalOptions="Center" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                    <!--#endregion-->
+                    <!--#region PIE-->
+                    <Grid
+                        Grid.Row="2"
+                        ColumnDefinitions="*,auto"
+                        ColumnSpacing="8">
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                            <Button
+                                Text="Pagar"
+                                TextTransform="Uppercase"
+                                WidthRequest="110" />
+                            <Button
+                                Command="{Binding CancelCompletePaymentCommand}"
+                                Text="Cancelar"
+                                TextTransform="Uppercase"
+                                WidthRequest="110" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                    <!--#endregion-->
+                </Grid>
+            </Frame>
+        </Border>
+        <!--#endregion-->
+        <!--#endregion-->
+    </Grid>
+
+</ContentPage>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AgroGestor360.App.Views.Sales.PgDeletedInSale"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:localModel="clr-namespace:AgroGestor360.App.Models"
+    xmlns:model="clr-namespace:AgroGestor360.Client.Models;assembly=AgroGestor360.Client"
+    xmlns:tool="clr-namespace:AgroGestor360.App.Tools.DataTemplateSelectors"
+    xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
+    x:DataType="vm:PgDeletedInSaleViewModel"
+    BackgroundColor="#99634833"
+    Shell.NavBarHasShadow="False"
+    Shell.PresentationMode="ModalAnimated">
+
+    <Frame
+        Margin="16"
+        BackgroundColor="{StaticResource White}"
+        HorizontalOptions="Center"
+        MinimumWidthRequest="480"
+        VerticalOptions="Center">
+        <Grid RowDefinitions="auto,*,auto" RowSpacing="12">
+            <!--#region TITULO-->
+            <Label
+                Grid.ColumnSpan="3"
+                FontSize="18"
+                HorizontalOptions="Center"
+                Text="Eliminar cotización"
+                TextTransform="Uppercase"
+                VerticalOptions="Center" />
+            <!--#endregion-->
+            <!--#region CONTENIDO-->
+            <VerticalStackLayout Grid.Row="1" Spacing="16">
+                <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                    <RadioButton Content="Por error del operador" IsChecked="{Binding DueOperatorError}" />
+                    <RadioButton
+                        Grid.Row="1"
+                        Content="Por rechazo del cliente"
+                        IsChecked="{Binding DueOperatorError, Converter={ctk:InvertedBoolConverter}}" />
+                </Grid>
+            </VerticalStackLayout>
+            <!--#endregion-->
+            <!--#region PIE-->
+            <Grid
+                Grid.Row="2"
+                ColumnDefinitions="*,auto"
+                ColumnSpacing="8">
+                <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                    <Button
+                        Command="{Binding SaveCommand}"
+                        Text="Eliminar"
+                        TextTransform="Uppercase" />
+                    <Button
+                        Command="{Binding CancelCommand}"
+                        Text="Cancelar"
+                        TextTransform="Uppercase" />
+                </HorizontalStackLayout>
+            </Grid>
+            <!--#endregion-->
+        </Grid>
+    </Frame>
+
+</ContentPage>
