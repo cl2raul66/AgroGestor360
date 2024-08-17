@@ -48,9 +48,10 @@
                     <Button
                         Command="{Binding UnSetDiscountCommand}"
                         FontFamily="icofont"
+                        IsEnabled="{Binding SelectedCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
                         Text="{StaticResource Close}"
                         ToolTipProperties.Text="Eliminar descuento a cliente seleccionado">
-                        <Button.IsEnabled>
+                        <!--<Button.IsEnabled>
                             <MultiBinding>
                                 <MultiBinding.Converter>
                                     <ctk:VariableMultiValueConverter ConditionType="Exact" Count="2" />
@@ -61,7 +62,7 @@
                                     Mode="OneWay"
                                     Path="SelectedCustomer" />
                             </MultiBinding>
-                        </Button.IsEnabled>
+                        </Button.IsEnabled>-->
                     </Button>
                     <BoxView
                         BackgroundColor="{StaticResource Gray300}"

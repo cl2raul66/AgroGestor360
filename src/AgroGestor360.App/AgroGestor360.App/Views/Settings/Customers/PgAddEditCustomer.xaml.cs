@@ -6,8 +6,8 @@ public partial class PgAddEditCustomer : ContentPage
 {
 	public PgAddEditCustomer(PgAddEditCustomerViewModel vm)
 	{
-		InitializeComponent();
+        InitializeComponent();
 
-		BindingContext = vm;
+        BindingContext = vm;
     }
 }

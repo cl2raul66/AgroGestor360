@@ -11,10 +11,12 @@ namespace AgroGestor360.App.ViewModels;
 public partial class PgAuthenticationDialogViewModel : ObservableValidator
 {
     readonly IAuthService authServ;
+    readonly string serverURL;
 
     public PgAuthenticationDialogViewModel(IAuthService authService)
     {
         authServ = authService;
+        serverURL = Preferences.Default.Get("serverurl", string.Empty);
     }
 
     [ObservableProperty]
@@ -32,9 +34,9 @@ public partial class PgAuthenticationDialogViewModel : ObservableValidator
             return;
         }
 
-        var result = 
+        var result = await authServ.AuthRoot(serverURL, Pwd!);
 
-        _ = WeakReferenceMessenger.Default.Send(WeakReferenceMessenger.Default);
+        _ = WeakReferenceMessenger.Default.Send(result.ToString(), "AuthDlgResult");
         await Task.CompletedTask;
     }
 

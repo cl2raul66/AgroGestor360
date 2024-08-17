@@ -1,5 +1,5 @@
-﻿using AgroGestor360.App.ViewModels;
-using AgroGestor360.App.Views;
+﻿using AgroGestor360.App.Views;
+using AgroGestor360.App.Views.Dialogs;
 using AgroGestor360.App.Views.Expense;
 using AgroGestor360.App.Views.Loans;
 using AgroGestor360.App.Views.Sales;
@@ -13,6 +13,7 @@ public partial class AppShell : Shell
     {
         InitializeComponent();
 
+        Routing.RegisterRoute(nameof(PgAuthenticationDialog), typeof(PgAuthenticationDialog));
         Routing.RegisterRoute(nameof(PgHome), typeof(PgHome));
         Routing.RegisterRoute(nameof(PgSettings), typeof(PgSettings));
         Routing.RegisterRoute(nameof(PgSetURL), typeof(PgSetURL));

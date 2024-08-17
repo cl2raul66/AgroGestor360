@@ -20,10 +20,10 @@ public partial class PgAddEditCustomerViewModel : ObservableValidator
     }
 
     [ObservableProperty]
-    LineCredit[]? credits;
+    LineCreditItem[]? credits;
 
     [ObservableProperty]
-    LineCredit? selectedCredit;
+    LineCreditItem? selectedCredit;
 
     [ObservableProperty]
     DiscountForCustomer[]? discounts;

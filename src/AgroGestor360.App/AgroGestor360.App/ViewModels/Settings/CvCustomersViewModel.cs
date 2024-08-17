@@ -1,4 +1,5 @@
-﻿using AgroGestor360.App.Views.Settings;
+﻿using AgroGestor360.App.Views.Dialogs;
+using AgroGestor360.App.Views.Settings;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -16,16 +17,14 @@ public partial class CvCustomersViewModel : ObservableRecipient
     readonly ILineCreditsService lineCreditsServ;
     readonly ITimeLimitsCreditsService timeLimitsCreditsServ;
     readonly IDiscountsCustomersService discountsCustomersServ;
-    readonly IAuthService authServ;
     readonly string serverURL;
 
-    public CvCustomersViewModel(ICustomersService customersService, ILineCreditsService lineCreditsService, ITimeLimitsCreditsService timeLimitsCreditsService, IDiscountsCustomersService discountsCustomersService, IAuthService authService)
+    public CvCustomersViewModel(ICustomersService customersService, ILineCreditsService lineCreditsService, ITimeLimitsCreditsService timeLimitsCreditsService, IDiscountsCustomersService discountsCustomersService)
     {
         customersServ = customersService;
         lineCreditsServ = lineCreditsService;
         timeLimitsCreditsServ = timeLimitsCreditsService;
         discountsCustomersServ = discountsCustomersService;
-        authServ = authService;
         serverURL = Preferences.Default.Get("serverurl", string.Empty);
     }
 
@@ -73,53 +72,7 @@ public partial class CvCustomersViewModel : ObservableRecipient
     [RelayCommand]
     async Task SetDiscount()
     {
-        if (EnableGetByDiscount)
-        {
-            StringBuilder sb = new();
-            sb.AppendLine($"¿Va a modificar el descuento al cliente: {SelectedCustomer!.CustomerName}?");
-            sb.AppendLine("");
-            sb.AppendLine("Inserte la contraseña:");
-            var pwd = await Shell.Current.DisplayPromptAsync("Modificar descuento", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
-            if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
-            {
-                SelectedCustomer = null;
-                return;
-            }
-
-            var approved = await authServ.AuthRoot(serverURL, pwd);
-            if (!approved)
-            {
-                await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-                SelectedCustomer = null;
-                return;
-            }
-        }
-
-        var options = await discountsCustomersServ.GetAllAsync(serverURL);
-        if (options is not null)
-        {
-            var selectedOpt = await Shell.Current.DisplayActionSheet("Seleccione un descuento", "Cancelar", null, options.Select(x => $"{x.Name} - {x.Discount}%").ToArray());
-            if (!string.IsNullOrEmpty(selectedOpt) && selectedOpt != "Cancelar")
-            {
-                var seccion = selectedOpt.Split('-');
-                var discount = options.FirstOrDefault(x => x.Name == seccion[0].Trim());
-
-                var result = await customersServ.UpdateDiscountAsync(serverURL, new() { CustomerId = SelectedCustomer!.CustomerId, DiscountId = discount!.Id });
-                if (result)
-                {
-                    if (EnableGetByDiscount)
-                    {
-                        int idx = Customers!.IndexOf(SelectedCustomer!);
-                        Customers[idx] = new() { CustomerId = SelectedCustomer!.CustomerId, CustomerName = SelectedCustomer!.CustomerName, Discount = discount };
-                    }
-                    else
-                    {
-                        Customers!.Remove(SelectedCustomer);
-                    }
-                }
-            }
-        }
-        SelectedCustomer = null;
+        await Shell.Current.GoToAsync(nameof(PgAuthenticationDialog), true);
     }
 
     [RelayCommand]
@@ -136,13 +89,13 @@ public partial class CvCustomersViewModel : ObservableRecipient
             return;
         }
 
-        var approved = await authServ.AuthRoot(serverURL, pwd);
-        if (!approved)
-        {
-            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-            SelectedCustomer = null;
-            return;
-        }
+        //var approved = await authServ.AuthRoot(serverURL, pwd);
+        //if (!approved)
+        //{
+        //    await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+        //    SelectedCustomer = null;
+        //    return;
+        //}
 
         var result = await customersServ.UpdateDiscountAsync(serverURL, new() { CustomerId = SelectedCustomer!.CustomerId, DiscountId = 0 });
         if (result)
@@ -192,13 +145,13 @@ public partial class CvCustomersViewModel : ObservableRecipient
             return;
         }
 
-        var approved = await authServ.AuthRoot(serverURL, pwd);
-        if (!approved)
-        {
-            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-            SelectedCustomer = null;
-            return;
-        }
+        //var approved = await authServ.AuthRoot(serverURL, pwd);
+        //if (!approved)
+        //{
+        //    await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+        //    SelectedCustomer = null;
+        //    return;
+        //}
 
         var result = await customersServ.DeleteAsync(serverURL, SelectedCustomer!.CustomerId!);
         if (result)
@@ -258,6 +211,39 @@ public partial class CvCustomersViewModel : ObservableRecipient
                 r.SelectedCustomer = null;
                 IsActive = false;
             }
+        });
+
+        WeakReferenceMessenger.Default.Register<CvCustomersViewModel, string, string>(this, "AuthDlgResult", async (r, m) =>
+        {
+            IsActive = false;
+            if (bool.Parse(m))
+            {
+                var options = await discountsCustomersServ.GetAllAsync(serverURL);
+                if (options is not null)
+                {
+                    var selectedOpt = await Shell.Current.DisplayActionSheet("Seleccione un descuento", "Cancelar", null, options.Select(x => $"{x.Name} - {x.Discount}%").ToArray());
+                    if (!string.IsNullOrEmpty(selectedOpt) && selectedOpt != "Cancelar")
+                    {
+                        var seccion = selectedOpt.Split('-');
+                        var discount = options.FirstOrDefault(x => x.Name == seccion[0].Trim());
+
+                        var result = await customersServ.UpdateDiscountAsync(serverURL, new() { CustomerId = SelectedCustomer!.CustomerId, DiscountId = discount!.Id });
+                        if (result)
+                        {
+                            //if (EnableGetByDiscount)
+                            //{
+                            //    int idx = Customers!.IndexOf(SelectedCustomer!);
+                            //    Customers[idx] = new() { CustomerId = SelectedCustomer!.CustomerId, CustomerName = SelectedCustomer!.CustomerName, Discount = discount };
+                            //}
+                            //else
+                            //{
+                            //    Customers!.Remove(SelectedCustomer);
+                            //}
+                        }
+                    }
+                }
+            }
+            r.SelectedCustomer = null;
         });
     }
 

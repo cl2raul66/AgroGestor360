@@ -12,6 +12,7 @@ using CommunityToolkit.Maui;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
+using AgroGestor360.App.Views.Dialogs;
 
 namespace AgroGestor360.App;
 
@@ -64,6 +65,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<INavigationService, NavigationService>();
 
         builder.Services.AddTransient<PgSignIn, PgSignInViewModel>();
+        builder.Services.AddTransient<PgAuthenticationDialog, PgAuthenticationDialogViewModel>();
         builder.Services.AddTransient<PgHome, PgHomeViewModel>();
         builder.Services.AddTransient<PgSettings, PgSettingsViewModel>();
         builder.Services.AddTransient<CvConnection, CvConnectionViewModel>();

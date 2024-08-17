@@ -9,9 +9,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="LiteDB" Version="5.0.19" />
-		<PackageReference Include="UnitsNet" Version="5.50.0" />
-		<PackageReference Include="vCardLib.dll" Version="5.0.0" />
+		<PackageReference Include="LiteDB" Version="5.0.21" />
+		<PackageReference Include="UnitsNet" Version="5.56.0" />
+		<PackageReference Include="vCardLib.dll" Version="5.0.1" />
 	</ItemGroup>
 
 </Project>
