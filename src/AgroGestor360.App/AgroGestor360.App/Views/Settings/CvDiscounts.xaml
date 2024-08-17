@@ -19,10 +19,6 @@
                     TextTransform="Uppercase"
                     VerticalOptions="Center" />
                 <HorizontalStackLayout Grid.Column="2" Spacing="8">
-                    <!--<BoxView
-                    BackgroundColor="{StaticResource Gray300}"
-                    CornerRadius="2"
-                    WidthRequest="2" />-->
                     <Button
                         Command="{Binding ShowNewDiscountForCustomerCommand}"
                         FontFamily="icofont"

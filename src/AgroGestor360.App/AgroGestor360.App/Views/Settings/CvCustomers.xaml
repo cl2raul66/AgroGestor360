@@ -27,39 +27,18 @@
                         Command="{Binding ShowSetCreditCommand}"
                         FontFamily="icofont"
                         IsEnabled="{Binding SelectedCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
-                        Text="{StaticResource UiCheck}"
+                        Text="{StaticResource Check}"
                         ToolTipProperties.Text="Agregar o modificar crédito al cliente seleccionado" />
                     <Button
                         Command="{Binding ClearCreditCommand}"
                         FontFamily="icofont"
                         IsEnabled="{Binding SelectedCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
-                        Text="{StaticResource UiClose}"
+                        Text="{StaticResource Close}"
                         ToolTipProperties.Text="Eliminar crédito al cliente seleccionado" />
-                    <BoxView
-                        BackgroundColor="{StaticResource Gray300}"
-                        CornerRadius="2"
-                        WidthRequest="2" />
-                    <Button
-                        Command="{Binding ChangeEnableGetByDiscountCommand}"
-                        FontFamily="icofont"
-                        Text="{StaticResource SaleDiscount}">
-                        <Button.Triggers>
-                            <DataTrigger
-                                Binding="{Binding EnableGetByDiscount, Mode=OneWay}"
-                                TargetType="Button"
-                                Value="true">
-                                <Setter Property="BackgroundColor" Value="{StaticResource Secondary}" />
-                                <Setter Property="ToolTipProperties.Text" Value="Ver clientes sin descuentos" />
-                            </DataTrigger>
-                            <DataTrigger
-                                Binding="{Binding EnableGetByDiscount, Mode=OneWay}"
-                                TargetType="Button"
-                                Value="false">
-                                <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
-                                <Setter Property="ToolTipProperties.Text" Value="Ver clientes con descuentos" />
-                            </DataTrigger>
-                        </Button.Triggers>
-                    </Button>
+                    <Label
+                        Text="Descuentos:"
+                        TextTransform="Uppercase"
+                        VerticalOptions="Center" />
                     <Button
                         Command="{Binding SetDiscountCommand}"
                         FontFamily="icofont"

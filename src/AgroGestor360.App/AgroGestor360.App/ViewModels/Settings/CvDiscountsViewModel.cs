@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System.Text;
-using System.Text.Json;
 
 namespace AgroGestor360.App.ViewModels;
 

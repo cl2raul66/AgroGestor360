@@ -38,15 +38,6 @@ public partial class CvCustomersViewModel : ObservableRecipient
     [ObservableProperty]
     DTO5_1? selectedCustomer;
 
-    [ObservableProperty]
-    bool enableGetByDiscount = true;
-
-    [RelayCommand]
-    void ChangeEnableGetByDiscount()
-    {
-        EnableGetByDiscount = !EnableGetByDiscount;
-    }
-
     [RelayCommand]
     async Task ShowSetCredit()
     {
@@ -124,11 +115,6 @@ public partial class CvCustomersViewModel : ObservableRecipient
                     else
                     {
                         Customers!.Remove(SelectedCustomer);
-
-                        if (Customers.Count == 0)
-                        {
-                            ChangeEnableGetByDiscount();
-                        }
                     }
                 }
             }
@@ -162,11 +148,6 @@ public partial class CvCustomersViewModel : ObservableRecipient
         if (result)
         {
             Customers!.Remove(SelectedCustomer);
-
-            if (Customers.Count == 0)
-            {
-                ChangeEnableGetByDiscount();
-            }
         }
         SelectedCustomer = null;
     }
@@ -223,10 +204,6 @@ public partial class CvCustomersViewModel : ObservableRecipient
         if (result)
         {
             Customers!.Remove(SelectedCustomer);
-            if (!Customers.Any())
-            {
-                ChangeEnableGetByDiscount();
-            }
         }
     }
 
@@ -238,10 +215,6 @@ public partial class CvCustomersViewModel : ObservableRecipient
             string result = await customersServ.InsertAsync(serverURL, m);
             if (!string.IsNullOrEmpty(result))
             {
-                if (EnableGetByDiscount)
-                {
-                    ChangeEnableGetByDiscount();
-                }
                 r.Customers ??= [];
                 r.Customers.Insert(0, new() { CustomerId = result, CustomerName = m.CustomerFullName, Discount = m.Discount });
             }
@@ -288,26 +261,9 @@ public partial class CvCustomersViewModel : ObservableRecipient
         });
     }
 
-    protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
-        if (e.PropertyName == nameof(EnableGetByDiscount))
-        {
-            Customers ??= [];
-            if (EnableGetByDiscount)
-            {
-                Customers = new(await customersServ.GetAllWithDiscountAsync(serverURL));
-            }
-            else
-            {
-                Customers = new(await customersServ.GetAllWithoutDiscountAsync(serverURL));
-                if (Customers?.Count == 0)
-                {
-                    EnableGetByDiscount = true;
-                }
-            }
-            SelectedCustomer = null;
-        }
     }
 
     #region EXTRA
@@ -320,11 +276,7 @@ public partial class CvCustomersViewModel : ObservableRecipient
 
     async Task GetCustomers()
     {
-        bool exist = await customersServ.ExistAsync(serverURL);
-        if (exist)
-        {
-            EnableGetByDiscount = false;
-        }
+        _ = await customersServ.ExistAsync(serverURL);
     }
     #endregion
 }

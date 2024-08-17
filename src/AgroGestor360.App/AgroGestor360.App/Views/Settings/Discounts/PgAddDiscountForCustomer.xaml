@@ -20,7 +20,7 @@
             <!--#region ENCABEZADO-->
             <Label
                 FontSize="18"
-                Text="Agregar crédito para clientes"
+                Text="Nuevo descuento para clientes"
                 TextTransform="Uppercase"
                 VerticalOptions="Center" />
             <!--#endregion-->
@@ -38,7 +38,7 @@
                             Text="{Binding Name}" />
                     </Grid>
                     <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                        <Label Text="Cantidad máxima: *" />
+                        <Label Text="Porcertaje: *" />
                         <Entry
                             Grid.Row="1"
                             ClearButtonVisibility="WhileEditing"
