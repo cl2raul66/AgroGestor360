@@ -8,9 +8,13 @@ using System.Text;
 
 namespace AgroGestor360.App.ViewModels;
 
+[QueryProperty(nameof(SendToken), nameof(SendToken))]
 [QueryProperty(nameof(CurrentArticle), nameof(CurrentArticle))]
 public partial class PgAddProductViewModel : ObservableValidator
 {
+    [ObservableProperty]
+    string? sendToken;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ArticleInfo))]
     DTO3? currentArticle;
@@ -51,7 +55,7 @@ public partial class PgAddProductViewModel : ObservableValidator
     [RelayCommand]
     async Task Cancel()
     {
-        _ = WeakReferenceMessenger.Default.Send("cancel", nameof(CvProductsViewModel));
+        _ = WeakReferenceMessenger.Default.Send("cancel", SendToken!);
 
         await Shell.Current.GoToAsync("..", true);
     }
@@ -60,7 +64,6 @@ public partial class PgAddProductViewModel : ObservableValidator
     async Task Add()
     {
         ValidateAllProperties();
-
 
         if (HasErrors || !double.TryParse(Quantity, out double theQuantity))
         {

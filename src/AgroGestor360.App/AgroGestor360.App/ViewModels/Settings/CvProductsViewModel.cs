@@ -1,4 +1,6 @@
-﻿using AgroGestor360.App.Views.Settings;
+﻿// Ignore Spelling: auth
+
+using AgroGestor360.App.Views.Settings;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -139,35 +141,17 @@ public partial class CvProductsViewModel : ObservableRecipient
     async Task AddProduct()
     {
         IsActive = true;
-        Dictionary<string, object> sendObject = new() { { "CurrentArticle", SelectedArticle! } };
-        await Shell.Current.GoToAsync(nameof(PgAddProduct), true, sendObject);
+        Dictionary<string, object> sendData = new()
+        {
+            { "SendToken", "D3B07384-D9A7-4B9F-8F1E-2B0B0D5E6F7A" },
+            { "CurrentArticle", SelectedArticle! }
+        };
+        await Shell.Current.GoToAsync(nameof(PgAddProduct), true, sendData);
     }
 
     [RelayCommand]
     async Task DeleteProduct()
     {
-        StringBuilder sb = new();
-        sb.AppendLine($"Seguro que quiere eliminar el siguiente producto:");
-        sb.AppendLine($"Nombre: {SelectedProduct!.ProductName}");
-        sb.AppendLine($"Presentación: {SelectedProduct!.Packaging?.Value} {SelectedProduct!.Packaging?.Unit}");
-        sb.AppendLine($"Precio: {SelectedProduct!.ArticlePrice.ToString("C")}");
-        sb.AppendLine("");
-        sb.AppendLine("Inserte la contraseña:");
-        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar producto", sb.ToString().Trim(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
-        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
-        {
-            AllSelectedAsNull();
-            return;
-        }
-
-        var approved = await authServ.AuthRoot(serverURL, pwd);
-        if (!approved)
-        {
-            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-            AllSelectedAsNull();
-            return;
-        }
-
         var result = await productsForSalesServ.DeleteAsync(serverURL, SelectedProduct!.Id!);
         if (result)
         {
@@ -187,37 +171,17 @@ public partial class CvProductsViewModel : ObservableRecipient
     async Task CreateOffer()
     {
         IsActive = true;
-        Dictionary<string, object> sendObject = new() {
+        Dictionary<string, object> sendData = new() {
+            { "SendToken", "D3B07384-D9A7-4B9F-8F1E-2B0B0D5E6F7A" },
             { "CurrentProduct", SelectedProduct! },
             { "OfferId", Offers is not null && Offers.Any() ? Offers.Max(x => x.Id) + 1 : 1}
         };
-        await Shell.Current.GoToAsync(nameof(PgCreateOffer), true, sendObject);
+        await Shell.Current.GoToAsync(nameof(PgCreateOffer), true, sendData);
     }
 
     [RelayCommand]
     async Task DeleteOffer()
     {
-        StringBuilder sb = new();
-        sb.AppendLine($"Seguro que quiere eliminar la siguiente oferta:");
-        sb.AppendLine($"Nombre:{SelectedProduct!.ProductName}-{SelectedOffert!.Id}");
-        sb.AppendLine($"Precio: {(SelectedProduct!.ArticlePrice * SelectedOffert!.Quantity).ToString("C")}");
-        sb.AppendLine("");
-        sb.AppendLine("Inserte la contraseña:");
-        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar oferta", sb.ToString().Trim(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
-        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
-        {
-            AllSelectedAsNull();
-            return;
-        }
-
-        var approved = await authServ.AuthRoot(serverURL, pwd);
-        if (!approved)
-        {
-            await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-            AllSelectedAsNull();
-            return;
-        }
-
         DTO4_4 deletedOffer = new() { Id = SelectedProduct!.Id, OfferId = SelectedOffert!.Id! };
 
         var result = await productsForSalesServ.UpdateAsync(serverURL, deletedOffer);
@@ -268,7 +232,7 @@ public partial class CvProductsViewModel : ObservableRecipient
             r.SelectedProduct = r.Products![idx];
         });
 
-        WeakReferenceMessenger.Default.Register<CvProductsViewModel, string, string>(this, nameof(CvProductsViewModel), (r, m) =>
+        WeakReferenceMessenger.Default.Register<CvProductsViewModel, string, string>(this, "D3B07384-D9A7-4B9F-8F1E-2B0B0D5E6F7A", (r, m) =>
         {
             if (m == "cancel")
             {
@@ -289,8 +253,6 @@ public partial class CvProductsViewModel : ObservableRecipient
             }
         }
     }
-
-    #region EXTRA
     public async void Initialize()
     {
         IsBusy = true;
@@ -298,6 +260,7 @@ public partial class CvProductsViewModel : ObservableRecipient
         IsBusy = false;
     }
 
+    #region EXTRA
     async Task GetArticles()
     {
         await GetArticlesZeroPrice();
