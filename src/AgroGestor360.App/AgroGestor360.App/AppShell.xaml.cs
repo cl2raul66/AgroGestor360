@@ -14,6 +14,7 @@ public partial class AppShell : Shell
         InitializeComponent();
 
         Routing.RegisterRoute(nameof(PgAuthenticationDialog), typeof(PgAuthenticationDialog));
+        Routing.RegisterRoute(nameof(PgSelectDiscountsOptionsDialog), typeof(PgSelectDiscountsOptionsDialog));
         Routing.RegisterRoute(nameof(PgHome), typeof(PgHome));
         Routing.RegisterRoute(nameof(PgSettings), typeof(PgSettings));
         Routing.RegisterRoute(nameof(PgSetURL), typeof(PgSetURL));

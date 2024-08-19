@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.ComponentModel.DataAnnotations;
+using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace AgroGestor360.App.ViewModels;
 
@@ -37,12 +38,14 @@ public partial class PgAuthenticationDialogViewModel : ObservableValidator
         var result = await authServ.AuthRoot(serverURL, Pwd!);
 
         _ = WeakReferenceMessenger.Default.Send(result.ToString(), "AuthDlgResult");
-        await Task.CompletedTask;
+
+        await Shell.Current.GoToAsync("..", true);
     }
 
     [RelayCommand]
     async Task Cancel()
     {
-        await Task.CompletedTask;
+        _ = WeakReferenceMessenger.Default.Send(false.ToString(), "AuthDlgResult");
+        await Shell.Current.GoToAsync("..", true);
     }
 }

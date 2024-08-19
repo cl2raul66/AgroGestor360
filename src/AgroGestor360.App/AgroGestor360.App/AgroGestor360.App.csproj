@@ -83,7 +83,6 @@
 		<PackageReference Include="QuestPDF" Version="2023.10.1" />
 		<PackageReference Include="Syncfusion.Maui.Inputs" Version="26.1.35" />
 		<PackageReference Include="Syncfusion.Maui.DataGrid" Version="26.1.35" />
-		<PackageReference Include="Syncfusion.Maui.Popup" Version="26.1.35" />
 		<PackageReference Include="UnitsNet" Version="5.56.0" />
 	</ItemGroup>
 
@@ -95,6 +94,9 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="Views\Dialogs\PgAuthenticationDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Dialogs\PgSelectDiscountsOptionsDialog.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\PgReports.xaml">
@@ -214,6 +216,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\Dialogs\PgSelectDiscountsOptionsDialog.xaml.cs">
+	    <DependentUpon>PgSelectDiscountsOptionsDialog.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\PgReports.xaml.cs">
 	    <DependentUpon>PgReports.xaml</DependentUpon>
 	  </Compile>

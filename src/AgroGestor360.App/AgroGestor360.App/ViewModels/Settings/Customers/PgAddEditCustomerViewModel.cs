@@ -35,7 +35,7 @@ public partial class PgAddEditCustomerViewModel : ObservableValidator
     DTO5_3? currentCustomer;
 
     [ObservableProperty]
-    DateTime date;                                                                      
+    DateTime date;
 
     [ObservableProperty]
     DateTime birthday;
@@ -70,6 +70,12 @@ public partial class PgAddEditCustomerViewModel : ObservableValidator
 
     [ObservableProperty]
     bool isBusiness;
+
+    [ObservableProperty]
+    string? title = "Agregar cliente";
+
+    [ObservableProperty]
+    string? titleBtn = "Agregar";
 
     [RelayCommand]
     async Task Cancel()
@@ -132,17 +138,22 @@ public partial class PgAddEditCustomerViewModel : ObservableValidator
     {
         base.OnPropertyChanged(e);
 
-        if (e.PropertyName == nameof(CurrentCustomer) && CurrentCustomer is not null)
+        if (e.PropertyName == nameof(CurrentCustomer))
         {
-            Name = CurrentCustomer?.CustomerFullName;
-            NIT = CurrentCustomer?.CustomerNIT;
-            Phone = CurrentCustomer?.CustomerPhone;
-            Birthday = CurrentCustomer?.Birthday ?? DateTime.Now;
-            Email = CurrentCustomer?.CustomerMail;
-            Address = CurrentCustomer?.CustomerAddress;
-            BusinessName = CurrentCustomer?.CustomerOrganizationName;
-            IsBusiness = !string.IsNullOrEmpty(CurrentCustomer?.CustomerOrganizationName);
+            if (CurrentCustomer is not null)
+            {
+                Name = CurrentCustomer?.CustomerFullName;
+                NIT = CurrentCustomer?.CustomerNIT;
+                Phone = CurrentCustomer?.CustomerPhone;
+                Birthday = CurrentCustomer?.Birthday ?? DateTime.Now;
+                Email = CurrentCustomer?.CustomerMail;
+                Address = CurrentCustomer?.CustomerAddress;
+                BusinessName = CurrentCustomer?.CustomerOrganizationName;
+                IsBusiness = !string.IsNullOrEmpty(CurrentCustomer?.CustomerOrganizationName);
+
+                Title = "Editar cliente";
+                TitleBtn = "Editar";
+            }
         }
     }
 }
-//todo: poner en el dto de inserccion y modificacion una propiedad para la fecha de inserccion y de modificacion

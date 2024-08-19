@@ -7,7 +7,6 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Text;
 
 namespace AgroGestor360.App.ViewModels;
 
@@ -48,9 +47,9 @@ public partial class CvCustomersViewModel : ObservableRecipient
         {
             { "canceltoken", nameof(PgAddEditCustomer) },
             { "currentcustomer", SelectedCustomer! },
-            {"credits", credits.ToArray() },
-            {"timelimits", timeLimits.ToArray() },
-            {"defaulttimelimits", defaulttimelimits! }
+            { "credits", credits.ToArray() },
+            { "timelimits", timeLimits.ToArray() },
+            { "defaulttimelimits", defaulttimelimits! }
         };
         await Shell.Current.GoToAsync(nameof(PgSetCreditForCustomer), true, sendObjects);
     }
@@ -72,39 +71,31 @@ public partial class CvCustomersViewModel : ObservableRecipient
     [RelayCommand]
     async Task SetDiscount()
     {
-        await Shell.Current.GoToAsync(nameof(PgAuthenticationDialog), true);
+        IsActive = true;
+        var options = await discountsCustomersServ.GetAllAsync(serverURL);
+        Dictionary<string, object> sendData = new()
+        {
+            {"Options", options.ToArray()},
+            {"SendToken", "71594d2a-3954-4591-807b-3f0328495550"}
+        };
+        await Shell.Current.GoToAsync(nameof(PgSelectDiscountsOptionsDialog), true, sendData);
     }
 
     [RelayCommand]
     async Task UnSetDiscount()
     {
-        StringBuilder sb = new();
-        sb.AppendLine($"¿Seguro que quiere eliminar el descuento al cliente: {SelectedCustomer!.CustomerName}?");
-        sb.AppendLine("");
-        sb.AppendLine("Inserte la contraseña:");
-        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar descuento", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
-        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
-        {
-            SelectedCustomer = null;
-            return;
-        }
-
-        //var approved = await authServ.AuthRoot(serverURL, pwd);
-        //if (!approved)
-        //{
-        //    await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-        //    SelectedCustomer = null;
-        //    return;
-        //}
-
         var result = await customersServ.UpdateDiscountAsync(serverURL, new() { CustomerId = SelectedCustomer!.CustomerId, DiscountId = 0 });
         if (result)
         {
-            Customers!.Remove(SelectedCustomer);
+            int idx = Customers!.IndexOf(SelectedCustomer!);
+            var modifiedCustomer = await customersServ.GetByIdAsync(serverURL, SelectedCustomer!.CustomerId!);
+            if (modifiedCustomer is not null)
+            {
+                Customers[idx] = modifiedCustomer;
+            }
         }
         SelectedCustomer = null;
     }
-
 
     [RelayCommand]
     async Task ShowAddCustomer()
@@ -134,25 +125,6 @@ public partial class CvCustomersViewModel : ObservableRecipient
     [RelayCommand]
     async Task ShowDeleteCustomer()
     {
-        StringBuilder sb = new();
-        sb.AppendLine($"¿Seguro que quiere eliminar el cliente: {SelectedCustomer!.CustomerName}?");
-        sb.AppendLine("");
-        sb.AppendLine("Inserte la contraseña:");
-        var pwd = await Shell.Current.DisplayPromptAsync("Eliminar cliente", sb.ToString().TrimEnd(), "Autenticar y eliminar", "Cancelar", "Escriba aquí");
-        if (string.IsNullOrEmpty(pwd) || string.IsNullOrWhiteSpace(pwd))
-        {
-            SelectedCustomer = null;
-            return;
-        }
-
-        //var approved = await authServ.AuthRoot(serverURL, pwd);
-        //if (!approved)
-        //{
-        //    await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-        //    SelectedCustomer = null;
-        //    return;
-        //}
-
         var result = await customersServ.DeleteAsync(serverURL, SelectedCustomer!.CustomerId!);
         if (result)
         {
@@ -204,7 +176,7 @@ public partial class CvCustomersViewModel : ObservableRecipient
             IsActive = false;
         });
 
-        WeakReferenceMessenger.Default.Register<CvCustomersViewModel, string, string>(this, nameof(PgAddEditCustomer), (r, m) =>
+        WeakReferenceMessenger.Default.Register<CvCustomersViewModel, string, string>(this, "16030c9d-7d3f-11eb-9631-0242ac130002", (r, m) =>
         {
             if (m == "cancel")
             {
@@ -213,33 +185,19 @@ public partial class CvCustomersViewModel : ObservableRecipient
             }
         });
 
-        WeakReferenceMessenger.Default.Register<CvCustomersViewModel, string, string>(this, "AuthDlgResult", async (r, m) =>
+        WeakReferenceMessenger.Default.Register<CvCustomersViewModel, DiscountForCustomer, string>(this, "71594d2a-3954-4591-807b-3f0328495550", async (r, m) =>
         {
             IsActive = false;
-            if (bool.Parse(m))
+            if (m is not null)
             {
-                var options = await discountsCustomersServ.GetAllAsync(serverURL);
-                if (options is not null)
+                var result = await customersServ.UpdateDiscountAsync(serverURL, new() { CustomerId = SelectedCustomer!.CustomerId, DiscountId = m.Id });
+                if (result)
                 {
-                    var selectedOpt = await Shell.Current.DisplayActionSheet("Seleccione un descuento", "Cancelar", null, options.Select(x => $"{x.Name} - {x.Discount}%").ToArray());
-                    if (!string.IsNullOrEmpty(selectedOpt) && selectedOpt != "Cancelar")
+                    int idx = Customers!.IndexOf(SelectedCustomer!);
+                    var modifiedCustomer = await customersServ.GetByIdAsync(serverURL, SelectedCustomer!.CustomerId!);
+                    if (modifiedCustomer is not null)
                     {
-                        var seccion = selectedOpt.Split('-');
-                        var discount = options.FirstOrDefault(x => x.Name == seccion[0].Trim());
-
-                        var result = await customersServ.UpdateDiscountAsync(serverURL, new() { CustomerId = SelectedCustomer!.CustomerId, DiscountId = discount!.Id });
-                        if (result)
-                        {
-                            //if (EnableGetByDiscount)
-                            //{
-                            //    int idx = Customers!.IndexOf(SelectedCustomer!);
-                            //    Customers[idx] = new() { CustomerId = SelectedCustomer!.CustomerId, CustomerName = SelectedCustomer!.CustomerName, Discount = discount };
-                            //}
-                            //else
-                            //{
-                            //    Customers!.Remove(SelectedCustomer);
-                            //}
-                        }
+                        Customers[idx] = modifiedCustomer;
                     }
                 }
             }
@@ -262,7 +220,11 @@ public partial class CvCustomersViewModel : ObservableRecipient
 
     async Task GetCustomers()
     {
-        _ = await customersServ.ExistAsync(serverURL);
+        bool exist = await customersServ.ExistAsync(serverURL);
+        if (exist)
+        {
+            Customers = [.. await customersServ.GetAllAsync(serverURL)];
+        }
     }
     #endregion
 }

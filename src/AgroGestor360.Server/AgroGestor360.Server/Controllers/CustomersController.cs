@@ -61,7 +61,15 @@ public class CustomersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public ActionResult<DTO5_3?> GetById(string id)
+    public ActionResult<DTO5_1?> GetById(string id)
+    {
+        var find = customersServ.GetById(new ObjectId(id));
+
+        return find is null ? NotFound() : Ok(find!.ToDTO5_1());
+    }
+
+    [HttpGet("GetDTO5_3/{id}")]
+    public ActionResult<DTO5_3?> GetDTO5_3ById(string id)
     {
         var find = customersServ.GetById(new ObjectId(id));
 

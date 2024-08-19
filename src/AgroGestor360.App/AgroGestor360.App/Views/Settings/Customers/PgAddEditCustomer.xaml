@@ -20,23 +20,9 @@
             <!--#region ENCABEZADO-->
             <Label
                 FontSize="18"
+                Text="{Binding Title}"
                 TextTransform="Uppercase"
-                VerticalOptions="Center">
-                <Label.Triggers>
-                    <DataTrigger
-                        Binding="{Binding CurrentCustomer, Mode=OneWay, Converter={ctk:IsNullConverter}}"
-                        TargetType="Label"
-                        Value="true">
-                        <Setter Property="Text" Value="Agregar cliente" />
-                    </DataTrigger>
-                    <DataTrigger
-                        Binding="{Binding CurrentCustomer, Mode=OneWay, Converter={ctk:IsNullConverter}}"
-                        TargetType="Label"
-                        Value="false">
-                        <Setter Property="Text" Value="Editar cliente" />
-                    </DataTrigger>
-                </Label.Triggers>
-            </Label>
+                VerticalOptions="Center" />
             <!--#endregion-->
             <!--#region CONTENIDO-->
             <ScrollView Grid.Row="1">
@@ -227,23 +213,8 @@
                 <HorizontalStackLayout Grid.Column="1" Spacing="4">
                     <Button
                         Command="{Binding AddCommand}"
-                        Text="Agregar"
-                        TextTransform="Uppercase">
-                        <Button.Triggers>
-                            <DataTrigger
-                                Binding="{Binding CurrentCustomer, Mode=OneWay, Converter={ctk:IsNullConverter}}"
-                                TargetType="Button"
-                                Value="true">
-                                <Setter Property="Text" Value="Agregar" />
-                            </DataTrigger>
-                            <DataTrigger
-                                Binding="{Binding CurrentCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
-                                TargetType="Button"
-                                Value="true">
-                                <Setter Property="Text" Value="Editar" />
-                            </DataTrigger>
-                        </Button.Triggers>
-                    </Button>
+                        Text="{Binding TitleBtn}"
+                        TextTransform="Uppercase" />
                     <Button
                         Command="{Binding CancelCommand}"
                         Text="Cancelar"

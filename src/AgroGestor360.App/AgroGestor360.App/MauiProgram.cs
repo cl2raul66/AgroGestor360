@@ -66,6 +66,7 @@ public static class MauiProgram
 
         builder.Services.AddTransient<PgSignIn, PgSignInViewModel>();
         builder.Services.AddTransient<PgAuthenticationDialog, PgAuthenticationDialogViewModel>();
+        builder.Services.AddTransient<PgSelectDiscountsOptionsDialog, PgSelectDiscountsOptionsDialogViewModel>();
         builder.Services.AddTransient<PgHome, PgHomeViewModel>();
         builder.Services.AddTransient<PgSettings, PgSettingsViewModel>();
         builder.Services.AddTransient<CvConnection, CvConnectionViewModel>();

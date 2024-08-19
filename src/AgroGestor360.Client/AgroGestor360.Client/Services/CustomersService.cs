@@ -13,7 +13,8 @@ public interface ICustomersService
     Task<IEnumerable<DiscountForCustomer>> GetAllDiscountAsync(string serverURL);
     Task<IEnumerable<DTO5_1>> GetAllWithDiscountAsync(string serverURL);
     Task<IEnumerable<DTO5_1>> GetAllWithoutDiscountAsync(string serverURL);
-    Task<DTO5_3?> GetByIdAsync(string serverURL, string id);
+    Task<DTO5_1?> GetByIdAsync(string serverURL, string id);
+    Task<DTO5_3?> GetDTO5_3ByIdAsync(string serverURL, string id);
     Task<string> InsertAsync(string serverURL, DTO5_2 dTO);
     Task<bool> UpdateAsync(string serverURL, DTO5_3 dTO);
     Task<bool> UpdateCreditAsync(string serverURL, DTO5_5 dTO);
@@ -107,11 +108,25 @@ public class CustomersService : ICustomersService
         return [];
     }
 
-    public async Task<DTO5_3?> GetByIdAsync(string serverURL, string id)
+    public async Task<DTO5_1?> GetByIdAsync(string serverURL, string id)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
             var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<DTO5_1>(content, ApiServiceBase.ProviderJSONOptions);
+            }
+        }
+        return null;
+    }
+
+    public async Task<DTO5_3?> GetDTO5_3ByIdAsync(string serverURL, string id)
+    {
+        if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
+        {
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/customers/GetDTO5_3/{id}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
