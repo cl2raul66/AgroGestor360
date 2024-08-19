@@ -25,6 +25,12 @@ public partial class PgAddEditWarehouseViewModel : ObservableValidator
     }
 
     [ObservableProperty]
+    string? title = "Agregar mercancía";
+
+    [ObservableProperty]
+    string? titleBtn = "Agregar";
+
+    [ObservableProperty]
     DTO1? currentMerchandise;
 
     [ObservableProperty]
@@ -163,6 +169,9 @@ public partial class PgAddEditWarehouseViewModel : ObservableValidator
                     SelectedUnit = CurrentMerchandise.Packaging.Unit;
                     Value = CurrentMerchandise.Packaging.Value.ToString();
                 }
+
+                Title = "Editar mercancía";
+                TitleBtn = "Editar";
             }
         }
 
