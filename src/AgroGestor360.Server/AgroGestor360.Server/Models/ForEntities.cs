@@ -294,6 +294,18 @@ public class BankAccount
 }
 
 /// <summary>
+/// Objeto: BankItem => Representa un elemento banco.
+/// <code>
+/// string [Id, Name]
+/// </code>
+/// </summary>
+public class BankItem
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+}
+
+/// <summary>
 /// Objeto: PaymentMethod => Representa un pago en el sistema.
 /// <code>
 /// PaymentType [Type] => Tipo de pago

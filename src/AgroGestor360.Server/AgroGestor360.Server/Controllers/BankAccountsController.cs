@@ -62,4 +62,46 @@ public class BankAccountsController : ControllerBase
 
         return !result ? NotFound() : Ok(result);
     }
+    
+
+    
+    [HttpGet("BankItem")]
+    public ActionResult<IEnumerable<BankItem>> GetAllBankItem()
+    {
+        var bankAccounts = bankAccountsService.GetBankItemAll();
+
+        return !bankAccounts?.Any() ?? true ? NotFound() : Ok(bankAccounts);
+    }
+
+    [HttpGet("BankItem/{id}")]
+    public ActionResult<BankItem> GetBankItemById(string id)
+    {
+        var find = bankAccountsService.GetBankItemById(id);
+
+        return find is null ? NotFound() : Ok(find);
+    }
+
+    [HttpPost("BankItem")]
+    public ActionResult<string> PostBankItem(BankItem bankAccount)
+    {
+        var result = bankAccountsService.InsertBankItem(bankAccount);
+
+        return string.IsNullOrEmpty(result) ? NotFound() : Ok(result);
+    }
+
+    [HttpPut("BankItem")]
+    public ActionResult<bool> PutBankItem(BankItem bankAccount)
+    {
+        var result = bankAccountsService.UpdateBankItem(bankAccount);
+
+        return !result ? NotFound() : Ok(result);
+    }
+
+    [HttpDelete("BankItem/{id}")]
+    public ActionResult<bool> DeleteBankItem(string id)
+    {
+        var result = bankAccountsService.DeleteBankItem(id);
+
+        return !result ? NotFound() : Ok(result);
+    }
 }

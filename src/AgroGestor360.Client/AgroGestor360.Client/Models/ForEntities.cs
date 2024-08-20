@@ -76,6 +76,18 @@ public class TimeLimitForCredit
 }
 
 /// <summary>
+/// Objeto: BankItem => Representa un elemento banco.
+/// <code>
+/// string [Id, Name]
+/// </code>
+/// </summary>
+public class BankItem
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+}
+
+/// <summary>
 /// Object: BankAccount => Represents a bank account for a ledger record.
 /// <code>
 /// string [Number, BankName, Alias]

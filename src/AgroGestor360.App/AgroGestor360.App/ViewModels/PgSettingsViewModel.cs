@@ -39,16 +39,16 @@ public partial class PgSettingsViewModel : ObservableObject
 
     public IEnumerable<string> Menu => DeviceInfo.Idiom == DeviceIdiom.Phone
         ? ["Conexión", "Entidad"] 
-        : ["Conexión",
-        "Entidad",
-        "Bancos",
-        "Descuentos",
-        "Línea de créditos",
-        "Vendedores",
-        "Clientes",
-        "Almacén",
-        "Productos"
-    ];
+        : [
+            "Conexión",
+            "Entidad",
+            "Descuentos",
+            "Línea de créditos",
+            "Vendedores",
+            "Clientes",
+            "Almacén",
+            "Productos"
+        ];
 
     [ObservableProperty]
     string? selectedMenu;
@@ -97,9 +97,6 @@ public partial class PgSettingsViewModel : ObservableObject
                         sb.AppendLine("No hay información de la entidad");
                     }
                     await Shell.Current.DisplayAlert("Información de la empresa", sb.ToString(), "Cerrar");
-                    break;
-                case "Bancos":
-                    navigationServ.NavigateToView<CvBankAccountsViewModel>(view => CurrentContent = view);
                     break;
                 case "Descuentos":
                     navigationServ.NavigateToView<CvDiscountsViewModel>(view => CurrentContent = view);
