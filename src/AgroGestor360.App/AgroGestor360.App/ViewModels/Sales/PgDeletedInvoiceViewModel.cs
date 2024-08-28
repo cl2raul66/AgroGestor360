@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using AgroGestor360.App.Tools.Messages;
 
 namespace AgroGestor360.App.ViewModels;
 
@@ -63,7 +62,7 @@ public partial class PgDeletedInvoiceViewModel : ObservableObject
     [RelayCommand]
     async Task Cancel()
     {
-        _ = WeakReferenceMessenger.Default.Send(new CancelDialogForPgSalesRequestMessage(true));
-        await Shell.Current.GoToAsync("..");
+        _ = WeakReferenceMessenger.Default.Send("cancel", "A1B2C3D4-E5F6-7890-ABCD-EF1234567890");
+        await Shell.Current.GoToAsync("..", true);
     }
 }

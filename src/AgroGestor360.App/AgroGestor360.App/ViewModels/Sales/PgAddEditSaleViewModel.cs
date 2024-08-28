@@ -308,7 +308,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
     [RelayCommand]
     async Task Cancel()
     {
-        _ = WeakReferenceMessenger.Default.Send("cancel", nameof(PgSalesViewModel));
+        _ = WeakReferenceMessenger.Default.Send("cancel", "A1B2C3D4-E5F6-7890-ABCD-EF1234567890");
         await Shell.Current.GoToAsync("..");
     }
 

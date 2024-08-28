@@ -36,7 +36,7 @@ public enum LoanType { Fiduciary, Mortgage, Pledge, CreditCard, Lender }
 /// DebitCard: Pago realizado con tarjeta de débito.
 /// CreditCard: Pago realizado con tarjeta de crédito.
 /// BankTransfer: Pago realizado mediante transferencia bancaria.
-/// MobilePayment: Pago realizado a través de un dispositivo móvil.
+/// BankDeposit: Pago realizado mediante deposito bancario.
 /// Check: Pago realizado mediante cheque.
 /// </code>
 /// </summary>
@@ -46,7 +46,7 @@ public enum PaymentType
     DebitCard,
     CreditCard,
     BankTransfer,
-    MobilePayment,
+    BankDeposit,
     Check
 }
 

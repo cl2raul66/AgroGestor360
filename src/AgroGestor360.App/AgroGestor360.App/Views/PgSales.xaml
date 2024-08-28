@@ -483,12 +483,20 @@
                             FontFamily="icofont"
                             Text="{StaticResource MoneyBag}"
                             ToolTipProperties.Text="Abonar a deuda.">
-                            <Button.IsEnabled>
-                                <MultiBinding Converter="{ctk:VariableMultiValueConverter ConditionType=Exact, Count=2}">
-                                    <Binding Converter="{ctk:IntToBoolConverter}" Path="SelectedInvoice.DaysRemaining" />
-                                    <Binding Converter="{ctk:IsNotNullConverter}" Path="SelectedInvoice" />
-                                </MultiBinding>
-                            </Button.IsEnabled>
+                            <Button.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding SelectedInvoice, Converter={ctk:IsNullConverter}}"
+                                    TargetType="Button"
+                                    Value="True">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </DataTrigger>
+                                <DataTrigger
+                                    Binding="{Binding SelectedInvoice.DaysRemaining}"
+                                    TargetType="Button"
+                                    Value="-1">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </DataTrigger>
+                            </Button.Triggers>
                         </Button>
                         <BoxView Style="{StaticResource ElementSeparator}" />
                         <Button
@@ -549,63 +557,6 @@
                     Text="by RandA Media Lab, Group" />
             </HorizontalStackLayout>
         </Grid>
-        <!--#endregion-->
-        <!--#region EXTRA-->
-        <!--#region PASSWORD DIALOG-->
-        <Border
-            Grid.RowSpan="3"
-            BackgroundColor="#99634833"
-            IsVisible="{Binding IsVisiblePwdDialog}">
-            <Frame
-                Margin="16"
-                BackgroundColor="{StaticResource White}"
-                HorizontalOptions="Center"
-                MinimumWidthRequest="400"
-                VerticalOptions="Center">
-                <Grid RowDefinitions="auto,*,auto" RowSpacing="12">
-                    <!--#region TITULO-->
-                    <Label
-                        Grid.ColumnSpan="3"
-                        FontSize="18"
-                        HorizontalOptions="Center"
-                        Text="Autorización"
-                        TextTransform="Uppercase"
-                        VerticalOptions="Center" />
-                    <!--#endregion-->
-                    <!--#region CONTENIDO-->
-                    <VerticalStackLayout Grid.Row="1" Spacing="16">
-                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                            <Label Text="Contraseña: *" />
-                            <Entry
-                                Grid.Row="1"
-                                ClearButtonVisibility="WhileEditing"
-                                IsPassword="True"
-                                Keyboard="Plain"
-                                Placeholder="Escriba aquí"
-                                Text="{Binding Pwd}" />
-                        </Grid>
-                    </VerticalStackLayout>
-                    <!--#endregion-->
-                    <!--#region PIE-->
-                    <Grid
-                        Grid.Row="2"
-                        ColumnDefinitions="*,auto"
-                        ColumnSpacing="8">
-                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                            <Button
-                                Command="{Binding SetPasswordCommand}"
-                                Text="Confirmar"
-                                TextTransform="Uppercase" />
-                            <Button
-                                Command="{Binding CancelPwdDialogCommand}"
-                                Text="Cancelar"
-                                TextTransform="Uppercase" />
-                        </HorizontalStackLayout>
-                    </Grid>
-                    <!--#endregion-->
-                </Grid>
-            </Frame>
-        </Border>
         <!--#endregion-->
         <!--#region DIALOGUE FOR TRANSITION CONFIRMATION WITHIN SALES-->
         <Border
@@ -723,171 +674,6 @@
                 </Grid>
             </Frame>
         </Border>
-        <!--#endregion-->
-        <!--#region DIALOGO PARA ABONO TOTAL O PARCIAL DE UNA VENTA SELECCIONADA-->
-        <Border
-            Grid.RowSpan="3"
-            BackgroundColor="#99634833"
-            IsVisible="{Binding IsOpenCompletePayment}">
-            <Frame
-                Margin="16"
-                BackgroundColor="{StaticResource White}"
-                HorizontalOptions="Center"
-                MinimumWidthRequest="400"
-                VerticalOptions="Center">
-                <Grid RowDefinitions="auto,*,auto" RowSpacing="16">
-                    <!--#region TITULO-->
-                    <Label
-                        Grid.ColumnSpan="3"
-                        FontSize="18"
-                        HorizontalOptions="Center"
-                        Text="Pago"
-                        TextTransform="Uppercase"
-                        VerticalOptions="Center" />
-                    <!--#endregion-->
-                    <!--#region CONTENIDO-->
-                    <VerticalStackLayout Grid.Row="1" Spacing="16">
-                        <Grid ColumnDefinitions="auto,auto" ColumnSpacing="16">
-                            <Grid
-                                RowDefinitions="auto,auto"
-                                RowSpacing="6"
-                                VerticalOptions="End">
-                                <Label Text="Fecha:" />
-                                <DatePicker Grid.Row="1" Format="dd/MM/yyyy" />
-                            </Grid>
-                            <Grid
-                                Grid.Column="1"
-                                RowDefinitions="auto,auto"
-                                RowSpacing="4">
-                                <Label Text="Cantidad:" />
-                                <Entry
-                                    Grid.Row="1"
-                                    ClearButtonVisibility="WhileEditing"
-                                    HorizontalOptions="Start"
-                                    HorizontalTextAlignment="End"
-                                    IsSpellCheckEnabled="True"
-                                    IsTextPredictionEnabled="True"
-                                    Keyboard="Numeric"
-                                    Placeholder="0"
-                                    Text="{Binding AmountPay}"
-                                    WidthRequest="100" />
-                            </Grid>
-                        </Grid>
-                        <Grid ColumnDefinitions="auto,*" ColumnSpacing="16">
-                            <Grid RowDefinitions="auto,auto" RowSpacing="4">
-                                <Label Text="No. Referencia:" />
-                                <Entry
-                                    Grid.Row="1"
-                                    ClearButtonVisibility="WhileEditing"
-                                    HorizontalOptions="Start"
-                                    IsSpellCheckEnabled="True"
-                                    IsTextPredictionEnabled="True"
-                                    Keyboard="Plain"
-                                    Placeholder="Escriba aquí"
-                                    Text="{Binding ReferentNo}"
-                                    WidthRequest="140" />
-                            </Grid>
-                            <Grid
-                                Grid.Column="1"
-                                RowDefinitions="auto,auto"
-                                RowSpacing="4">
-                                <Label Text="Modo de pago: *" />
-                                <Picker
-                                    Grid.Row="1"
-                                    IsEnabled="{Binding SelectedInvoice, Converter={ctk:IsNotNullConverter}}"
-                                    ItemsSource="{Binding PaymentsTypes}"
-                                    SelectedItem="{Binding SelectedPaymentType}">
-                                    <Picker.Triggers>
-                                        <DataTrigger
-                                            Binding="{Binding SelectedInvoice.DaysRemaining}"
-                                            TargetType="Picker"
-                                            Value="-1">
-                                            <Setter Property="IsVisible" Value="True" />
-                                        </DataTrigger>
-                                    </Picker.Triggers>
-                                </Picker>
-                            </Grid>
-                        </Grid>
-                        <Grid
-                            Grid.Column="1"
-                            RowDefinitions="auto,auto"
-                            RowSpacing="4">
-                            <Label Text="Información del pago" />
-                            <VerticalStackLayout Grid.Row="1" Spacing="8">
-                                <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="12"
-                                        HorizontalOptions="Start"
-                                        Text="IMPORTE:"
-                                        TextColor="{StaticResource Primary}"
-                                        VerticalOptions="Center" />
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="12"
-                                        HorizontalOptions="End"
-                                        Text="{Binding SelectedInvoice.TotalAmount, StringFormat='{0:C}'}"
-                                        TextColor="{StaticResource Primary}"
-                                        VerticalOptions="Center" />
-                                </Grid>
-                                <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="12"
-                                        HorizontalOptions="Start"
-                                        Text="MONTO ABONADO:"
-                                        TextColor="{StaticResource Primary}"
-                                        VerticalOptions="Center" />
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="12"
-                                        HorizontalOptions="End"
-                                        Text="{Binding SelectedInvoice.Paid, StringFormat='{0:C}'}"
-                                        TextColor="{StaticResource Primary}"
-                                        VerticalOptions="Center" />
-                                </Grid>
-                                <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="12"
-                                        HorizontalOptions="Start"
-                                        Text="MONTO A PAGAR:"
-                                        TextColor="{StaticResource Primary}"
-                                        VerticalOptions="Center" />
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="12"
-                                        HorizontalOptions="End"
-                                        Text="{Binding Debt, StringFormat='{0:C}'}"
-                                        TextColor="{StaticResource Secondary}"
-                                        VerticalOptions="Center" />
-                                </Grid>
-                            </VerticalStackLayout>
-                        </Grid>
-                    </VerticalStackLayout>
-                    <!--#endregion-->
-                    <!--#region PIE-->
-                    <Grid
-                        Grid.Row="2"
-                        ColumnDefinitions="*,auto"
-                        ColumnSpacing="8">
-                        <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                            <Button
-                                Text="Pagar"
-                                TextTransform="Uppercase"
-                                WidthRequest="110" />
-                            <Button
-                                Command="{Binding CancelCompletePaymentCommand}"
-                                Text="Cancelar"
-                                TextTransform="Uppercase"
-                                WidthRequest="110" />
-                        </HorizontalStackLayout>
-                    </Grid>
-                    <!--#endregion-->
-                </Grid>
-            </Frame>
-        </Border>
-        <!--#endregion-->
         <!--#endregion-->
     </Grid>
 

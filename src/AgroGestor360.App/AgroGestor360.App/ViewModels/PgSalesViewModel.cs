@@ -1,4 +1,5 @@
-﻿using AgroGestor360.App.Tools.Messages;
+﻿// Ignore Spelling: auth api
+
 using AgroGestor360.App.Views.Sales;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
@@ -24,14 +25,14 @@ public partial class PgSalesViewModel : ObservableRecipient
     readonly IQuotesService quotationsServ;
     readonly IReportsService reportsServ;
     readonly IOrdersService ordersServ;
-    readonly IAuthService authServ;
-    readonly IInvoicesService invoicesServ;
+    // readonly IAuthService authServ;
+    readonly ISaleRecordsService salesServ;
     readonly IApiService apiServ;
     readonly ITimeLimitsCreditsService timeLimitsCreditsServ;
     readonly IPaymentTypeService paymentTypeServ;
     //readonly SemaphoreSlim semaphore = new(0, 2);
 
-    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, IAuthService authService, IInvoicesService invoicesService, IApiService apiService, ITimeLimitsCreditsService timeLimitsCreditsService, IPaymentTypeService paymentTypeService)
+    public PgSalesViewModel(IQuotesService quotesService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService, IReportsService reportsService, IOrdersService ordersService, ISaleRecordsService salesService, IApiService apiService, ITimeLimitsCreditsService timeLimitsCreditsService, IPaymentTypeService paymentTypeService)
     {
         quotationsServ = quotesService;
         sellersServ = sellersService;
@@ -39,8 +40,8 @@ public partial class PgSalesViewModel : ObservableRecipient
         productsForSalesServ = productsForSalesService;
         reportsServ = reportsService;
         ordersServ = ordersService;
-        authServ = authService;
-        invoicesServ = invoicesService;
+        //authServ = authService;
+        salesServ = salesService;
         apiServ = apiService;
         timeLimitsCreditsServ = timeLimitsCreditsService;
         paymentTypeServ = paymentTypeService;
@@ -359,7 +360,7 @@ public partial class PgSalesViewModel : ObservableRecipient
 
         if (ResultSalesConfirmationDialog.HasValue && ResultSalesConfirmationDialog.Value)
         {
-            DTO_SB1 currentInvoice = await invoicesServ.GetDTO_SB1FromOrderAsync(serverURL, SelectedOrder!.Code!) ?? new();
+            DTO_SB1 currentInvoice = await salesServ.GetDTO_SB1FromOrderAsync(serverURL, SelectedOrder!.Code!) ?? new();
             sendData.Add("currentInvoice", currentInvoice);
         }
 
@@ -370,7 +371,7 @@ public partial class PgSalesViewModel : ObservableRecipient
     async Task RemovedInvoice()
     {
         IsActive = true;
-        var concepts = await invoicesServ.GetConceptsAsync(serverURL);
+        var concepts = await salesServ.GetConceptsAsync(serverURL);
         Dictionary<string, object> sendData = new()
         {
             { "concepts", concepts.ToArray() }
@@ -385,19 +386,25 @@ public partial class PgSalesViewModel : ObservableRecipient
 
         Dictionary<string, object> sendData = new()
         {
-            { "currentInvoice", SelectedInvoice! }
+            {"SendToken", "E7F8G9H0-I1J2-3K4L-M5N6-O7P8Q9R0S1T2"},
+            { "CurrentSale", SelectedInvoice! }
         };
 
-        await Shell.Current.GoToAsync(nameof(PgAmortizeInvoiceCredit), true, sendData);
+        await Shell.Current.GoToAsync(nameof(PgTotalOrPartialPayment), true, sendData);
     }
 
     [RelayCommand]
     async Task CompletePayment()
     {
-        Debt = SelectedInvoice!.TotalAmount - SelectedInvoice!.Paid;
-        AmountPay = Debt.ToString();
-        IsOpenCompletePayment = true;
-        await Task.CompletedTask;
+        IsActive = true;
+
+        Dictionary<string, object> sendData = new()
+        {
+            {"SendToken", "F4E5D6C7-B8A9-0B1C-D2E3-F4567890ABCD"},
+            {"CurrentSale", SelectedInvoice!}
+        };
+
+        await Shell.Current.GoToAsync(nameof(PgTotalOrPartialPayment), true, sendData);
     }
 
     [RelayCommand]
@@ -405,7 +412,7 @@ public partial class PgSalesViewModel : ObservableRecipient
     {
         DTO10_2 data = new() { Code = SelectedQuotation!.Code };
 
-        var resultInsert = await invoicesServ.InsertFromQuoteAsync(serverURL, data);
+        var resultInsert = await salesServ.InsertFromQuoteAsync(serverURL, data);
         if (!string.IsNullOrEmpty(resultInsert))
         {
             bool resultChanges = await quotationsServ.ChangesByStatusAsync(serverURL, new() { Code = SelectedQuotation!.Code!, Status = QuotationStatus.Accepted });
@@ -437,7 +444,7 @@ public partial class PgSalesViewModel : ObservableRecipient
             if (OptionSalesConfirmationDialog)
             {
                 DTO8 currentOrder = Orders!.First(x => x.Code == SelectedOrder!.Code);
-                var resultInsert = await invoicesServ.InsertFromOrderAsync(serverURL, currentOrder);
+                var resultInsert = await salesServ.InsertFromOrderAsync(serverURL, currentOrder);
                 if (!string.IsNullOrEmpty(resultInsert))
                 {
                     bool resultChanges = await ordersServ.ChangeByStatusAsync(serverURL, new DTO8_6() { Code = currentOrder.Code!, Status = OrderStatus.Completed });
@@ -445,7 +452,7 @@ public partial class PgSalesViewModel : ObservableRecipient
                     {
                         _ = Orders!.Remove(currentOrder);
                         Invoices ??= [];
-                        var orderGet = await invoicesServ.GetByCodeAsync(serverURL, resultInsert);
+                        var orderGet = await salesServ.GetByCodeAsync(serverURL, resultInsert);
                         Invoices.Insert(0, orderGet!);
                         ViewBills();
                     }
@@ -464,32 +471,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         SelectedOrder = null;
         SelectedQuotation = null;
     }
-    #endregion
-
-    #region PASSWORD DIALOG
-    [ObservableProperty]
-    bool isVisiblePwdDialog;
-
-    [ObservableProperty]
-    bool resultPWD;
-
-    [ObservableProperty]
-    string? pwd;
-
-    [RelayCommand]
-    async Task SetPassword()
-    {
-        ResultPWD = await authServ.AuthRoot(serverURL, Pwd!);
-        CancelPwdDialog();
-    }
-
-    [RelayCommand]
-    void CancelPwdDialog()
-    {
-        Pwd = null;
-        IsVisiblePwdDialog = false;
-    }
-    #endregion
+    #endregion    
 
     #region DIALOGUE FOR TRANSITION CONFIRMATION WITHIN SALES
     [ObservableProperty]
@@ -549,66 +531,7 @@ public partial class PgSalesViewModel : ObservableRecipient
         }
     }
     #endregion
-
-    #region DIALOGO PARA ABONO TOTAL O PARCIAL DE UNA VENTA SELECCIONADA
-    [ObservableProperty]
-    bool isOpenCompletePayment;
-
-    [ObservableProperty]
-    double debt;
-
-    [ObservableProperty]
-    DateTime? completePaymentDate;
-
-    [ObservableProperty]
-    string? amountPay;
-
-    [ObservableProperty]
-    string? referentNo;
-
-    [ObservableProperty]
-    string[]? paymentsTypes;
-
-    [ObservableProperty]
-    string? selectedPaymentType;
-
-    [RelayCommand]
-    async Task PayCompletePayment()
-    {
-        if (!double.TryParse(AmountPay, out double theAmountPay))
-        {
-            theAmountPay = 0;
-        }
-
-        DTO10_2 data = new()
-        {
-            Code = SelectedInvoice!.Code,
-            PaymentMethods = [new() { Date = DateTime.Now, Amount = theAmountPay, ReferenceNumber = ReferentNo, Type = PaymentType.Cash }]
-        };
-
-        bool result = await invoicesServ.RepaymentAsync(serverURL, data);
-        if (result)
-        {
-            Invoices!.Remove(SelectedInvoice!);
-        }
-
-        IsOpenCompletePayment = false;
-        await Task.CompletedTask;
-    }
-
-    [RelayCommand]
-    async Task CancelCompletePayment()
-    {
-        AmountPay = null;
-        Debt = 0;
-        ReferentNo = null;
-        IsOpenCompletePayment = false;
-        SelectedInvoice = null;
-        await Task.CompletedTask;
-    }
-
-    #endregion
-
+       
     void ApiServ_OnReceiveStatusMessage(ServerStatus status)
     {
         HaveConnection = status is ServerStatus.Running;
@@ -672,11 +595,11 @@ public partial class PgSalesViewModel : ObservableRecipient
         WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_1, string>(this, "addinvoice", async (r, m) =>
         {
             IsActive = false;
-            var result = await invoicesServ.InsertAsync(serverURL, m);
+            var result = await salesServ.InsertAsync(serverURL, m);
             if (!string.IsNullOrEmpty(result))
             {
                 r.Invoices ??= [];
-                var invoiceGet = await invoicesServ.GetByCodeAsync(serverURL, result);
+                var invoiceGet = await salesServ.GetByCodeAsync(serverURL, result);
                 r.Invoices.Insert(0, invoiceGet!);
             }
             r.SelectedInvoice = null;
@@ -685,11 +608,11 @@ public partial class PgSalesViewModel : ObservableRecipient
         WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_1, string>(this, "addinvoicefromorder", async (r, m) =>
         {
             IsActive = false;
-            var result = await invoicesServ.InsertFromOrderWithModificationsAsync(serverURL, m);
+            var result = await salesServ.InsertFromOrderWithModificationsAsync(serverURL, m);
             if (!string.IsNullOrEmpty(result))
             {
                 r.Invoices ??= [];
-                var invoiceGet = await invoicesServ.GetByCodeAsync(serverURL, result);
+                var invoiceGet = await salesServ.GetByCodeAsync(serverURL, result);
                 r.Invoices.Insert(0, invoiceGet!);
             }
 
@@ -709,11 +632,11 @@ public partial class PgSalesViewModel : ObservableRecipient
         WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_2, string>(this, "setdepreciation", async (r, m) =>
         {
             IsActive = false;
-            var result = await invoicesServ.RepaymentAsync(serverURL, m);
+            var result = await salesServ.RepaymentAsync(serverURL, m);
             if (result)
             {
                 r.Invoices ??= [];
-                var invoice = await invoicesServ.GetByCodeAsync(serverURL, m.Code!);
+                var invoice = await salesServ.GetByCodeAsync(serverURL, m.Code!);
                 if (invoice is null)
                 {
                     r.Invoices.Remove(r.SelectedInvoice!);
@@ -736,12 +659,12 @@ public partial class PgSalesViewModel : ObservableRecipient
 
             if (bool.Parse(m))
             {
-                IsVisiblePwdDialog = true;
-                while (IsVisiblePwdDialog)
-                {
-                    await Task.Delay(100);
-                }
-                deletedQuote = ResultPWD && await quotationsServ.DeleteAsync(serverURL, currentQuote.Code!);
+                //IsVisiblePwdDialog = true;
+                //while (IsVisiblePwdDialog)
+                //{
+                //    await Task.Delay(100);
+                //}
+                //deletedQuote = ResultPWD && await quotationsServ.DeleteAsync(serverURL, currentQuote.Code!);
             }
             else
             {
@@ -766,12 +689,12 @@ public partial class PgSalesViewModel : ObservableRecipient
 
             if (bool.Parse(m))
             {
-                IsVisiblePwdDialog = true;
-                while (IsVisiblePwdDialog)
-                {
-                    await Task.Delay(100);
-                }
-                deletedOrder = ResultPWD && await ordersServ.DeleteAsync(serverURL, currentOrder.Code!);
+                //IsVisiblePwdDialog = true;
+                //while (IsVisiblePwdDialog)
+                //{
+                //    await Task.Delay(100);
+                //}
+                //deletedOrder = ResultPWD && await ordersServ.DeleteAsync(serverURL, currentOrder.Code!);
             }
             else
             {
@@ -797,17 +720,17 @@ public partial class PgSalesViewModel : ObservableRecipient
 
             if (isEmpty)
             {
-                IsVisiblePwdDialog = true;
-                //while (IsVisiblePwdDialog)
-                //{
-                //    await Task.Delay(100);
-                //}
-                deletedInInvoice = ResultPWD && await invoicesServ.DeleteAsync(serverURL, currentInvoice.Code!);
+                //IsVisiblePwdDialog = true;
+                ////while (IsVisiblePwdDialog)
+                ////{
+                ////    await Task.Delay(100);
+                ////}
+                //deletedInInvoice = ResultPWD && await salesServ.DeleteAsync(serverURL, currentInvoice.Code!);
             }
             else
             {
                 DTO10_3 dTO = new() { Code = currentInvoice.Code, Status = SaleStatus.Cancelled, Notes = m.Concept };
-                deletedInInvoice = await invoicesServ.ChangeByStatusAsync(serverURL, dTO);
+                deletedInInvoice = await salesServ.ChangeByStatusAsync(serverURL, dTO);
             }
 
             if (deletedInInvoice)
@@ -818,16 +741,46 @@ public partial class PgSalesViewModel : ObservableRecipient
             SelectedInvoice = null;
         });
 
-        WeakReferenceMessenger.Default.Register<CancelDialogForPgSalesRequestMessage>(this, (r, m) =>
+        //Abono a registro de venta
+        WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_2, string>(this, "E7F8G9H0-I1J2-3K4L-M5N6-O7P8Q9R0S1T2", async (r, m) =>
         {
+            bool result = await salesServ.RepaymentAsync(serverURL, m);
+            if (result)
+            {
+                int idx = Invoices!.IndexOf(SelectedInvoice!);
+                var updateInvoice = await salesServ.GetByCodeAsync(serverURL, SelectedInvoice!.Code!);
+                if (updateInvoice is not null)
+                {
+                    Invoices[idx] = updateInvoice;
+                }
+            }
+
+            SelectedInvoice = null;
             IsActive = false;
-            if (m.Value)
+        });
+
+        //Pago total del registro de venta
+        WeakReferenceMessenger.Default.Register<PgSalesViewModel, DTO10_2, string>(this, "F4E5D6C7-B8A9-0B1C-D2E3-F4567890ABCD", async (r, m) =>
+        {
+            bool result = await salesServ.RepaymentAsync(serverURL, m);
+            if (result)
+            {
+                Invoices!.Remove(SelectedInvoice!);
+            }
+
+            SelectedInvoice = null;
+            IsActive = false;
+        });
+
+        WeakReferenceMessenger.Default.Register<PgSalesViewModel, string, string>(this, "A1B2C3D4-E5F6-7890-ABCD-EF1234567890", (r, m) =>
+        {
+            if (m == "cancel")
             {
                 SelectedQuotation = null;
                 SelectedOrder = null;
                 SelectedInvoice = null;
-                //semaphore.Release();
             }
+            IsActive = false;
         });
     }
 
@@ -844,7 +797,7 @@ public partial class PgSalesViewModel : ObservableRecipient
 
         if (e.PropertyName == nameof(IsBillsVisible))
         {
-            Invoices = IsBillsVisible ? new(await invoicesServ.GetAllAsync(serverURL)) : null;
+            Invoices = IsBillsVisible ? new(await salesServ.GetAllAsync(serverURL)) : null;
         }
 
         if (e.PropertyName == nameof(IsShowAddOrder))
@@ -872,16 +825,15 @@ public partial class PgSalesViewModel : ObservableRecipient
             }
         }
 
-        if (e.PropertyName == nameof(IsOpenCompletePayment))
-        {
-            if (IsOpenCompletePayment)
-            {
-                PaymentsTypes = [.. paymentTypeServ.GetAll()];
-            }
-        }
+        //if (e.PropertyName == nameof(IsOpenCompletePayment))
+        //{
+        //    if (IsOpenCompletePayment)
+        //    {
+        //        PaymentsTypes = [.. paymentTypeServ.GetAll()];
+        //    }
+        //}
     }
 
-    #region EXTRA
     public async void Initialize()
     {
         HaveConnection = await apiServ.ConnectToServerHub(serverURL);
@@ -896,11 +848,12 @@ public partial class PgSalesViewModel : ObservableRecipient
 
         //if (IsBillsVisible)
         //{
-        //    Invoices = new(await invoicesServ.GetAllAsync(serverURL));
+        //    Invoices = new(await salesServ.GetAllAsync(serverURL));
         //}
         IsBusy = false;
     }
 
+    #region EXTRA
     string GeneratePathFileForQuotation()
     {
         string title = $"{SelectedQuotation!.Date:yyyyMMdd} - Cotización de {SelectedQuotation!.TotalAmount:F2} para {SelectedQuotation!.CustomerName}";
@@ -958,7 +911,7 @@ public partial class PgSalesViewModel : ObservableRecipient
 
     async Task<string> GenerateBodyTextFromInvoice()
     {
-        var currentInvoice = await invoicesServ.GetProductsByCodeAsync(serverURL, SelectedInvoice!.Code!);
+        var currentInvoice = await salesServ.GetProductsByCodeAsync(serverURL, SelectedInvoice!.Code!);
         StringBuilder sb = new();
         sb.AppendLine($"No.: {currentInvoice!.Code}");
         sb.AppendLine($"Fecha de creación: {currentInvoice!.Date:dd MMM yyyy}");
@@ -1022,12 +975,12 @@ public partial class PgSalesViewModel : ObservableRecipient
                 return false;
             }
 
-            var approved = await authServ.AuthRoot(serverURL, pwd);
-            if (!approved)
-            {
-                await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
-                return false;
-            }
+            //var approved = await authServ.AuthRoot(serverURL, pwd);
+            //if (!approved)
+            //{
+            //    await Shell.Current.DisplayAlert("Error", "¡Contraseña incorrecta!", "Cerrar");
+            //    return false;
+            //}
 
             return true;
         }

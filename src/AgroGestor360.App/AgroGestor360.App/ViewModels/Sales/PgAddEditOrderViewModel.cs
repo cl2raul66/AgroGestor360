@@ -8,7 +8,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using AgroGestor360.App.Models;
 using AgroGestor360.Client.Tools;
-using AgroGestor360.App.Tools.Messages;
 
 namespace AgroGestor360.App.ViewModels;
 
@@ -289,8 +288,8 @@ public partial class PgAddEditOrderViewModel : ObservableValidator
     [RelayCommand]
     async Task Cancel()
     {
-        _ = WeakReferenceMessenger.Default.Send(new CancelDialogForPgSalesRequestMessage(true));
-        await Shell.Current.GoToAsync("..");
+        _ = WeakReferenceMessenger.Default.Send("cancel", "A1B2C3D4-E5F6-7890-ABCD-EF1234567890");
+        await Shell.Current.GoToAsync("..", true);
     }
 
     protected override async void OnPropertyChanged(PropertyChangedEventArgs e)

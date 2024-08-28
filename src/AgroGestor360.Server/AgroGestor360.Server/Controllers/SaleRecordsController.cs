@@ -277,14 +277,14 @@ public class SaleRecordsController : ControllerBase
             Products = [.. productItems]
         };
 
-        if (dTO.PaymentMethods is not null)
+        if (dTO.PaymentMethod is not null)
         {
-            entity.PaymentMethods = [dTO.PaymentMethods];
+            entity.PaymentMethods = [dTO.PaymentMethod];
         }
 
-        if (dTO.PaymentMethods is not null)
+        if (dTO.PaymentMethod is not null)
         {
-            entity.PaymentMethods = [dTO.PaymentMethods];
+            entity.PaymentMethods = [dTO.PaymentMethod];
         }
 
         saleRecordsServ.BeginTrans();
@@ -505,11 +505,11 @@ public class SaleRecordsController : ControllerBase
 
         double totalAmount = GetTotalAmount.Get(found);
 
-        if (dTO.PaymentMethods is not null)
+        if (dTO.PaymentMethod is not null)
         {
             List<PaymentMethod> immediatePayments = new(found.PaymentMethods ?? [])
             {
-                dTO.PaymentMethods
+                dTO.PaymentMethod
             };
             found.PaymentMethods = [.. immediatePayments];
 
@@ -519,11 +519,11 @@ public class SaleRecordsController : ControllerBase
                 found.Status = SaleStatus.Paid;
             }
         }
-        else if (dTO.PaymentMethods is not null)
+        else if (dTO.PaymentMethod is not null)
         {
             List<PaymentMethod> creditPayments = new(found.PaymentMethods ?? [])
             {
-                dTO.PaymentMethods
+                dTO.PaymentMethod
             };
 
             found.PaymentMethods = [.. creditPayments];
@@ -787,8 +787,8 @@ public class SaleRecordsController : ControllerBase
     (List<ProductSaleBase>, List<ArticleItemForWarehouse>) ProcessProductItems(IEnumerable<DTO9> productItemsDTO)
     {
         // Se inicializan las listas vacías para almacenar los elementos de producto y artículo
-        List<ProductSaleBase> productItems = new List<ProductSaleBase>();
-        List<ArticleItemForWarehouse> articleItems = new List<ArticleItemForWarehouse>();
+        List<ProductSaleBase> productItems = [];
+        List<ArticleItemForWarehouse> articleItems = [];
 
         // Se obtienen los IDs de los productos de la colección de DTO9
         var productIds = productItemsDTO.Select(item => new ObjectId(item.ProductItemForSaleId)).ToList();
@@ -812,7 +812,7 @@ public class SaleRecordsController : ControllerBase
             ArticleItemForWarehouse articleItemForWarehouse = warehouseItems[product.MerchandiseId!];
 
             // Se crea un objeto ProductSaleBase para el pedido
-            ProductSaleBase productItemForOrder = new ProductSaleBase()
+            ProductSaleBase productItemForOrder = new()
             {
                 HasCustomerDiscount = item.HasCustomerDiscount,
                 OfferId = item.OfferId,

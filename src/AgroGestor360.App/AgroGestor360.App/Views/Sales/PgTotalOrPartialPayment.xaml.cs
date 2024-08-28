@@ -2,9 +2,9 @@ using AgroGestor360.App.ViewModels;
 
 namespace AgroGestor360.App.Views.Sales;
 
-public partial class PgAmortizeInvoiceCredit : ContentPage
+public partial class PgTotalOrPartialPayment : ContentPage
 {
-	public PgAmortizeInvoiceCredit(PgAmortizeInvoiceCreditViewModel vm)
+	public PgTotalOrPartialPayment(PgTotalOrPartialPaymentViewModel vm)
 	{
 		InitializeComponent();
 

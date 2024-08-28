@@ -18,7 +18,7 @@ namespace AgroGestor360.Client.Services
             { PaymentType.Cash, "Efectivo" },
             { PaymentType.DebitCard, "Tarjeta de débito" },
             { PaymentType.BankTransfer, "Transferencia bancaria" },
-            { PaymentType.MobilePayment, "Pago móvil" }
+            { PaymentType.BankDeposit, "Depósito bancario" }
         };
 
         public IEnumerable<string> GetAll()

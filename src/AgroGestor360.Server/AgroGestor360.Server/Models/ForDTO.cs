@@ -602,14 +602,13 @@ public class DTO10_1
 /// Represents a invoice for normal POST and POST from quote.
 /// <code>
 /// Code: Code of the invoice and key in database from invoice or quote
-/// ImmediateMethod: Immediate payment method
-/// CreditPaymentMethod: Credit payment method
+/// PaymentMethod: Payment method
 /// </code>
 /// </summary>
 public class DTO10_2
 {
     public string? Code { get; set; }
-    public PaymentMethod? PaymentMethods { get; set; }
+    public PaymentMethod? PaymentMethod { get; set; }
 }
 
 /// <summary>

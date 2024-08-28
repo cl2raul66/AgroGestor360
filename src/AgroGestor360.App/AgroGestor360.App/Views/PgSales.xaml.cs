@@ -9,7 +9,6 @@ public partial class PgSales : ContentPage
 		InitializeComponent();
 
 		vm.Initialize();
-
         BindingContext = vm;
 	}
 

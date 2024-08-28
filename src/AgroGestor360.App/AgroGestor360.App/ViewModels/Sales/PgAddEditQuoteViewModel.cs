@@ -1,5 +1,4 @@
 ﻿using AgroGestor360.App.Models;
-using AgroGestor360.App.Tools.Messages;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using AgroGestor360.Client.Tools;
@@ -253,8 +252,8 @@ public partial class PgAddEditQuoteViewModel : ObservableValidator
     [RelayCommand]
     async Task Cancel()
     {
-        _ = WeakReferenceMessenger.Default.Send(new CancelDialogForPgSalesRequestMessage(true));
-        await Shell.Current.GoToAsync("..");
+        _ = WeakReferenceMessenger.Default.Send("cancel", "A1B2C3D4-E5F6-7890-ABCD-EF1234567890");
+        await Shell.Current.GoToAsync("..", true);
     }
 
     protected override async void OnPropertyChanged(PropertyChangedEventArgs e)

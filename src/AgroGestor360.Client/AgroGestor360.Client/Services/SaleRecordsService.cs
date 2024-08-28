@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace AgroGestor360.Client.Services;
 
-public interface IInvoicesService
+public interface ISaleRecordsService
 {
     Task<bool> ChangeByStatusAsync(string serverURL, DTO10_3 dTO);
     Task<bool> CheckExistence(string serverURL);
@@ -25,13 +25,13 @@ public interface IInvoicesService
     Task<string> InsertFromQuoteAsync(string serverURL, DTO10_2 dTO);
 }
 
-public class InvoicesService : IInvoicesService
+public class SaleRecordsService : ISaleRecordsService
 {
     public async Task<IEnumerable<int>> GetCreditTimeAsync(string serverURL)
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/invoices/getcredittime");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/SaleRecords/getcredittime");
 
             if (response.StatusCode is HttpStatusCode.NotFound)
             {
@@ -52,7 +52,7 @@ public class InvoicesService : IInvoicesService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/invoices/exist");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/SaleRecords/exist");
 
             if (response.IsSuccessStatusCode)
             {
@@ -67,7 +67,7 @@ public class InvoicesService : IInvoicesService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/invoices");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/SaleRecords");
 
             if (response.StatusCode is HttpStatusCode.NotFound)
             {
@@ -88,7 +88,7 @@ public class InvoicesService : IInvoicesService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/invoices/{code}");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/SaleRecords/{code}");
 
             switch (response.StatusCode)
             {
@@ -110,7 +110,7 @@ public class InvoicesService : IInvoicesService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/invoices/getproductsbycode/{code}");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/SaleRecords/getproductsbycode/{code}");
 
             switch (response.StatusCode)
             {
@@ -132,7 +132,7 @@ public class InvoicesService : IInvoicesService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/invoices/getdto_sb1fromorder/{code}");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/SaleRecords/getdto_sb1fromorder/{code}");
 
             if (response.StatusCode == HttpStatusCode.NotFound || response.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -158,7 +158,7 @@ public class InvoicesService : IInvoicesService
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/invoices", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/SaleRecords", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -175,7 +175,7 @@ public class InvoicesService : IInvoicesService
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/invoices/insertfromquote", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/SaleRecords/insertfromquote", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -192,7 +192,7 @@ public class InvoicesService : IInvoicesService
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/invoices/insertfromorder", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/SaleRecords/insertfromorder", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -209,7 +209,7 @@ public class InvoicesService : IInvoicesService
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/invoices/InsertFromOrderWithModifications", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/SaleRecords/InsertFromOrderWithModifications", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -226,7 +226,7 @@ public class InvoicesService : IInvoicesService
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/invoices/Repayment", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/SaleRecords/Repayment", content);
 
             return response.IsSuccessStatusCode;
         }
@@ -240,7 +240,7 @@ public class InvoicesService : IInvoicesService
             var json = JsonSerializer.Serialize(dTO, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/invoices/ChangeByStatus", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PutAsync($"{serverURL}/SaleRecords/ChangeByStatus", content);
 
             return response.IsSuccessStatusCode;
         }
@@ -251,7 +251,7 @@ public class InvoicesService : IInvoicesService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/invoices/{code}");
+            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/SaleRecords/{code}");
 
             return response.IsSuccessStatusCode;
         }
@@ -263,7 +263,7 @@ public class InvoicesService : IInvoicesService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/invoices/concepts");
+            var response = await ApiServiceBase.ProviderHttpClient!.GetAsync($"{serverURL}/SaleRecords/concepts");
 
             if (response.StatusCode is not HttpStatusCode.OK)
             {
@@ -285,7 +285,7 @@ public class InvoicesService : IInvoicesService
             var json = JsonSerializer.Serialize(entity, ApiServiceBase.ProviderJSONOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/invoices/concepts", content);
+            var response = await ApiServiceBase.ProviderHttpClient!.PostAsync($"{serverURL}/SaleRecords/concepts", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -300,7 +300,7 @@ public class InvoicesService : IInvoicesService
     {
         if (ApiServiceBase.IsSetClientAccessToken && Uri.IsWellFormedUriString(serverURL, UriKind.Absolute))
         {
-            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/invoices/concepts/{id}");
+            var response = await ApiServiceBase.ProviderHttpClient!.DeleteAsync($"{serverURL}/SaleRecords/concepts/{id}");
 
             return response.IsSuccessStatusCode;
         }

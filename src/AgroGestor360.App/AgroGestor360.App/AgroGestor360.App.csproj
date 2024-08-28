@@ -123,7 +123,7 @@
 	  <MauiXaml Update="Views\Sales\PgAddEditQuote.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Sales\PgAmortizeInvoiceCredit.xaml">
+	  <MauiXaml Update="Views\Sales\PgTotalOrPartialPayment.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\CvSellers.xaml">
@@ -228,12 +228,19 @@
 	  <Compile Update="Views\Sales\PgAddEditOrder.xaml.cs">
 	    <DependentUpon>PgAddEditOrder.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\Sales\PgTotalOrPartialPayment.xaml.cs">
+	    <DependentUpon>PgTotalOrPartialPayment.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\Sales\PgDeletedInSale.xaml.cs">
 	    <DependentUpon>PgDeletedInSale.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\Sales\PgDeletedInvoice.xaml.cs">
 	    <DependentUpon>PgDeletedInvoice.xaml</DependentUpon>
 	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Tools\Messages\" />
 	</ItemGroup>
 
 </Project>
