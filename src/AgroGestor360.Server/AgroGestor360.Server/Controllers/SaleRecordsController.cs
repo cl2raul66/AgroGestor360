@@ -23,8 +23,9 @@ public class SaleRecordsController : ControllerBase
     readonly IQuotesInLiteDbService quotesServ;
     readonly IOrdersInLiteDbService ordersServ;
     readonly IConfiguration configurationServ;
+    readonly IAccountsReceivableInLiteDbService accountsReceivableServ;
 
-    public SaleRecordsController(ISaleRecordsInLiteDbService saleRecordsService, ISellersInLiteDbService sellersService, ICustomersInLiteDbService customersService, IProductsForSalesInLiteDbService productsForSalesService, IWasteSaleRecordsInLiteDbService wasteSaleRecordsService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService, IQuotesInLiteDbService quotesService, IOrdersInLiteDbService ordersService, IConfiguration configuration)
+    public SaleRecordsController(ISaleRecordsInLiteDbService saleRecordsService, ISellersInLiteDbService sellersService, ICustomersInLiteDbService customersService, IProductsForSalesInLiteDbService productsForSalesService, IWasteSaleRecordsInLiteDbService wasteSaleRecordsService, IArticlesForWarehouseInLiteDbService articlesForWarehouseService, IQuotesInLiteDbService quotesService, IOrdersInLiteDbService ordersService, IConfiguration configuration, IAccountsReceivableInLiteDbService accountsReceivableService)
     {
         saleRecordsServ = saleRecordsService;
         sellersServ = sellersService;
@@ -35,6 +36,7 @@ public class SaleRecordsController : ControllerBase
         quotesServ = quotesService;
         ordersServ = ordersService;
         configurationServ = configuration;
+        accountsReceivableServ = accountsReceivableService;
     }
 
     [HttpGet("GetCreditTime")]
@@ -507,11 +509,11 @@ public class SaleRecordsController : ControllerBase
 
         if (dTO.PaymentMethod is not null)
         {
-            List<PaymentMethod> immediatePayments = new(found.PaymentMethods ?? [])
+            List<PaymentMethod> paymentMethods = new(found.PaymentMethods ?? [])
             {
                 dTO.PaymentMethod
             };
-            found.PaymentMethods = [.. immediatePayments];
+            found.PaymentMethods = [.. paymentMethods];
 
             double paidAmount = found.PaymentMethods.Sum(x => x.Amount);
             if (Math.Abs(paidAmount - totalAmount) < 0.01)
@@ -570,6 +572,20 @@ public class SaleRecordsController : ControllerBase
             }
         }
 
+        accountsReceivableServ.BeginTrans();
+        AccountReceivableRecord accountReceivableRecord = new()
+        {
+            DateOfPayment = dTO.PaymentMethod!.Date,
+            AmountPaid = dTO.PaymentMethod!.Amount,
+            SaleReportId = found.Code
+        };
+        string resultInsertAccountReceivableRecord = accountsReceivableServ.Insert(accountReceivableRecord);
+        if (string.IsNullOrEmpty(resultInsertAccountReceivableRecord))
+        {
+            accountsReceivableServ.Rollback();
+        }
+
+        accountsReceivableServ.Commit();
         saleRecordsServ.Commit();
         return Ok();
     }

@@ -46,18 +46,16 @@ public class AccountsPayable
 /// Registro de cuenta por cobrar.
 /// <code>
 /// Id: Id del registro
-/// InvoiceId: Id de la factura
-/// CustomerId: Id del cliente
-/// DueDate: Fecha de vencimiento
-/// AmountDue: Monto a cobrar
+/// InvoiceId: Id de la venta
+/// AmountPaid: Monto pagado
+/// DateOfPayment: Fecha del abono al crédito
 /// </code>
 /// </summary>
-public class AccountsReceivable
+public class AccountReceivableRecord
 {
     public ObjectId? Id { get; set; }
-    public string? InvoiceId { get; set; }
-    public string? CustomerId { get; set; }
-    public double AmountDue { get; set; }
-    public DateTime DueDate { get; set; }
+    public string? SaleReportId { get; set; }
+    public double AmountPaid { get; set; }
+    public DateTime DateOfPayment { get; set; }
 }
 #endregion
