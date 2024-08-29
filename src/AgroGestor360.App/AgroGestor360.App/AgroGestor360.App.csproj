@@ -76,14 +76,15 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.80" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.80" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.82" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.82" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.80" />
+		<PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.82" />
 		<PackageReference Include="QuestPDF" Version="2023.10.1" />
 		<PackageReference Include="Syncfusion.Maui.Inputs" Version="26.1.35" />
 		<PackageReference Include="Syncfusion.Maui.DataGrid" Version="26.1.35" />
-		<PackageReference Include="UnitsNet" Version="5.56.0" />
+		<PackageReference Include="System.Text.Json" Version="8.0.4" />
+		<PackageReference Include="UnitsNet" Version="5.57.0" />
 	</ItemGroup>
 
 	<ItemGroup>
