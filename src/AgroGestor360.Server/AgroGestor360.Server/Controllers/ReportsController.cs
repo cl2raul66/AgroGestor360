@@ -152,7 +152,7 @@ public class ReportsController : ControllerBase
                     {
                         saleItems.AddRange(CreateSaleTablesFromSaleRecords(getSaleRecords!, dTO));
                     }
-                    if (getWasteSaleRecords is not null && getSaleRecords!.Any())
+                    if (getWasteSaleRecords is not null && getWasteSaleRecords!.Any())
                     {
                         saleItems.AddRange(CreateSaleTablesFromWasteSaleRecords(getWasteSaleRecords!, dTO));
                     }

@@ -29,7 +29,10 @@ public partial class PgTotalOrPartialPaymentViewModel : ObservableObject
     string? title;
 
     [ObservableProperty]
-    DateTime? paymentDate;
+    bool isTotalPay;
+
+    [ObservableProperty]
+    DateTime paymentDate;
 
     [ObservableProperty]
     double debt;
@@ -69,7 +72,7 @@ public partial class PgTotalOrPartialPaymentViewModel : ObservableObject
             return;
         }
 
-        if (CurrentSale!.DaysRemaining > -1 && theAmountPay >= Debt)
+        if (!IsTotalPay && theAmountPay >= Debt)
         {
             TextInfo = "Debe ingresar un monto menor que el monto a pagar.";
             await Task.Delay(4000);
@@ -81,7 +84,7 @@ public partial class PgTotalOrPartialPaymentViewModel : ObservableObject
         DTO10_2 data = new()
         {
             Code = CurrentSale!.Code,
-            PaymentMethod = new() { Date = DateTime.Now, Amount = theAmountPay, ReferenceNumber = ReferentNo, Type = paymentTypeServ.GetByName(SelectedPaymentType!) }
+            PaymentMethod = new() { Date = PaymentDate, Amount = theAmountPay, ReferenceNumber = ReferentNo, Type = paymentTypeServ.GetByName(SelectedPaymentType!) }
         };
 
         _ = WeakReferenceMessenger.Default.Send(data, SendToken!);
@@ -105,15 +108,9 @@ public partial class PgTotalOrPartialPaymentViewModel : ObservableObject
             {
                 PaymentsTypes = [.. paymentTypeServ.GetAll()];
                 Debt = CurrentSale.TotalAmount - CurrentSale.Paid;
-                if (CurrentSale.DaysRemaining == -1)
-                {                    
-                    AmountPay = Debt.ToString();
-                    Title = "Pago total";
-                }
-                else
+                if (SendToken == "F4E5D6C7-B8A9-0B1C-D2E3-F4567890ABCD")
                 {
-                    
-                    Title = "Abonar a crédito";
+                    AmountPay = Debt.ToString();
                 }
             }
         }
@@ -124,12 +121,17 @@ public partial class PgTotalOrPartialPaymentViewModel : ObservableObject
             {
                 if (SendToken == "E7F8G9H0-I1J2-3K4L-M5N6-O7P8Q9R0S1T2")
                 {
-                    
+                    Title = "Abonar a crédito";
                 }
 
                 if (SendToken == "F4E5D6C7-B8A9-0B1C-D2E3-F4567890ABCD")
                 {
-                    
+                    if (CurrentSale is not null)
+                    {
+                        AmountPay = Debt.ToString();
+                    }                        
+                    Title = "Pago total";
+                    IsTotalPay = true;
                 }
             }
         }

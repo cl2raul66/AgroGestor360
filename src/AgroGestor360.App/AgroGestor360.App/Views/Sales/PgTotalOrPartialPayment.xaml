@@ -45,16 +45,9 @@
                     </Grid>
                     <Grid
                         Grid.Column="1"
+                        IsVisible="{Binding IsTotalPay, Converter={ctk:InvertedBoolConverter}}"
                         RowDefinitions="auto,auto"
                         RowSpacing="4">
-                        <Grid.Triggers>
-                            <DataTrigger
-                                Binding="{Binding CurrentSale.DaysRemaining}"
-                                TargetType="Grid"
-                                Value="-1">
-                                <Setter Property="IsVisible" Value="False" />
-                            </DataTrigger>
-                        </Grid.Triggers>
                         <Label Text="Monto:" />
                         <Entry
                             Grid.Row="1"
@@ -76,16 +69,7 @@
                             Grid.Row="1"
                             IsEnabled="{Binding CurrentSale, Converter={ctk:IsNotNullConverter}}"
                             ItemsSource="{Binding PaymentsTypes}"
-                            SelectedItem="{Binding SelectedPaymentType}">
-                            <Picker.Triggers>
-                                <DataTrigger
-                                    Binding="{Binding CurrentSale.DaysRemaining}"
-                                    TargetType="Picker"
-                                    Value="-1">
-                                    <Setter Property="IsVisible" Value="True" />
-                                </DataTrigger>
-                            </Picker.Triggers>
-                        </Picker>
+                            SelectedItem="{Binding SelectedPaymentType}" />
                     </Grid>
                     <Grid
                         Grid.Column="1"
@@ -126,15 +110,10 @@
                                 TextColor="{StaticResource Primary}"
                                 VerticalOptions="Center" />
                         </Grid>
-                        <Grid Padding="8,4" BackgroundColor="{StaticResource Gray100}">
-                            <Grid.Triggers>
-                                <DataTrigger
-                                    Binding="{Binding CurrentSale.DaysRemaining}"
-                                    TargetType="Grid"
-                                    Value="-1">
-                                    <Setter Property="IsVisible" Value="False" />
-                                </DataTrigger>
-                            </Grid.Triggers>
+                        <Grid
+                            Padding="8,4"
+                            BackgroundColor="{StaticResource Gray100}"
+                            IsVisible="{Binding IsTotalPay, Converter={ctk:InvertedBoolConverter}}">
                             <Label
                                 FontAttributes="Bold"
                                 FontSize="12"
