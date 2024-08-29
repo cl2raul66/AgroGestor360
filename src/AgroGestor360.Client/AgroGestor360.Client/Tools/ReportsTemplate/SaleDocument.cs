@@ -134,7 +134,7 @@ public class SaleDocument : IDocument
                 table.Cell().Element(CellStyle).Text(item.Code);
                 table.Cell().Element(CellStyle).ExtendHorizontal().Text(item.Seller);
                 table.Cell().Element(CellStyle).ExtendHorizontal().Text(item.Customer);
-                table.Cell().Element(CellStyle).AlignCenter().Text(item.InvoiceDate?.ToString("dd/MM/yyyy") ?? "-");
+                table.Cell().Element(CellStyle).AlignCenter().Text(item.SaleDate?.ToString("dd/MM/yyyy") ?? "-");
                 switch (item.SaleStatus)
                 {
                     case SaleStatus.Paid:

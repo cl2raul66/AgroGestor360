@@ -1,4 +1,6 @@
-﻿using AgroGestor360.App.Models;
+﻿// Ignore Spelling: api
+
+using AgroGestor360.App.Models;
 using AgroGestor360.Client.Models;
 using AgroGestor360.Client.Services;
 using AgroGestor360.Client.Tools;
@@ -114,6 +116,8 @@ public partial class PgReportsViewModel : ObservableObject
 
     [ObservableProperty]
     double totalToPay;
+
+    SaleReport? saleReport;
     #endregion
 
     [RelayCommand]
@@ -149,8 +153,6 @@ public partial class PgReportsViewModel : ObservableObject
                 reportState = "Canceladas";
             }
 
-            string filePath = Path.Combine(FileSystem.CacheDirectory, "REPORTE DE VENTAS.pdf");
-
             SaleReportParameters parameters = new(
                 reportState,
                 "NONE",
@@ -159,19 +161,55 @@ public partial class PgReportsViewModel : ObservableObject
                 SelectedCustomer?.CustomerId,
                 SelectedSeller?.Id);
 
-            var saleReport = await reportsServ.GetSaleReportReportAsync(serverURL, parameters);
+            saleReport = await reportsServ.GetSaleReportReportAsync(serverURL, parameters);
 
             SaleTableItems = saleReport is null ? null : new(saleReport.SaleItems!);
             TotalPaid = saleReport?.SaleItems?.Sum(x => x.TotalPaid) ?? 0;
             TotalToPay = saleReport?.SaleItems?.Sum(x => x.TotalToPay) ?? 0;
-
-            //string result = await reportsServ.GeneratePDFSaleReportAsync(serverURL, parameters, filePath);
         }
+    }
+
+    [RelayCommand]
+    async Task ShareAsPdf()
+    {
+        IsFoundElement = false;
+        string filePath = Path.Combine(FileSystem.CacheDirectory, "REPORTE DE VENTAS.pdf");
+        string result = await reportsServ.GeneratePDFSaleReportAsync(serverURL, saleReport!, filePath);
+        if (!string.IsNullOrEmpty(result))
+        {
+            await Share.Default.RequestAsync(new ShareFileRequest
+            {
+                Title = $"Compartir cotización seleccionada",
+                File = new ShareFile(result)
+            });
+        }
+        IsFoundElement = true;
+    }
+
+    [RelayCommand]
+    async Task ShowAsPdf()
+    {
+        IsFoundElement = false;
+        string filePath = Path.Combine(FileSystem.CacheDirectory, "REPORTE DE VENTAS.pdf");
+        string result = await reportsServ.GeneratePDFSaleReportAsync(serverURL, saleReport!, filePath);
+        if (!string.IsNullOrEmpty(result))
+        {
+            await Launcher.OpenAsync(new OpenFileRequest
+            {
+                File = new ReadOnlyFile(result)
+            });
+        }
+        IsFoundElement = true;
     }
 
     void ApiServ_OnReceiveStatusMessage(ServerStatus status)
     {
         HaveConnection = status is ServerStatus.Running;
+    }
+
+    partial void OnSaleTableItemsChanged(ObservableCollection<SaleReport.SaleTable>? value)
+    {
+        IsFoundElement = value is not null && value.Count > 0;
     }
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
@@ -246,7 +284,16 @@ public partial class PgReportsViewModel : ObservableObject
         {
             Sellers = new(await sellersServ.GetAllAsync(serverURL));
         }
+
+        await Task.Run(() =>
+        {
+            foreach (var f in Directory.GetFiles(FileSystem.CacheDirectory, "*.pdf"))
+            {
+                File.Delete(f);
+            }
+        });
     }
+
     #region EXTRA
 
     #endregion

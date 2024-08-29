@@ -41,15 +41,17 @@
                 IsEnabled="{Binding IsEnabledToolBar}"
                 Spacing="8">
                 <Button
+                    Command="{Binding ShareAsPdfCommand}"
                     FontFamily="icofont"
                     IsEnabled="{Binding IsFoundElement}"
                     Text="{StaticResource Share}"
-                    ToolTipProperties.Text="Compartir reporte como PDF" />
+                    ToolTipProperties.Text="Compartir reporte como PDF." />
                 <Button
+                    Command="{Binding ShowAsPdfCommand}"
                     FontFamily="icofont"
                     IsEnabled="{Binding IsFoundElement}"
                     Text="{StaticResource FilePdf}"
-                    ToolTipProperties.Text="Ver como PDF, la cotización seleccionada." />
+                    ToolTipProperties.Text="Ver el reporte como PDF." />
                 <BoxView Style="{StaticResource ElementSeparator}" />
                 <Button
                     Command="{Binding SearchCommand}"
@@ -343,7 +345,7 @@
                                         Format="dd/MM/yyyy"
                                         HeaderText="ULTIMO ABONO"
                                         HeaderTextAlignment="Center"
-                                        MappingName="InvoiceDate" />
+                                        MappingName="SaleDate" />
                                     <DataGrid:DataGridTextColumn
                                         ColumnWidthMode="Fill"
                                         Format="F2"
@@ -360,7 +362,7 @@
                                 </DataGrid:SfDataGrid.Columns>
                                 <DataGrid:SfDataGrid.SortColumnDescriptions>
                                     <DataGrid:SortColumnDescription ColumnName="SaleEntryDate" />
-                                    <DataGrid:SortColumnDescription ColumnName="InvoiceDate" />
+                                    <DataGrid:SortColumnDescription ColumnName="SaleDate" />
                                 </DataGrid:SfDataGrid.SortColumnDescriptions>
                             </DataGrid:SfDataGrid>
                         </ScrollView>

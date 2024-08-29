@@ -56,7 +56,7 @@ public class SaleReport()
     {
         public string? Code { get; set; }
         public DateTime SaleEntryDate { get; set; }
-        public DateTime? InvoiceDate { get; set; }
+        public DateTime? SaleDate { get; set; }
         public SaleStatus SaleStatus { get; set; }
         public string? Seller { get; set; }
         public string? Customer { get; set; }

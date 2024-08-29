@@ -12,7 +12,7 @@ namespace AgroGestor360.Client.Services;
 public interface IReportsService
 {
     Task<bool> GeneratePDFCustomerQuoteReportAsync(string serverURL, string code, string path = "");
-    Task<string> GeneratePDFSaleReportAsync(string serverURL, SaleReportParameters dTO, string path);
+    Task<string> GeneratePDFSaleReportAsync(string serverURL, SaleReport saleReport, string path);
     Task<SaleReport?> GetSaleReportReportAsync(string serverURL, SaleReportParameters dTO);
     //Task<CustomerQuoteReport?> GetCustomerQuoteReportAsync(string serverURL, string code);
 }
@@ -42,11 +42,10 @@ public class ReportsService : IReportsService
         return false;
     }
 
-    public async Task<string> GeneratePDFSaleReportAsync(string serverURL, SaleReportParameters dTO, string path)
+    public async Task<string> GeneratePDFSaleReportAsync(string serverURL, SaleReport saleReport, string path)
     {
         if (!string.IsNullOrWhiteSpace(serverURL) && !string.IsNullOrEmpty(path))
         {
-            var saleReport = await GetSaleReportReportAsync(serverURL, dTO);
             IDocument document = new SaleDocument(saleReport!);
 
             string directory = Path.GetDirectoryName(path)!;
