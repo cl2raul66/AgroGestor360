@@ -65,17 +65,27 @@ public class QuotesInLiteDbService : IQuotesInLiteDbService
 
     public bool Delete(string code) => collection.Delete(code);
 
+    //public bool DeleteMany(IEnumerable<string> codes)
+    //{
+    //    var count = 0;
+    //    foreach (var code in codes)
+    //    {
+    //        if (!collection.Delete(code))
+    //        {
+    //            return false;
+    //        }
+    //        count++;
+    //    }
+    //    return count == codes.Count();
+    //}
+
     public bool DeleteMany(IEnumerable<string> codes)
     {
-        var count = 0;
-        foreach (var code in codes)
-        {
-            if (!collection.Delete(code))
-            {
-                return false;
-            }
-            count++;
-        }
-        return count == codes.Count();
+        var codesCount = codes.Count();
+
+        var deleted = collection.DeleteMany(Query.In("_id", codes.Select(x => new BsonValue(x))));
+
+        var result = deleted == codesCount;
+        return result;
     }
 }

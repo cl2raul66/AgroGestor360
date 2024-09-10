@@ -34,6 +34,7 @@ public class PeriodicTaskService : IHostedService, IDisposable
     void DoWork(object? state)
     {
         CheckDateExpirableInQuotation();
+        //CheckDateExpirableInOrder();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -74,7 +75,7 @@ public class PeriodicTaskService : IHostedService, IDisposable
 
         quotesServ.BeginTrans();
         wasteQuotationServ.BeginTrans();
-        
+
         try
         {
             var results = wasteQuotationServ.InsertMany(cancelledQuotations);
@@ -97,11 +98,11 @@ public class PeriodicTaskService : IHostedService, IDisposable
             quotesServ.Commit();
             wasteQuotationServ.Commit();
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine(ex.ToString());
             quotesServ.Rollback();
             wasteQuotationServ.Rollback();
-            throw;
         }
     }
 
