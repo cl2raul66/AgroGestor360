@@ -15,12 +15,12 @@
     <Grid
         Padding="8"
         RowDefinitions="auto,*,auto"
-        RowSpacing="16">
+        RowSpacing="8">
         <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
-            <HorizontalStackLayout MinimumHeightRequest="36" Spacing="8">
+            <HorizontalStackLayout Spacing="8">
                 <Button
                     Command="{Binding GoToBackCommand}"
-                    FontFamily="icofont"
+                    Style="{StaticResource ButtonIcon}"
                     Text="{StaticResource ArrowLeft}"
                     ToolTipProperties.Text="Ir a inicio" />
                 <Label
@@ -33,7 +33,7 @@
             <HorizontalStackLayout Grid.Column="2" Spacing="8">
                 <Button
                     Command="{Binding ShowMenuCommand}"
-                    FontFamily="icofont"
+                    Style="{StaticResource ButtonIcon}"
                     Text="{StaticResource Settings}"
                     ToolTipProperties.Text="Muestra el menu de ajustes">
                     <Button.Triggers>
@@ -57,7 +57,7 @@
                 WidthRequest="{OnIdiom Default='280',
                                        Phone='-1'}"
                 ZIndex="10">
-                <VerticalStackLayout Spacing="8">
+                <VerticalStackLayout Spacing="4">
                     <Label
                         Grid.Column="1"
                         FontSize="{OnIdiom Default='18',
@@ -107,7 +107,6 @@
         <!--#region PIE DE PAGINA-->
         <Grid
             Grid.Row="2"
-            Padding="8,0"
             ColumnDefinitions="*,auto"
             ColumnSpacing="8">
             <HorizontalStackLayout Spacing="8">

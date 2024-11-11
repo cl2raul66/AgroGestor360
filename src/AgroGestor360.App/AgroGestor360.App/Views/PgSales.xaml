@@ -13,18 +13,17 @@
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
 
-    <Grid RowDefinitions="auto,*,auto" RowSpacing="0">
+    <Grid
+        Padding="8"
+        RowDefinitions="auto,*,auto"
+        RowSpacing="8">
         <!--#region ENCABEZADO-->
-        <Grid
-            Padding="8"
-            ColumnDefinitions="auto,*,auto"
-            ColumnSpacing="8">
+        <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
             <HorizontalStackLayout Padding="2" Spacing="8">
                 <Button
                     Command="{Binding GoToBackCommand}"
-                    FontFamily="icofont"
+                    Style="{StaticResource ButtonIcon}"
                     Text="{StaticResource ArrowLeft}"
-                    TextTransform="Uppercase"
                     ToolTipProperties.Text="Atras" />
                 <Label
                     Grid.Column="1"
@@ -37,17 +36,15 @@
                 <!--<BoxView Style="{StaticResource ElementSeparator}"  />-->
                 <Button
                     Command="{Binding ViewPresaleCommand}"
-                    FontFamily="icofont"
                     IsEnabled="{Binding IsBillsVisible, Mode=OneWay}"
+                    Style="{StaticResource ButtonIcon}"
                     Text="{StaticResource SubListing}"
-                    TextTransform="Uppercase"
                     ToolTipProperties.Text="Preventa" />
                 <Button
                     Command="{Binding ViewBillsCommand}"
-                    FontFamily="icofont"
                     IsEnabled="{Binding IsBillsVisible, Mode=OneWay, Converter={ctk:InvertedBoolConverter}}"
+                    Style="{StaticResource ButtonIcon}"
                     Text="{StaticResource Ticket}"
-                    TextTransform="Uppercase"
                     ToolTipProperties.Text="Ventas" />
             </HorizontalStackLayout>
         </Grid>
@@ -64,7 +61,6 @@
         <!--#region VISTA DE PREVENTAS-->
         <Grid
             Grid.Row="1"
-            Padding="8"
             ColumnDefinitions="*,auto,*"
             ColumnSpacing="8">
             <Grid.IsVisible>
@@ -109,9 +105,9 @@
                                             ColumnSpacing="8">
                                             <HorizontalStackLayout Spacing="8">
                                                 <Label
-                                                    Style="{StaticResource LabelItem}"
                                                     FontFamily="icofont"
-                                                    FontSize="16">
+                                                    FontSize="16"
+                                                    Style="{StaticResource LabelItem}">
                                                     <Label.Triggers>
                                                         <DataTrigger
                                                             Binding="{Binding IsDraftStatus}"
@@ -130,15 +126,15 @@
                                                     </Label.Triggers>
                                                 </Label>
                                                 <Label
-                                                    Style="{StaticResource LabelItem}"
                                                     FontAttributes="Bold"
+                                                    Style="{StaticResource LabelItem}"
                                                     Text="{Binding Date, StringFormat='{0:dd} {0:MMMM} {0:yyyy}'}"
                                                     TextTransform="Uppercase" />
                                             </HorizontalStackLayout>
                                             <Label
-                                                Style="{StaticResource LabelItem}"
                                                 Grid.Column="1"
                                                 FontAttributes="Bold"
+                                                Style="{StaticResource LabelItem}"
                                                 Text="{Binding TotalAmount, StringFormat='TOTAL: {0:C}'}" />
                                         </Grid>
                                         <VerticalStackLayout
@@ -227,9 +223,9 @@
             </Grid>
             <!--#endregion-->
             <BoxView
-                Style="{StaticResource ElementSeparator}"
                 Grid.RowSpan="3"
-                Grid.Column="1" />
+                Grid.Column="1"
+                Style="{StaticResource ElementSeparator}" />
             <!--#region PANEL DERECHA-->
             <Grid
                 Grid.Column="2"
@@ -269,10 +265,10 @@
                                             ColumnSpacing="8">
                                             <HorizontalStackLayout Spacing="8">
                                                 <Label
-                                                    Style="{StaticResource LabelItem}"
                                                     FontFamily="icofont"
                                                     FontSize="16"
                                                     IsVisible="{Binding IsPendingStatus}"
+                                                    Style="{StaticResource LabelItem}"
                                                     Text="{StaticResource UiClock}">
                                                     <Label.Triggers>
                                                         <DataTrigger
@@ -284,16 +280,16 @@
                                                     </Label.Triggers>
                                                 </Label>
                                                 <Label
-                                                    Style="{StaticResource LabelItem}"
                                                     FontAttributes="Bold"
+                                                    Style="{StaticResource LabelItem}"
                                                     Text="{Binding Date, StringFormat='{0:dd} {0:MMMM} {0:yyyy}'}"
                                                     TextTransform="Uppercase"
                                                     VerticalOptions="CenterAndExpand" />
                                             </HorizontalStackLayout>
                                             <Label
-                                                Style="{StaticResource LabelItem}"
                                                 Grid.Column="1"
                                                 FontAttributes="Bold"
+                                                Style="{StaticResource LabelItem}"
                                                 Text="{Binding TotalAmount, StringFormat='TOTAL: {0:C}'}"
                                                 VerticalOptions="CenterAndExpand" />
                                         </Grid>
@@ -353,7 +349,6 @@
         <!--#region VISTA DE REGISTROS DE VENTAS-->
         <Grid
             Grid.Row="1"
-            Padding="8"
             IsVisible="{Binding IsBillsVisible, Mode=OneWay}"
             RowDefinitions="auto,*,auto"
             RowSpacing="8">
@@ -389,15 +384,15 @@
                                         ColumnSpacing="8">
                                         <HorizontalStackLayout Spacing="8">
                                             <Label
-                                                Style="{StaticResource LabelItem}"
                                                 FontAttributes="Bold"
+                                                Style="{StaticResource LabelItem}"
                                                 Text="{Binding Date, StringFormat='{0:dd} {0:MMMM} {0:yyyy}'}"
                                                 TextTransform="Uppercase" />
                                         </HorizontalStackLayout>
                                         <Label
-                                            Style="{StaticResource LabelItem}"
                                             Grid.Column="1"
                                             FontAttributes="Bold"
+                                            Style="{StaticResource LabelItem}"
                                             Text="{Binding TotalAmount, StringFormat='TOTAL: {0:C}'}" />
                                     </Grid>
                                     <VerticalStackLayout
@@ -419,8 +414,8 @@
                                         ColumnSpacing="8">
                                         <HorizontalStackLayout Spacing="8">
                                             <Label
-                                                Style="{StaticResource LabelItem}"
                                                 FontAttributes="Bold"
+                                                Style="{StaticResource LabelItem}"
                                                 Text="{Binding DaysRemaining, StringFormat='Vence en {0} días'}"
                                                 TextTransform="Uppercase">
                                                 <Label.Triggers>
@@ -435,9 +430,9 @@
                                             </Label>
                                         </HorizontalStackLayout>
                                         <Label
-                                            Style="{StaticResource LabelItem}"
                                             Grid.Column="1"
                                             FontAttributes="Bold"
+                                            Style="{StaticResource LabelItem}"
                                             Text="{Binding Paid, StringFormat='PAGADO: {0:C}', TargetNullValue='NO PAGADA', FallbackValue='NO PAGADA'}">
                                             <Label.Triggers>
                                                 <DataTrigger
@@ -456,31 +451,30 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </ScrollView>
-            <Frame Grid.Row="2" Padding="8">
+            <Frame Grid.Row="2">
                 <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
                     <HorizontalStackLayout Spacing="8">
                         <Button
-                            FontFamily="icofont"
-                            IsEnabled="{Binding Invoices, Mode=OneWay, Converter={ctk:IsListNotNullOrEmptyConverter}}"
+                            Style="{StaticResource ButtonIcon}"
                             Text="{StaticResource Inbox}"
                             ToolTipProperties.Text="Conciliación de caja" />
                         <Button
                             Command="{Binding ShowInvoiceDetailCommand}"
-                            FontFamily="icofont"
                             IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                            Style="{StaticResource ButtonIcon}"
                             Text="{StaticResource UiNote}"
                             ToolTipProperties.Text="Ver detalles del pedido seleccionado." />
                     </HorizontalStackLayout>
                     <HorizontalStackLayout Grid.Column="1" Spacing="8">
                         <Button
                             Command="{Binding CompletePaymentCommand}"
-                            FontFamily="icofont"
                             IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                            Style="{StaticResource ButtonIcon}"
                             Text="{StaticResource BillAlt}"
-                            ToolTipProperties.Text="Pagar saldo pendiente o liquidar deuda" />
+                            ToolTipProperties.Text="Liquidar pago al contado o deuda por credito." />
                         <Button
                             Command="{Binding ShowAmortizeInvoiceCommand}"
-                            FontFamily="icofont"
+                            Style="{StaticResource ButtonIcon}"
                             Text="{StaticResource MoneyBag}"
                             ToolTipProperties.Text="Abonar a deuda.">
                             <Button.Triggers>
@@ -501,13 +495,13 @@
                         <BoxView Style="{StaticResource ElementSeparator}" />
                         <Button
                             Command="{Binding ShowAddEditSaleCommand}"
-                            FontFamily="icofont"
+                            Style="{StaticResource ButtonIcon}"
                             Text="{StaticResource Plus}"
                             ToolTipProperties.Text="Agregar" />
                         <Button
                             Command="{Binding RemovedInvoiceCommand}"
-                            FontFamily="icofont"
                             IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                            Style="{StaticResource ButtonIcon}"
                             Text="{StaticResource UiDelete}"
                             ToolTipProperties.Text="Eliminar o cancelar factura" />
                     </HorizontalStackLayout>
@@ -519,10 +513,9 @@
         <!--#region PIE DE PAGINA-->
         <Grid
             Grid.Row="2"
-            Padding="8,0"
             ColumnDefinitions="*,auto"
             ColumnSpacing="8">
-            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+            <HorizontalStackLayout Spacing="8">
                 <Label
                     Padding="2"
                     FontFamily="icofont"
@@ -545,10 +538,7 @@
                     </Label.Triggers>
                 </Label>
             </HorizontalStackLayout>
-            <HorizontalStackLayout
-                Grid.Column="1"
-                Padding="8"
-                Spacing="8">
+            <HorizontalStackLayout Grid.Column="1" Spacing="8">
                 <Label FontSize="11" Text="{Binding AppInfo}" />
                 <BoxView Style="{StaticResource ElementSeparator}" />
                 <Label

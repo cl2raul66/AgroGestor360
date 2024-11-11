@@ -1,11 +1,16 @@
-﻿namespace AgroGestor360.App;
+﻿using Microsoft.Extensions.Configuration;
+using Syncfusion.Licensing;
+
+namespace AgroGestor360.App;
 
 public partial class App : Application
 {
     public App()
     {
-        ////Register Syncfusion license
-        //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("key");
+        var builder = new ConfigurationBuilder().AddUserSecrets<App>(true);
+        IConfiguration configuration = builder.Build();
+        var secretValue = configuration["SF"]; 
+        SyncfusionLicenseProvider.RegisterLicense(secretValue);
 
         InitializeComponent();
 

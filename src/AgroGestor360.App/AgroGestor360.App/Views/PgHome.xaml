@@ -14,7 +14,7 @@
     <Grid
         Padding="8"
         RowDefinitions="auto,*,auto,auto"
-        RowSpacing="16">
+        RowSpacing="8">
         <!--#region ENCABEZADO-->
         <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
             <Label
@@ -23,17 +23,14 @@
                 Text="Inicio"
                 TextTransform="Uppercase"
                 VerticalOptions="Center" />
-            <HorizontalStackLayout
-                Grid.Column="2"
-                MinimumHeightRequest="36"
-                Spacing="8">
+            <HorizontalStackLayout Grid.Column="2" Spacing="8">
                 <Button
                     Command="{Binding GoToReportsCommand}"
                     IsEnabled="{Binding HaveConnection}"
                     IsVisible="{OnIdiom Phone='False',
                                         Default='True'}"
+                    Style="{StaticResource ButtonText}"
                     Text="Reportes"
-                    TextTransform="Uppercase"
                     ToolTipProperties.Text="Ir a reportes"
                     WidthRequest="110" />
                 <Button
@@ -41,16 +38,15 @@
                     IsEnabled="{Binding HaveConnection}"
                     IsVisible="{OnIdiom Phone='False',
                                         Default='True'}"
+                    Style="{StaticResource ButtonText}"
                     Text="Ventas"
-                    TextTransform="Uppercase"
                     ToolTipProperties.Text="Ir a ventas"
                     WidthRequest="110" />
-                <BoxView Style="{StaticResource ElementSeparator}" IsVisible="{OnIdiom Phone='False', Default='True'}" />
+                <BoxView IsVisible="{OnIdiom Phone='False', Default='True'}" Style="{StaticResource ElementSeparator}" />
                 <Button
                     Command="{Binding GoToSettingsCommand}"
-                    FontFamily="icofont"
+                    Style="{StaticResource ButtonIcon}"
                     Text="{StaticResource UiSettings}"
-                    TextTransform="Uppercase"
                     ToolTipProperties.Text="Ajustes" />
             </HorizontalStackLayout>
         </Grid>
@@ -164,7 +160,6 @@
         <!--#region PIE DE PAGINA-->
         <Grid
             Grid.Row="3"
-            Padding="8,0"
             ColumnDefinitions="*,auto"
             ColumnSpacing="8">
             <HorizontalStackLayout Spacing="8">

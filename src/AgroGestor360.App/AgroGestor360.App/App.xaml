@@ -98,6 +98,17 @@
                 <Setter Property="CornerRadius" Value="1" />
                 <Setter Property="WidthRequest" Value="1" />
             </Style>
+            <Style x:Key="ButtonText" TargetType="Button">
+                <Setter Property="FontFamily" Value="icofont" />
+                <Setter Property="HeightRequest" Value="32" />
+                <Setter Property="TextTransform" Value="Uppercase" />
+            </Style>
+            <Style x:Key="ButtonIcon" TargetType="Button">
+                <Setter Property="FontFamily" Value="icofont" />
+                <Setter Property="Padding" Value="8" />
+                <Setter Property="HeightRequest" Value="32" />
+                <Setter Property="WidthRequest" Value="32" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

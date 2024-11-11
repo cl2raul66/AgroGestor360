@@ -53,6 +53,7 @@ public class ReportsService : IReportsService
 
             string newPath = Path.Combine(directory, $"{saleReport!.IssueDate:yyyyMMdd} - {fileName}");
             document.GeneratePdf(newPath);
+            await Task.CompletedTask;
             return newPath;
         }
 

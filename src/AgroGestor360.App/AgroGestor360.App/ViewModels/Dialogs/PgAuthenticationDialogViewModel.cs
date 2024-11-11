@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System.ComponentModel.DataAnnotations;
-using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace AgroGestor360.App.ViewModels;
 

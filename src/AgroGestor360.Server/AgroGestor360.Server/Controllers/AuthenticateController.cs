@@ -7,19 +7,19 @@ namespace AgroGestor360.Server.Controllers;
 [ApiController]
 public class AuthController(IConfiguration configuration) : Controller
 {
-    private readonly IConfiguration _configuration = configuration;
+    private readonly IConfiguration cfg = configuration;
 
     [HttpPost]
-    public IActionResult Authenticate([FromBody] string tokenauth)
+    public IActionResult Authenticate(string tokenauth)
     {
         if (string.IsNullOrEmpty(tokenauth) && string.IsNullOrWhiteSpace(tokenauth))
         {
             return BadRequest();
         }
 
-        string? username = _configuration["User:Username"];
-        string? password = _configuration["User:Password"];
-        string? salt = _configuration["Organization:Id"];
+        string? username = cfg["User:Username"];
+        string? password = cfg["User:Password"];
+        string? salt = cfg["Organization:Id"];
 
         string token = HashHelper.GenerateHash(username! + password! + salt!);
 

@@ -202,13 +202,9 @@ public class SaleRecordsController : ControllerBase
                 Status = dTO.Status
             };
 
-            if (dTO.TimeCredit is null)
+            if (dTO.TimeCredit is not null && dTO.TimeCredit.TimeLimit > 0)
             {
-                entity.PaymentMethods = [];
-            }
-            else
-            {
-                entity.PaymentMethods = [];
+                entity.PaymentMethods ??= [];
             }
 
             saleRecordsServ.BeginTrans();
