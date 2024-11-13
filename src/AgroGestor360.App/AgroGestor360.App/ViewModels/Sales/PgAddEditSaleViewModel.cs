@@ -377,6 +377,7 @@ public partial class PgAddEditSaleViewModel : ObservableValidator
         {
             if (SelectedProduct is not null)
             {
+                Stock = 0;
                 LoadingStock = true;
                 await UpdateStock(SelectedProduct!.MerchandiseId!);
                 LoadingStock = false;

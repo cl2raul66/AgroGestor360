@@ -1,0 +1,87 @@
+:::mermaid
+stateDiagram-v2
+    [*] --> ConfiguracionInicial
+    ConfiguracionInicial --> VentasTransacciones
+
+    state VentasTransacciones {
+        [*] --> ConteoInicial
+        
+        state ConteoInicial {
+            [*] --> RealizarConteo
+            RealizarConteo --> CompararMonto
+            CompararMonto --> VerificarDiferenciasInicial
+            VerificarDiferenciasInicial --> NotificarGerenciaInicial
+            NotificarGerenciaInicial --> SinDiferenciasInicial: No hay diferencias
+            NotificarGerenciaInicial --> IdentificarFaltanteInicial: Hay faltante
+            NotificarGerenciaInicial --> IdentificarSobranteInicial: Hay sobrante
+            SinDiferenciasInicial --> ContinuarOperaciones
+            IdentificarFaltanteInicial --> AprobarFaltanteInicial
+            IdentificarSobranteInicial --> AprobarSobranteInicial
+            AprobarFaltanteInicial --> ContinuarOperaciones
+            AprobarSobranteInicial --> ContinuarOperaciones
+        }
+
+        ContinuarOperaciones --> RegistroVenta
+        RegistroVenta --> TipoVenta
+
+        state TipoVenta {
+            Contado --> PagoInmediato
+            Credito --> ValidarLineaCredito
+        }
+
+        ValidarLineaCredito --> RegistrarDeuda
+        PagoInmediato --> ActualizarCaja
+        RegistrarDeuda --> RegistrarPago
+
+        state RegistrarPago {
+            [*] --> ValidarMonto
+            ValidarMonto --> ActualizarCaja
+            ActualizarCaja --> GenerarComprobante
+        }
+    }
+
+    VentasTransacciones --> ArqueoCaja
+    VentasTransacciones --> ArqueoSorpresivo: Auditor solicita arqueo
+
+    state ArqueoSorpresivo {
+        [*] --> SuspenderOperaciones
+        SuspenderOperaciones --> RegistrarMomentoArqueo
+        RegistrarMomentoArqueo --> ConteoFisicoAuditoria
+        ConteoFisicoAuditoria --> CompararSistemaAuditoria
+        CompararSistemaAuditoria --> VerificarDiferenciasAuditoria
+        VerificarDiferenciasAuditoria --> NotificarGerenciaAuditoria
+        
+        NotificarGerenciaAuditoria --> SinDiferenciasAuditoria: No hay diferencias
+        NotificarGerenciaAuditoria --> IdentificarFaltanteAuditoria: Hay faltante
+        NotificarGerenciaAuditoria --> IdentificarSobranteAuditoria: Hay sobrante
+        
+        SinDiferenciasAuditoria --> GenerarInformeAuditoria
+        IdentificarFaltanteAuditoria --> DocumentarHallazgos
+        IdentificarSobranteAuditoria --> DocumentarHallazgos
+        DocumentarHallazgos --> GenerarInformeAuditoria
+        GenerarInformeAuditoria --> ReanudarOperaciones
+        ReanudarOperaciones --> VentasTransacciones
+    }
+
+    state ArqueoCaja {
+        [*] --> IniciarArqueo
+        IniciarArqueo --> ConteoFisico
+        ConteoFisico --> CompararSistema
+        CompararSistema --> VerificarDiferenciasArqueo
+        VerificarDiferenciasArqueo --> NotificarGerenciaArqueo
+        
+        NotificarGerenciaArqueo --> SinDiferenciasArqueo: No hay diferencias
+        NotificarGerenciaArqueo --> IdentificarFaltanteArqueo: Hay faltante
+        NotificarGerenciaArqueo --> IdentificarSobranteArqueo: Hay sobrante
+        
+        SinDiferenciasArqueo --> GenerarReporteArqueo
+        IdentificarFaltanteArqueo --> AprobarFaltanteArqueo
+        IdentificarSobranteArqueo --> AprobarSobranteArqueo
+        AprobarFaltanteArqueo --> GenerarReporteArqueo
+        AprobarSobranteArqueo --> GenerarReporteArqueo
+    }
+
+    ArqueoCaja --> ReportesGenerales
+    ArqueoSorpresivo --> ReportesGenerales
+    ReportesGenerales --> [*]
+:::

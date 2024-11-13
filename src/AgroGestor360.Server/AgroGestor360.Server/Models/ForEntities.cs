@@ -1,5 +1,6 @@
 ﻿using AgroGestor360.Server.Tools.Enums;
 using LiteDB;
+using System;
 using vCardLib.Models;
 
 namespace AgroGestor360.Server.Models;
@@ -495,4 +496,35 @@ public class ConceptForDeletedSaleRecord
 {
     public int Id { get; set; }
     public string? Concept { get; set; }
+}
+
+
+public class ReconciliationPolicy
+{
+    public int Id { get; set; }
+    public TypeFrequencyReconciliationPolicy Frequency { get; set; }
+    public TimeSpan Time { get; set; }
+}
+
+public class CashReconciliation
+{
+    string? Id { get; set; }
+    public DateTime Date { get; set; }
+    public CountCash? InitialCashCount { get; set; }
+    public CountCash? FinalCashCount { get; set; }
+}
+
+public class CountCash
+{
+    public TimeSpan Time { get; set; }
+    public decimal SystemAmount { get; set; }
+    public decimal UserAmount { get; set; }
+    public Discrepancy? Incongruity { get; set; }
+}
+
+public class Discrepancy
+{
+    public TypeDiscrepancy Type { get; set; }
+    public bool HadToBeReported { get; set; }
+    public bool IsApproved { get; set; }
 }
