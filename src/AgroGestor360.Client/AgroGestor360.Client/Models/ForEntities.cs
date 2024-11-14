@@ -30,6 +30,13 @@ public class Organization
     public string? Email { get; set; }
 }
 
+public class ReconciliationPolicy
+{
+    public int Id { get; set; }
+    public TypeFrequencyReconciliationPolicy Frequency { get; set; }
+    public TimeSpan Time { get; set; }
+}
+
 /// <summary>
 /// Represents a presentation.
 /// </summary>

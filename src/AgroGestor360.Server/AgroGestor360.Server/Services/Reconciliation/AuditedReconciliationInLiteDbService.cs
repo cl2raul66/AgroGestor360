@@ -4,7 +4,15 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public class AuditedReconciliationInLiteDbService
+public interface IAuditedReconciliationInLiteDbService : IDisposable
+{
+    void BeginTrans();
+    void Commit();
+    CashReconciliation GetById(string id);
+    void Rollback();
+}
+
+public class AuditedReconciliationInLiteDbService : IAuditedReconciliationInLiteDbService
 {
     readonly LiteDatabase db;
     readonly ILiteCollection<CashReconciliation> collection;
@@ -26,4 +34,8 @@ public class AuditedReconciliationInLiteDbService
     public void Commit() => db.Commit();
 
     public void Rollback() => db.Rollback();
+
+    public CashReconciliation GetById(string id) => collection.FindById(id);
+
+    public void Dispose() => db.Dispose();
 }

@@ -4,7 +4,18 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public class ReconciliationInLiteDbService
+public interface IReconciliationInLiteDbService : IDisposable
+{
+    void BeginTrans();
+    void Commit();
+    ReconciliationPolicy GetPolicy();
+    bool HasPolitic();
+    int InsertPolicy(ReconciliationPolicy entity);
+    void Rollback();
+    bool UpdatePolicy(ReconciliationPolicy entity);
+}
+
+public class ReconciliationInLiteDbService : IReconciliationInLiteDbService
 {
     readonly LiteDatabase db;
     readonly ILiteCollection<ReconciliationPolicy> policies;
@@ -30,6 +41,8 @@ public class ReconciliationInLiteDbService
 
     public void Rollback() => db.Rollback();
 
+    public void Dispose() => db.Dispose();
+
     #region POLICIES
     public bool HasPolitic() => policies.Count() > 0;
 
@@ -46,5 +59,9 @@ public class ReconciliationInLiteDbService
     }
 
     public bool UpdatePolicy(ReconciliationPolicy entity) => policies.Update(entity);
+    #endregion
+
+    #region CASH RECONCILIATION
+
     #endregion
 }

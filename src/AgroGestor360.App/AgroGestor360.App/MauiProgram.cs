@@ -63,6 +63,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IPaymentTypeService, PaymentTypeService>();
         builder.Services.AddSingleton<IMeasurementService, MeasurementService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddSingleton<IReconciliationService, ReconciliationService>();
 
         builder.Services.AddTransient<PgSignIn, PgSignInViewModel>();
         builder.Services.AddTransient<PgAuthenticationDialog, PgAuthenticationDialogViewModel>();
@@ -96,6 +97,7 @@ public static class MauiProgram
         builder.Services.AddTransient<PgSales, PgSalesViewModel>();
         builder.Services.AddTransient<CvSellers, CvSellersViewModel>();
         builder.Services.AddTransient<PgAddEditSeller, PgAddEditSellerViewModel>();
+        builder.Services.AddTransient<CvSales, CvSalesViewModel>();
         builder.Services.AddTransient<PgAddEditQuote, PgAddEditQuoteViewModel>();
         builder.Services.AddTransient<PgAddEditOrder, PgAddEditOrderViewModel>();
         builder.Services.AddTransient<PgAddEditSale, PgAddEditSaleViewModel>();

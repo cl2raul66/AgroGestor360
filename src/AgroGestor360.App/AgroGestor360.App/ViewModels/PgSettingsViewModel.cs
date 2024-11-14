@@ -47,7 +47,8 @@ public partial class PgSettingsViewModel : ObservableObject
             "Vendedores",
             "Clientes",
             "Almacén",
-            "Productos"
+            "Productos",
+            "Ventas"
         ];
 
     [ObservableProperty]
@@ -115,6 +116,9 @@ public partial class PgSettingsViewModel : ObservableObject
                     break;
                 case "Vendedores":
                     navigationServ.NavigateToView<CvSellersViewModel>(view => CurrentContent = view);
+                    break;
+                case "Ventas":
+                    navigationServ.NavigateToView<CvSalesViewModel>(view => CurrentContent = view);
                     break;
                 default:
                     navigationServ.NavigateToNullView(view => CurrentContent = view);

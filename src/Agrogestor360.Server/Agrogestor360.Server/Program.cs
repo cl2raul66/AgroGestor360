@@ -31,6 +31,8 @@ builder.Services.AddSingleton<IAccountsReceivableInLiteDbService, AccountsReceiv
 builder.Services.AddSingleton<IWasteSaleRecordsInLiteDbService, WasteSaleRecordsInLiteDbService>();
 builder.Services.AddSingleton<ILineCreditsInLiteDbService, LineCreditsInLiteDbService>();
 builder.Services.AddSingleton<IDiscountsInLiteDbService, DiscountsInLiteDbService>();
+builder.Services.AddSingleton<IReconciliationInLiteDbService, ReconciliationInLiteDbService>();
+builder.Services.AddSingleton<IAuditedReconciliationInLiteDbService, AuditedReconciliationInLiteDbService>();
 
 builder.Services.AddHostedService<PeriodicTaskService>();
 builder.Services.AddSignalR();

@@ -6,6 +6,8 @@ public enum GroupName { GroupSender, GroupReceiver }
 
 public enum ServerStatus { Running, Stopped }
 
+public enum TypeFrequencyReconciliationPolicy { Daily, Weekly, Monthly, ShiftChange }
+
 /// <summary>
 /// Representa el tipo de transacción en el sistema.
 /// <code>

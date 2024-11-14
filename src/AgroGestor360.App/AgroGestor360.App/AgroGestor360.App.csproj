@@ -138,6 +138,9 @@
 	  <MauiXaml Update="Views\Sales\PgTotalOrPartialPayment.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\Settings\CvSales.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Settings\CvSellers.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

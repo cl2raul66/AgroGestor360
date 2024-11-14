@@ -58,6 +58,9 @@ public class NavigationService : INavigationService
             case CvSellersViewModel vm:
                 updateViewAction(new CvSellers(vm));
                 break;
+            case CvSalesViewModel vm:
+                updateViewAction(new CvSales(vm));
+                break;
             default:
                 updateViewAction(new CvNullSelected());
                 break;
