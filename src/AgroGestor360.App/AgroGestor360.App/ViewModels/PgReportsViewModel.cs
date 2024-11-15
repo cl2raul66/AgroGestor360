@@ -33,8 +33,7 @@ public partial class PgReportsViewModel : ObservableObject
         AppInfo = $"Versión: {VersionTracking.Default.CurrentVersion}";
         ReportsMenu = [
             new MenuItemReport() { Title = "Ventas", Description = "Reporte de ventas." },
-            new MenuItemReport() { Title = "Cierre de caja", Description = "Reporte de re conteo de las operaciones al final del día." },
-            new MenuItemReport() { Title = "Conciliación de caja", Description = "Reporte de ventas." }
+            new MenuItemReport() { Title = "Arqueo de caja", Description = "Reporte de arqueos de caja." }
         ];
     }
 

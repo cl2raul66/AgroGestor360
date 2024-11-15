@@ -456,8 +456,8 @@
                     <HorizontalStackLayout Spacing="8">
                         <Button
                             Style="{StaticResource ButtonIcon}"
-                            Text="{StaticResource Inbox}"
-                            ToolTipProperties.Text="Conciliación de caja" />
+                            Text="{StaticResource CalculatorAlt2}"
+                            ToolTipProperties.Text="Realizar arqueo de caja." />
                         <Button
                             Command="{Binding ShowInvoiceDetailCommand}"
                             IsEnabled="{Binding SelectedInvoice, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
