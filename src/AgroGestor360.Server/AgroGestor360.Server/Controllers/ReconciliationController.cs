@@ -21,12 +21,7 @@ public class ReconciliationController : ControllerBase
     [HttpGet("policy")]
     public IActionResult GetPolicy()
     {
-        var policy = reconciliationInLiteDbServ.GetPolicy();
-        if (policy == null)
-        {
-            return NotFound();
-        }
-        return Ok(policy);
+        return Ok(reconciliationInLiteDbServ.GetPolicy());
     }
 
     [HttpGet("haspolicy")]
@@ -37,11 +32,11 @@ public class ReconciliationController : ControllerBase
     }
 
     [HttpPost("policy")]
-    public IActionResult InsertPolicy([FromBody] ReconciliationPolicy entity)
+    public IActionResult InsertPolicy(ReconciliationPolicy entity)
     {
-        if (entity == null)
+        if (entity is null)
         {
-            return BadRequest("Invalid policy entity.");
+            return BadRequest();
         }
 
         reconciliationInLiteDbServ.BeginTrans();
@@ -49,17 +44,17 @@ public class ReconciliationController : ControllerBase
         {
             int id = reconciliationInLiteDbServ.InsertPolicy(entity);
             reconciliationInLiteDbServ.Commit();
-            return CreatedAtAction(nameof(GetPolicy), new { id }, entity);
+            return Ok(id);
         }
         catch (Exception)
         {
             reconciliationInLiteDbServ.Rollback();
-            return StatusCode(500, "An error occurred while inserting the policy.");
+            return NotFound();
         }
     }
 
     [HttpPut("policy")]
-    public IActionResult UpdatePolicy([FromBody] ReconciliationPolicy entity)
+    public IActionResult UpdatePolicy(ReconciliationPolicy entity)
     {
         if (entity is null)
         {
@@ -71,7 +66,7 @@ public class ReconciliationController : ControllerBase
         {
             bool success = reconciliationInLiteDbServ.UpdatePolicy(entity);
             reconciliationInLiteDbServ.Commit();
-            return success ? Ok() : NotFound();
+            return Ok(success);
         }
         catch (Exception)
         {

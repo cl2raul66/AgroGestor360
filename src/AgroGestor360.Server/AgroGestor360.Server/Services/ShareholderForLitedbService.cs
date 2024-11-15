@@ -4,7 +4,7 @@ using vCardLib.Models;
 
 namespace AgroGestor360.Server.Services;
 
-public interface IShareholderForLitedbService
+public interface IShareholderForLitedbService:IDisposable
 {
     bool Exist { get; }
 
@@ -14,20 +14,29 @@ public interface IShareholderForLitedbService
     bool Update(vCard vCard);
 }
 
-public class ShareholderForLitedbService : IShareholderForLitedbService
+public class ShareholderForLiteDbService : IShareholderForLitedbService
 {
+    readonly LiteDatabase db;
     readonly ILiteCollection<vCard> collection;
 
-    public ShareholderForLitedbService()
+    public ShareholderForLiteDbService()
     {
         var cnx = new ConnectionString()
         {
             Filename = FileHelper.GetFileDbPath("Shareholder")
         };
 
-        LiteDatabase db = new(cnx);
+        db = new(cnx);
         collection = db.GetCollection<vCard>();
     }
+
+    public void BeginTrans() => db.BeginTrans();
+
+    public void Commit() => db.Commit();
+
+    public void Rollback() => db.Rollback();
+
+    public void Dispose() => db.Dispose();
 
     public bool Exist => collection.Count() > 0;
 

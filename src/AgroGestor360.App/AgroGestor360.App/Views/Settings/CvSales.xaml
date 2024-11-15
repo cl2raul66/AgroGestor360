@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:AgroGestor360.App.ViewModels"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     x:DataType="vm:CvSalesViewModel">
 
     <Grid RowDefinitions="auto,*" RowSpacing="8">
@@ -47,16 +48,20 @@
                             </Grid>
                             <Grid RowDefinitions="auto,auto">
                                 <Label Text="Frecuencia: *" />
-                                <Picker Grid.Row="1" />
+                                <Picker Grid.Row="1" ItemsSource="{Binding FrequencyList}" SelectedItem="{Binding SelectedFrecuency}"/>
                             </Grid>
                             <Grid RowDefinitions="auto,auto">
                                 <Label Text="Horario: *" />
-                                <TimePicker Grid.Row="1" />
+                                <TimePicker Grid.Row="1" Time="{Binding Time}"/>
                             </Grid>
                         </VerticalStackLayout>
-                        <Grid Grid.Row="2" ColumnDefinitions="*,auto">
+                        <Grid Grid.Row="2" ColumnDefinitions="200,auto">
+                            <HorizontalStackLayout Spacing="4" IsVisible="{Binding TextInfo, Converter={ctk:IsStringNotNullOrEmptyConverter}}">
+                                <Label FontFamily="icofont" FontSize="12" VerticalOptions="Center" TextColor="Red" Text="{StaticResource InfoCircle}"/>
+                                <Label FontSize="12" TextColor="Red"  VerticalOptions="Center" Text="{Binding TextInfo}" LineBreakMode="WordWrap"/>
+                            </HorizontalStackLayout>
                             <Button
-                                Grid.Column="1"
+                                Grid.Column="1" Command="{Binding SaveCommand}"
                                 Text="Guardar"
                                 ToolTipProperties.Text="Guardar configuracion para arqueo de caja." />
                         </Grid>

@@ -64,6 +64,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IMeasurementService, MeasurementService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
         builder.Services.AddSingleton<IReconciliationService, ReconciliationService>();
+        builder.Services.AddSingleton<ITypeFrequencyReconciliationPolicyService, TypeFrequencyReconciliationPolicyService>();
 
         builder.Services.AddTransient<PgSignIn, PgSignInViewModel>();
         builder.Services.AddTransient<PgAuthenticationDialog, PgAuthenticationDialogViewModel>();

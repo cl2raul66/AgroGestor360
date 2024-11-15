@@ -4,7 +4,7 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public interface IAccountsReceivableInLiteDbService
+public interface IAccountsReceivableInLiteDbService  : IDisposable
 {
     bool Exist { get; }
 
@@ -57,4 +57,6 @@ public class AccountsReceivableInLiteDbService : IAccountsReceivableInLiteDbServ
     }
 
     public bool Deleted(ObjectId id) => collection.Delete(id);
+
+    public void Dispose() => db.Dispose();
 }

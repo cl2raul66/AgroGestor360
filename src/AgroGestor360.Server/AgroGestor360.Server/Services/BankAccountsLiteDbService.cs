@@ -4,7 +4,7 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public interface IBankAccountsLiteDbService
+public interface IBankAccountsLiteDbService : IDisposable
 {
     bool Exist { get; }
 
@@ -22,6 +22,7 @@ public interface IBankAccountsLiteDbService
 
 public class BankAccountsLiteDbService : IBankAccountsLiteDbService
 {
+    readonly LiteDatabase db;
     readonly ILiteCollection<BankAccount> collection;
     readonly ILiteCollection<BankItem> collection1;
 
@@ -36,10 +37,18 @@ public class BankAccountsLiteDbService : IBankAccountsLiteDbService
 
         mapper.Entity<BankAccount>().Id(x => x.Number);
 
-        LiteDatabase db = new(cnx, mapper);
+        db = new(cnx, mapper);
         collection = db.GetCollection<BankAccount>();
         collection1 = db.GetCollection<BankItem>();
     }
+
+    public void BeginTrans() => db.BeginTrans();
+
+    public void Commit() => db.Commit();
+
+    public void Rollback() => db.Rollback();
+
+    public void Dispose() => db.Dispose();
 
     public bool Exist => collection.Count() > 0;
 

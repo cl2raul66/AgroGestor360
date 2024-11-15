@@ -4,7 +4,7 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public interface IWasteOrdersInLiteDbService
+public interface IWasteOrdersInLiteDbService : IDisposable
 {
     bool Exist { get; }
 
@@ -45,6 +45,9 @@ public class WasteOrdersInLiteDbService : IWasteOrdersInLiteDbService
     public void Commit() => db.Commit();
 
     public void Rollback() => db.Rollback();
+
+    public void Dispose() => db.Dispose();
+
 
     public bool Exist => collection.Count() > 0;
 

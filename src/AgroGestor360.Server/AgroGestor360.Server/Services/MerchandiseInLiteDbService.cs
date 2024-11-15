@@ -4,7 +4,7 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public interface IMerchandiseInLiteDbService
+public interface IMerchandiseInLiteDbService : IDisposable
 {
     bool Exist { get; }
 
@@ -16,7 +16,7 @@ public interface IMerchandiseInLiteDbService
     MerchandiseItem GetById(ObjectId id);
     string Insert(MerchandiseItem entity);
     void Rollback();
-    bool Update(MerchandiseItem entity); 
+    bool Update(MerchandiseItem entity);
     bool UpdateMany(IEnumerable<MerchandiseItem> entities);
 }
 
@@ -41,6 +41,8 @@ public class MerchandiseInLiteDbService : IMerchandiseInLiteDbService
     public void Commit() => db.Commit();
 
     public void Rollback() => db.Rollback();
+
+    public void Dispose() => db.Dispose();
 
     public bool Exist => collection.Count() > 0;
 

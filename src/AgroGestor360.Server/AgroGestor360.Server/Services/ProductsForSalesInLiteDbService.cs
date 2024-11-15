@@ -4,7 +4,7 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public interface IProductsForSalesInLiteDbService
+public interface IProductsForSalesInLiteDbService : IDisposable
 {
     bool Exist { get; }
 
@@ -23,8 +23,8 @@ public interface IProductsForSalesInLiteDbService
 
 public class ProductsForSalesInLiteDbService : IProductsForSalesInLiteDbService
 {
-    readonly ILiteCollection<ProductItemForSale> collection;
     readonly LiteDatabase db;
+    readonly ILiteCollection<ProductItemForSale> collection;
 
     public ProductsForSalesInLiteDbService()
     {
@@ -42,6 +42,8 @@ public class ProductsForSalesInLiteDbService : IProductsForSalesInLiteDbService
     public void Commit() => db.Commit();
 
     public void Rollback() => db.Rollback();
+
+    public void Dispose() => db.Dispose();
 
     public bool Exist => collection.Count() > 0;
 

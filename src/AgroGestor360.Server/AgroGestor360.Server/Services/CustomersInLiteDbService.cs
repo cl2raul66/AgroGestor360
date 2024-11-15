@@ -4,7 +4,7 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public interface ICustomersInLiteDbService
+public interface ICustomersInLiteDbService : IDisposable
 {
     bool Exist { get; }
 
@@ -22,6 +22,7 @@ public interface ICustomersInLiteDbService
 
 public class CustomersInLiteDbService : ICustomersInLiteDbService
 {
+    readonly LiteDatabase db;
     readonly ILiteCollection<Customer> collection;
 
     public CustomersInLiteDbService()
@@ -31,10 +32,18 @@ public class CustomersInLiteDbService : ICustomersInLiteDbService
             Filename = FileHelper.GetFileDbPath("Customers")
         };
 
-        LiteDatabase db = new(cnx);
+        db = new(cnx);
         collection = db.GetCollection<Customer>();
         collection.EnsureIndex(x => x.Discount!.Id);
     }
+
+    public void BeginTrans() => db.BeginTrans();
+
+    public void Commit() => db.Commit();
+
+    public void Rollback() => db.Rollback();
+
+    public void Dispose() => db.Dispose();
 
     public bool Exist => collection.Count() > 0;
 

@@ -5,7 +5,7 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public interface ISaleRecordsInLiteDbService
+public interface ISaleRecordsInLiteDbService : IDisposable
 {
     bool Exist { get; }
 
@@ -55,6 +55,8 @@ public class SaleRecordsInLiteDbService : ISaleRecordsInLiteDbService
     public void Commit() => db.Commit();
 
     public void Rollback() => db.Rollback();
+
+    public void Dispose() => db.Dispose();
 
     public bool Exist => collection.Count() > 0;
 

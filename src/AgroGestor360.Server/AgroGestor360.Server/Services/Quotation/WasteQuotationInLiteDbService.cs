@@ -4,7 +4,7 @@ using LiteDB;
 
 namespace AgroGestor360.Server.Services;
 
-public interface IWasteQuotationInLiteDbService
+public interface IWasteQuotationInLiteDbService : IDisposable
 {
     void BeginTrans();
     void Commit();
@@ -42,6 +42,9 @@ public class WasteQuotationInLiteDbService : IWasteQuotationInLiteDbService
     public void Commit() => db.Commit();
 
     public void Rollback() => db.Rollback();
+
+    public void Dispose() => db.Dispose();
+
 
     public Quotation GetByCode(string code) => collection.FindById(code);
 

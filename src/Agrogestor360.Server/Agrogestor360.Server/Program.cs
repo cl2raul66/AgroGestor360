@@ -15,7 +15,7 @@ builder.Services.AddSingleton<ContactsDbConfig>();
 builder.Services.AddSingleton<MerchandiseDbConfig>();
 builder.Services.AddSingleton<ProductsDbConfig>();
 builder.Services.AddSingleton<IBankAccountsLiteDbService,BankAccountsLiteDbService>();
-builder.Services.AddSingleton<IShareholderForLitedbService, ShareholderForLitedbService>();
+builder.Services.AddSingleton<IShareholderForLitedbService, ShareholderForLiteDbService>();
 builder.Services.AddSingleton<IMerchandiseInLiteDbService, MerchandiseInLiteDbService>();
 builder.Services.AddSingleton<IArticlesForWarehouseInLiteDbService, ArticlesForWarehouseInLiteDbService>();
 builder.Services.AddSingleton<IArticlesForSalesInLiteDbService, ArticlesForSalesInLiteDbService>();

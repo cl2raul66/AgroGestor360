@@ -57,7 +57,7 @@
             HorizontalOptions="Fill"
             IsVisible="{Binding HaveConnection}"
             VerticalOptions="Center">
-            <Grid RowDefinitions="auto,auto" RowSpacing="8">
+            <Grid RowDefinitions="auto,auto" RowSpacing="4">
                 <Label Text="Accesos rápidos:" />
                 <FlexLayout
                     Grid.Row="1"

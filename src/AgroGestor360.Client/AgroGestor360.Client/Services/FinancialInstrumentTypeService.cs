@@ -42,5 +42,4 @@ public class FinancialInstrumentTypeService : IFinancialInstrumentTypeService
             return string.Empty;
         }
     }
-
 }
