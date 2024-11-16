@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AgroGestor360App.Views.PgSignIn"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AgroGestor360App.ViewModels"
+    Title="SignIn"
+    x:DataType="vm:PgSignInViewModel"
+    Shell.NavBarIsVisible="False">
+
+    <Grid
+        Padding="8"
+        HorizontalOptions="Center"
+        RowDefinitions="auto,*,auto"
+        RowSpacing="16">
+        <Label
+            FontSize="18"
+            HorizontalOptions="Center"
+            Text="Iniciar sección"
+            TextTransform="Uppercase" />
+        <Frame Grid.Row="1" VerticalOptions="Center">
+            <VerticalStackLayout Spacing="16">
+                <HorizontalStackLayout Spacing="16">
+                    <Image
+                        IsVisible="{OnIdiom Phone='False',
+                                            Default='True'}"
+                        MaximumHeightRequest="270"
+                        Source="signin.png" />
+                    <VerticalStackLayout MinimumWidthRequest="300" Spacing="16">
+                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                            <Label Text="Usuario:" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Placeholder="Escriba aquí" />
+                        </Grid>
+                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                            <Label Text="Contraseña:" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                IsPassword="True"
+                                Placeholder="Escriba aquí" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+                <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <Label FontSize="14" VerticalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span
+                                    FontFamily="icofont"
+                                    Text="{StaticResource InfoCircle}"
+                                    TextColor="Red" />
+                                <Span Text=" ¡Usuario o contraseña no validos!" TextColor="Red" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <HorizontalStackLayout Grid.Column="1" Spacing="4">
+                        <Button
+                            Command="{Binding SigninCommand}"
+                            Text="Entrar"
+                            TextTransform="Uppercase" />
+                    </HorizontalStackLayout>
+                </Grid>
+            </VerticalStackLayout>
+        </Frame>
+        <Label
+            Grid.Row="3"
+            FontSize="12"
+            HorizontalOptions="Center"
+            Text="By RandA Media Lab, Group." />
+    </Grid>
+
+</ContentPage>

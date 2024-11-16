@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AgroGestor360App.Views.Settings.PgAddEditSeller"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:AgroGestor360App.ViewModels"
+    Title="AddEditSeller"
+    x:DataType="vm:PgAddEditSellerViewModel"
+    BackgroundColor="#99634833"
+    Shell.NavBarIsVisible="False"
+    Shell.PresentationMode="ModalAnimated">
+
+    <Frame
+        Margin="16"
+        HorizontalOptions="Center"
+        MaximumWidthRequest="480"
+        VerticalOptions="Center">
+        <Grid RowDefinitions="auto,*,auto" RowSpacing="16">
+            <Label
+                FontSize="18"
+                TextTransform="Uppercase"
+                VerticalOptions="Center">
+                <Label.Triggers>
+                    <DataTrigger
+                        Binding="{Binding CurrentSeller, Mode=OneWay, Converter={ctk:IsNullConverter}}"
+                        TargetType="Label"
+                        Value="true">
+                        <Setter Property="Text" Value="Agregar vendedor" />
+                    </DataTrigger>
+                    <DataTrigger
+                        Binding="{Binding CurrentSeller, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        TargetType="Label"
+                        Value="true">
+                        <Setter Property="Text" Value="Editar vendedor" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout Spacing="8">
+                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                        <Label Text="Fecha de nacimiento:" />
+                        <DatePicker
+                            Grid.Row="1"
+                            Date="{Binding Birthday}"
+                            Format="dd/MM/yyyy" />
+                    </Grid>
+                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                        <Label Text="Nombre completo: *" />
+                        <Entry
+                            Grid.Row="1"
+                            ClearButtonVisibility="WhileEditing"
+                            IsSpellCheckEnabled="True"
+                            IsTextPredictionEnabled="True"
+                            Placeholder="Escriba aquí"
+                            Text="{Binding Name}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                            <Label Text="NIT: *" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Keyboard="Plain"
+                                Placeholder="Escriba aquí"
+                                Text="{Binding NIT}" />
+                        </Grid>
+                        <Grid
+                            Grid.Column="1"
+                            RowDefinitions="auto,auto"
+                            RowSpacing="4">
+                            <Label Text="DPI: *" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Keyboard="Plain"
+                                Placeholder="Escriba aquí"
+                                Text="{Binding DPI}" />
+                        </Grid>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                            <Label Text="Teléfono principal: *" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Keyboard="Telephone"
+                                Placeholder="Escriba aquí"
+                                Text="{Binding Phone}" />
+                        </Grid>
+                        <Grid
+                            Grid.Column="1"
+                            RowDefinitions="auto,auto"
+                            RowSpacing="4">
+                            <Label Text="Correo electrónico principal:" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Keyboard="Email"
+                                Placeholder="Escriba aquí"
+                                Text="{Binding Email}" />
+                        </Grid>
+                    </Grid>
+                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                        <Label Text="Dirección de residencia:" />
+                        <Editor
+                            Grid.Row="1"
+                            HeightRequest="64"
+                            IsSpellCheckEnabled="True"
+                            IsTextPredictionEnabled="True"
+                            Placeholder="Escriba aquí"
+                            Text="{Binding Address}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </ScrollView>
+            <Grid
+                Grid.Row="2"
+                ColumnDefinitions="*,auto"
+                ColumnSpacing="8">
+                <Label
+                    FontSize="14"
+                    IsVisible="{Binding IsVisisbleInfo, Mode=OneWay}"
+                    VerticalOptions="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span
+                                FontFamily="icofont"
+                                Text="{StaticResource InfoCircle}"
+                                TextColor="Red" />
+                            <Span Text=" Rellene toda la información los requeridos (*)" TextColor="Red" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <HorizontalStackLayout Grid.Column="1" Spacing="4">
+                    <Button
+                        Command="{Binding AddCommand}"
+                        Text="Agregar"
+                        TextTransform="Uppercase">
+                        <Button.Triggers>
+                            <DataTrigger
+                                Binding="{Binding CurrentSeller, Mode=OneWay, Converter={ctk:IsNullConverter}}"
+                                TargetType="Button"
+                                Value="true">
+                                <Setter Property="Text" Value="Agregar" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding CurrentSeller, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                                TargetType="Button"
+                                Value="true">
+                                <Setter Property="Text" Value="Editar" />
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                    <Button
+                        Command="{Binding CancelCommand}"
+                        Text="Cancelar"
+                        TextTransform="Uppercase" />
+                </HorizontalStackLayout>
+            </Grid>
+        </Grid>
+    </Frame>
+
+</ContentPage>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AgroGestor360App.Views.Dialogs.PgAuthenticationDialog"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:AgroGestor360App.ViewModels"
+    Title="PgAuthenticationDialog"
+    x:DataType="vm:PgAuthenticationDialogViewModel"
+    BackgroundColor="#99634833"
+    Shell.NavBarIsVisible="False"
+    Shell.PresentationMode="ModalAnimated">
+
+    <Frame
+        Margin="16"
+        BackgroundColor="{StaticResource White}"
+        HorizontalOptions="Center"
+        MinimumWidthRequest="400"
+        VerticalOptions="Center">
+        <Grid RowDefinitions="auto,*,auto" RowSpacing="16">
+            <!--#region TITULO-->
+            <Label
+                Grid.ColumnSpan="3"
+                FontSize="18"
+                HorizontalOptions="Center"
+                Text="Autorización"
+                TextTransform="Uppercase"
+                VerticalOptions="Center" />
+            <!--#endregion-->
+            <!--#region CONTENIDO-->
+            <VerticalStackLayout Grid.Row="1" Spacing="16">
+                <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                    <Label Text="Contraseña: *" />
+                    <Entry
+                        Grid.Row="1"
+                        ClearButtonVisibility="WhileEditing"
+                        IsPassword="True"
+                        Keyboard="Plain"
+                        Placeholder="Escriba aquí"
+                        Text="{Binding Pwd}" />
+                </Grid>
+            </VerticalStackLayout>
+            <!--#endregion-->
+            <!--#region PIE-->
+            <Grid
+                Grid.Row="2"
+                ColumnDefinitions="*,auto"
+                ColumnSpacing="8">
+                <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                    <Button
+                        Command="{Binding SetAndCheckPasswordCommand}"
+                        Text="Confirmar"
+                        TextTransform="Uppercase" />
+                    <Button
+                        Command="{Binding CancelCommand}"
+                        Text="Cancelar"
+                        TextTransform="Uppercase" />
+                </HorizontalStackLayout>
+            </Grid>
+            <!--#endregion-->
+        </Grid>
+    </Frame>
+
+</ContentPage>

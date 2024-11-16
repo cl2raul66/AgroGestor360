@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AgroGestor360App.Views.Settings.PgAdminTimeLimit"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ctk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:AgroGestor360App.ViewModels"
+    Title="PgAdminTimeLimit"
+    x:DataType="vm:PgAdminTimeLimitViewModel"
+    BackgroundColor="#99634833"
+    Shell.NavBarIsVisible="False"
+    Shell.PresentationMode="ModalAnimated">
+
+    <Frame
+        Margin="16"
+        HorizontalOptions="Center"
+        MaximumWidthRequest="530"
+        VerticalOptions="Center">
+        <Grid RowDefinitions="auto,*,auto" RowSpacing="16">
+            <!--#region ENCABEZADO-->
+            <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                <Label
+                    FontSize="18"
+                    Text="Administrar tiempos limites para créditos"
+                    TextTransform="Uppercase"
+                    VerticalOptions="Center" />
+                <Button
+                    Grid.Column="1"
+                    Command="{Binding CancelCommand}"
+                    FontFamily="icofont"
+                    Text="{StaticResource UiClose}"
+                    ToolTipProperties.Text="Cerrar" />
+            </Grid>
+            <!--#endregion-->
+            <!--#region CONTENIDO-->
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout Spacing="12">
+                    <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                        <Label Text="Tiempos límites existentes (en días): " />
+                        <Label
+                            Grid.Row="1"
+                            FontAttributes="Bold"
+                            Text="{Binding TimesView}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                            <Label Text="Número de días máximos: *" />
+                            <Entry
+                                Grid.Row="1"
+                                ClearButtonVisibility="WhileEditing"
+                                HorizontalOptions="Start"
+                                HorizontalTextAlignment="End"
+                                IsSpellCheckEnabled="True"
+                                IsTextPredictionEnabled="True"
+                                Keyboard="Numeric"
+                                Placeholder="0"
+                                Text="{Binding NewTime}"
+                                WidthRequest="100" />
+                        </Grid>
+                        <HorizontalStackLayout
+                            Grid.Column="1"
+                            Spacing="8"
+                            VerticalOptions="End">
+                            <Button
+                                Command="{Binding AddCommand}"
+                                FontFamily="icofont"
+                                Text="{StaticResource UiAdd}"
+                                ToolTipProperties.Text="Agregar" />
+                            <Button
+                                FontFamily="icofont"
+                                Text="{StaticResource UiDelete}"
+                                ToolTipProperties.Text="Eliminar" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <Grid RowDefinitions="auto,auto" RowSpacing="4">
+                            <Label Text="Establecer tiempo de crédito predeterminado: " />
+                            <Picker
+                                Grid.Row="1"
+                                ItemDisplayBinding="{Binding TimeLimit, StringFormat='{0} días'}"
+                                ItemsSource="{Binding Times}"
+                                SelectedItem="{Binding SelectedTime, Mode=TwoWay}" />
+                        </Grid>
+                        <Button
+                            Grid.Column="1"
+                            Command="{Binding SetDefaultTimeLimitCommand}"
+                            FontFamily="icofont"
+                            Text="{StaticResource UiCheck}"
+                            ToolTipProperties.Text="Establecer como predeterminado"
+                            VerticalOptions="End" />
+                    </Grid>
+                </VerticalStackLayout>
+            </ScrollView>
+            <!--#endregion-->
+            <!--#region PIE-->
+            <Grid
+                Grid.Row="2"
+                ColumnDefinitions="*,auto"
+                ColumnSpacing="8">
+                <Label
+                    FontSize="14"
+                    IsVisible="{Binding TextInfo, Converter={ctk:IsStringNotNullOrEmptyConverter}}"
+                    VerticalOptions="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span
+                                FontFamily="icofont"
+                                Text="{StaticResource InfoCircle}"
+                                TextColor="Red" />
+                            <Span Text="{Binding TextInfo}" TextColor="Red" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+            </Grid>
+            <!--#endregion-->
+        </Grid>
+    </Frame>
+
+</ContentPage>
