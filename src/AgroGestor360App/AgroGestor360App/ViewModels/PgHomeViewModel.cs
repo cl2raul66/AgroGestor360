@@ -11,12 +11,21 @@ public partial class PgHomeViewModel : ObservableRecipient
     readonly IProductsForSalesService productsForSalesServ;
     readonly ISellersService sellersServ;
     readonly ICustomersService customersServ;
-    readonly string serverURL;
+    string? serverURL;
     readonly IApiService apiServ;
 
     public PgHomeViewModel(IApiService apiService, ISellersService sellersService, ICustomersService customersService, IProductsForSalesService productsForSalesService)
     {
-        serverURL = Preferences.Default.Get("serverurl", string.Empty);
+        //serverURL = Preferences.Default.Get("serverurl", string.Empty);
+        //if (string.IsNullOrEmpty(serverURL))
+        //{
+        //    var result = await apiServ.CheckUrl("http://localhost:5010");
+        //    if (result)
+        //    {
+        //        serverURL = "http://localhost:5010";
+        //        Preferences.Default.Set("serverurl", serverURL);
+        //    }
+        //}
         apiServ = apiService;
         apiServ.OnReceiveStatusMessage += ApiServ_OnReceiveStatusMessage;
         sellersServ = sellersService;
@@ -88,9 +97,26 @@ public partial class PgHomeViewModel : ObservableRecipient
 
     public async void Initialize()
     {
+        serverURL = Preferences.Default.Get("serverurl", string.Empty);
+
+        if (DeviceInfo.Platform == DevicePlatform.WinUI)
+        {
+            if (string.IsNullOrEmpty(serverURL))
+            {
+                var result = await apiServ.CheckUrl("http://localhost:5010");
+                if (result)
+                {
+                    serverURL = "http://localhost:5010";
+                    Preferences.Default.Set("serverurl", serverURL);
+                }
+
+            }
+        }
+
         ServerConnected = await apiServ.CheckUrl(serverURL);
         HaveConnection = await apiServ.ConnectToServerHub(serverURL);
     }
+
     #region EXTRA
     #endregion
 }

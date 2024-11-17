@@ -48,8 +48,6 @@
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
 		<AppInstallerUri>C:\INSTALADORES\AgroGestor360</AppInstallerUri>
 		<HoursBetweenUpdateChecks>168</HoursBetweenUpdateChecks>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 	
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
@@ -104,19 +102,19 @@
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
-		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.10" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.0" />
 		<!--<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.93" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.93" />-->
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.93" />
 		<PackageReference Include="QuestPDF" Version="2023.10.1" />
-		<PackageReference Include="Syncfusion.Maui.Inputs" Version="27.1.58" />
-		<PackageReference Include="Syncfusion.Maui.DataGrid" Version="27.1.58" />
-		<PackageReference Include="System.Text.Json" Version="8.0.5" />
+		<PackageReference Include="Syncfusion.Maui.Inputs" Version="27.2.2" />
+		<PackageReference Include="Syncfusion.Maui.DataGrid" Version="27.2.2" />
+		<PackageReference Include="System.Text.Json" Version="9.0.0" />
 		<PackageReference Include="UnitsNet" Version="5.60.0" />
 	</ItemGroup>
 
@@ -279,7 +277,7 @@
 
 	<ItemGroup>
 	  <Reference Include="AgroGestor360Client">
-	    <HintPath>..\..\AgroGestor360Client\AgroGestor360Client\bin\Release\net8.0-windows10.0.19041.0\AgroGestor360Client.dll</HintPath>
+	    <HintPath>..\..\AgroGestor360Client\AgroGestor360Client\bin\Debug\net8.0\AgroGestor360Client.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 

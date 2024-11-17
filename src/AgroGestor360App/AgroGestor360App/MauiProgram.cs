@@ -11,8 +11,8 @@ using AgroGestor360Client.Services;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
 using AgroGestor360App.Views.Dialogs;
+using System.Reflection;
 
 namespace AgroGestor360App;
 
@@ -21,6 +21,9 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
+
+        //builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
         builder
             .UseMauiApp<App>()
             .ConfigureSyncfusionCore()
