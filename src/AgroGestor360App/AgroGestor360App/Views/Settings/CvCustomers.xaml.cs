@@ -12,7 +12,7 @@ public partial class CvCustomers : ContentView
         BindingContext = vm;
     }
 
-    void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var collectionView = sender as CollectionView;
         if (collectionView is not null)

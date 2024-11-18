@@ -10,7 +10,7 @@
 
     <Grid RowDefinitions="auto,*" RowSpacing="8">
         <!--#region ENCABEZADO-->
-        <Frame Padding="8">
+        <Frame>
             <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
                 <Label
                     Grid.Column="1"
@@ -22,33 +22,33 @@
                     <Label
                         Text="Crédito:"
                         TextTransform="Uppercase"
-                        VerticalOptions="Center" />
+                        VerticalOptions="End" />
                     <Button
                         Command="{Binding ShowSetCreditCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource Check}"
                         ToolTipProperties.Text="Agregar o modificar crédito al cliente seleccionado" />
                     <Button
                         Command="{Binding ClearCreditCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource Close}"
                         ToolTipProperties.Text="Eliminar crédito al cliente seleccionado" />
                     <Label
                         Text="Descuentos:"
                         TextTransform="Uppercase"
-                        VerticalOptions="Center" />
+                        VerticalOptions="End" />
                     <Button
                         Command="{Binding SetDiscountCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource Check}"
                         ToolTipProperties.Text="Agregar o modificar descuento a cliente seleccionado" />
                     <Button
                         Command="{Binding UnSetDiscountCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource Close}"
                         ToolTipProperties.Text="Eliminar descuento a cliente seleccionado">
                         <!--<Button.IsEnabled>
@@ -70,19 +70,19 @@
                         WidthRequest="2" />
                     <Button
                         Command="{Binding ShowAddCustomerCommand}"
-                        FontFamily="icofont"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource Plus}"
                         ToolTipProperties.Text="Agregar" />
                     <Button
                         Command="{Binding ShowEditCustomerCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource Edit}"
                         ToolTipProperties.Text="Modificar" />
                     <Button
                         Command="{Binding ShowDeleteCustomerCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedCustomer, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource UiDelete}"
                         ToolTipProperties.Text="Eliminar" />
                 </HorizontalStackLayout>

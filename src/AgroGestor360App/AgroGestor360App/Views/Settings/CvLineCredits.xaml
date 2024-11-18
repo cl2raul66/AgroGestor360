@@ -10,7 +10,7 @@
 
     <Grid RowDefinitions="auto,*" RowSpacing="8">
         <!--#region ENCABEZADO-->
-        <Frame Padding="8">
+        <Frame>
             <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
                 <Label
                     Grid.Column="1"
@@ -21,7 +21,7 @@
                 <HorizontalStackLayout Grid.Column="2" Spacing="8">
                     <Button
                         Command="{Binding ShowAdminTimeLimitCommand}"
-                        FontFamily="icofont"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource UiClock}"
                         ToolTipProperties.Text="Administrar tiempos limites para creditos." />
                     <BoxView
@@ -30,13 +30,13 @@
                         WidthRequest="2" />
                     <Button
                         Command="{Binding ShowNewCreditCommand}"
-                        FontFamily="icofont"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource Plus}"
                         ToolTipProperties.Text="Agregar línea de crédito" />
                     <Button
                         Command="{Binding ShowDeletedCreditCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedCredit, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource UiDelete}"
                         ToolTipProperties.Text="Eliminar línea de crédito" />
                 </HorizontalStackLayout>

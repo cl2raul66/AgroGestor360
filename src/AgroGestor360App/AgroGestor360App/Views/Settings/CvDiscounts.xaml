@@ -10,7 +10,7 @@
 
     <Grid RowDefinitions="auto,*" RowSpacing="8">
         <!--#region ENCABEZADO-->
-        <Frame Padding="8">
+        <Frame>
             <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
                 <Label
                     Grid.Column="1"
@@ -21,13 +21,13 @@
                 <HorizontalStackLayout Grid.Column="2" Spacing="8">
                     <Button
                         Command="{Binding ShowNewDiscountForCustomerCommand}"
-                        FontFamily="icofont"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource Plus}"
                         ToolTipProperties.Text="Agregar" />
                     <Button
                         Command="{Binding ShowDeletedDiscountForCustomerCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedDiscount, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource UiDelete}"
                         ToolTipProperties.Text="Eliminar" />
                 </HorizontalStackLayout>

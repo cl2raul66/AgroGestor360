@@ -10,7 +10,7 @@
 
     <Grid RowDefinitions="auto,*" RowSpacing="8">
         <!--#region ENCABEZADO-->
-        <Frame Padding="8">
+        <Frame>
             <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
                 <Label
                     Grid.Column="1"
@@ -21,8 +21,8 @@
                 <HorizontalStackLayout Grid.Column="2" Spacing="8">
                     <Button
                         Command="{Binding SetMerchandiseEntryCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedWarehouse, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource Inbox}"
                         ToolTipProperties.Text="Entrada de mercancia seleccionada" />
                     <BoxView
@@ -31,19 +31,19 @@
                         WidthRequest="2" />
                     <Button
                         Command="{Binding ShowAddMerchandiseCommand}"
-                        FontFamily="icofont"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource Plus}"
                         ToolTipProperties.Text="Agregar nueva mercancia" />
                     <Button
                         Command="{Binding ShowEditMerchandiseCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedWarehouse, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource UiEdit}"
                         ToolTipProperties.Text="Editar mercancia" />
                     <Button
                         Command="{Binding DeleteMerchandiseCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedWarehouse, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource UiDelete}"
                         ToolTipProperties.Text="Eliminar" />
                 </HorizontalStackLayout>
@@ -82,8 +82,8 @@
                                         FontSize="Title"
                                         HorizontalOptions="Center"
                                         Text="{Binding Quantity, Mode=OneWay}"
-                                        TextColor="{StaticResource White}" 
-                                        ToolTipProperties.Text="Artículos existente"/>
+                                        TextColor="{StaticResource White}"
+                                        ToolTipProperties.Text="Artículos existente" />
                                     <Label
                                         HorizontalOptions="End"
                                         Text="{Binding Reserved, Mode=OneWay}"

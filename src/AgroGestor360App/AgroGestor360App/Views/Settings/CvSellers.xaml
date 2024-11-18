@@ -10,7 +10,7 @@
 
     <Grid RowDefinitions="auto,*" RowSpacing="8">
         <!--#region ENCABEZADO-->
-        <Frame Padding="8">
+        <Frame>
             <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
                 <Label
                     Grid.Column="1"
@@ -25,19 +25,19 @@
                     WidthRequest="2" />-->
                     <Button
                         Command="{Binding ShowAddSellerCommand}"
-                        FontFamily="icofont"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource Plus}"
                         ToolTipProperties.Text="Agregar" />
                     <Button
                         Command="{Binding ShowEditSellerCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedSeller, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource Edit}"
                         ToolTipProperties.Text="Modificar" />
                     <Button
                         Command="{Binding ShowDeleteSellerCommand}"
-                        FontFamily="icofont"
                         IsEnabled="{Binding SelectedSeller, Mode=OneWay, Converter={ctk:IsNotNullConverter}}"
+                        Style="{StaticResource ButtonIcon}"
                         Text="{StaticResource UiDelete}"
                         ToolTipProperties.Text="Eliminar" />
                 </HorizontalStackLayout>

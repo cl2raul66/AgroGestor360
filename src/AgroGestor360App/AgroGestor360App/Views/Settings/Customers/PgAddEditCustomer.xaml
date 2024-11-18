@@ -155,14 +155,14 @@
                                         <MultiBinding>
                                             <MultiBinding.StringFormat>{0} - {1}%</MultiBinding.StringFormat>
                                             <Binding Path="Name" />
-                                            <Binding Path="Value" />
+                                            <Binding Path="Discount" />
                                         </MultiBinding>
                                     </Picker.ItemDisplayBinding>
                                 </Picker>
                             </Grid>
                         </ctk:Expander.Content>
                     </ctk:Expander>
-                    <ctk:Expander x:Name="expander1" IsVisible="{Binding CurrentCustomer, Mode=OneWay, Converter={ctk:IsNullConverter}}">
+                    <!--<ctk:Expander x:Name="expander1" IsVisible="{Binding CurrentCustomer, Mode=OneWay, Converter={ctk:IsNullConverter}}">
                         <ctk:Expander.Header>
                             <StackLayout Orientation="Horizontal">
                                 <CheckBox IsChecked="{Binding IsExpanded, Source={x:Reference expander1}, Mode=TwoWay}" />
@@ -178,16 +178,21 @@
                                     SelectedItem="{Binding SelectedCredit}">
                                     <Picker.ItemDisplayBinding>
                                         <MultiBinding>
-                                            <MultiBinding.StringFormat>Crédito {0} de {1} por {2} días</MultiBinding.StringFormat>
+                                            <MultiBinding.StringFormat>Crédito {0} de {1:C}</MultiBinding.StringFormat>
+                                            -->
+                    <!--<MultiBinding.StringFormat>Crédito {0} de {1} por {2} días</MultiBinding.StringFormat>-->
+                    <!--
                                             <Binding Path="Name" />
                                             <Binding Path="Amount" />
-                                            <Binding Path="TimeLimit" />
+                                            -->
+                    <!--<Binding Path="TimeLimit" />-->
+                    <!--
                                         </MultiBinding>
                                     </Picker.ItemDisplayBinding>
                                 </Picker>
                             </Grid>
                         </ctk:Expander.Content>
-                    </ctk:Expander>
+                    </ctk:Expander>-->
                 </VerticalStackLayout>
             </ScrollView>
             <!--#endregion-->

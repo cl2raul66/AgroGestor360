@@ -137,6 +137,7 @@ public partial class CvCustomersViewModel : ObservableRecipient
         base.OnActivated();
         WeakReferenceMessenger.Default.Register<CvCustomersViewModel, DTO5_2, string>(this, "newCustomer", async (r, m) =>
         {
+            IsActive = false;
             string result = await customersServ.InsertAsync(serverURL, m);
             if (!string.IsNullOrEmpty(result))
             {
@@ -144,11 +145,11 @@ public partial class CvCustomersViewModel : ObservableRecipient
                 r.Customers.Insert(0, new() { CustomerId = result, CustomerName = m.CustomerFullName, Discount = m.Discount });
             }
             r.SelectedCustomer = null;
-            IsActive = false;
         });
 
         WeakReferenceMessenger.Default.Register<CvCustomersViewModel, DTO5_3, string>(this, "editCustomer", async (r, m) =>
         {
+            IsActive = false;
             bool result = await customersServ.UpdateAsync(serverURL, m);
             if (result)
             {
@@ -157,11 +158,11 @@ public partial class CvCustomersViewModel : ObservableRecipient
             }
 
             r.SelectedCustomer = null;
-            IsActive = false;
         });
 
         WeakReferenceMessenger.Default.Register<CvCustomersViewModel, LineCredit, string>(this, "setcreditforcustomer", async (r, m) =>
         {
+            IsActive = false;
             DTO5_5 dTO = new() { CustomerId = SelectedCustomer!.CustomerId, Credit = m };
             bool result = await customersServ.UpdateCreditAsync(serverURL, dTO);
             if (result)
@@ -173,15 +174,14 @@ public partial class CvCustomersViewModel : ObservableRecipient
             }
 
             r.SelectedCustomer = null;
-            IsActive = false;
         });
 
         WeakReferenceMessenger.Default.Register<CvCustomersViewModel, string, string>(this, "16030c9d-7d3f-11eb-9631-0242ac130002", (r, m) =>
         {
+                IsActive = false;
             if (m == "cancel")
             {
                 r.SelectedCustomer = null;
-                IsActive = false;
             }
         });
 
@@ -203,11 +203,6 @@ public partial class CvCustomersViewModel : ObservableRecipient
             }
             r.SelectedCustomer = null;
         });
-    }
-
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
-    {
-        base.OnPropertyChanged(e);
     }
 
     #region EXTRA
